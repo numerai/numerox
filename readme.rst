@@ -224,7 +224,7 @@ This is what you need to run numerox:
 - requests
 - nose
 
-Install with pipi (not yet working)::
+Install with pipi::
 
     $ sudo pip install numerox
 
