@@ -57,6 +57,16 @@ def micro_data(index=None, nfeatures=3):
     return data
 
 
+def micro_prediction(index=None):
+    d = micro_data(index)
+    n = len(d)
+    rs = np.random.RandomState(0)
+    yhat = 0.2 * (rs.rand(n) - 0.5) + 0.5
+    prediction = nx.Prediction()
+    prediction.append(d.ids, yhat)
+    return prediction
+
+
 def load_play_data():
     "About 1% of a regular Numerai dataset, so contains around 60 rows per era"
     return nx.load_data(TEST_DATA)

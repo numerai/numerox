@@ -1,8 +1,9 @@
 import numpy as np
-from nose.tools import ok_
+from nose.tools import ok_, assert_raises
 
 from numerox import Prediction
-from numerox.testing import load_play_data, shares_memory
+from numerox.testing import (load_play_data, shares_memory, micro_prediction,
+                             micro_data)
 
 
 def test_prediction_copies():
@@ -31,3 +32,29 @@ def test_data_properties():
     idx = ~np.isnan(p.df.yhat)
     ok_((p.yhat[idx] == p.df.yhat[idx]).all(), "yhat is corrupted")
     ok_((p.yhat[idx] == d.df.y[idx]).all(), "yhat is corrupted")
+
+
+def test_prediction_add():
+    "add two predictions together"
+
+    d = micro_data()
+    p1 = Prediction()
+    p2 = Prediction()
+    d1 = d['train']
+    d2 = d['tournament']
+    rs = np.random.RandomState(0)
+    yhat1 = 0.2 * (rs.rand(len(d1)) - 0.5) + 0.5
+    yhat2 = 0.2 * (rs.rand(len(d2)) - 0.5) + 0.5
+    p1.append(d1.ids, yhat1)
+    p2.append(d2.ids, yhat2)
+
+    p = p1 + p2  # just make sure that it runs
+
+    assert_raises(IndexError, p.__add__, p1)
+    assert_raises(IndexError, p1.__add__, p1)
+
+
+def test_prediction_repr():
+    "make sure prediction.__repr__() runs"
+    p = micro_prediction()
+    p.__repr__()
