@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 
-from sklearn.metrics import log_loss, roc_auc_score, accuracy_score
+from numerox.metrics import calc_metrics
 
 HDF_PREDICTION_KEY = 'numerox_prediction'
 
@@ -54,7 +54,8 @@ class Prediction(object):
             self.df.to_hdf(path_or_buf, HDF_PREDICTION_KEY)
 
     def performance(self, data):
-        metrics = calc_metrics(data, self)
+        metrics = calc_metrics(data, self.df)
+        metrics = metrics['yhat']
         for region in metrics:
             metric = metrics[region]
             if metric is None:
@@ -137,64 +138,16 @@ def concat_prediction(predictions):
     return Prediction(df)
 
 
-def calc_metrics(data, prediction):
-
-    # merge prediction with data (remove features x)
-    yhat_df = prediction.df.dropna()
-    data = data.region_isin(['train', 'validation'])  # speed optimzation
-    data_df = data.df[['era', 'region', 'y']]  # speed optimzation
-    df = pd.merge(data_df, yhat_df, left_index=True, right_index=True,
-                  how='right')
-
-    metrics = {'train': None, 'validation': None}
-    for region in metrics:
-
-        # pull out region
-        idx = df.region.isin([region])
-        df_region = df[idx]
-        if len(df_region) == 0:
-            continue
-
-        # calc metrics for each era
-        unique_eras = df_region.era.unique()
-        ys = df_region[['y', 'yhat']]
-        metric = []
-        for era in unique_eras:
-            idx = df_region.era.isin([era])
-            ys_era = ys[idx]
-            y = ys_era['y'].values
-            yhat = ys_era['yhat'].values
-            m = _calc_metrics_1era(y, yhat)
-            metric.append(m)
-        metric = np.array(metric)
-
-        # jam into a dataframe
-        columns = ['logloss', 'auc', 'acc', 'ystd']
-        metric = pd.DataFrame(metric, columns=columns, index=unique_eras)
-
-        metrics[region] = metric
-
-    return metrics
-
-
-def _calc_metrics_1era(y, yhat):
-    "standard metrics for `yhat` given actual outcome `y`"
-    m = []
-    m.append(log_loss(y, yhat))
-    m.append(roc_auc_score(y, yhat))
-    yh = np.zeros(yhat.size)
-    yh[yhat >= 0.5] = 1
-    m.append(accuracy_score(y, yh))
-    m.append(yhat.std())
-    return m
-
-
 if __name__ == '__main__':
     import numerox as nx
     data = nx.load_data('/data/nx/numerai_dataset_20171024.hdf')
+    p = nx.load_prediction('/data/nx/pred/extratrees_nfeature2.pred')
+    p.performance(data)
+    """
     model = nx.model.logistic()
     prediction1 = nx.backtest(model, data, verbosity=1)
     prediction2 = nx.production(model, data)
+    """
     """
     prediction = prediction1 + prediction2
     print prediction
