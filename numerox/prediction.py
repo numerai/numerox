@@ -56,22 +56,20 @@ class Prediction(object):
     def performance(self, data):
         metrics = calc_metrics(data, self.df)
         metrics = metrics['yhat']
-        for region in metrics:
-            metric = metrics[region]
-            if metric is None:
-                continue
-            print("      logloss   auc     acc     ystd")
-            fmt = "{:<4}  {:.6f}  {:.4f}  {:.4f}  {:.4f}{extra}"
-            extra = "  |  {:<7}  {:<}".format('region', region)
-            print(fmt.format('mean', *metric.mean(axis=0), extra=extra))
-            extra = "  |  {:<7}  {:<}".format('eras', metric.shape[0])
-            print(fmt.format('std', *metric.std(axis=0), extra=extra))
-            consistency = (metric['logloss'] < np.log(2)).mean()
-            extra = "  |  {:<7}  {:<.4f}".format('consis', consistency)
-            print(fmt.format('min', *metric.min(axis=0), extra=extra))
-            prctile = np.percentile(metric['logloss'], 75)
-            extra = "  |  {:<7}  {:<.4f}".format('75th', prctile)
-            print(fmt.format('max', *metric.max(axis=0), extra=extra))
+        regions = data.unique_region().tolist()
+        regions = ', '.join(regions)
+        print("      logloss   auc     acc     ystd")
+        fmt = "{:<4}  {:.6f}  {:.4f}  {:.4f}  {:.4f}{extra}"
+        extra = "  |  {:<7}  {:<}".format('region', regions)
+        print(fmt.format('mean', *metrics.mean(axis=0), extra=extra))
+        extra = "  |  {:<7}  {:<}".format('eras', metrics.shape[0])
+        print(fmt.format('std', *metrics.std(axis=0), extra=extra))
+        consistency = (metrics['logloss'] < np.log(2)).mean()
+        extra = "  |  {:<7}  {:<.4f}".format('consis', consistency)
+        print(fmt.format('min', *metrics.min(axis=0), extra=extra))
+        prctile = np.percentile(metrics['logloss'], 75)
+        extra = "  |  {:<7}  {:<.4f}".format('75th', prctile)
+        print(fmt.format('max', *metrics.max(axis=0), extra=extra))
 
     def copy(self):
         "Copy of prediction"
@@ -142,7 +140,7 @@ if __name__ == '__main__':
     import numerox as nx
     data = nx.load_data('/data/nx/numerai_dataset_20171024.hdf')
     p = nx.load_prediction('/data/nx/pred/extratrees_nfeature2.pred')
-    p.performance(data)
+    p.performance(data['train'])
     """
     model = nx.model.logistic()
     prediction1 = nx.backtest(model, data, verbosity=1)

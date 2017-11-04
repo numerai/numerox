@@ -23,12 +23,14 @@ class Report(object):
         df = pd.concat(dfs, axis=1, verify_integrity=True, copy=False)
         return Report(df)
 
-    def performance(self, data, region, sort_by='logloss'):
+    def performance(self, data, sort_by='logloss'):
         metrics = calc_metrics(data, self.df)
-        print("logloss   auc     acc     ystd    consis  (%s)" % region)
+        regions = data.unique_region().tolist()
+        regions = ', '.join(regions)
+        print("logloss   auc     acc     ystd    consis  (%s)" % regions)
         fmt = "{:.6f}  {:.4f}  {:.4f}  {:.4f}  {:.4f}  {model:<}"
         for model in metrics:
-            metric_df = metrics[model][region]
+            metric_df = metrics[model]
             metric = metric_df.mean(axis=0)
             metric['consis'] = (metric_df['logloss'] < np.log(2)).mean()
             print(fmt.format(*metric, model=model))
@@ -54,4 +56,4 @@ if __name__ == '__main__':
     import numerox as nx
     data = nx.load_data('/data/nx/numerai_dataset_20171024.hdf')
     report = nx.report.load_report('/data/nx/pred')
-    report.performance(data, 'train')
+    report.performance(data['train'])
