@@ -64,7 +64,18 @@ go ahead and save the result::
 
 Once you have run and saved several predictions, you can make a report::
 
-    >>> TODO
+    >> report = nx.report.load_report('/round92', extension='pred')
+    >> report.performance(data, 'train')
+    logloss   auc     acc     ystd    consis  (train)
+    0.692629  0.5240  0.5164  0.0074  0.7294  extratrees_nfeature5
+    0.692565  0.5236  0.5162  0.0086  0.7294  extratrees_nfeature7
+    0.692831  0.5238  0.5163  0.0042  0.7647  extratrees_nfeature2
+    0.692747  0.5232  0.5162  0.0055  0.7647  extratrees_nfeature3
+    0.692487  0.5224  0.5159  0.0121  0.7294  logistic_1e-04
+    0.692974  0.5226  0.5159  0.0023  0.7647  logistic_1e-05
+    0.692581  0.5206  0.5143  0.0253  0.6000  logistic_1e-02
+    0.692455  0.5215  0.5149  0.0219  0.6824  logistic_1e-03
+    0.692704  0.5200  0.5140  0.0273  0.5412  logistic_1e-01
 
 Both the ``production`` and ``backtest`` functions are just very thin wrappers
 around the ``run`` function::

@@ -2,8 +2,10 @@ import os
 import glob
 
 import pandas as pd
+import numpy as np
 
 from numerox.prediction import load_prediction
+from numerox.metrics import calc_metrics
 
 
 class Report(object):
@@ -12,22 +14,27 @@ class Report(object):
         self.df = df
 
     @staticmethod
-    def from_data_predictions(data, prediction_dict):
+    def from_data_predictions(prediction_dict):
         dfs = []
         for model in prediction_dict:
             df = prediction_dict[model].df
             df.rename(columns={'yhat': model}, inplace=True)
             dfs.append(df)
         df = pd.concat(dfs, axis=1, verify_integrity=True, copy=False)
-        ery = data.df[['era', 'region', 'y']]
-        df = pd.merge(ery, df, left_index=True, right_index=True, how='right')
         return Report(df)
 
-    def performance(self):
-        pass
+    def performance(self, data, region, sort_by='logloss'):
+        metrics = calc_metrics(data, self.df)
+        print("logloss   auc     acc     ystd    consis  (%s)" % region)
+        fmt = "{:.6f}  {:.4f}  {:.4f}  {:.4f}  {:.4f}  {model:<}"
+        for model in metrics:
+            metric_df = metrics[model][region]
+            metric = metric_df.mean(axis=0)
+            metric['consis'] = (metric_df['logloss'] < np.log(2)).mean()
+            print(fmt.format(*metric, model=model))
 
 
-def load_report(data, prediction_dir, extension='pred'):
+def load_report(prediction_dir, extension='pred'):
     "Load Prediction objects (hdf) in `prediction_dir`; return Report object"
     original_dir = os.getcwd()
     os.chdir(prediction_dir)
@@ -39,5 +46,12 @@ def load_report(data, prediction_dir, extension='pred'):
             predictions[model] = prediction
     finally:
         os.chdir(original_dir)
-    report = Report.from_data_predictions(data, predictions)
+    report = Report.from_data_predictions(predictions)
     return report
+
+
+if __name__ == '__main__':
+    import numerox as nx
+    data = nx.load_data('/data/nx/numerai_dataset_20171024.hdf')
+    report = nx.report.load_report('/data/nx/pred')
+    report.performance(data, 'train')
