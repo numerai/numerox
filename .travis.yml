@@ -14,19 +14,22 @@ matrix:
 
         # python 2.7; install from sdist
         - os: linux
-          env: PYTHON_VERSION="2.7"
+          env: TEST_DEPS="numpy pandas pytables scikit-learn nose"
+               PYTHON_VERSION="2.7"
                PYTHON_ARCH="64"
                TEST_RUN="sdist"
 
         # python 3.5; install from sdist
         - os: linux
-          env: PYTHON_VERSION="3.5"
+          env: TEST_DEPS="numpy pandas pytables scikit-learn nose"
+               PYTHON_VERSION="3.5"
                PYTHON_ARCH="64"
                TEST_RUN="sdist"
 
         # python 3.6
         - os: linux
-          env: PYTHON_VERSION="3.6"
+          env: TEST_DEPS="numpy pandas pytables scikit-learn nose"
+               PYTHON_VERSION="3.6"
                PYTHON_ARCH="64"
 
 before_install:
