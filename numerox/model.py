@@ -31,7 +31,7 @@ class Model(object):
         model = self.__class__.__name__
         msg += model + "("
         if hasattr(self, "p"):
-            for name, value in self.p.iteritems():
+            for name, value in self.p.items():
                 msg += name + "=" + str(value) + ", "
             msg = msg[:-2]
             msg += ")"
