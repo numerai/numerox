@@ -243,7 +243,7 @@ Resources
 
 Questions, comments, suggestions, bugs:
 
-- https://community.numer.ai
+- https://community.numer.ai/channel/numerox
 - https://github.com/kwgoodman/numerox/issues
 
 License
