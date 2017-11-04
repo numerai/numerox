@@ -141,9 +141,10 @@ def calc_metrics(data, prediction):
 
     # merge prediction with data (remove features x)
     yhat_df = prediction.df.dropna()
-    data_df = data.df[['era', 'region', 'y']]
+    data = data.region_isin(['train', 'validation'])  # speed optimzation
+    data_df = data.df[['era', 'region', 'y']]  # speed optimzation
     df = pd.merge(data_df, yhat_df, left_index=True, right_index=True,
-                  how='inner')
+                  how='right')
 
     metrics = {'train': None, 'validation': None}
     for region in metrics:
@@ -155,19 +156,21 @@ def calc_metrics(data, prediction):
             continue
 
         # calc metrics for each era
-        eras = df_region.era.unique()
+        unique_eras = df_region.era.unique()
+        ys = df_region[['y', 'yhat']]
         metric = []
-        for era in eras:
+        for era in unique_eras:
             idx = df_region.era.isin([era])
-            df_era = df_region[idx]
-            arr = df_era[['y', 'yhat']].values
-            m = _calc_metrics_1era(arr[:, 0], arr[:, 1])
+            ys_era = ys[idx]
+            y = ys_era['y'].values
+            yhat = ys_era['yhat'].values
+            m = _calc_metrics_1era(y, yhat)
             metric.append(m)
         metric = np.array(metric)
 
         # jam into a dataframe
         columns = ['logloss', 'auc', 'acc', 'ystd']
-        metric = pd.DataFrame(metric, columns=columns, index=eras)
+        metric = pd.DataFrame(metric, columns=columns, index=unique_eras)
 
         metrics[region] = metric
 
