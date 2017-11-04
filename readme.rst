@@ -244,7 +244,7 @@ Resources
 Questions, comments, suggestions, bugs:
 
 - https://community.numer.ai
-- https://github.com/kwgoodman/numerox/issues.
+- https://github.com/kwgoodman/numerox/issues
 
 License
 =======

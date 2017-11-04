@@ -54,31 +54,23 @@ class Prediction(object):
             self.df.to_hdf(path_or_buf, HDF_PREDICTION_KEY)
 
     def performance(self, data):
-
-        # merge prediction with data (remove features x)
-        yhat_df = self.df.dropna()
-        data_df = data.df[['era', 'region', 'y']]
-        df = pd.merge(data_df, yhat_df, left_index=True, right_index=True,
-                      how='inner')
-
-        # separate performance for each region
-        regions = ['train', 'validation']
-        for region in regions:
-            metrics = _calc_metrics(df, region, 'yhat')
-            if metrics is None:
+        metrics = calc_metrics(data, self)
+        for region in metrics:
+            metric = metrics[region]
+            if metric is None:
                 continue
             print("      logloss   auc     acc     ystd")
             fmt = "{:<4}  {:.6f}  {:.4f}  {:.4f}  {:.4f}{extra}"
             extra = "  |  {:<7}  {:<}".format('region', region)
-            print(fmt.format('mean', *metrics.mean(axis=0), extra=extra))
-            extra = "  |  {:<7}  {:<}".format('eras', metrics.shape[0])
-            print(fmt.format('std', *metrics.std(axis=0), extra=extra))
-            consistency = (metrics['logloss'] < np.log(2)).mean()
+            print(fmt.format('mean', *metric.mean(axis=0), extra=extra))
+            extra = "  |  {:<7}  {:<}".format('eras', metric.shape[0])
+            print(fmt.format('std', *metric.std(axis=0), extra=extra))
+            consistency = (metric['logloss'] < np.log(2)).mean()
             extra = "  |  {:<7}  {:<.4f}".format('consis', consistency)
-            print(fmt.format('min', *metrics.min(axis=0), extra=extra))
-            prctile = np.percentile(metrics['logloss'], 75)
+            print(fmt.format('min', *metric.min(axis=0), extra=extra))
+            prctile = np.percentile(metric['logloss'], 75)
             extra = "  |  {:<7}  {:<.4f}".format('75th', prctile)
-            print(fmt.format('max', *metrics.max(axis=0), extra=extra))
+            print(fmt.format('max', *metric.max(axis=0), extra=extra))
 
     def copy(self):
         "Copy of prediction"
@@ -145,29 +137,39 @@ def concat_prediction(predictions):
     return Prediction(df)
 
 
-def _calc_metrics(df, region, column_name):
-    "`df` must contain at least era, region, y and `column_name`"
+def calc_metrics(data, prediction):
 
-    # pull out region
-    idx = df.region.isin([region])
-    df_region = df[idx]
-    if len(df_region) == 0:
-        return None
+    # merge prediction with data (remove features x)
+    yhat_df = prediction.df.dropna()
+    data_df = data.df[['era', 'region', 'y']]
+    df = pd.merge(data_df, yhat_df, left_index=True, right_index=True,
+                  how='inner')
 
-    # calc metrics for each era
-    eras = df_region.era.unique()
-    metrics = []
-    for era in eras:
-        idx = df_region.era.isin([era])
-        df_era = df_region[idx]
-        arr = df_era[['y', column_name]].values
-        m = _calc_metrics_1era(arr[:, 0], arr[:, 1])
-        metrics.append(m)
-    metrics = np.array(metrics)
+    metrics = {'train': None, 'validation': None}
+    for region in metrics:
 
-    # jam into a dataframe
-    columns = ['logloss', 'auc', 'acc', 'ystd']
-    metrics = pd.DataFrame(metrics, columns=columns, index=eras)
+        # pull out region
+        idx = df.region.isin([region])
+        df_region = df[idx]
+        if len(df_region) == 0:
+            continue
+
+        # calc metrics for each era
+        eras = df_region.era.unique()
+        metric = []
+        for era in eras:
+            idx = df_region.era.isin([era])
+            df_era = df_region[idx]
+            arr = df_era[['y', 'yhat']].values
+            m = _calc_metrics_1era(arr[:, 0], arr[:, 1])
+            metric.append(m)
+        metric = np.array(metric)
+
+        # jam into a dataframe
+        columns = ['logloss', 'auc', 'acc', 'ystd']
+        metric = pd.DataFrame(metric, columns=columns, index=eras)
+
+        metrics[region] = metric
 
     return metrics
 
@@ -185,7 +187,6 @@ def _calc_metrics_1era(y, yhat):
 
 
 if __name__ == '__main__':
-    # test prediction.performance()
     import numerox as nx
     data = nx.load_data('/data/nx/numerai_dataset_20171024.hdf')
     model = nx.model.logistic()
