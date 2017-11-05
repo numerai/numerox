@@ -28,7 +28,7 @@ class Report(object):
         df = df.round(decimals={'logloss': 6, 'auc': 4, 'acc': 4, 'ystd': 4,
                                 'consis': 4})
         with pd.option_context('display.colheader_justify', 'left'):
-            print df.to_string(index=False)
+            print(df.to_string(index=False))
 
     def performance_df(self, data):
 
