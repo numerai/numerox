@@ -3,13 +3,23 @@ import numpy as np
 from sklearn.metrics import log_loss, roc_auc_score, accuracy_score
 
 
-def calc_metrics(data, df):
+def calc_metrics(data, pred_or_report, join='data'):
 
-    # merge prediction with data (remove features x)
+    df = pred_or_report.df
+
+    # merge prediction or report with data (remove features x)
+    if join == 'data':
+        how = 'left'
+    elif join == 'yhat':
+        how = 'right'
+    elif join == 'inner':
+        how = 'inner'
+    else:
+        raise ValueError("`join` method not recognized")
     yhats_df = df.dropna()
     data_df = data.df[['era', 'region', 'y']]
     df = pd.merge(data_df, yhats_df, left_index=True, right_index=True,
-                  how='left')
+                  how=how)
 
     models = yhats_df.columns.values
     metrics = {}
@@ -24,7 +34,7 @@ def calc_metrics(data, df):
         y = df_era['y'].values
         for model in models:
             yhat = df_era[model].values
-            m = _calc_metrics_1era(y, yhat)
+            m = calc_metrics_arrays(y, yhat)
             metrics[model].append(m)
 
     columns = ['logloss', 'auc', 'acc', 'ystd']
@@ -35,7 +45,7 @@ def calc_metrics(data, df):
     return metrics
 
 
-def _calc_metrics_1era(y, yhat):
+def calc_metrics_arrays(y, yhat):
     "standard metrics for `yhat` array given actual outcome `y` array"
 
     metrics = []

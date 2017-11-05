@@ -24,7 +24,7 @@ class Report(object):
         return Report(df)
 
     def performance(self, data, sort_by='logloss'):
-        metrics = calc_metrics(data, self.df)
+        metrics = calc_metrics(data, self)
         regions = data.unique_region().tolist()
         nera = metrics[metrics.keys()[0]].shape[0]
         regera = ', '.join(regions) + '; %d' % nera + ' eras'

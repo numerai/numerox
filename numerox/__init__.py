@@ -28,6 +28,7 @@ from numerox.run import backtest
 # misc
 from numerox.web import download_dataset
 from numerox.data import concat
+from numerox.metrics import calc_metrics
 from numerox.version import __version__
 
 try:

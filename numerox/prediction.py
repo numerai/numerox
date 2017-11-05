@@ -54,7 +54,7 @@ class Prediction(object):
             self.df.to_hdf(path_or_buf, HDF_PREDICTION_KEY)
 
     def performance(self, data):
-        metrics = calc_metrics(data, self.df)
+        metrics = calc_metrics(data, self)
         metrics = metrics['yhat']
         regions = data.unique_region().tolist()
         regions = ', '.join(regions)
