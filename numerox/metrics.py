@@ -3,7 +3,7 @@ import numpy as np
 from sklearn.metrics import log_loss, roc_auc_score, accuracy_score
 
 
-def calc_metrics(data, pred_or_report, join='data'):
+def metrics_per_era(data, pred_or_report, join='data'):
 
     df = pred_or_report.df
 

@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 
-from numerox.metrics import calc_metrics
+from numerox.metrics import metrics_per_era
 
 HDF_PREDICTION_KEY = 'numerox_prediction'
 
@@ -54,7 +54,7 @@ class Prediction(object):
             self.df.to_hdf(path_or_buf, HDF_PREDICTION_KEY)
 
     def performance(self, data):
-        metrics = calc_metrics(data, self)
+        metrics = metrics_per_era(data, self)
         metrics = metrics['yhat']
         regions = data.unique_region().tolist()
         regions = ', '.join(regions)

@@ -5,7 +5,7 @@ import pandas as pd
 import numpy as np
 
 from numerox.prediction import load_prediction
-from numerox.metrics import calc_metrics
+from numerox.metrics import metrics_per_era
 
 
 class Report(object):
@@ -33,7 +33,7 @@ class Report(object):
     def performance_df(self, data):
 
         # calc performance
-        metrics = calc_metrics(data, self)
+        metrics = metrics_per_era(data, self)
         regions = data.unique_region().tolist()
         nera = metrics[metrics.keys()[0]].shape[0]
         regera = ', '.join(regions) + '; %d' % nera + ' eras'
