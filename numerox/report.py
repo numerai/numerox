@@ -23,18 +23,32 @@ class Report(object):
         df = pd.concat(dfs, axis=1, verify_integrity=True, copy=False)
         return Report(df)
 
-    def performance(self, data, sort_by='logloss'):
+    def performance(self, data):
+        df = self.performance_df(data)
+        df = df.round(decimals={'logloss': 6, 'auc': 4, 'acc': 4, 'ystd': 4,
+                                'consis': 4})
+        with pd.option_context('display.colheader_justify', 'left'):
+            print df.to_string(index=False)
+
+    def performance_df(self, data):
+
+        # calc performance
         metrics = calc_metrics(data, self)
         regions = data.unique_region().tolist()
         nera = metrics[metrics.keys()[0]].shape[0]
         regera = ', '.join(regions) + '; %d' % nera + ' eras'
-        print("logloss   auc     acc     ystd    consis  (%s)" % regera)
-        fmt = "{:.6f}  {:.4f}  {:.4f}  {:.4f}  {:.4f}  {model:<}"
-        for model in metrics:
+
+        # create dataframe of performance
+        cols = ['logloss', 'auc', 'acc', 'ystd', 'consis', '(%s)' % regera]
+        df = pd.DataFrame(columns=cols)
+        for i, model in enumerate(metrics):
             metric_df = metrics[model]
-            metric = metric_df.mean(axis=0)
-            metric['consis'] = (metric_df['logloss'] < np.log(2)).mean()
-            print(fmt.format(*metric, model=model))
+            metric = metric_df.mean(axis=0).tolist()
+            consis = (metric_df['logloss'] < np.log(2)).mean()
+            metric.extend([consis, model])
+            df.loc[i] = metric
+
+        return df
 
 
 def load_report(prediction_dir, extension='pred'):
