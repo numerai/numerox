@@ -13,8 +13,14 @@ class Report(object):
     def __init__(self, df=None):
         self.df = df
 
-    @staticmethod
-    def from_data_predictions(prediction_dict):
+    def append_prediction(self, prediction, model_name):
+        df = prediction.df
+        df.rename(columns={'yhat': model_name}, inplace=True)
+        dfs = [self.df, df]
+        df = pd.concat(dfs, axis=1, verify_integrity=True, copy=False)
+        return Report(df)
+
+    def append_prediction_dict(self, prediction_dict):
         dfs = []
         for model in prediction_dict:
             df = prediction_dict[model].df
@@ -64,7 +70,8 @@ def load_report(prediction_dir, extension='pred'):
             predictions[model] = prediction
     finally:
         os.chdir(original_dir)
-    report = Report.from_data_predictions(predictions)
+    report = Report()
+    report = report.append_prediction_dict(predictions)
     return report
 
 
