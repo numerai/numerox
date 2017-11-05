@@ -26,8 +26,9 @@ class Report(object):
     def performance(self, data, sort_by='logloss'):
         metrics = calc_metrics(data, self.df)
         regions = data.unique_region().tolist()
-        regions = ', '.join(regions)
-        print("logloss   auc     acc     ystd    consis  (%s)" % regions)
+        nera = metrics[metrics.keys()[0]].shape[0]
+        regera = ', '.join(regions) + '; %d' % nera + ' eras'
+        print("logloss   auc     acc     ystd    consis  (%s)" % regera)
         fmt = "{:.6f}  {:.4f}  {:.4f}  {:.4f}  {:.4f}  {model:<}"
         for model in metrics:
             metric_df = metrics[model]

@@ -59,7 +59,7 @@ class Prediction(object):
         regions = data.unique_region().tolist()
         regions = ', '.join(regions)
         print("      logloss   auc     acc     ystd")
-        fmt = "{:<4}  {:.6f}  {:.4f}  {:.4f}  {:.4f}{extra}"
+        fmt = "{:<4}  {:8.6f}  {:6.4f}  {:6.4f}  {:6.4f}{extra}"
         extra = "  |  {:<7}  {:<}".format('region', regions)
         print(fmt.format('mean', *metrics.mean(axis=0), extra=extra))
         extra = "  |  {:<7}  {:<}".format('eras', metrics.shape[0])
@@ -140,7 +140,7 @@ if __name__ == '__main__':
     import numerox as nx
     data = nx.load_data('/data/nx/numerai_dataset_20171024.hdf')
     p = nx.load_prediction('/data/nx/pred/extratrees_nfeature2.pred')
-    p.performance(data['train'])
+    p.performance(data['validation'])
     """
     model = nx.model.logistic()
     prediction1 = nx.backtest(model, data, verbosity=1)

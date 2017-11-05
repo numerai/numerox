@@ -20,22 +20,11 @@ dataset and then load it (there is no need to unzip it)::
     x         50, min 0.0000, mean 0.4993, max 1.0000
     y         mean 0.499961, fraction missing 0.3109
 
-Let's use the extratrees model in numerox to run 5-fold cross validation on the
-training data::
-
-    >>> model = nx.model.extratrees()
-    >>> prediction1 = nx.backtest(model, data, verbosity=1)
-    extratrees(depth=3, ntrees=100, seed=0, nfeatures=7)
-          logloss   auc     acc     ystd
-    mean  0.692565  0.5236  0.5162  0.0086  |  region   train
-    std   0.000868  0.0280  0.0214  0.0006  |  eras     85
-    min   0.690201  0.4529  0.4641  0.0075  |  consis   0.7294
-    max   0.694862  0.5925  0.5679  0.0097  |  75th     0.6933
-
-And logistic regression::
+Let's use the logistic regression model in numerox to run 5-fold cross
+validation on the training data::
 
     >>> model = nx.model.logistic()
-    >>> prediction2 = nx.backtest(model, data, verbosity=1)
+    >>> prediction1 = nx.backtest(model, data, verbosity=1)
     logistic(inverse_l2=1e-05)
           logloss   auc     acc     ystd
     mean  0.692974  0.5226  0.5159  0.0023  |  region   train
@@ -46,7 +35,7 @@ And logistic regression::
 OK, results are good enough for a demo so let's make a submission file for the
 tournament::
 
-    >>> prediction3 = nx.production(model, data)
+    >>> prediction2 = nx.production(model, data)
     logistic(inverse_l2=1e-05)
           logloss   auc     acc     ystd
     mean  0.692993  0.5157  0.5115  0.0028  |  region   validation
@@ -55,11 +44,11 @@ tournament::
     max   0.693330  0.5734  0.5555  0.0028  |  75th     0.6931
     >>> prediction3.to_csv('logistic.csv')  # 8 decimal places by default
 
-There is no overlap in ids between prediction2 (train) and prediction3
+There is no overlap in ids between prediction1 (train) and prediction2
 (tournament) so you can add (concatenate) them if you're into that and let's
 go ahead and save the result::
 
-    >>> prediction = prediction2 + prediction3
+    >>> prediction = prediction1 + prediction2
     >>> prediction.save('logloss_1e-05.pred')  # HDF5
 
 Once you have run and saved several predictions, you can make a report::
