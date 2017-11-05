@@ -35,13 +35,14 @@ class Report(object):
         # calc performance
         metrics = metrics_per_era(data, self)
         regions = data.unique_region().tolist()
-        nera = metrics[metrics.keys()[0]].shape[0]
+        models = list(metrics.keys())
+        nera = metrics[models[0]].shape[0]
         regera = ', '.join(regions) + '; %d' % nera + ' eras'
 
         # create dataframe of performance
         cols = ['logloss', 'auc', 'acc', 'ystd', 'consis', '(%s)' % regera]
         df = pd.DataFrame(columns=cols)
-        for i, model in enumerate(metrics):
+        for i, model in enumerate(models):
             metric_df = metrics[model]
             metric = metric_df.mean(axis=0).tolist()
             consis = (metric_df['logloss'] < np.log(2)).mean()
