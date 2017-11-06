@@ -10,7 +10,7 @@ import numerox.model
 
 # load
 from numerox.data import load_data, load_zip
-from numerox.testing import load_play_data
+from numerox.testing import play_data
 from numerox.prediction import load_prediction
 from numerox.report import load_report
 

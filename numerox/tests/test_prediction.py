@@ -2,14 +2,14 @@ import numpy as np
 from nose.tools import ok_, assert_raises
 
 from numerox import Prediction
-from numerox.testing import (load_play_data, shares_memory, micro_prediction,
+from numerox.testing import (play_data, shares_memory, micro_prediction,
                              micro_data)
 
 
 def test_prediction_copies():
     "prediction properties should be copies"
 
-    d = load_play_data()
+    d = play_data()
     p = Prediction()
     p.append(d.ids, d.y)
 
@@ -23,7 +23,7 @@ def test_prediction_copies():
 def test_data_properties():
     "prediction properties should not be corrupted"
 
-    d = load_play_data()
+    d = play_data()
     p = Prediction()
     p.append(d.ids, d.y)
 

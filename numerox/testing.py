@@ -67,13 +67,13 @@ def micro_prediction(index=None):
     return prediction
 
 
-def load_play_data():
+def play_data():
     "About 1% of a regular Numerai dataset, so contains around 60 rows per era"
     return nx.load_data(TEST_DATA)
 
 
 def update_play_data(numerai_zip_path):
-    "Create and save data used by load_play_data function"
+    "Create and save data used by play_data function"
     data = nx.load_zip(numerai_zip_path)
     play = row_sample(data, fraction=0.01, seed=0)
     play.save(TEST_DATA)

@@ -219,7 +219,7 @@ You can pull out numpy arrays (copies, not views) like so ``data.ids``,
 
 Numerox comes with a small dataset to play with::
 
-    >>> nx.load_play_data()
+    >>> nx.play_data()
     region    live, test, train, validation
     rows      8795
     era       98, [era1, eraX]

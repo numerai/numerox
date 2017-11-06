@@ -5,8 +5,8 @@ from numerox import Report, Prediction
 from numerox.testing import micro_data
 
 
-def test_report():
-    "make sure report runs"
+def test_report_performance_df():
+    "make sure report.performance_df runs"
 
     d = micro_data()
     d = d['train'] + d['validation']

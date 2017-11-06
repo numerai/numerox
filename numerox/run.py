@@ -22,9 +22,9 @@ def run(model, splitter, verbosity=2):
     return prediction
 
 
-def production(model, data):
+def production(model, data, verbosity=2):
     splitter = tournament_splitter(data)
-    prediction = run(model, splitter)
+    prediction = run(model, splitter, verbosity=verbosity)
     return prediction
 
 
