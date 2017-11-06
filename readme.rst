@@ -2,6 +2,8 @@
     :target: https://travis-ci.org/kwgoodman/numerox
 .. image:: https://ci.appveyor.com/api/projects/status/github/kwgoodman/numerox?svg=true&passingText=passing&failingText=failing&pendingText=pending
     :target: https://ci.appveyor.com/project/kwgoodman/numerox
+.. image:: https://img.shields.io/pypi/v/numerox.svg
+   :target: https://pypi.python.org/pypi/numerox/
 numerox
 =======
 
@@ -262,6 +264,13 @@ Questions, comments, suggestions, bugs:
 
 - https://community.numer.ai/channel/numerox
 - https://github.com/kwgoodman/numerox/issues
+
+Sponsors
+========
+
+Numerox is built by and for the data scientists who compete in the Numerai
+tournament. The lead developer (kwgoodman) gratefully acknowleges the
+financial and technical support provided by Numerai.
 
 License
 =======

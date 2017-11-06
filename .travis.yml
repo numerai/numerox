@@ -32,12 +32,6 @@ matrix:
                PYTHON_VERSION="3.6"
                PYTHON_ARCH="64"
 
-        # OSX; python 3.6
-        - os: osx
-          env: TEST_DEPS="numpy pandas pytables scikit-learn nose"
-               PYTHON_VERSION="3.6"
-               PYTHON_ARCH="64"
-
 before_install:
     - uname -a
     - source "tools/travis/conda_setup.sh"
