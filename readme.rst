@@ -73,7 +73,8 @@ Once you have run and saved several predictions, you can make a report::
 Let's sneak a peek at the performance in two of the most difficult eras in
 validation::
 
-    >>> report.performance(data.era_isin(['era92', 'era93']), sort_by='logloss')
+    >>> d = data.era_isin(['era92', 'era93'])
+    >>> report.performance(d, sort_by='logloss')
     logloss   auc     acc     ystd    consis (validation; 2 eras)
     0.693182  0.4968  0.4945  0.0028  0.5           logistic_1e-05
     0.693226  0.4948  0.4940  0.0041  0.5     extratrees_nfeature2
