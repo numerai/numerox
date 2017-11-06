@@ -58,32 +58,32 @@ go ahead and save the result::
 Once you have run and saved several predictions, you can make a report::
 
     >>> report = nx.report.load_report('/round79', extension='pred')
-    >>> report.performance(data['train'])
-    logloss   auc     acc     ystd    consis  (train)
-    0.692629  0.5240  0.5164  0.0074  0.7294  extratrees_nfeature5
+    >>> report.performance(data['train'], sort_by='logloss')
+    logloss   auc     acc     ystd    consis (train; 85 eras)
+    0.692455  0.5215  0.5149  0.0219  0.6824        logistic_1e-03
+    0.692487  0.5224  0.5159  0.0121  0.7294        logistic_1e-04
     0.692565  0.5236  0.5162  0.0086  0.7294  extratrees_nfeature7
-    0.692831  0.5238  0.5163  0.0042  0.7647  extratrees_nfeature2
+    0.692581  0.5206  0.5143  0.0253  0.6000        logistic_1e-02
+    0.692629  0.5240  0.5164  0.0074  0.7294  extratrees_nfeature5
+    0.692704  0.5200  0.5140  0.0273  0.5412        logistic_1e-01
     0.692747  0.5232  0.5162  0.0055  0.7647  extratrees_nfeature3
-    0.692487  0.5224  0.5159  0.0121  0.7294  logistic_1e-04
-    0.692974  0.5226  0.5159  0.0023  0.7647  logistic_1e-05
-    0.692581  0.5206  0.5143  0.0253  0.6000  logistic_1e-02
-    0.692455  0.5215  0.5149  0.0219  0.6824  logistic_1e-03
-    0.692704  0.5200  0.5140  0.0273  0.5412  logistic_1e-01
+    0.692831  0.5238  0.5163  0.0042  0.7647  extratrees_nfeature2
+    0.692974  0.5226  0.5159  0.0023  0.7647        logistic_1e-05
 
 Let's sneak a peek at the performance in two of the most difficult eras in
 validation::
 
-    >>> report.performance(data.era_isin(['era92', 'era93']))
-    logloss   auc     acc     ystd    consis  (validation)
-    0.693353  0.4942  0.4918  0.0072  0.0000  extratrees_nfeature5
-    0.693312  0.4978  0.4951  0.0084  0.0000  extratrees_nfeature7
-    0.693226  0.4948  0.4940  0.0041  0.5000  extratrees_nfeature2
-    0.693303  0.4922  0.4910  0.0055  0.0000  extratrees_nfeature3
-    0.693582  0.4968  0.4954  0.0131  0.0000  logistic_1e-04
-    0.693182  0.4968  0.4945  0.0028  0.5000  logistic_1e-05
-    0.694728  0.4954  0.4940  0.0245  0.0000  logistic_1e-02
-    0.694339  0.4958  0.4930  0.0217  0.0000  logistic_1e-03
-    0.695001  0.4952  0.4965  0.0264  0.0000  logistic_1e-01
+    >>> report.performance(data.era_isin(['era92', 'era93']), sort_by='logloss')
+    logloss   auc     acc     ystd    consis (validation; 2 eras)
+    0.693182  0.4968  0.4945  0.0028  0.5           logistic_1e-05
+    0.693226  0.4948  0.4940  0.0041  0.5     extratrees_nfeature2
+    0.693303  0.4922  0.4910  0.0055  0.0     extratrees_nfeature3
+    0.693312  0.4978  0.4951  0.0084  0.0     extratrees_nfeature7
+    0.693353  0.4942  0.4918  0.0072  0.0     extratrees_nfeature5
+    0.693582  0.4968  0.4954  0.0131  0.0           logistic_1e-04
+    0.694339  0.4958  0.4930  0.0217  0.0           logistic_1e-03
+    0.694728  0.4954  0.4940  0.0245  0.0           logistic_1e-02
+    0.695001  0.4952  0.4965  0.0264  0.0           logistic_1e-01
 
 Both the ``production`` and ``backtest`` functions are just very thin wrappers
 around the ``run`` function::

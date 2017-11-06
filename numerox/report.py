@@ -29,8 +29,21 @@ class Report(object):
         df = pd.concat(dfs, axis=1, verify_integrity=True, copy=False)
         return Report(df)
 
-    def performance(self, data):
+    def performance(self, data, sort_by='logloss'):
         df = self.performance_df(data)
+        if sort_by == 'logloss':
+            df = df.sort_values(by='logloss', ascending=True)
+        elif sort_by == 'auc':
+            df = df.sort_values(by='auc', ascending=False)
+        elif sort_by == 'acc':
+            df = df.sort_values(by='acc', ascending=False)
+        elif sort_by == 'ystd':
+            df = df.sort_values(by='ystd', ascending=False)
+        elif sort_by == 'consis':
+            df = df.sort_values(by=['consis', 'logloss'],
+                                ascending=[False, True])
+        else:
+            raise ValueError("`sort_by` name not recognized")
         df = df.round(decimals={'logloss': 6, 'auc': 4, 'acc': 4, 'ystd': 4,
                                 'consis': 4})
         with pd.option_context('display.colheader_justify', 'left'):
