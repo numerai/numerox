@@ -26,11 +26,11 @@ class Data(object):
     @property
     def era(self):
         "Copy of era as a 1d numpy str array"
-        return self.df['era'].values.astype(str)
+        return self.df.era.values.astype(str)
 
     def unique_era(self):
         "array of unique eras"
-        return np.unique(self.era)
+        return self.df.era.unique().astype(str)
 
     def era_isin(self, eras):
         "Copy of data containing only eras in the iterable `eras`"
@@ -47,11 +47,11 @@ class Data(object):
     @property
     def region(self):
         "Copy of region as a 1d numpy str array"
-        return self.df['region'].values.astype(str)
+        return self.df.region.values.astype(str)
 
     def unique_region(self):
         "array of unique regions"
-        return np.unique(self.region)
+        return self.df.region.unique().astype(str)
 
     def region_isin(self, regions):
         "Copy of data containing only regions in the iterable `regions`"
