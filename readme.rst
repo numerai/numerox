@@ -46,7 +46,7 @@ tournament::
     std   0.000225  0.0224  0.0172  0.0000  |  eras     12
     min   0.692440  0.4853  0.4886  0.0028  |  consis   0.7500
     max   0.693330  0.5734  0.5555  0.0028  |  75th     0.6931
-    >>> prediction3.to_csv('logistic.csv')  # 8 decimal places by default
+    >>> prediction2.to_csv('logistic.csv')  # 8 decimal places by default
 
 There is no overlap in ids between prediction1 (train) and prediction2
 (tournament) so you can add (concatenate) them if you're into that and let's

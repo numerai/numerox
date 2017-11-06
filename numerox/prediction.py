@@ -1,3 +1,5 @@
+import warnings
+
 import pandas as pd
 import numpy as np
 
@@ -67,7 +69,9 @@ class Prediction(object):
         consistency = (metrics['logloss'] < np.log(2)).mean()
         extra = "  |  {:<7}  {:<.4f}".format('consis', consistency)
         print(fmt.format('min', *metrics.min(axis=0), extra=extra))
-        prctile = np.percentile(metrics['logloss'], 75)
+        with warnings.catch_warnings():
+            warnings.filterwarnings('ignore', '', RuntimeWarning)
+            prctile = np.percentile(metrics['logloss'], 75)
         extra = "  |  {:<7}  {:<.4f}".format('75th', prctile)
         print(fmt.format('max', *metrics.max(axis=0), extra=extra))
 
