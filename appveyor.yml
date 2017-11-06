@@ -11,10 +11,10 @@ environment:
         CMD_IN_ENV: "cmd /E:ON /V:ON /C .\\tools\\appveyor\\windows_sdk.cmd"
 
     matrix:
-        - PYTHON_VERSION: "3.6"
-          PYTHON_ARCH: "64"
-          platform: x64
-          CONDA_HOME: "C:\\Miniconda3-x64"
+        - PYTHON_VERSION: "2.7"
+          PYTHON_ARCH: "32"
+          platform: x86
+          CONDA_HOME: "C:\\Miniconda"
 
 install:
     - "SET PATH=%CONDA_HOME%;%CONDA_HOME%\\Scripts;%PATH%"
