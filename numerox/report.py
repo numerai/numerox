@@ -13,12 +13,16 @@ class Report(object):
     def __init__(self, df=None):
         self.df = df
 
+    @property
+    def models(self):
+        return self.df.columns.tolist()
+
     def append_prediction(self, prediction, model_name):
         df = prediction.df
-        df.rename(columns={'yhat': model_name}, inplace=True)
+        df = df.rename(columns={'yhat': model_name})
         dfs = [self.df, df]
         df = pd.concat(dfs, axis=1, verify_integrity=True, copy=False)
-        return Report(df)
+        self.df = df
 
     def append_prediction_dict(self, prediction_dict):
         dfs = []
@@ -27,7 +31,7 @@ class Report(object):
             df.rename(columns={'yhat': model}, inplace=True)
             dfs.append(df)
         df = pd.concat(dfs, axis=1, verify_integrity=True, copy=False)
-        return Report(df)
+        self.df = df
 
     def performance(self, data, sort_by='logloss'):
         df = self.performance_df(data)
@@ -84,7 +88,7 @@ def load_report(prediction_dir, extension='pred'):
     finally:
         os.chdir(original_dir)
     report = Report()
-    report = report.append_prediction_dict(predictions)
+    report.append_prediction_dict(predictions)
     return report
 
 
@@ -92,4 +96,4 @@ if __name__ == '__main__':
     import numerox as nx
     data = nx.load_data('/data/nx/numerai_dataset_20171024.hdf')
     report = nx.report.load_report('/data/nx/pred')
-    report.performance(data['train'])
+    report.performance(data['train'], sort_by='consis')
