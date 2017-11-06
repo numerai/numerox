@@ -1,5 +1,7 @@
 .. image:: https://travis-ci.org/kwgoodman/numerox.svg?branch=master
     :target: https://travis-ci.org/kwgoodman/numerox
+.. image:: https://ci.appveyor.com/api/projects/status/github/kwgoodman/numerox?svg=true&passingText=passing&failingText=failing&pendingText=pending
+    :target: https://ci.appveyor.com/project/kwgoodman/numerox
 numerox
 =======
 
@@ -249,9 +251,9 @@ failures)::
     >>> import numerox as nx
     >>> nx.test()
     <snip>
-    Ran 13 tests 0.789
+    Ran 12 tests 0.789
     OK
-    <nose.result.TextTestResult run=13 errors=0 failures=0>
+    <nose.result.TextTestResult run=12 errors=0 failures=0>
 
 Resources
 =========
