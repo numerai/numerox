@@ -1,23 +1,8 @@
-import tempfile
-
 import numpy as np
 from nose.tools import ok_
 
-from numerox.data import load_data
 from numerox.testing import shares_memory, micro_data
 from numerox.testing import assert_data_equal as ade
-
-
-def test_data_roundtrip():
-    "Saving and then loading data shouldn't change data"
-    d = micro_data()
-    with tempfile.NamedTemporaryFile() as temp:
-        d.save(temp.name)
-        d2 = load_data(temp.name)
-        ade(d, d2, "data corrupted during roundtrip")
-        d.save(temp.name, compress=True)
-        d2 = load_data(temp.name)
-        ade(d, d2, "data corrupted during roundtrip")
 
 
 def test_data_indexing():
