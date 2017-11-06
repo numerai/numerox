@@ -1,5 +1,7 @@
 .. image:: https://travis-ci.org/kwgoodman/numerox.svg?branch=master
     :target: https://travis-ci.org/kwgoodman/numerox
+.. image:: https://ci.appveyor.com/api/projects/status/github/kwgoodman/numerox?svg=true&passingText=passing&failingText=failing&pendingText=pending
+    :target: https://ci.appveyor.com/project/kwgoodman/numerox
 numerox
 =======
 
