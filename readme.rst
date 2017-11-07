@@ -7,7 +7,7 @@
 numerox
 =======
 
-Numerox is a Numerai competition toolbox written in Python.
+Numerox is a Numerai tournament toolbox written in Python.
 
 All you have to do is create a model. Take a look at ``model.py`` for examples.
 
