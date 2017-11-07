@@ -9,7 +9,7 @@ numerox
 
 Numerox is a Numerai tournament toolbox written in Python.
 
-All you have to do is create a model. Take a look at ``model.py`` for examples.
+All you have to do is create a model. Take a look at `model.py`_ for examples.
 
 Once you have a model numerox will do the rest. First download the Numerai
 dataset and then load it (there is no need to unzip it)::
@@ -70,8 +70,8 @@ Once you have run and saved several predictions, you can make a report::
     0.692831  0.5238  0.5163  0.0042  0.7647  extratrees_nfeature2
     0.692974  0.5226  0.5159  0.0023  0.7647        logistic_1e-05
 
-The lowest logloss was by ``logistic_1e-03``. Let's looks at its per era
-performance on the validation data::
+The lowest logloss on the train data was by ``logistic_1e-03``. Let's look at
+its per era performance on the validation data::
 
     >>> report.performance_per_era(data['validation'], 'logistic_1e-03')
     logistic_1e-03
@@ -120,11 +120,6 @@ This preview release has minimal unit tests coverage (yikes!) and the code
 has seen little use. The next release will likely break any code you write
 using numerox---the api is not yet stable. Please report any bugs or such
 `at github`_.
-
-The next release will focus on bug fixes, adding unit tests, and design
-tweaks.
-
-.. _at github: https://github.com/kwgoodman/numerox/issues
 
 Data class
 ==========
@@ -265,17 +260,21 @@ Resources
 - Ask usage questions `on rocket.chat`_
 - Report bugs `on github`_.
 
-.. _on rocket.chat: https://community.numer.ai/channel/numerox
-.. _on github: https://github.com/kwgoodman/numerox
-
-Sponsors
-========
+Sponsor
+=======
 
 Numerox is built by and for the data scientists who compete in the Numerai
-tournament. The lead developer (kwgoodman) gratefully acknowleges the
+tournament. The lead developer (kwgoodman) acknowledges the generous
 financial and technical support provided by Numerai.
 
 License
 =======
 
 Numerox is distributed under the Simplified BSD. See LICENSE file for details.
+
+
+.. _model.py: https://github.com/kwgoodman/numerox/blob/master/numerox/model.py 
+.. _at github: https://github.com/kwgoodman/numerox/issues
+.. _on rocket.chat: https://community.numer.ai/channel/numerox
+.. _on github: https://github.com/kwgoodman/numerox
+

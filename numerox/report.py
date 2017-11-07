@@ -34,10 +34,9 @@ class Report(object):
         self.df = df
 
     def performance_per_era(self, data, model_name):
-        df = self.df[model_name].to_frame(model_name)
-        rep = Report(df)
-        df = metrics_per_era(data, rep)[model_name]
         print(model_name)
+        df = self.df[model_name].to_frame(model_name)
+        df = metrics_per_era(data, Report(df))[model_name]
         df = df.round(decimals={'logloss': 6, 'auc': 4, 'acc': 4, 'ystd': 4})
         with pd.option_context('display.colheader_justify', 'left'):
             print(df.to_string())
