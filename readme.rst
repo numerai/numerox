@@ -116,12 +116,12 @@ Warning
 This preview release has minimal unit tests coverage (yikes!) and the code
 has seen little use. The next release will likely break any code you write
 using numerox---the api is not yet stable. Please report any bugs or such
-`on github`_.
+`at github`_.
 
 The next release will focus on bug fixes, adding unit tests, and design
 tweaks.
 
-.. _on github: https://github.com/kwgoodman/numerox/issues
+.. _at github: https://github.com/kwgoodman/numerox/issues
 
 Data class
 ==========
