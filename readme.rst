@@ -70,21 +70,24 @@ Once you have run and saved several predictions, you can make a report::
     0.692831  0.5238  0.5163  0.0042  0.7647  extratrees_nfeature2
     0.692974  0.5226  0.5159  0.0023  0.7647        logistic_1e-05
 
-Let's sneak a peek at the performance in two of the most difficult eras in
-validation::
+The lowest logloss was by ``logistic_1e-03``. Let's looks at its per era
+performance on the validation data::
 
-    >>> d = data.era_isin(['era92', 'era93'])
-    >>> report.performance(d, sort_by='logloss')
-    logloss   auc     acc     ystd    consis (validation; 2 eras)
-    0.693182  0.4968  0.4945  0.0028  0.5           logistic_1e-05
-    0.693226  0.4948  0.4940  0.0041  0.5     extratrees_nfeature2
-    0.693303  0.4922  0.4910  0.0055  0.0     extratrees_nfeature3
-    0.693312  0.4978  0.4951  0.0084  0.0     extratrees_nfeature7
-    0.693353  0.4942  0.4918  0.0072  0.0     extratrees_nfeature5
-    0.693582  0.4968  0.4954  0.0131  0.0           logistic_1e-04
-    0.694339  0.4958  0.4930  0.0217  0.0           logistic_1e-03
-    0.694728  0.4954  0.4940  0.0245  0.0           logistic_1e-02
-    0.695001  0.4952  0.4965  0.0264  0.0           logistic_1e-01
+    >>> report.performance_per_era(data['validation'], 'logistic_1e-03')
+    logistic_1e-03
+           logloss   auc     acc     ystd  
+    era86  0.691499  0.5322  0.5296  0.0220
+    era87  0.689715  0.5552  0.5371  0.0219
+    era88  0.692501  0.5189  0.5167  0.0220
+    era89  0.694544  0.4954  0.4916  0.0218
+    era90  0.691133  0.5349  0.5230  0.0221
+    era91  0.692794  0.5140  0.5061  0.0218
+    era92  0.694579  0.4933  0.4906  0.0217
+    era93  0.694098  0.4983  0.4954  0.0218
+    era94  0.688417  0.5752  0.5591  0.0218
+    era95  0.691734  0.5265  0.5224  0.0216
+    era96  0.693184  0.5119  0.5092  0.0215
+    era97  0.693276  0.5077  0.5089  0.0215
 
 Both the ``production`` and ``backtest`` functions are just very thin wrappers
 around the ``run`` function::

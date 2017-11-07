@@ -33,6 +33,15 @@ class Report(object):
         df = pd.concat(dfs, axis=1, verify_integrity=True, copy=False)
         self.df = df
 
+    def performance_per_era(self, data, model_name):
+        df = self.df[model_name].to_frame(model_name)
+        rep = Report(df)
+        df = metrics_per_era(data, rep)[model_name]
+        print(model_name)
+        df = df.round(decimals={'logloss': 6, 'auc': 4, 'acc': 4, 'ystd': 4})
+        with pd.option_context('display.colheader_justify', 'left'):
+            print(df.to_string())
+
     def performance(self, data, sort_by='logloss'):
         df = self.performance_df(data)
         if sort_by == 'logloss':
