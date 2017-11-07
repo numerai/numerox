@@ -116,10 +116,12 @@ Warning
 This preview release has minimal unit tests coverage (yikes!) and the code
 has seen little use. The next release will likely break any code you write
 using numerox---the api is not yet stable. Please report any bugs or such
-to https://github.com/kwgoodman/numerox/issues.
+`on github`_.
 
 The next release will focus on bug fixes, adding unit tests, and design
 tweaks.
+
+.. _on github: https://github.com/kwgoodman/numerox/issues
 
 Data class
 ==========
@@ -257,10 +259,11 @@ failures)::
 Resources
 =========
 
-Questions, comments, suggestions, bugs:
+- Ask usage questions `on rocket.chat`_
+- Report bugs `on github`_.
 
-- https://community.numer.ai/channel/numerox
-- https://github.com/kwgoodman/numerox/issues
+.. _on rocket.chat: https://community.numer.ai/channel/numerox
+.. _on github: https://github.com/kwgoodman/numerox
 
 Sponsors
 ========
