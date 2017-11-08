@@ -75,7 +75,7 @@ def submission_status(submission_id, public_id, secret_key):
         '''
     variable = {'submission_id': submission_id}
     create = api.call(query, variable)
-    print create
+    return create
 
 
 # ---------------------------------------------------------------------------
