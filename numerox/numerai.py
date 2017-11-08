@@ -48,6 +48,17 @@ def upload_submission(full_filename, public_id, secret_key):
         '''
     create = api.call(create_query, {'filename': submission_auth['filename']})
     submission_id = create['data']['create_submission']['id']
+
+    import time
+    import datetime
+    for i in range(100):
+        print(datetime.datetime.now())
+        status = submission_status(submission_id, public_id, secret_key)
+        print(status)
+        if status.values().count(None) == 0:
+            break
+        time.sleep(1)
+
     return submission_id
 
 
@@ -74,8 +85,16 @@ def submission_status(submission_id, public_id, secret_key):
         }
         '''
     variable = {'submission_id': submission_id}
-    create = api.call(query, variable)
-    return create
+    status_raw = api.call(query, variable)
+    status_raw = status_raw['data']['submissions'][0]
+    status = {}
+    for key, value in status_raw.items():
+        if value is None:
+            value = None
+        elif isinstance(value, dict):
+            value = value['value']
+        status[key] = value
+    return status
 
 
 # ---------------------------------------------------------------------------
