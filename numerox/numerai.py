@@ -1,5 +1,6 @@
-import requests
 import os
+import time
+import requests
 
 API_TOURNAMENT_URL = 'https://api-tournament.numer.ai'
 
@@ -20,7 +21,13 @@ def download_dataset(saved_filename):
 
 
 def upload_submission(full_filename, public_id, secret_key):
-    "Upload submission (csv file) to numerai"
+    """
+    Upload tournament submission (csv file) to Numerai.
+
+    This function assume that the scope of your token is both
+    upload_submission and read_submission_info.
+    """
+    t0 = time.time()
     api = Numerai(public_id, secret_key)
     if not api.has_token():
         raise ValueError("Must supply public_id, secret_key")
@@ -49,13 +56,19 @@ def upload_submission(full_filename, public_id, secret_key):
     create = api.call(create_query, {'filename': submission_auth['filename']})
     submission_id = create['data']['create_submission']['id']
 
-    import time
-    import datetime
-    for i in range(100):
-        print(datetime.datetime.now())
+    # diplay status until complete
+    seen = []
+    print("            minutes")
+    fmt = "{:>10.6f}  {:<.4f}  {:<}"
+    while True:
         status = submission_status(submission_id, public_id, secret_key)
-        print(status)
-        if status.values().count(None) == 0:
+        for key, value in status.items():
+            if value is not None and key not in seen:
+                seen.append(key)
+                t = time.time()
+                minutes = (t - t0) / 60
+                print(fmt.format(value, minutes, key))
+        if len(status) == len(seen):
             break
         time.sleep(1)
 
