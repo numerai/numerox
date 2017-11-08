@@ -16,9 +16,9 @@ def run(model, splitter, verbosity=2):
         else:
             data = data + data_predict
         if verbosity > 1:
-            prediction.performance(data)
+            prediction.performance(data.region_isnotin(['test', 'live']))
     if verbosity == 1:
-        prediction.performance(data)
+        prediction.performance(data.region_isnotin(['test', 'live']))
     return prediction
 
 
