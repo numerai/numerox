@@ -23,7 +23,7 @@ def upload_submission(full_filename, public_id, secret_key):
     "Upload submission (csv file) to numerai"
     api = Numerai(public_id, secret_key)
     if not api.has_token():
-        raise ValueError("Must supply public_id, secret_key to upload")
+        raise ValueError("Must supply public_id, secret_key")
     filename = os.path.basename(full_filename)
     auth_query = \
         '''
@@ -47,7 +47,35 @@ def upload_submission(full_filename, public_id, secret_key):
         }
         '''
     create = api.call(create_query, {'filename': submission_auth['filename']})
-    return create['data']['create_submission']['id']
+    submission_id = create['data']['create_submission']['id']
+    return submission_id
+
+
+def submission_status(submission_id, public_id, secret_key):
+    "display submission status"
+    api = Numerai(public_id, secret_key)
+    if not api.has_token():
+        raise ValueError("Must supply public_id, secret_key")
+    query = \
+        '''
+        query submissions($submission_id: String!) {
+          submissions(id: $submission_id) {
+            originality {
+              pending
+              value
+            }
+            concordance {
+              pending
+              value
+            }
+            consistency
+            validation_logloss
+          }
+        }
+        '''
+    variable = {'submission_id': submission_id}
+    create = api.call(query, variable)
+    print create
 
 
 # ---------------------------------------------------------------------------
