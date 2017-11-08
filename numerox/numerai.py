@@ -20,12 +20,13 @@ def download_dataset(saved_filename):
             fd.write(chunk)
 
 
-def upload_submission(full_filename, public_id, secret_key):
+def upload_submission(full_filename, public_id, secret_key, verbose=True):
     """
     Upload tournament submission (csv file) to Numerai.
 
-    This function assume that the scope of your token is both
-    upload_submission and read_submission_info.
+    If verbose is True (default) then the scope of your token must be both
+    upload_submission and read_submission_info. If verbose is False then only
+    upload_submission is needed.
     """
     t0 = time.time()
     api = Numerai(public_id, secret_key)
@@ -57,20 +58,21 @@ def upload_submission(full_filename, public_id, secret_key):
     submission_id = create['data']['create_submission']['id']
 
     # diplay status until complete
-    seen = []
-    print("            minutes")
-    fmt = "{:>10.6f}  {:<.4f}  {:<}"
-    while True:
-        status = submission_status(submission_id, public_id, secret_key)
-        for key, value in status.items():
-            if value is not None and key not in seen:
-                seen.append(key)
-                t = time.time()
-                minutes = (t - t0) / 60
-                print(fmt.format(value, minutes, key))
-        if len(status) == len(seen):
-            break
-        time.sleep(1)
+    if verbose:
+        seen = []
+        print("            minutes")
+        fmt = "{:>10.6f}  {:<.4f}  {:<}"
+        while True:
+            status = submission_status(submission_id, public_id, secret_key)
+            for key, value in status.items():
+                if value is not None and key not in seen:
+                    seen.append(key)
+                    t = time.time()
+                    minutes = (t - t0) / 60
+                    print(fmt.format(value, minutes, key))
+            if len(status) == len(seen):
+                break
+            time.sleep(5)
 
     return submission_id
 
