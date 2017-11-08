@@ -64,15 +64,18 @@ def upload_submission(full_filename, public_id, secret_key, verbose=True):
         fmt = "{:>10.6f}  {:<.4f}  {:<}"
         while True:
             status = submission_status(submission_id, public_id, secret_key)
+            t = time.time()
             for key, value in status.items():
                 if value is not None and key not in seen:
                     seen.append(key)
-                    t = time.time()
                     minutes = (t - t0) / 60
                     print(fmt.format(value, minutes, key))
             if len(status) == len(seen):
                 break
-            time.sleep(5)
+            if t - t0 > 300:
+                time.sleep(20)
+            else:
+                time.sleep(5)
 
     return submission_id
 
