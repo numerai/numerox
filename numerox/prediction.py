@@ -40,10 +40,13 @@ class Prediction(object):
                 raise IndexError("Overlap in ids found")
         self.df = df
 
-    def to_csv(self, path_or_buf=None, decimals=8):
+    def to_csv(self, path_or_buf=None, decimals=6):
         "Save a csv file of predictions for later upload to Numerai"
+        df = self.df.copy()
+        df.index.rename('id', inplace=True)
+        df.rename(columns={'yhat': 'probability'}, inplace=True)
         float_format = "%.{}f".format(decimals)
-        return self.df.to_csv(path_or_buf, float_format=float_format)
+        df.to_csv(path_or_buf, float_format=float_format)
 
     def save(self, path_or_buf, compress=True):
         "Save prediction as an hdf archive; raises if nothing to save"
