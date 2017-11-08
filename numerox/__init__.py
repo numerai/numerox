@@ -25,8 +25,11 @@ from numerox.run import run
 from numerox.run import production
 from numerox.run import backtest
 
-# misc
+# numerai
 from numerox.web import download_dataset
+from numerox.numerai import upload_submission
+
+# misc
 from numerox.data import concat
 from numerox.metrics import metrics_per_era
 from numerox.version import __version__

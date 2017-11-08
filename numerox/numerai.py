@@ -4,7 +4,43 @@ import os
 API_TOURNAMENT_URL = 'https://api-tournament.numer.ai'
 
 
-class ApiTournament:
+# ---------------------------------------------------------------------------
+# high-level user functions
+
+def upload_submission(full_filename, public_id, secret_key):
+    api = Numerai(public_id, secret_key)
+    if not api.has_token():
+        raise ValueError("Must supply public_id, secret_key to upload")
+    filename = os.path.basename(full_filename)
+    auth_query = \
+        '''
+        query($filename: String!) {
+            submission_upload_auth(filename: $filename) {
+                filename
+                url
+            }
+        }
+        '''
+    submission_resp = api.call(auth_query, {'filename': filename})
+    submission_auth = submission_resp['data']['submission_upload_auth']
+    file_object = open(full_filename, 'rb').read()
+    requests.put(submission_auth['url'], data=file_object)
+    create_query = \
+        '''
+        mutation($filename: String!) {
+            create_submission(filename: $filename) {
+                id
+            }
+        }
+        '''
+    create = api.call(create_query, {'filename': submission_auth['filename']})
+    return create['data']['create_submission']['id']
+
+
+# ---------------------------------------------------------------------------
+# low-level numerai api functions
+
+class Numerai(object):
 
     def __init__(self, public_id=None, secret_key=None):
         if public_id and secret_key:
@@ -15,6 +51,11 @@ class ApiTournament:
             print("You supply both a public id and a secret key.")
             self.token = None
 
+    def has_token(self):
+        if self.token is not None:
+            return True
+        return False
+
     def call(self, query, variables=None):
         body = {'query': query,
                 'variables': variables}
@@ -24,35 +65,5 @@ class ApiTournament:
             public_id, secret_key = self.token
             headers['Authorization'] = \
                 'Token {}${}'.format(public_id, secret_key)
-
         r = requests.post(API_TOURNAMENT_URL, json=body, headers=headers)
         return r.json()
-
-    def upload_submission(self, full_filename):
-        filename = os.path.basename(full_filename)
-        if not self.token:
-            print("You supply an API token to upload.")
-        auth_query = \
-            '''
-            query($filename: String!) {
-                submission_upload_auth(filename: $filename) {
-                    filename
-                    url
-                }
-            }
-            '''
-        submission_resp = self.call(auth_query, {'filename': filename})
-        submission_auth = submission_resp['data']['submission_upload_auth']
-        file_object = open(full_filename, 'rb').read()
-        requests.put(submission_auth['url'], data=file_object)
-        create_query = \
-            '''
-            mutation($filename: String!) {
-                create_submission(filename: $filename) {
-                    id
-                }
-            }
-            '''
-        create = self.call(create_query,
-                           {'filename': submission_auth['filename']})
-        return create['data']['create_submission']['id']
