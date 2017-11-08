@@ -20,6 +20,7 @@ def download_dataset(saved_filename):
 
 
 def upload_submission(full_filename, public_id, secret_key):
+    "Upload submission (csv file) to numerai"
     api = Numerai(public_id, secret_key)
     if not api.has_token():
         raise ValueError("Must supply public_id, secret_key to upload")
