@@ -26,7 +26,7 @@ from numerox.run import production
 from numerox.run import backtest
 
 # numerai
-from numerox.web import download_dataset
+from numerox.numerai import download_dataset
 from numerox.numerai import upload_submission
 
 # misc
