@@ -115,7 +115,7 @@ class Submission(object):
         return self.status
 
     def status_block(self, verbose=True):
-        "block until until status completes; then return status_dict"
+        "block until status completes; then return status dictionary"
         seen = []
         fmt = "{:>10.6f}  {:<.4f}  {:<}"
         while True:
@@ -145,6 +145,8 @@ class Submission(object):
         return self._is_status_complete(self.status)
 
     def _is_status_complete(self, status):
+        if status is None:
+            return False
         n_none = status.values().count(None)
         if n_none > 0:
             return False
