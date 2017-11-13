@@ -26,7 +26,7 @@ class Data(object):
     @property
     def era(self):
         "Copy of era as a 1d numpy str array"
-        return self.df.era.values.astype(str)
+        return self.df.era.values
 
     def unique_era(self):
         "array of unique eras"
@@ -209,6 +209,20 @@ def load_zip(file_path):
     for i in range(1, 51):
         rename_map['feature' + str(i)] = 'x' + str(i)
     df.rename(columns=rename_map, inplace=True)
+
+    import time
+    t0 = time.time()
+    era_str = df['era'].tolist()
+    era_float = np.empty(len(era_str))
+    for i, era in enumerate(era_str):
+        try:
+            e = int(era[3:])
+        except ValueError:
+            e = 999
+        era_float[i] = e
+    df['era'] = era_float
+    print time.time()-t0
+
     return Data(df)
 
 

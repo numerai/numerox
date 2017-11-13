@@ -4,6 +4,7 @@
 from numerox.data import Data
 from numerox.prediction import Prediction
 from numerox.report import Report
+from numerox.model import Model
 
 # models
 import numerox.model
