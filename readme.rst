@@ -208,7 +208,7 @@ adding them together. Let's add validation era92 to the training data::
 
 Or, let's go crazy::
 
-    >>> nx.concat([data['live'], data['era1'], data['era92']])
+    >>> nx.concat_data([data['live'], data['era1'], data['era92']])
     region    live, train, validation
     rows      19194
     era       3, [era1, eraX]

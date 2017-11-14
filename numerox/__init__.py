@@ -29,7 +29,7 @@ from numerox.run import backtest
 from numerox.numerai import download_dataset
 
 # misc
-from numerox.data import concat
+from numerox.data import concat_data
 from numerox.metrics import metrics_per_era
 from numerox.version import __version__
 

@@ -155,7 +155,7 @@ class Data(object):
 
     def __add__(self, other_data):
         "concatenate two data objects that have no overlap in ids"
-        return concat([self, other_data])
+        return concat_data([self, other_data])
 
     def __repr__(self):
 
@@ -212,7 +212,7 @@ def load_zip(file_path):
     return Data(df)
 
 
-def concat(datas):
+def concat_data(datas):
     "Concatenate list-like of data objects; ids must not overlap"
     dfs = [d.df for d in datas]
     try:
