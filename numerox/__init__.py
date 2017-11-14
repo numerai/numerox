@@ -27,8 +27,6 @@ from numerox.run import backtest
 
 # numerai
 from numerox.numerai import download_dataset
-from numerox.numerai import upload_submission
-from numerox.numerai import submission_status
 
 # misc
 from numerox.data import concat
