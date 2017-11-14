@@ -6,6 +6,11 @@ Release Notes
 These are the major changes made in each release. For details of the changes
 see the commit log at http://github.com/kwgoodman/numerox
 
+numerox 0.0.2
+=============
+
+*Release date: not yet released, in development*
+
 numerox 0.0.1
 =============
 
