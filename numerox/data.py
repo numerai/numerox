@@ -201,27 +201,38 @@ def load_data(file_path):
 
 def load_zip(file_path):
     "Load numerai dataset from zip archive; return Data"
+
+    # load zip
     zf = zipfile.ZipFile(file_path)
     train = pd.read_csv(zf.open(TRAIN_FILE), header=0, index_col=0)
     tourn = pd.read_csv(zf.open(TOURNAMENT_FILE), header=0, index_col=0)
+
+    # turn into single dataframe and rename columns
     df = pd.concat([train, tourn], axis=0)
     rename_map = {'data_type': 'region', 'target': 'y'}
     for i in range(1, 51):
         rename_map['feature' + str(i)] = 'x' + str(i)
     df.rename(columns=rename_map, inplace=True)
 
-    import time
-    t0 = time.time()
+    # convert era strings to float64
     era_str = df['era'].tolist()
-    era_float = np.empty(len(era_str))
-    for i, era in enumerate(era_str):
-        try:
-            e = int(era[3:])
-        except ValueError:
-            e = 999
-        era_float[i] = e
-    df['era'] = era_float
-    print time.time()-t0
+    eras = []
+    for era in era_str:
+        e = era[3:]
+        if e == 'X':
+            e = '999'
+        eras.append(e)
+    df['era'] = np.array(eras, dtype=np.float64)
+
+    # convert region strings to float64
+    region_map = {'train': 0.0, 'validation': 1.0, 'test': 2.0, 'live': 3.0}
+    region_str = df['region'].tolist()
+    region_float = [region_map[r] for r in region_str]
+    df['region'] = region_float
+
+    # to avoid copies we need the dtype of each column to be the same
+    if df.dtypes.unique().size != 1:
+        raise TypeError("dtype of each column should be the same")
 
     return Data(df)
 
