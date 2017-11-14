@@ -263,14 +263,13 @@ Resources
 Sponsor
 =======
 
-Numerox is built by and for the data scientists who compete in the Numerai
-tournament. The lead developer (kwgoodman) acknowledges the generous
-financial and technical support provided by Numerai.
+Thank you Numerai for providing a significant portion of the development cost
+of Numerox 0.0.1.
 
 License
 =======
 
-Numerox is distributed under the Simplified BSD. See LICENSE file for details.
+Numerox is distributed under the the GPL v3+. See LICENSE file for details.
 
 
 .. _model.py: https://github.com/kwgoodman/numerox/blob/master/numerox/model.py 
