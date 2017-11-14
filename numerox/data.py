@@ -67,9 +67,8 @@ class Data(object):
 
     @property
     def x(self):
-        "Copy of features, x, as a numpy array"
-        names = self._x_names()
-        return self.df[names].values
+        "View of features, x, as a numpy array"
+        return self.df.iloc[:, 2:-1].values
 
     def replace_x(self, x_array):
         "Copy of data but with data.x=`x_array`; must have same number of rows"
@@ -229,6 +228,10 @@ def load_zip(file_path):
     region_str = df['region'].tolist()
     region_float = [region_map[r] for r in region_str]
     df['region'] = region_float
+
+    # need to make a copy now that everything has the same dtype or else
+    # slicing to get a view of x returns a copy
+    df = df.copy()
 
     # to avoid copies we need the dtype of each column to be the same
     if df.dtypes.unique().size != 1:
