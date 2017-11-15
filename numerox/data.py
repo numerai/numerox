@@ -225,9 +225,7 @@ def load_zip(file_path):
 
     # convert region strings to float64
     region_map = {'train': 0.0, 'validation': 1.0, 'test': 2.0, 'live': 3.0}
-    region_str = df['region'].tolist()
-    region_float = [region_map[r] for r in region_str]
-    df['region'] = region_float
+    df['region'] = df['region'].map(region_map)
 
     # need to make a copy now that everything has the same dtype or else
     # slicing to get a view of x returns a copy
