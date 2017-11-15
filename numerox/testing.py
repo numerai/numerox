@@ -4,6 +4,7 @@ import pandas as pd
 import numpy as np
 
 import numerox as nx
+from numerox.data import ERA_STR_TO_FLOAT, REGION_STR_TO_FLOAT
 
 TEST_DATA = os.path.join(os.path.dirname(__file__), 'tests', 'test_data.hdf')
 
@@ -24,10 +25,17 @@ def shares_memory(data1, data_or_array2):
     "True if `data1` shares memory with `data_or_array2`; False otherwise"
     isdata_like = isinstance(data_or_array2, nx.Data)
     isdata_like = isdata_like or isinstance(data_or_array2, nx.Prediction)
-    for col in data1._column_list():
-        a1 = data1.df[col].values
+    cols = data1._column_list() + ['ids']
+    for col in cols:
+        if col == 'ids':
+            a1 = data1.df.index.values
+        else:
+            a1 = data1.df[col].values
         if isdata_like:
-            a2 = data_or_array2.df[col].values
+            if col == 'ids':
+                a2 = data_or_array2.df.index.values
+            else:
+                a2 = data_or_array2.df[col].values
         else:
             a2 = data_or_array2
         if np.shares_memory(a1, a2):
@@ -51,8 +59,11 @@ def micro_data(index=None, nfeatures=3):
     df.loc['index7'] = ['eraX', 'test'] + [0.7] * nfeatures + [1.]
     df.loc['index8'] = ['eraX', 'test'] + [0.8] * nfeatures + [0.]
     df.loc['index9'] = ['eraX', 'live'] + [0.9] * nfeatures + [1.]
+    df['era'] = df['era'].map(ERA_STR_TO_FLOAT)
+    df['region'] = df['region'].map(REGION_STR_TO_FLOAT)
     if index is not None:
         df = df.iloc[index]
+    df = df.copy()  # assure contiguous memory
     data = nx.Data(df)
     return data
 

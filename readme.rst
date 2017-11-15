@@ -135,13 +135,13 @@ You can create a data object from the zip archive provided by Numerai::
     x         50, min 0.0000, mean 0.4993, max 1.0000
     y         mean 0.499961, fraction missing 0.3109
 
-But that is slow (~7 seconds) which is painful for dedicated overfitters.
+But that is slow (~9 seconds) which is painful for dedicated overfitters.
 Let's create an HDF5 archive::
 
     >>> data.save('numerai_dataset.hdf')
     >>> data2 = nx.load_data('numerai_dataset.hdf')
 
-That loads quickly (~0.2 seconds, but takes more disk space than the
+That loads quickly (~0.1 seconds, but takes more disk space than the
 unexpanded zip archive).
 
 Data indexing is done by rows, not columns::
@@ -215,8 +215,10 @@ Or, let's go crazy::
     x         50, min 0.0000, mean 0.4992, max 1.0000
     y         mean 0.499960, fraction missing 0.3544
 
-You can pull out numpy arrays (copies, not views) like so ``data.ids``,
-``data.era``, ``data.region``, ``data.x``, ``data.y``.
+To get views (not copies) of the data as numpy arrays use ``data.ids``,
+``data.x``, ``data.y``. To get copies (not views) of era and region as numpy
+string arrays use ``data.era``, ``data.region``. Internally era and region are
+stored as floats. To get views: ``data.era_float``, ``data.region_region``.
 
 Numerox comes with a small dataset to play with::
 
