@@ -113,14 +113,6 @@ and the ``production`` function::
     >>> splitter = nx.tournament_splitter(data)
     >>> prediction = nx.run(model, splitter)
 
-Warning
-=======
-
-This preview release has minimal unit tests coverage (yikes!) and the code
-has seen little use. The next release will likely break any code you write
-using numerox---the api is not yet stable. Please report any bugs or such
-`at github`_.
-
 Data class
 ==========
 
@@ -265,8 +257,7 @@ Resources
 Sponsor
 =======
 
-Thank you Numerai for providing a significant portion of the development cost
-of Numerox 0.0.1.
+Thank you Numerai for providing funding towards the development of Numerox.
 
 License
 =======
