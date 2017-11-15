@@ -135,13 +135,13 @@ You can create a data object from the zip archive provided by Numerai::
     x         50, min 0.0000, mean 0.4993, max 1.0000
     y         mean 0.499961, fraction missing 0.3109
 
-But that is slow (~7 seconds) which is painful for dedicated overfitters.
+But that is slow (~9 seconds) which is painful for dedicated overfitters.
 Let's create an HDF5 archive::
 
     >>> data.save('numerai_dataset.hdf')
     >>> data2 = nx.load_data('numerai_dataset.hdf')
 
-That loads quickly (~0.2 seconds, but takes more disk space than the
+That loads quickly (~0.1 seconds, but takes more disk space than the
 unexpanded zip archive).
 
 Data indexing is done by rows, not columns::

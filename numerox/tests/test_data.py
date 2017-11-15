@@ -47,18 +47,23 @@ def test_empty_data():
 
 
 def test_data_copies():
-    "data properties should be copies"
+    "data properties should be copies or views"
 
     d = micro_data()
 
     ok_(shares_memory(d, d), "looks like shares_memory failed")
-    ok_(~shares_memory(d, d.copy()), "should be a copy")
 
-    ok_(~shares_memory(d, d.ids), "d.ids should be a copy")
-    ok_(~shares_memory(d, d.era), "d.era should be a copy")
-    ok_(~shares_memory(d, d.region), "d.region should be a copy")
-    ok_(~shares_memory(d, d.x), "d.x should be a copy")
-    ok_(~shares_memory(d, d.y), "d.y should be a copy")
+    # copies
+    ok_(not shares_memory(d, d.copy()), "should be a copy")
+    ok_(not shares_memory(d, d.era), "d.era should be a copy")
+    ok_(not shares_memory(d, d.region), "d.region should be a copy")
+
+    # views
+    ok_(shares_memory(d, d.ids), "d.ids should be a copy")
+    ok_(shares_memory(d, d.era_float), "d.era_float should be a view")
+    ok_(shares_memory(d, d.region_float), "d.region_float should be a view")
+    ok_(shares_memory(d, d.x), "d.x should be a view")
+    ok_(shares_memory(d, d.y), "d.y should be a view")
 
 
 def test_data_properties():
@@ -67,8 +72,8 @@ def test_data_properties():
     d = micro_data()
 
     ok_((d.ids == d.df.index).all(), "ids is corrupted")
-    ok_((d.era == d.df.era).all(), "era is corrupted")
-    ok_((d.region == d.df.region).all(), "region is corrupted")
+    ok_((d.era_float == d.df.era).all(), "era is corrupted")
+    ok_((d.region_float == d.df.region).all(), "region is corrupted")
 
     idx = ~np.isnan(d.df.y)
     ok_((d.y[idx] == d.df.y[idx]).all(), "y is corrupted")

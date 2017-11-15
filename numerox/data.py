@@ -6,7 +6,23 @@ import pandas as pd
 TRAIN_FILE = 'numerai_training_data.csv'
 TOURNAMENT_FILE = 'numerai_tournament_data.csv'
 HDF_DATA_KEY = 'numerox_data'
+
+ERA_INT_TO_STR = {}
+ERA_STR_TO_INT = {}
+ERA_STR_TO_FLOAT = {}
+for i in range(120):
+    name = 'era' + str(i)
+    ERA_INT_TO_STR[i] = name
+    ERA_STR_TO_INT[name] = i
+    ERA_STR_TO_FLOAT[name] = float(i)
+ERA_INT_TO_STR[999] = 'eraX'
+ERA_STR_TO_INT['eraX'] = 999
+ERA_STR_TO_FLOAT['eraX'] = 999.0
+
 TOURNAMENT_REGIONS = ['validation', 'test', 'live']
+REGION_INT_TO_STR = {0: 'train', 1: 'validation', 2: 'test', 3: 'live'}
+REGION_STR_TO_INT = {'train': 0, 'validation': 1, 'test': 2, 'live': 3}
+REGION_STR_TO_FLOAT = {'train': 0., 'validation': 1., 'test': 2., 'live': 3.}
 
 
 class Data(object):
@@ -25,60 +41,105 @@ class Data(object):
 
     @property
     def era(self):
+        "Copy of era as a 1d numpy str array"
+        series = self.df['era'].map(ERA_INT_TO_STR)
+        return series.values.astype(str)
+
+    @property
+    def era_float(self):
         "View of era as a 1d numpy float array"
         return self.df['era'].values
 
-    @property
-    def era_str(self):
-        "Copy of era as a 1d numpy str array"
-        era_map = {}
-        for i in range(120):
-            era_map[i] = 'era' + str(i)
-        era_map[999] = 'eraX'
-        series = self.df['era'].map(era_map)
-        return series.values.astype(str)
-
-    def unique_era(self):
-        "array of unique eras"
-        return self.df.era.unique()
+    def unique_era(self, as_str=True):
+        "Array of unique eras as strings (default) or floats"
+        unique_era = self.df.era.unique()
+        if as_str:
+            unique_era = np.array(self.eras_int2str(unique_era))
+        return unique_era
 
     def era_isin(self, eras):
         "Copy of data containing only eras in the iterable `eras`"
+        eras = self.eras_str2int(eras)
         idx = self.df.era.isin(eras)
         return self[idx]
 
     def era_isnotin(self, eras):
         "Copy of data containing eras that are not the iterable `eras`"
+        eras = self.eras_str2int(eras)
         idx = self.df.era.isin(eras)
         return self[~idx]
+
+    def eras_str2int(self, eras):
+        "List with eras names (str) converted to int"
+        e = []
+        for era in eras:
+            if era in ERA_STR_TO_INT:
+                e.append(ERA_STR_TO_INT[era])
+            else:
+                e.append(era)
+        return e
+
+    def eras_int2str(self, eras):
+        "List with eras numbers converted to eras names (str)"
+        e = []
+        for era in eras:
+            if era in ERA_INT_TO_STR:
+                e.append(ERA_INT_TO_STR[era])
+            else:
+                e.append(era)
+        return e
 
     # region ----------------------------------------------------------------
 
     @property
     def region(self):
+        "Copy of region as a 1d numpy str array"
+        series = self.df['region'].map(REGION_INT_TO_STR)
+        return series.values.astype(str)
+
+    @property
+    def region_float(self):
         "View of region as a 1d numpy float array"
         return self.df['region'].values
 
-    @property
-    def region_str(self):
-        "Copy of region as a 1d numpy str array"
-        region_map = {0: 'train', 1: 'validation', 2: 'test', 3: 'live'}
-        series = self.df['region'].map(region_map)
-        return series.values.astype(str)
-
-    def unique_region(self):
-        "array of unique regions"
-        return self.df.region.unique()
+    def unique_region(self, as_str=True):
+        "Array of unique regions as strings (default) or floats"
+        unique_region = self.df.region.unique()
+        if as_str:
+            unique_region = np.array(self.regions_int2str(unique_region))
+        return unique_region
 
     def region_isin(self, regions):
         "Copy of data containing only regions in the iterable `regions`"
+        regions = self.regions_str2int(regions)
         idx = self.df.region.isin(regions)
         return self[idx]
 
     def region_isnotin(self, regions):
         "Copy of data containing regions that are not the iterable `regions`"
+        regions = self.regions_str2int(regions)
         idx = self.df.region.isin(regions)
         return self[~idx]
+
+    def regions_str2int(self, regions):
+        "List with regions names (str) converted to int"
+        r = []
+        for region in regions:
+            if region in REGION_STR_TO_INT:
+                r.append(REGION_STR_TO_INT[region])
+            else:
+                r.append(region)
+        return r
+
+    def regions_int2str(self, regions):
+        "List with regions numbers converted to region names (str)"
+        r = []
+        for region in regions:
+            if region in REGION_INT_TO_STR:
+                r.append(REGION_INT_TO_STR[region])
+            else:
+                r.append(region)
+        return r
 
     # x ---------------------------------------------------------------------
 
@@ -118,7 +179,12 @@ class Data(object):
 
     def copy(self):
         "Copy of data"
-        return Data(self.df.copy(deep=True))
+        # df.copy(deep=True) doesn't copy index. So:
+        df = self.df
+        df = pd.DataFrame(df.values.copy(),
+                          df.index.copy(deep=True),
+                          df.columns.copy())
+        return Data(df)
 
     def save(self, path_or_buf, compress=False):
         "Save data as an hdf archive"
@@ -182,7 +248,7 @@ class Data(object):
         fmt = '{:<10}{:<}'
 
         # region
-        r = self.unique_region()
+        r = self.unique_region(as_str=True)
         stats = ', '.join(r)
         t.append(fmt.format('region', stats))
 
@@ -190,7 +256,7 @@ class Data(object):
         t.append(fmt.format('rows', len(self)))
 
         # era
-        e = self.unique_era()
+        e = self.unique_era(as_str=True)
         stats = '{}, [{}, {}]'.format(e.size, e[0], e[-1])
         t.append(fmt.format('era', stats))
 
@@ -230,22 +296,11 @@ def load_zip(file_path):
         rename_map['feature' + str(i)] = 'x' + str(i)
     df.rename(columns=rename_map, inplace=True)
 
-    # convert era strings to float64
-    era_str = df['era'].tolist()
-    eras = []
-    for era in era_str:
-        e = era[3:]
-        if e == 'X':
-            e = '999'
-        eras.append(e)
-    df['era'] = np.array(eras, dtype=np.float64)
+    # convert era and region strings to np.float64
+    df['era'] = df['era'].map(ERA_STR_TO_FLOAT)
+    df['region'] = df['region'].map(REGION_STR_TO_FLOAT)
 
-    # convert region strings to float64
-    region_map = {'train': 0.0, 'validation': 1.0, 'test': 2.0, 'live': 3.0}
-    df['region'] = df['region'].map(region_map)
-
-    # need to make a copy now that everything has the same dtype or else
-    # slicing to get a view of x returns a copy
+    # make sure memory is contiguous so that, e.g., data.x is a view
     df = df.copy()
 
     # to avoid copies we need the dtype of each column to be the same
