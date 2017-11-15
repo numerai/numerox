@@ -24,6 +24,9 @@ Accessing the features ``data.x`` has dropped from 0.1 seconds to
 adventureous, you can get a view of the underlying floats by using
 ``data.era_float`` and ``data.region_float``.
 
+HDF5 datasets (``data.save``) created with numerox 0.0.1 cannot be loaded with
+0.0.2. To create new datasets, load from zip (``nx.load_zip``) and save.
+
 numerox 0.0.1
 =============
 
