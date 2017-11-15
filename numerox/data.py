@@ -18,13 +18,18 @@ class Data(object):
 
     @property
     def ids(self):
-        "Copy of ids as a numpy str array"
-        return self.df.index.values.astype(str)
+        "View of ids as a numpy str array"
+        return self.df.index.values
 
     # era -------------------------------------------------------------------
 
     @property
     def era(self):
+        "View of era as a 1d numpy float array"
+        return self.df['era'].values
+
+    @property
+    def era_str(self):
         "Copy of era as a 1d numpy str array"
         era_map = {}
         for i in range(120):
@@ -33,14 +38,9 @@ class Data(object):
         series = self.df['era'].map(era_map)
         return series.values.astype(str)
 
-    @property
-    def era_float(self):
-        "View of era as a 1d numpy float array"
-        return self.df['era'].values
-
     def unique_era(self):
         "array of unique eras"
-        return self.df.era.unique().astype(str)
+        return self.df.era.unique()
 
     def era_isin(self, eras):
         "Copy of data containing only eras in the iterable `eras`"
@@ -56,19 +56,19 @@ class Data(object):
 
     @property
     def region(self):
+        "View of region as a 1d numpy float array"
+        return self.df['region'].values
+
+    @property
+    def region_str(self):
         "Copy of region as a 1d numpy str array"
         region_map = {0: 'train', 1: 'validation', 2: 'test', 3: 'live'}
         series = self.df['region'].map(region_map)
         return series.values.astype(str)
 
-    @property
-    def region_float(self):
-        "View of region as a 1d numpy float array"
-        return self.df['region'].values
-
     def unique_region(self):
         "array of unique regions"
-        return self.df.region.unique().astype(str)
+        return self.df.region.unique()
 
     def region_isin(self, regions):
         "Copy of data containing only regions in the iterable `regions`"
@@ -84,7 +84,7 @@ class Data(object):
 
     @property
     def x(self):
-        "View of features, x, as a numpy array"
+        "View of features, x, as a numpy float array"
         return self.df.iloc[:, 2:-1].values
 
     def replace_x(self, x_array):
@@ -113,8 +113,8 @@ class Data(object):
 
     @property
     def y(self):
-        "Copy of y as a 1d numpy array"
-        return self.df['y'].values.copy()
+        "View of y as a 1d numpy float array"
+        return self.df['y'].values
 
     def copy(self):
         "Copy of data"
