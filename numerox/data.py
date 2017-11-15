@@ -26,7 +26,17 @@ class Data(object):
     @property
     def era(self):
         "Copy of era as a 1d numpy str array"
-        return self.df.era.values
+        era_map = {}
+        for i in range(120):
+            era_map[i] = 'era' + str(i)
+        era_map[999] = 'eraX'
+        series = self.df['era'].map(era_map)
+        return series.values.astype(str)
+
+    @property
+    def era_float(self):
+        "View of era as a 1d numpy float array"
+        return self.df['era'].values
 
     def unique_era(self):
         "array of unique eras"
@@ -47,7 +57,14 @@ class Data(object):
     @property
     def region(self):
         "Copy of region as a 1d numpy str array"
-        return self.df.region.values.astype(str)
+        region_map = {0: 'train', 1: 'validation', 2: 'test', 3: 'live'}
+        series = self.df['region'].map(region_map)
+        return series.values.astype(str)
+
+    @property
+    def region_float(self):
+        "View of region as a 1d numpy float array"
+        return self.df['region'].values
 
     def unique_region(self):
         "array of unique regions"
