@@ -215,8 +215,10 @@ Or, let's go crazy::
     x         50, min 0.0000, mean 0.4992, max 1.0000
     y         mean 0.499960, fraction missing 0.3544
 
-You can pull out numpy arrays (copies, not views) like so ``data.ids``,
-``data.era``, ``data.region``, ``data.x``, ``data.y``.
+To get views (not copies) of the data as numpy arrays use ``data.ids``,
+``data.x``, ``data.y``. To get copies (not views) of era and region as numpy
+string arrays use ``data.era``, ``data.region``. Internally era and region are
+stored as floats. To get views: ``data.era_float``, ``data.region_region``.
 
 Numerox comes with a small dataset to play with::
 
