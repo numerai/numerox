@@ -14,5 +14,5 @@ else
     fi
     # Workaround for https://github.com/travis-ci/travis-ci/issues/6522
     set +e
-    python "tools/test-installed-numerox.py"
+    python "ci/test-installed-numerox.py"
 fi
