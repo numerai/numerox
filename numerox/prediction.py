@@ -145,8 +145,8 @@ def concat_prediction(predictions):
 
 if __name__ == '__main__':
     import numerox as nx
-    data = nx.load_data('/data/nx/numerai_dataset_20171024.hdf')
-    p = nx.load_prediction('/data/nx/pred/extratrees_nfeature2.pred')
+    data = nx.load_data('/data/nx/numerai_dataset.h5')
+    p = nx.load_prediction('/data/nx/logistic.pred')
     p.performance(data['validation'])
     """
     model = nx.model.logistic()

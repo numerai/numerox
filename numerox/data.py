@@ -57,6 +57,15 @@ class Data(object):
             unique_era = np.array(self.eras_int2str(unique_era))
         return unique_era
 
+    def era_iter(self, as_str=True):
+        "Iterator that yields era and bool index that gives rows of era"
+        eras = self.unique_era(as_str=False)
+        for era in eras:
+            index = self.era_float == era
+            if as_str:
+                era = ERA_INT_TO_STR[era]
+            yield era, index
+
     def era_isin(self, eras):
         "Copy of data containing only eras in the iterable `eras`"
         eras = self.eras_str2int(eras)
@@ -108,6 +117,15 @@ class Data(object):
         if as_str:
             unique_region = np.array(self.regions_int2str(unique_region))
         return unique_region
+
+    def region_iter(self, as_str=True):
+        "Iterator that yields region and bool index that gives rows of region"
+        regions = self.unique_region(as_str=False)
+        for region in regions:
+            index = self.region_float == region
+            if as_str:
+                region = REGION_INT_TO_STR[region]
+            yield region, index
 
     def region_isin(self, regions):
         "Copy of data containing only regions in the iterable `regions`"
