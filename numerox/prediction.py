@@ -15,17 +15,13 @@ class Prediction(object):
 
     @property
     def ids(self):
-        "Copy of ids as a numpy str array or None is empty"
-        if self.df is None:
-            return None
-        return self.df.index.values.astype(str)
+        "View of ids as a numpy str array"
+        return self.df.index.values
 
     @property
     def yhat(self):
-        "Copy of yhat as a 1d numpy array or None is empty"
-        if self.df is None:
-            return None
-        return self.df['yhat'].values.copy()
+        "View of yhat as a 1d numpy float array"
+        return self.df['yhat'].values
 
     def append(self, ids, yhat):
         df = pd.DataFrame(data={'yhat': yhat}, index=ids)
