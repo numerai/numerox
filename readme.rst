@@ -252,7 +252,8 @@ Resources
 =========
 
 - Ask usage questions `on rocket.chat`_
-- Report bugs `on github`_.
+- Report bugs `on github`_
+- Check out the `release notes`_ to see what is new
 
 Sponsor
 =======
@@ -269,4 +270,4 @@ Numerox is distributed under the the GPL v3+. See LICENSE file for details.
 .. _at github: https://github.com/kwgoodman/numerox/issues
 .. _on rocket.chat: https://community.numer.ai/channel/numerox
 .. _on github: https://github.com/kwgoodman/numerox
-
+.. _release notes: https://github.com/kwgoodman/numerox/blob/master/release.rst
