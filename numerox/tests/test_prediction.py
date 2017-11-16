@@ -29,10 +29,10 @@ def test_prediction_copies():
     p.append(d.ids, d.y)
 
     ok_(shares_memory(p, p), "looks like shares_memory failed")
-    ok_(~shares_memory(p, p.copy()), "should be a copy")
+    ok_(not shares_memory(p, p.copy()), "should be a copy")
 
-    ok_(~shares_memory(p, p.ids), "p.ids should be a copy")
-    ok_(~shares_memory(p, p.yhat), "p.yhat should be a copy")
+    ok_(not shares_memory(p, p.ids), "p.ids should be a copy")
+    ok_(not shares_memory(p, p.yhat), "p.yhat should be a copy")
 
 
 def test_data_properties():
