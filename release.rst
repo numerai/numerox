@@ -12,8 +12,10 @@ numerox 0.0.3
 *Release date: in development; not yet released*
 
 - Added ``data.era_iter`` which yields the era and a bool index of the data
-  rows that belong to that era.
-- Also added the iterator ``data.region_iter``.
+  rows that belong to that era
+- Also added the iterator ``data.region_iter``
+- Remove appveyor
+- More unit tests
 
 numerox 0.0.2
 =============

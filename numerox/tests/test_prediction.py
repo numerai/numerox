@@ -1,9 +1,24 @@
+import tempfile
+
 import numpy as np
 from nose.tools import ok_, assert_raises
 
+import numerox as nx
 from numerox import Prediction
+from numerox.testing import assert_data_equal as ade
 from numerox.testing import (play_data, shares_memory, micro_prediction,
                              micro_data)
+
+
+def test_prediction_roundtrip():
+    "save/load roundtrip shouldn't change prediction"
+    d = micro_data()
+    m = nx.model.logistic()
+    p = nx.production(m, d, verbosity=0)
+    with tempfile.NamedTemporaryFile() as temp:
+        p.save(temp.name)
+        p2 = nx.load_prediction(temp.name)
+        ade(p, p2, "prediction corrupted during roundtrip")
 
 
 def test_prediction_copies():
