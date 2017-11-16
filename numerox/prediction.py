@@ -82,7 +82,12 @@ class Prediction(object):
         "Copy of prediction"
         if self.df is None:
             return Prediction(None)
-        return Prediction(self.df.copy(deep=True))
+        # df.copy(deep=True) doesn't copy index. So:
+        df = self.df
+        df = pd.DataFrame(df.values.copy(),
+                          df.index.copy(deep=True),
+                          df.columns.copy())
+        return Prediction(df)
 
     @property
     def size(self):
