@@ -9,7 +9,7 @@ see the commit log at http://github.com/kwgoodman/numerox
 numerox 0.0.2
 =============
 
-*Release date: not yet released, in development*
+*Release date: 2017-11-16*
 
 The Data class is now a much lighter wrapper around the Numerai dataset.
 Accessing the data with ``data.x`` and ``data.y`` now gives a view instead of
