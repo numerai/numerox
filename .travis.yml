@@ -34,13 +34,13 @@ matrix:
 
 before_install:
     - uname -a
-    - source "tools/travis/conda_setup.sh"
+    - source "ci/travis/conda_setup.sh"
 
 install:
-    - source "tools/travis/conda_install.sh"
+    - source "ci/travis/conda_install.sh"
 
 script:
-    - source "tools/travis/numerox_setup.sh"
+    - source "ci/travis/numerox_setup.sh"
 
 notifications:
     email:
