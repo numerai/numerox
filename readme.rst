@@ -251,14 +251,14 @@ failures)::
 Resources
 =========
 
-- Ask usage questions `on rocket.chat`_
-- Report bugs `on github`_
-- Check out the `release notes`_ to see what is new
+- Ask questions on `chat`_
+- Report bugs on `github`_
+- See what's new in the `release notes`_
 
 Sponsor
 =======
 
-Thank you Numerai for providing funding towards the development of Numerox.
+Thank you Numerai for providing funding for the development of Numerox.
 
 License
 =======
@@ -267,7 +267,6 @@ Numerox is distributed under the the GPL v3+. See LICENSE file for details.
 
 
 .. _model.py: https://github.com/kwgoodman/numerox/blob/master/numerox/model.py 
-.. _at github: https://github.com/kwgoodman/numerox/issues
-.. _on rocket.chat: https://community.numer.ai/channel/numerox
-.. _on github: https://github.com/kwgoodman/numerox
+.. _chat: https://community.numer.ai/channel/numerox
+.. _github: https://github.com/kwgoodman/numerox/issues
 .. _release notes: https://github.com/kwgoodman/numerox/blob/master/release.rst
