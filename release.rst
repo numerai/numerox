@@ -3,7 +3,7 @@
 Release Notes
 =============
 
-- v0.0.3 (not yet released)
+- v0.0.3
 
   * Add examples
   * Add iterator ``data.era_iter``

@@ -10,7 +10,7 @@ Numerox is a Numerai tournament toolbox written in Python.
 All you have to do is create a model. Take a look at `model.py`_ for examples.
 
 Once you have a model numerox will do the rest. First download the Numerai
-dataset and then load it (there is no need to unzip it)::
+dataset and then load it::
 
     >>> import numerox as nx
     >>> nx.download_dataset('numerai_dataset.zip')
@@ -35,7 +35,8 @@ validation on the training data::
     max   0.693589  0.5875  0.5606  0.0027  |  75th     0.6931
 
 OK, results are good enough for a demo so let's make a submission file for the
-tournament::
+tournament. We will fit the model on the train data and make our predictions
+for the tournament data::
 
     >>> prediction = nx.production(model, data)
     logistic(inverse_l2=1e-05)
@@ -54,7 +55,17 @@ Have a look at the numerox `examples`_.
 Install
 =======
 
-This is what you need to run numerox:
+Install with pip::
+
+    $ sudo pip install numerox
+
+After you have installed numerox, run the unit tests (please report any
+failures)::
+
+    >>> import numerox as nx
+    >>> nx.test()
+
+Requirements:
 
 - python
 - setuptools
@@ -65,28 +76,18 @@ This is what you need to run numerox:
 - requests
 - nose
 
-Install with pipi::
-
-    $ sudo pip install numerox
-
-After you have installed numerox, run the unit tests (please report any
-failures)::
-
-    >>> import numerox as nx
-    >>> nx.test()
-
 Resources
 =========
 
-- Ask questions on `chat`_
-- Report bugs on `github`_
+- Join us on Numerai's `chat`_
 - See `what's new`_
-- See numerox `examples`_
+- Look at the `examples`_
+- Report bugs on `github`_
 
 Sponsor
 =======
 
-Thank you Numerai for providing funding for the development of Numerox.
+Thank you Numerai for funding the development of Numerox.
 
 License
 =======
