@@ -3,12 +3,12 @@
 Release Notes
 =============
 
-- v0.0.3 (in development)
+- v0.0.3
 
   * Added iterator ``data.era_iter``
   * Added iterator ``data.region_iter``
   * ``prediction.ids`` and ``prediction.yhat`` are now views instead of copies
-  * Bug: ``prediction.copy`` was not copying the index
+  * Bugfix: ``prediction.copy`` was not copying the index
   * Remove appveyor
   * Add more unit tests
 
