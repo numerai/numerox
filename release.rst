@@ -5,8 +5,9 @@ Release Notes
 
 - v0.0.3 (not yet released)
 
-  * Added iterator ``data.era_iter``
-  * Added iterator ``data.region_iter``
+  * Add examples
+  * Add iterator ``data.era_iter``
+  * Add iterator ``data.region_iter``
   * ``prediction.ids`` and ``prediction.yhat`` are now views instead of copies
   * Add more unit tests
   * Remove appveyor so that unit tests can use Python's tempfile
