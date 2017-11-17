@@ -3,44 +3,21 @@
 Release Notes
 =============
 
-These are the major changes made in each release. For details of the changes
-see the commit log at http://github.com/kwgoodman/numerox
+- v0.0.3 (in development)
 
-numerox 0.0.3
-=============
+  * Added iterator ``data.era_iter``
+  * Added iterator ``data.region_iter``
+  * ``prediction.ids`` and ``prediction.yhat`` are now views instead of copies
+  * Bug: ``prediction.copy`` was not copying the index
+  * Remove appveyor
+  * Add more unit tests
 
-*Release date: in development; not yet released*
+- v0.0.2
 
-- Added ``data.era_iter`` which yields the era and a bool index of the data
-  rows that belong to that era
-- Also added the iterator ``data.region_iter``
-- Remove appveyor
-- More unit tests
+  * ``data.x`` and ``data.y`` now return fast views instead of slow copies
+  * era and region stored internally as floats
+  * HDF5 datasets created with v0.0.1 cannot be loaded with v0.0.2
 
-numerox 0.0.2
-=============
+- v0.0.1
 
-*Release date: 2017-11-16*
-
-The Data class is now a much lighter wrapper around the Numerai dataset.
-Accessing the data with ``data.x`` and ``data.y`` now gives a view instead of
-an expensive copy. To accomplish this the data is now stored in a contiguous
-block of memory. To get contiguous memory all data now have the same data type
-which was accomplished by converting era and region to floats.
-
-Accessing the features ``data.x`` has dropped from 0.1 seconds to
-0.0001 seconds.
-
-``data.era`` and ``data.region`` still return numpy string arrays. For the
-adventureous, you can get a view of the underlying floats by using
-``data.era_float`` and ``data.region_float``.
-
-HDF5 datasets (``data.save``) created with numerox 0.0.1 cannot be loaded with
-0.0.2. To create new datasets, load from zip (``nx.load_zip``) and save.
-
-numerox 0.0.1
-=============
-
-*Release date: 2017-11-14*
-
-- Preview release of numerox
+  * Preview release of numerox
