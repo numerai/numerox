@@ -1,7 +1,10 @@
 import tempfile
 
 import numpy as np
+from numpy.testing import assert_array_equal
+
 from nose.tools import ok_
+from nose.tools import assert_raises
 
 import numerox as nx
 from numerox.testing import shares_memory, micro_data
@@ -48,6 +51,18 @@ def test_data_indexing():
     msg = 'error indexing data by array'
     ade(d[d.y == 0], micro_data([0, 2, 4, 6, 8]), msg)
     ade(d[d.era == 'era4'], micro_data([6]), msg)
+
+
+def test_data_x_replace():
+    "test data.x_replace"
+    d = nx.testing.micro_data()
+    x = d.x.copy()
+    x = x[:, -2:]
+    d2 = d.x_replace(x)
+    ok_(not shares_memory(d, d2), "data.x_replace should return a copy")
+    ok_(d2.xshape[1] == 2, "x should have two columns")
+    assert_array_equal(d2.x, x, "data.replace corrupted the values")
+    assert_raises(ValueError, d.x_replace, x[:4])
 
 
 def test_empty_data():

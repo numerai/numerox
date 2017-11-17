@@ -35,6 +35,8 @@ def shares_memory(data1, data_or_array2):
             if col == 'ids':
                 a2 = data_or_array2.df.index.values
             else:
+                if col not in data_or_array2.df:
+                    continue
                 a2 = data_or_array2.df[col].values
         else:
             a2 = data_or_array2
@@ -43,22 +45,20 @@ def shares_memory(data1, data_or_array2):
     return False
 
 
-def micro_data(index=None, nfeatures=3):
+def micro_data(index=None):
     "Returns a tiny data object for use in unit testing"
-    cols = ['era', 'region']
-    cols += ['x' + str(i) for i in range(1, nfeatures + 1)]
-    cols += ['y']
+    cols = ['era', 'region', 'x1', 'x2', 'x3', 'y']
     df = pd.DataFrame(columns=cols)
-    df.loc['index0'] = ['era1', 'train'] + [0.0] * nfeatures + [0.]
-    df.loc['index1'] = ['era2', 'train'] + [0.1] * nfeatures + [1.]
-    df.loc['index2'] = ['era2', 'train'] + [0.2] * nfeatures + [0.]
-    df.loc['index3'] = ['era3', 'validation'] + [0.3] * nfeatures + [1.]
-    df.loc['index4'] = ['era3', 'validation'] + [0.4] * nfeatures + [0.]
-    df.loc['index5'] = ['era3', 'validation'] + [0.5] * nfeatures + [1.]
-    df.loc['index6'] = ['era4', 'validation'] + [0.6] * nfeatures + [0.]
-    df.loc['index7'] = ['eraX', 'test'] + [0.7] * nfeatures + [1.]
-    df.loc['index8'] = ['eraX', 'test'] + [0.8] * nfeatures + [0.]
-    df.loc['index9'] = ['eraX', 'live'] + [0.9] * nfeatures + [1.]
+    df.loc['index0'] = ['era1', 'train'] + [0.00, 0.01, 0.02] + [0.]
+    df.loc['index1'] = ['era2', 'train'] + [0.10, 0.11, 0.12] + [1.]
+    df.loc['index2'] = ['era2', 'train'] + [0.20, 0.21, 0.22] + [0.]
+    df.loc['index3'] = ['era3', 'validation'] + [0.30, 0.31, 0.32] + [1.]
+    df.loc['index4'] = ['era3', 'validation'] + [0.40, 0.41, 0.42] + [0.]
+    df.loc['index5'] = ['era3', 'validation'] + [0.50, 0.51, 0.52] + [1.]
+    df.loc['index6'] = ['era4', 'validation'] + [0.60, 0.61, 0.62] + [0.]
+    df.loc['index7'] = ['eraX', 'test'] + [0.70, 0.71, 0.72] + [1.]
+    df.loc['index8'] = ['eraX', 'test'] + [0.80, 0.81, 0.82] + [0.]
+    df.loc['index9'] = ['eraX', 'live'] + [0.90, 0.91, 0.92] + [1.]
     df['era'] = df['era'].map(ERA_STR_TO_FLOAT)
     df['region'] = df['region'].map(REGION_STR_TO_FLOAT)
     if index is not None:

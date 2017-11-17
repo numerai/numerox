@@ -57,7 +57,7 @@ Install
 
 Install with pip::
 
-    $ sudo pip install numerox
+    $ pip install numerox
 
 After you have installed numerox, run the unit tests (please report any
 failures)::
@@ -65,8 +65,7 @@ failures)::
     >>> import numerox as nx
     >>> nx.test()
 
-Requirements: python, setuptools, numpy, pandas, pytables, sklearn, requests,
-nose.
+Requirements: setuptools, numpy, pandas, pytables, sklearn, requests, nose.
 
 Resources
 =========

@@ -5,6 +5,11 @@ Release Notes
 
 - v0.0.4 (not yet released)
 
+  * ``data.replace_x`` renamed to ``data.x_replace``
+  * You can now change the number of x columns with ``data.x_replace``
+  * ``shares_memory`` can now check datas with different number of x columns
+  * Add more unit tests
+
 - v0.0.3
 
   * Add examples

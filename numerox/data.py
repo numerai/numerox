@@ -166,11 +166,18 @@ class Data(object):
         "View of features, x, as a numpy float array"
         return self.df.iloc[:, 2:-1].values
 
-    def replace_x(self, x_array):
+    def x_replace(self, x_array):
         "Copy of data but with data.x=`x_array`; must have same number of rows"
-        df = self.df.copy()
-        xname = self._x_names()
-        df[xname] = x_array
+        if x_array.shape[0] != len(self):
+            msg = "`x_array` must have the same number of rows as data"
+            raise ValueError(msg)
+        df = pd.DataFrame()
+        df['era'] = self.df['era'].copy()
+        df['region'] = self.df['region'].copy()
+        for i in range(x_array.shape[1]):
+            df['x' + str(i + 1)] = x_array[:, i]
+        df['y'] = self.df['y'].copy()
+        df.index = df.index.copy(deep=True)
         return Data(df)
 
     def _x_names(self):
