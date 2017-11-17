@@ -50,7 +50,7 @@ for the tournament data::
 Examples
 ========
 
-Have a look at the numerox `examples`_.
+Have a look at the `examples`_.
 
 Install
 =======
@@ -65,16 +65,8 @@ failures)::
     >>> import numerox as nx
     >>> nx.test()
 
-Requirements:
-
-- python
-- setuptools
-- numpy
-- pandas
-- pytables
-- sklearn
-- requests
-- nose
+Requirements: python, setuptools, numpy, pandas, pytables, sklearn, requests,
+nose.
 
 Resources
 =========

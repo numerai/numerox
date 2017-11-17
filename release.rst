@@ -3,6 +3,8 @@
 Release Notes
 =============
 
+- v0.0.4 (not yet released)
+
 - v0.0.3
 
   * Add examples
@@ -12,7 +14,7 @@ Release Notes
   * Add more unit tests
   * Remove appveyor so that unit tests can use Python's tempfile
   * Bugfix: ``prediction.copy`` was not copying the index
-  * Bugfix: mistakes in two unit tests meant they would never fail
+  * Bugfix: mistakes in two unit tests meant they could never fail
 
 - v0.0.2
 
