@@ -3,14 +3,15 @@
 Release Notes
 =============
 
-- v0.0.3
+- v0.0.3 (not yet released)
 
   * Added iterator ``data.era_iter``
   * Added iterator ``data.region_iter``
   * ``prediction.ids`` and ``prediction.yhat`` are now views instead of copies
-  * Bugfix: ``prediction.copy`` was not copying the index
-  * Remove appveyor
   * Add more unit tests
+  * Remove appveyor so that unit tests can use Python's tempfile
+  * Bugfix: ``prediction.copy`` was not copying the index
+  * Bugfix: mistakes in two unit tests meant they would never fail
 
 - v0.0.2
 
