@@ -2,6 +2,7 @@ import zipfile
 
 import numpy as np
 import pandas as pd
+from sklearn.decomposition import PCA
 
 TRAIN_FILE = 'numerai_training_data.csv'
 TOURNAMENT_FILE = 'numerai_tournament_data.csv'
@@ -201,6 +202,44 @@ class Data(object):
     def y(self):
         "View of y as a 1d numpy float array"
         return self.df['y'].values
+
+    # transforms ----------------------------------------------------------
+
+    def pca_transform(self, data_fit=None, nfactor=None):
+        """
+        Tranform the features (x) using Principal component analysis (PCA).
+
+        Parameters
+        ----------
+        data_fit : {Data, None}, optional
+            The data used to fit the PCA. By default (None) all data is used.
+        nfactor : {int, float, None}, optional
+            The number of orthogonal features to keep in the transform. By
+            default (None) all components are kept. If `nfactor` is less than
+            1 then `nfactor` represents the number of factors such that at
+            least `nfactor` of the variance is explain. If `nfactor` is
+            greater than 1 then it represents the number fo factors to keep.
+
+        Returns
+        -------
+        data : Data
+            A copy of the data object with the requested number of orthogonal
+            features.
+        """
+        if data_fit is None:
+            data_fit = self
+        if nfactor is None:
+            nfactor = self.xshape[1]
+        pca = PCA(n_components=data_fit.xshape[1])
+        pca.fit(data_fit.x)
+        if nfactor < 1:
+            expvar = np.cumsum(pca.explained_variance_ratio_)
+            nfactor = np.where(expvar >= nfactor)[0][0] + 1
+        x = pca.transform(self.x)[:, :nfactor]
+        data = self.x_replace(x)
+        return data
+
+    # misc ------------------------------------------------------------------
 
     def copy(self):
         "Copy of data"
