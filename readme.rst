@@ -65,15 +65,16 @@ failures)::
     >>> import numerox as nx
     >>> nx.test()
 
-Requirements: setuptools, numpy, pandas, pytables, sklearn, requests, nose.
+Requirements: python, setuptools, numpy, pandas, pytables, sklearn, requests,
+nose.
 
 Resources
 =========
 
-- Join us on Numerai's `chat`_
-- See `what's new`_
-- Look at the `examples`_
-- Report bugs on `github`_
+- `Chat`_ with us
+- See the `examples`_
+- Check `what's new`_
+- `Report bugs`_
 
 Sponsor
 =======
@@ -89,5 +90,5 @@ Numerox is distributed under the the GPL v3+. See LICENSE file for details.
 .. _model.py: https://github.com/kwgoodman/numerox/blob/master/numerox/model.py 
 .. _examples: https://github.com/kwgoodman/numerox/blob/master/examples/readme.rst
 .. _chat: https://community.numer.ai/channel/numerox
-.. _github: https://github.com/kwgoodman/numerox/issues
+.. _Report bugs: https://github.com/kwgoodman/numerox/issues
 .. _what's new: https://github.com/kwgoodman/numerox/blob/master/release.rst

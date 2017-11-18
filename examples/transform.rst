@@ -1,7 +1,7 @@
 Transform features
 ==================
 
-Numerox offers several ways to transform features (x).
+Numerox offers several ways to transform features (``data.x``).
 
 PCA
 ---
@@ -11,7 +11,7 @@ orthogonal::
 
     >>> data2 = data.pca()
 
-You can only keep the number of orthogonal features that explain at least,
+You can keep only the number of orthogonal features that explain at least,
 say, 90% of the variance::
 
     >>> data2 = data.pca(nfactor=0.9)
@@ -23,3 +23,25 @@ You can fit the PCA on, say, the train data and then use that fit to transform
 all the data::
 
     >>> data2 = data.pca(nfactor=0.9, data_fit=data['train'])
+
+Make your own
+-------------
+
+You can make your own (secret) transformation of the data. Let's multiply
+all features by 2::
+
+    >>> x = 2 * data.x
+    >>> data2 = data.x_replace(x)
+
+Let's only keep the first 20 features::
+
+    >>> x = data.x[:, :20]
+    >>> data2 = data.x_replace(x)
+
+Let's double the number of features::
+
+    >>> x = data.x
+    >>> x = np.hstack((x, x * x))
+    >>> data2 = data.x_replace(x)
+
+OK, you get the idea.
