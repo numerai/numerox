@@ -1,8 +1,10 @@
 import requests
 
 
-def download_dataset(saved_filename):
+def download_dataset(saved_filename, verbose=False):
     "Download the current Numerai dataset"
+    if verbose:
+        print("Download dataset {}".format(saved_filename))
     url = 'https://api.numer.ai/competitions/current/dataset'
     r = requests.get(url)
     if r.status_code != 200:

@@ -342,7 +342,7 @@ def load_data(file_path):
     return Data(df)
 
 
-def load_zip(file_path):
+def load_zip(file_path, verbose=False):
     "Load numerai dataset from zip archive; return Data"
 
     # load zip
@@ -368,7 +368,11 @@ def load_zip(file_path):
     if df.dtypes.unique().size != 1:
         raise TypeError("dtype of each column should be the same")
 
-    return Data(df)
+    data = Data(df)
+    if verbose:
+        print(data)
+
+    return data
 
 
 def concat_data(datas):
