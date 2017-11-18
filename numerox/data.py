@@ -205,20 +205,20 @@ class Data(object):
 
     # transforms ----------------------------------------------------------
 
-    def pca_transform(self, data_fit=None, nfactor=None):
+    def pca(self, nfactor=None, data_fit=None):
         """
         Tranform the features (x) using Principal component analysis (PCA).
 
         Parameters
         ----------
-        data_fit : {Data, None}, optional
-            The data used to fit the PCA. By default (None) all data is used.
         nfactor : {int, float, None}, optional
             The number of orthogonal features to keep in the transform. By
             default (None) all components are kept. If `nfactor` is less than
             1 then `nfactor` represents the number of factors such that at
             least `nfactor` of the variance is explain. If `nfactor` is
             greater than 1 then it represents the number fo factors to keep.
+        data_fit : {Data, None}, optional
+            The data used to fit the PCA. By default (None) all data is used.
 
         Returns
         -------

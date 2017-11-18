@@ -65,13 +65,13 @@ def test_data_x_replace():
     assert_raises(ValueError, d.x_replace, x[:4])
 
 
-def test_data_pca_transform():
-    "test data.pca_transform"
+def test_data_pca():
+    "test data.pca"
     d = nx.play_data()
     nfactors = (None, 3, 0.5)
     for nfactor in nfactors:
-        d2 = d.pca_transform(nfactor=nfactor)
-        msg = "data.pca_transform should return a copy"
+        d2 = d.pca(nfactor=nfactor)
+        msg = "data.pca should return a copy"
         ok_(not shares_memory(d, d2), msg)
         if nfactor is None:
             ok_(d.shape == d2.shape, "shape should not change")

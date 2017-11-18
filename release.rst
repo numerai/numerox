@@ -5,9 +5,10 @@ Release Notes
 
 - v0.0.4 (not yet released)
 
-  * Add ``data.pca_transform``
-  * ``data.replace_x`` renamed to ``data.x_replace``
+  * Add ``data.pca``
+  * Add examples of transforming features
   * You can now change the number of features with ``data.x_replace``
+  * ``data.replace_x`` renamed to ``data.x_replace``
   * ``shares_memory`` can now check datas with different number of x columns
   * Add more unit tests
 

@@ -5,7 +5,8 @@ Numerox examples
 - Your `first tournament`_
 - The `run and splitter`_ functions
 - `Compare models`_
-- Manipulating `data`_
+- Manipulate `data`_
+- `Transform features`_ (x)
 
 
 .. _model: https://github.com/kwgoodman/numerox/blob/master/numerox/model.py
@@ -13,3 +14,4 @@ Numerox examples
 .. _run and splitter: https://github.com/kwgoodman/numerox/blob/master/examples/run.rst
 .. _compare models: https://github.com/kwgoodman/numerox/blob/master/examples/compare_models.rst
 .. _data: https://github.com/kwgoodman/numerox/blob/master/examples/data.rst
+.. _Transform features: https://github.com/kwgoodman/numerox/blob/master/examples/transform.rst
