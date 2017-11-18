@@ -7,8 +7,8 @@ Release Notes
 
   * Add ``data.pca``
   * Add examples of transforming features
-  * You can now change the number of features with ``data.x_replace``
-  * ``data.replace_x`` renamed to ``data.x_replace``
+  * You can now change the number of features with ``data.xnew``
+  * ``data.xnew`` is the new name of ``data.replace_x``
   * ``shares_memory`` can now check datas with different number of x columns
   * Add more unit tests
 

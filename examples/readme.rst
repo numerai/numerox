@@ -6,7 +6,7 @@ Numerox examples
 - The `run and splitter`_ functions
 - `Compare models`_
 - Manipulate `data`_
-- `Transform features`_ (x)
+- `Transform features`_ (``data.x``)
 
 
 .. _model: https://github.com/kwgoodman/numerox/blob/master/numerox/model.py

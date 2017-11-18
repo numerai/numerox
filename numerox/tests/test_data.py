@@ -53,16 +53,16 @@ def test_data_indexing():
     ade(d[d.era == 'era4'], micro_data([6]), msg)
 
 
-def test_data_x_replace():
-    "test data.x_replace"
+def test_data_xnew():
+    "test data.xnew"
     d = nx.testing.micro_data()
     x = d.x.copy()
     x = x[:, -2:]
-    d2 = d.x_replace(x)
-    ok_(not shares_memory(d, d2), "data.x_replace should return a copy")
+    d2 = d.xnew(x)
+    ok_(not shares_memory(d, d2), "data.xnew should return a copy")
     ok_(d2.xshape[1] == 2, "x should have two columns")
-    assert_array_equal(d2.x, x, "data.replace corrupted the values")
-    assert_raises(ValueError, d.x_replace, x[:4])
+    assert_array_equal(d2.x, x, "data.xnew corrupted the values")
+    assert_raises(ValueError, d.xnew, x[:4])
 
 
 def test_data_pca():

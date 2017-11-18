@@ -31,17 +31,17 @@ You can make your own (secret) transformation of the data. Let's multiply
 all features by 2::
 
     >>> x = 2 * data.x
-    >>> data2 = data.x_replace(x)
+    >>> data2 = data.xnew(x)
 
 Let's only keep the first 20 features::
 
     >>> x = data.x[:, :20]
-    >>> data2 = data.x_replace(x)
+    >>> data2 = data.xnew(x)
 
 Let's double the number of features::
 
     >>> x = data.x
     >>> x = np.hstack((x, x * x))
-    >>> data2 = data.x_replace(x)
+    >>> data2 = data.xnew(x)
 
 OK, you get the idea.

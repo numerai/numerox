@@ -167,7 +167,7 @@ class Data(object):
         "View of features, x, as a numpy float array"
         return self.df.iloc[:, 2:-1].values
 
-    def x_replace(self, x_array):
+    def xnew(self, x_array):
         "Copy of data but with data.x=`x_array`; must have same number of rows"
         if x_array.shape[0] != len(self):
             msg = "`x_array` must have the same number of rows as data"
@@ -233,7 +233,7 @@ class Data(object):
         pca = PCA(n_components=nfactor)
         pca.fit(data_fit.x)
         x = pca.transform(self.x)
-        data = self.x_replace(x)
+        data = self.xnew(x)
         return data
 
     # misc ------------------------------------------------------------------
