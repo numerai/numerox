@@ -230,12 +230,9 @@ class Data(object):
             data_fit = self
         if nfactor is None:
             nfactor = self.xshape[1]
-        pca = PCA(n_components=data_fit.xshape[1])
+        pca = PCA(n_components=nfactor)
         pca.fit(data_fit.x)
-        if nfactor < 1:
-            expvar = np.cumsum(pca.explained_variance_ratio_)
-            nfactor = np.where(expvar >= nfactor)[0][0] + 1
-        x = pca.transform(self.x)[:, :nfactor]
+        x = pca.transform(self.x)
         data = self.x_replace(x)
         return data
 
