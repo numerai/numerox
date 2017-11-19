@@ -71,15 +71,15 @@ nose.
 Resources
 =========
 
-- `Chat`_ with us
-- See the `examples`_
+- Let's `Chat`_
+- See `examples`_
 - Check `what's new`_
-- `Report bugs`_
+- Report `bugs`_
 
 Sponsor
 =======
 
-Thank you Numerai for funding the development of Numerox.
+Thank you `Numerai`_ for funding the development of Numerox.
 
 License
 =======
@@ -87,8 +87,9 @@ License
 Numerox is distributed under the the GPL v3+. See LICENSE file for details.
 
 
-.. _model.py: https://github.com/kwgoodman/numerox/blob/master/numerox/model.py 
+.. _model.py: https://github.com/kwgoodman/numerox/blob/master/numerox/model.py
 .. _examples: https://github.com/kwgoodman/numerox/blob/master/examples/readme.rst
 .. _chat: https://community.numer.ai/channel/numerox
-.. _Report bugs: https://github.com/kwgoodman/numerox/issues
+.. _bugs: https://github.com/kwgoodman/numerox/issues
 .. _what's new: https://github.com/kwgoodman/numerox/blob/master/release.rst
+.. _Numerai: https://numer.ai

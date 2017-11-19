@@ -27,7 +27,7 @@ all the data::
 Make your own
 -------------
 
-You can make your own (secret) transformation of the data. Let's multiply
+You can make your own (secret) transformations of the features. Let's multiply
 all features by 2::
 
     >>> x = 2 * data.x
