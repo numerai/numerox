@@ -71,7 +71,7 @@ nose.
 Resources
 =========
 
-- Let's `Chat`_
+- Let's `chat`_
 - See `examples`_
 - Check `what's new`_
 - Report `bugs`_

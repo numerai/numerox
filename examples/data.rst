@@ -1,6 +1,11 @@
 Data class
 ==========
 
+The Data class is the most important object in numerox.
+
+Load data quickly
+-----------------
+
 You can create a data object from the zip archive provided by Numerai::
 
     >>> import numerox as nx
@@ -20,6 +25,17 @@ Let's create an HDF5 archive::
 
 That loads quickly (~0.1 seconds, but takes more disk space than the
 unexpanded zip archive).
+
+Where's the data?
+-----------------
+
+To get views (not copies) of the data as numpy arrays use ``data.ids``,
+``data.x``, ``data.y``. To get copies (not views) of era and region as numpy
+string arrays use ``data.era``, ``data.region``. Internally era and region are
+stored as floats. To get views: ``data.era_float``, ``data.region_region``.
+
+Indexing
+--------
 
 Data indexing is done by rows, not columns::
 
@@ -92,10 +108,9 @@ Or, let's go crazy::
     x         50, min 0.0000, mean 0.4992, max 1.0000
     y         mean 0.499960, fraction missing 0.3544
 
-To get views (not copies) of the data as numpy arrays use ``data.ids``,
-``data.x``, ``data.y``. To get copies (not views) of era and region as numpy
-string arrays use ``data.era``, ``data.region``. Internally era and region are
-stored as floats. To get views: ``data.era_float``, ``data.region_region``.
+
+Try it
+------
 
 Numerox comes with a small dataset to play with::
 
@@ -107,4 +122,4 @@ Numerox comes with a small dataset to play with::
     y         mean 0.502646, fraction missing 0.3126
 
 It is about 1% of a regular Numerai dataset, so contains around 60 rows per
-era.
+era. The data (``data.y``) is not balanced.
