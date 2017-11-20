@@ -3,6 +3,8 @@
 Release Notes
 =============
 
+- v0.0.5 (not yet released)
+
 - v0.0.4
 
   * Add ``data.pca``
