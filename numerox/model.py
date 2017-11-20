@@ -1,3 +1,4 @@
+import numpy as np
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import ExtraTreesClassifier as ETC
 
@@ -68,4 +69,15 @@ class extratrees(Model):
                   random_state=self.p['seed'])
         clf.fit(data_fit.x, data_fit.y)
         yhat = clf.predict_proba(data_predict.x)[:, 1]
+        return data_predict.ids, yhat
+
+
+# fast model for testing; always predicts 0.5
+class fifty(Model):
+
+    def __init__(self):
+        self.p = {}
+
+    def fit_predict(self, data_fit, data_predict):
+        yhat = 0.5 * np.ones(len(data_predict))
         return data_predict.ids, yhat

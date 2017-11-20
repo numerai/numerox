@@ -1,6 +1,6 @@
 import pprint
 
-from numerox import Prediction, tournament_splitter, cv_splitter
+from numerox import Prediction, TournamentSplitter, CVSplitter
 
 
 def run(model, splitter, verbosity=2):
@@ -23,7 +23,7 @@ def run(model, splitter, verbosity=2):
 
 
 def production(model, data, verbosity=2):
-    splitter = tournament_splitter(data)
+    splitter = TournamentSplitter(data)
     prediction = run(model, splitter, verbosity=verbosity)
     return prediction
 

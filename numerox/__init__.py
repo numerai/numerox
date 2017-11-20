@@ -16,10 +16,10 @@ from numerox.prediction import load_prediction
 from numerox.report import load_report
 
 # splitters
-from numerox.splitter import tournament_splitter
-from numerox.splitter import validation_splitter
-from numerox.splitter import split_splitter
-from numerox.splitter import cv_splitter
+from numerox.splitter import TournamentSplitter
+from numerox.splitter import ValidationSplitter
+from numerox.splitter import SplitSplitter
+from numerox.splitter import CVSplitter
 
 # run
 from numerox.run import run
