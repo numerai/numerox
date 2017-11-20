@@ -110,9 +110,9 @@ def test_data_copies():
     ok_(not shares_memory(d, d.copy()), "should be a copy")
     ok_(not shares_memory(d, d.era), "d.era should be a copy")
     ok_(not shares_memory(d, d.region), "d.region should be a copy")
+    ok_(not shares_memory(d, d.ids), "d.ids should be a copy")
 
     # views
-    ok_(shares_memory(d, d.ids), "d.ids should be a copy")
     ok_(shares_memory(d, d.era_float), "d.era_float should be a view")
     ok_(shares_memory(d, d.region_float), "d.region_float should be a view")
     ok_(shares_memory(d, d.x), "d.x should be a view")

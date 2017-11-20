@@ -5,6 +5,8 @@ Release Notes
 
 - v0.0.5 (not yet released)
 
+  * ``data.ids`` returns numpy string array copy instead of object array view
+
 - v0.0.4
 
   * Add ``data.pca``
