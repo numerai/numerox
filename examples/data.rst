@@ -29,10 +29,12 @@ unexpanded zip archive).
 Where's the data?
 -----------------
 
-To get views (not copies) of the data as numpy arrays use ``data.ids``,
-``data.x``, ``data.y``. To get copies (not views) of era and region as numpy
-string arrays use ``data.era``, ``data.region``. Internally era and region are
-stored as floats. To get views: ``data.era_float``, ``data.region_region``.
+To get views (not copies) of the data as numpy arrays use ``data.x`` and 
+``data.y``. To get copies (not views) of ids, era, and region as numpy
+string arrays use ``data.ids``, ``data.era``, ``data.region``.
+
+Internally era and region are stored as floats. To get views of era and region
+as numpy float arrays use ``data.era_float``, ``data.region_region``.
 
 Indexing
 --------
