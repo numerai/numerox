@@ -3,7 +3,7 @@
 Release Notes
 =============
 
-- v0.0.4 (not yet released)
+- v0.0.4
 
   * Add ``data.pca``
   * Add examples of transforming features
