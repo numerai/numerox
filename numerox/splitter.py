@@ -19,7 +19,9 @@ class Splitter(object):
     def reset(self):
         self.count = 0
 
-    __next__ = next  # py3 compat
+    def __next__(self):
+        # py3 compat
+        return self.next()
 
     def __repr__(self):
         msg = ""
