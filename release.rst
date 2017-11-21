@@ -3,6 +3,8 @@
 Release Notes
 =============
 
+- v0.0.6 (not yet released)
+
 - v0.0.5
 
   * Data splitters can now be reused to run more than one model
