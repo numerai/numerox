@@ -7,20 +7,27 @@ from sklearn.model_selection import KFold
 # simple splitters ----------------------------------------------------------
 
 class Splitter(object):
-    "Base class used by simple splitters"
+    "Base class used by simple splitters with data as only input"
 
     def __init__(self, data):
         self.data = data
+        self.reset()
+
+    def reset(self):
         self.count = 0
 
     def __iter__(self):
         return self
 
-    def reset(self):
-        self.count = 0
+    def next(self):
+        if self.count > 0:
+            raise StopIteration
+        tup = self.next_split()
+        self.count += 1
+        return tup
 
+    # py3 compat
     def __next__(self):
-        # py3 compat
         return self.next()
 
     def __repr__(self):
@@ -33,30 +40,21 @@ class Splitter(object):
 class TournamentSplitter(Splitter):
     "Single split of data into train, tournament"
 
-    def next(self):
-        if self.count > 0:
-            raise StopIteration
-        self.count += 1
+    def next_split(self):
         return self.data['train'], self.data['tournament']
 
 
 class ValidationSplitter(Splitter):
     "Single split of data into train, validation"
 
-    def next(self):
-        if self.count > 0:
-            raise StopIteration
-        self.count += 1
+    def next_split(self):
         return self.data['train'], self.data['validation']
 
 
 class CheatSplitter(Splitter):
     "Single split of data into train+validation, tournament"
 
-    def next(self):
-        if self.count > 0:
-            raise StopIteration
-        self.count += 1
+    def next_split(self):
         dfit = self.data.region_isin(['train', 'validation'])
         dpredict = self.data['validation']
         return dfit, dpredict
@@ -64,14 +62,8 @@ class CheatSplitter(Splitter):
 
 # complicated splitters -----------------------------------------------------
 
-class Splitter2(object):
-    "Base class used by more complicated splitters"
-
-    def __iter__(self):
-        return self
-
-    def reset(self):
-        self.count = 0
+class Splitter2(Splitter):
+    "Base class used by splitters with input besides data"
 
     def __repr__(self):
         msg = ""
@@ -93,11 +85,9 @@ class SplitSplitter(Splitter2):
                   'fit_fraction': fit_fraction,
                   'seed': seed,
                   'train_only': train_only}
-        self.count = 0
+        self.reset()
 
-    def next(self):
-        if self.count > 0:
-            raise StopIteration
+    def next_split(self):
         data = self.p['data']
         if self.p['train_only']:
             data = data['train']
@@ -107,10 +97,7 @@ class SplitSplitter(Splitter2):
         nfit = int(self.p['fit_fraction'] * eras.size + 0.5)
         data_fit = data.era_isin(eras[:nfit])
         data_predict = data.era_isin(eras[nfit:])
-        self.count += 1
         return data_fit, data_predict
-
-    __next__ = next  # py3 compat
 
 
 class CVSplitter(Splitter2):
@@ -121,13 +108,11 @@ class CVSplitter(Splitter2):
                   'kfold': kfold,
                   'seed': seed,
                   'train_only': train_only}
-        self.count = 0
         self.eras = None
         self.cv = None
+        self.reset()
 
-    def next(self):
-        if self.count >= self.p['kfold']:
-            raise StopIteration
+    def next_split(self):
         data = self.p['data']
         if self.count == 0:
             if self.p['train_only']:
@@ -144,7 +129,4 @@ class CVSplitter(Splitter2):
         era_predict = [self.eras[i] for i in predict_index]
         dfit = data.era_isin(era_fit)
         dpredict = data.era_isin(era_predict)
-        self.count += 1
         return dfit, dpredict
-
-    __next__ = next  # py3 compat
