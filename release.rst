@@ -5,7 +5,12 @@ Release Notes
 
 - v0.0.5 (not yet released)
 
+  * Data splitters can now be reused to run more than one model
+  * To reuse a splitter, reset it: ``splitter.reset()``
+  * All splitters renamed; e.g. ``cheat_splitter`` is now ``CheatSplitter``
+  * Splitters are now iterator classes instead of generator functions
   * ``data.ids`` returns numpy string array copy instead of object array view
+  * More unit tests
 
 - v0.0.4
 
@@ -14,7 +19,7 @@ Release Notes
   * You can now change the number of features with ``data.xnew``
   * ``data.xnew`` is the new name of ``data.replace_x``
   * ``shares_memory`` can now check datas with different number of x columns
-  * Add more unit tests
+  * More unit tests
 
 - v0.0.3
 
@@ -25,7 +30,7 @@ Release Notes
   * Remove appveyor so that unit tests can use Python's tempfile
   * Bugfix: ``prediction.copy`` was not copying the index
   * Bugfix: mistakes in two unit tests meant they could never fail
-  * Add more unit tests
+  * More unit tests
 
 - v0.0.2
 

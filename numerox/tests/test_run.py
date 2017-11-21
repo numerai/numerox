@@ -1,19 +1,19 @@
 from numerox.run import run, backtest, production
 from numerox.testing import play_data
 from numerox.model import logistic, extratrees
-from numerox.splitter import (tournament_splitter, validation_splitter,
-                              cheat_splitter, cv_splitter, split_splitter)
+from numerox.splitter import (TournamentSplitter, ValidationSplitter,
+                              CheatSplitter, CVSplitter, SplitSplitter)
 
 
 def test_run():
     "Make sure run runs"
     d = play_data()
     models = [logistic(), extratrees(nfeatures=2)]
-    splitters = [tournament_splitter(d),
-                 validation_splitter(d),
-                 cheat_splitter(d),
-                 cv_splitter(d, kfold=2),
-                 split_splitter(d, fit_fraction=0.5)]
+    splitters = [TournamentSplitter(d),
+                 ValidationSplitter(d),
+                 CheatSplitter(d),
+                 CVSplitter(d, kfold=2),
+                 SplitSplitter(d, fit_fraction=0.5)]
     for model in models:
         for splitter in splitters:
             run(model, splitter, verbosity=0)

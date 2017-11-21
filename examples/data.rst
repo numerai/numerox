@@ -34,7 +34,7 @@ To get views (not copies) of the data as numpy arrays use ``data.x`` and
 string arrays use ``data.ids``, ``data.era``, ``data.region``.
 
 Internally era and region are stored as floats. To get views of era and region
-as numpy float arrays use ``data.era_float``, ``data.region_region``.
+as numpy float arrays use ``data.era_float``, ``data.region_float``.
 
 Indexing
 --------
