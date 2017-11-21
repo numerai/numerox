@@ -1,3 +1,5 @@
+import sys
+
 import numpy as np
 from sklearn.model_selection import KFold
 
@@ -133,7 +135,10 @@ class CVSplitter(Splitter2):
             cv = KFold(n_splits=self.p['kfold'], random_state=self.p['seed'],
                        shuffle=True)
             self.cv = cv.split(self.eras)
-        fit_index, predict_index = self.cv.next()
+        if sys.version_info[0] == 2:
+            fit_index, predict_index = self.cv.next()
+        else:
+            fit_index, predict_index = self.cv.__next__()
         era_fit = [self.eras[i] for i in fit_index]
         era_predict = [self.eras[i] for i in predict_index]
         dfit = data.era_isin(era_fit)
