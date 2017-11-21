@@ -5,6 +5,10 @@ Release Notes
 
 - v0.0.5 (not yet released)
 
+  * Data splitters can now be reused to run more than one model
+  * To reuse a splitter, reset it: ``splitter.reset()``
+  * All splitters renamed; e.g. ``cheat_splitter`` is now ``CheatSplitter``
+  * Splitters are now iterator classes instead of generator functions
   * ``data.ids`` returns numpy string array copy instead of object array view
 
 - v0.0.4
