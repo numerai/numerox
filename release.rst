@@ -3,7 +3,7 @@
 Release Notes
 =============
 
-- v0.0.5 (not yet released)
+- v0.0.5
 
   * Data splitters can now be reused to run more than one model
   * To reuse a splitter, reset it: ``splitter.reset()``
