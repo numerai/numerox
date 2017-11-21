@@ -85,22 +85,26 @@ class Splitter2(object):
 class SplitSplitter(Splitter2):
     "Single fit-predict split of data"
 
-    def __init__(self, data, fit_fraction, seed=0):
+    def __init__(self, data, fit_fraction, seed=0, train_only=True):
         self.p = {'data': data,
                   'fit_fraction': fit_fraction,
-                  'seed': seed}
+                  'seed': seed,
+                  'train_only': train_only}
         self.count = 0
 
     def next(self):
         if self.count > 0:
             raise StopIteration
         data = self.p['data']
+        if self.p['train_only']:
+            data = data['train']
         eras = data.unique_era()
         rs = np.random.RandomState(self.p['seed'])
         rs.shuffle(eras)
         nfit = int(self.p['fit_fraction'] * eras.size + 0.5)
         data_fit = data.era_isin(eras[:nfit])
         data_predict = data.era_isin(eras[nfit:])
+        self.count += 1
         return data_fit, data_predict
 
     __next__ = next  # py3 compat

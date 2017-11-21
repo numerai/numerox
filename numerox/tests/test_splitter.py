@@ -1,18 +1,18 @@
 from nose.tools import ok_
 
 from numerox.testing import micro_data
-from numerox.splitter import (tournament_splitter, validation_splitter,
-                              cheat_splitter, cv_splitter, split_splitter)
+from numerox.splitter import (TournamentSplitter, ValidationSplitter,
+                              CheatSplitter, CVSplitter, SplitSplitter)
 
 
 def test_splitter_overlap():
     "prediction data should not overlap"
     d = micro_data()
-    splitters = [tournament_splitter(d),
-                 validation_splitter(d),
-                 cheat_splitter(d),
-                 cv_splitter(d, kfold=2),
-                 split_splitter(d, fit_fraction=0.5)]
+    splitters = [TournamentSplitter(d),
+                 ValidationSplitter(d),
+                 CheatSplitter(d),
+                 CVSplitter(d, kfold=2),
+                 SplitSplitter(d, fit_fraction=0.5)]
     for splitter in splitters:
         predict_ids = []
         for dfit, dpredict in splitter:
