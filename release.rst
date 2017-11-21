@@ -5,6 +5,9 @@ Release Notes
 
 - v0.0.6 (not yet released)
 
+  * Bugfix: in v0.0.5 CVSplitter ran only a single cross validation fold
+  * More unit tests
+
 - v0.0.5
 
   * Data splitters can now be reused to run more than one model

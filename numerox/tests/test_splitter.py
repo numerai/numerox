@@ -1,6 +1,6 @@
 from nose.tools import ok_
 
-from numerox.testing import micro_data
+from numerox.testing import micro_data, play_data
 from numerox.splitter import (TournamentSplitter, ValidationSplitter,
                               CheatSplitter, CVSplitter, SplitSplitter)
 
@@ -38,3 +38,14 @@ def test_splitter_reset():
             splitter.reset()
         ok_(ftups[0] == ftups[1], "splitter reset changed fit split")
         ok_(ptups[0] == ptups[1], "splitter reset changed predict split")
+
+
+def test_cvsplitter_kfold():
+    "make sure cvsplitter runs k folds"
+    d = play_data()
+    for k in (2, 3):
+        splitter = CVSplitter(d, kfold=k)
+        count = 0
+        for dfit, dpredict in splitter:
+            count += 1
+        ok_(count == k, "CVSplitter iterated through wrong number of folds")

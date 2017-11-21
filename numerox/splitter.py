@@ -112,7 +112,9 @@ class CVSplitter(Splitter2):
         self.cv = None
         self.reset()
 
-    def next_split(self):
+    def next(self):
+        if self.count >= self.p['kfold']:
+            raise StopIteration
         data = self.p['data']
         if self.count == 0:
             if self.p['train_only']:
@@ -129,4 +131,5 @@ class CVSplitter(Splitter2):
         era_predict = [self.eras[i] for i in predict_index]
         dfit = data.era_isin(era_fit)
         dpredict = data.era_isin(era_predict)
+        self.count += 1
         return dfit, dpredict
