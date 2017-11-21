@@ -19,6 +19,8 @@ class Splitter(object):
     def reset(self):
         self.count = 0
 
+    __next__ = next  # py3 compat
+
     def __repr__(self):
         msg = ""
         splitter = self.__class__.__name__
@@ -34,7 +36,6 @@ class TournamentSplitter(Splitter):
             raise StopIteration
         self.count += 1
         return self.data['train'], self.data['tournament']
-    __next__ = next  # py3 compat
 
 
 class ValidationSplitter(Splitter):
@@ -45,7 +46,6 @@ class ValidationSplitter(Splitter):
             raise StopIteration
         self.count += 1
         return self.data['train'], self.data['validation']
-    __next__ = next  # py3 compat
 
 
 class CheatSplitter(Splitter):
@@ -58,7 +58,6 @@ class CheatSplitter(Splitter):
         dfit = self.data.region_isin(['train', 'validation'])
         dpredict = self.data['validation']
         return dfit, dpredict
-    __next__ = next  # py3 compat
 
 
 # complicated splitters -----------------------------------------------------
