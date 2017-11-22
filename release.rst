@@ -3,6 +3,8 @@
 Release Notes
 =============
 
+- v0.0.7 (not yet released)
+
 - v0.0.6
 
   * Add ``concordance``
