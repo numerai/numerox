@@ -3,7 +3,7 @@
 Release Notes
 =============
 
-- v0.0.6 (not yet released)
+- v0.0.6
 
   * Add ``concordance``
   * New Runner class can run multiple models through a single data splitter
