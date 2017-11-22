@@ -5,6 +5,7 @@ Release Notes
 
 - v0.0.6 (not yet released)
 
+  * Update ``download_dataset`` for recent Numerai API change
   * Bugfix: in v0.0.5 CVSplitter ran only a single cross validation fold
   * More unit tests
 
