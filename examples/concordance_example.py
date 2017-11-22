@@ -2,7 +2,7 @@
 
 """
 Example showing how to calculate concordance.
-Concrdance must be less than 0.12 to pass numerai's check.
+Concordance must be less than 0.12 to pass numerai's check.
 For an accurate concordance calculation Data must be the full dataset.
 """
 
