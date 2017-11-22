@@ -3,3 +3,4 @@ include release.rst
 include LICENSE
 include numerox/tests/test_data.hdf
 recursive-include examples *.py *.rst
+recursive-include licenses *

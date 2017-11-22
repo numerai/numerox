@@ -31,6 +31,7 @@ from numerox.numerai import download_dataset
 
 # misc
 from numerox.data import concat_data
+from numerox.metrics import concordance
 from numerox.metrics import metrics_per_era
 from numerox.version import __version__
 

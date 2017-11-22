@@ -85,6 +85,8 @@ License
 =======
 
 Numerox is distributed under the the GPL v3+. See LICENSE file for details.
+Where indicated by code comments parts of NumPy and SciPy are included in
+numerox. Their licenses appear in the licenses directory.
 
 
 .. _model.py: https://github.com/kwgoodman/numerox/blob/master/numerox/model.py

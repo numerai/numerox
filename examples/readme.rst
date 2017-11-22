@@ -8,6 +8,7 @@ Numerox examples
 - `Compare models`_
 - Manipulate `data`_
 - `Transform features`_ (``data.x``)
+- `Concordance`_
 
 
 .. _model: https://github.com/kwgoodman/numerox/blob/master/numerox/model.py
@@ -17,3 +18,4 @@ Numerox examples
 .. _compare models: https://github.com/kwgoodman/numerox/blob/master/examples/compare_models.rst
 .. _data: https://github.com/kwgoodman/numerox/blob/master/examples/data.rst
 .. _Transform features: https://github.com/kwgoodman/numerox/blob/master/examples/transform.rst
+.. _concordance: https://github.com/kwgoodman/numerox/blob/master/examples/concordance_example.py

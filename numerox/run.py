@@ -1,9 +1,13 @@
+import time
 import pprint
 
 from numerox import Prediction, TournamentSplitter, CVSplitter
 
 
 def run(model, splitter, verbosity=2):
+    t0 = time.time()
+    if verbosity > 2:
+        print(splitter)
     if verbosity > 0:
         pprint.pprint(model)
     data = None
@@ -19,6 +23,9 @@ def run(model, splitter, verbosity=2):
             prediction.performance(data.region_isnotin(['test', 'live']))
     if verbosity == 1:
         prediction.performance(data.region_isnotin(['test', 'live']))
+    if verbosity > 2:
+        minutes = (time.time() - t0) / 60
+        print('Done in {:.2f} minutes'.format(minutes))
     return prediction
 
 
