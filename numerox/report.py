@@ -98,10 +98,3 @@ def load_report(prediction_dir, extension='pred'):
     report = Report()
     report.append_prediction_dict(predictions)
     return report
-
-
-if __name__ == '__main__':
-    import numerox as nx
-    data = nx.load_data('/data/nx/numerai_dataset_20171024.hdf')
-    report = nx.report.load_report('/data/nx/pred')
-    report.performance(data['train'], sort_by='consis')

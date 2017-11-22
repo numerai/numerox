@@ -144,38 +144,3 @@ def concat_prediction(predictions):
         # object, the id overlaps that it prints can be very long so
         raise IndexError("Overlap in ids found")
     return Prediction(df)
-
-
-if __name__ == '__main__':
-    import numerox as nx
-    data = nx.load_data('/data/nx/numerai_dataset.h5')
-    p = nx.load_prediction('/data/nx/logistic.pred')
-    p.performance(data['validation'])
-    """
-    model = nx.model.logistic()
-    prediction1 = nx.backtest(model, data, verbosity=1)
-    prediction2 = nx.production(model, data)
-    """
-    """
-    prediction = prediction1 + prediction2
-    print prediction
-    prediction.performance(data)
-    prediction.save('/data/nx/pred/logistic_1e-5.pred')
-    """
-
-    """
-    for c in (1e-1, 1e-2, 1e-3, 1e-4, 1e-5):
-        print c
-        model = nx.model.logistic(c)
-        prediction1 = nx.backtest(model, data, verbosity=1)
-        prediction2 = nx.production(model, data)
-        prediction = prediction1 + prediction2
-        prediction.save('/data/nx/pred/logistic_{:.0e}.pred'.format(c))
-
-    for n in (2, 3, 5, 7):
-        model = nx.model.extratrees(nfeatures=n)
-        prediction1 = nx.backtest(model, data, verbosity=1)
-        prediction2 = nx.production(model, data)
-        prediction = prediction1 + prediction2
-        prediction.save('/data/nx/pred/extratrees_nfeature{}.pred'.format(n))
-    """
