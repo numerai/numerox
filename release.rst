@@ -10,6 +10,7 @@ Release Notes
   * Update ``download_dataset`` for recent Numerai API change
   * Add ``RollSplitter`` roll forward fit-predict splits from consecutive eras
   * Add another verbosity level to ``run`` (verbosity=3)
+  * Use ``play_data`` instead of numerai server or hard coding my local path
   * Bugfix: in v0.0.5 CVSplitter ran only a single cross validation fold
   * More unit tests
 
