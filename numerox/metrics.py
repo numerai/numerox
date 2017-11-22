@@ -118,10 +118,11 @@ def concordance(data, prediction):
     return concord
 
 
-# copied from scipy to avoid scipy depedency; modified for use in numerox
+# copied from scipy to avoid scipy dependency; modified for use in numerox
 def ks_2samp(y1, y2):
     """
     Compute the Kolmogorov-Smirnov statistic on 2 samples.
+
     This is a two-sided test for the null hypothesis that 2 independent samples
     are drawn from the same continuous distribution.
 
@@ -141,8 +142,10 @@ def ks_2samp(y1, y2):
     This tests whether 2 samples are drawn from the same distribution. Note
     that, like in the case of the one-sample K-S test, the distribution is
     assumed to be continuous.
+
     This is the two-sided test, one-sided tests are not implemented.
     The test uses the two-sided asymptotic Kolmogorov-Smirnov distribution.
+
     If the K-S statistic is small or the p-value is high, then we cannot
     reject the hypothesis that the distributions of the two samples
     are the same.
