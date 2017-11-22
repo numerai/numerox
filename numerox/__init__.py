@@ -19,6 +19,7 @@ from numerox.report import load_report
 from numerox.splitter import TournamentSplitter
 from numerox.splitter import ValidationSplitter
 from numerox.splitter import SplitSplitter
+from numerox.splitter import CheatSplitter
 from numerox.splitter import CVSplitter
 from numerox.splitter import RollSplitter
 
