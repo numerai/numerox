@@ -133,3 +133,48 @@ class CVSplitter(Splitter2):
         dpredict = data.era_isin(era_predict)
         self.count += 1
         return dfit, dpredict
+
+
+class RollSplitter(Splitter2):
+    "Roll forward through consecutive eras to generate fit, train splits"
+
+    def __init__(self, data, fit_window, predict_window, step,
+                 train_only=True):
+        self.p = {'data': data,
+                  'fit_window': fit_window,
+                  'predict_window': predict_window,
+                  'step': step,
+                  'train_only': train_only}
+        self.eras = None
+        self.cv = None
+        self.reset()
+
+    def next(self):
+        data = self.p['data']
+        if self.count == 0:
+            if self.p['train_only']:
+                data = data['train']
+            self.eras = data.unique_era()
+        f_idx1 = self.count * self.p['step']
+        f_idx2 = f_idx1 + self.p['fit_window']
+        p_idx1 = f_idx2
+        p_idx2 = p_idx1 + self.p['predict_window']
+        nera = self.eras.size
+        if p_idx2 > nera:
+            raise StopIteration
+        era_fit = []
+        era_pre = []
+        for i in range(nera):
+            n_ifs = 0
+            if i >= f_idx1 and i < f_idx2:
+                era_fit.append(self.eras[i])
+                n_ifs += 1
+            if i >= p_idx1 and i < p_idx2:
+                era_pre.append(self.eras[i])
+                n_ifs += 1
+            if n_ifs > 1:
+                raise RuntimeError("You found a RollSplitter bug!")
+        dfit = data.era_isin(era_fit)
+        dpre = data.era_isin(era_pre)
+        self.count += 1
+        return dfit, dpre
