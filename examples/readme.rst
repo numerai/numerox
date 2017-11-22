@@ -5,10 +5,11 @@ Numerox examples
 - Your `first tournament`_
 - `Backtest`_ example
 - The `run and splitter`_ functions
-- `Compare models`_
+- `Compare model`_ performances
 - Manipulate `data`_
 - `Transform features`_ (``data.x``)
-- `Concordance`_
+- Calculate `concordance`_
+- `Run multiple models`_ through a single data splitter
 
 
 .. _model: https://github.com/kwgoodman/numerox/blob/master/numerox/model.py
@@ -19,3 +20,4 @@ Numerox examples
 .. _data: https://github.com/kwgoodman/numerox/blob/master/examples/data.rst
 .. _Transform features: https://github.com/kwgoodman/numerox/blob/master/examples/transform.rst
 .. _concordance: https://github.com/kwgoodman/numerox/blob/master/examples/concordance_example.py
+.. _run multiple models: https://github.com/kwgoodman/numerox/blob/master/examples/runner_example.py

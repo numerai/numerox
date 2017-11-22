@@ -6,6 +6,7 @@ Release Notes
 - v0.0.6 (not yet released)
 
   * Add ``concordance``
+  * New Runner class can run multiple models through a single data splitter
   * Update ``download_dataset`` for recent Numerai API change
   * Add another verbosity level to ``run`` (verbosity=3)
   * Bugfix: in v0.0.5 CVSplitter ran only a single cross validation fold
