@@ -6,6 +6,7 @@ Release Notes
 - v0.0.7 (not yet released)
 
   * Add ``dataset_url`` function
+  * Refactor splitter.py
 
 - v0.0.6
 

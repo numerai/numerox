@@ -4,10 +4,8 @@ import numpy as np
 from sklearn.model_selection import KFold
 
 
-# simple splitters ----------------------------------------------------------
-
 class Splitter(object):
-    "Base class used by simple splitters with data as only input"
+    "Base class used by data splitters; cannot be used as a splitter by itself"
 
     def __init__(self, data):
         self.data = data
@@ -33,7 +31,16 @@ class Splitter(object):
     def __repr__(self):
         msg = ""
         splitter = self.__class__.__name__
-        msg += splitter + "(data)"
+        if not hasattr(self, 'p'):
+            msg += splitter + "(data)"
+        else:
+            splitter = self.__class__.__name__
+            msg += splitter + "(data, "
+            for name, value in self.p.items():
+                if name != 'data':
+                    msg += name + "=" + str(value) + ", "
+            msg = msg[:-2]
+            msg += ")"
         return msg
 
 
@@ -60,24 +67,7 @@ class CheatSplitter(Splitter):
         return dfit, dpredict
 
 
-# complicated splitters -----------------------------------------------------
-
-class Splitter2(Splitter):
-    "Base class used by splitters with input besides data"
-
-    def __repr__(self):
-        msg = ""
-        splitter = self.__class__.__name__
-        msg += splitter + "(data, "
-        for name, value in self.p.items():
-            if name != 'data':
-                msg += name + "=" + str(value) + ", "
-        msg = msg[:-2]
-        msg += ")"
-        return msg
-
-
-class SplitSplitter(Splitter2):
+class SplitSplitter(Splitter):
     "Single fit-predict split of data"
 
     def __init__(self, data, fit_fraction, seed=0, train_only=True):
@@ -100,7 +90,7 @@ class SplitSplitter(Splitter2):
         return data_fit, data_predict
 
 
-class CVSplitter(Splitter2):
+class CVSplitter(Splitter):
     "K-fold cross validation fit-predict splits across train eras"
 
     def __init__(self, data, kfold=5, seed=0, train_only=True):
@@ -135,7 +125,7 @@ class CVSplitter(Splitter2):
         return dfit, dpredict
 
 
-class RollSplitter(Splitter2):
+class RollSplitter(Splitter):
     "Roll forward through consecutive eras to generate fit, train splits"
 
     def __init__(self, data, fit_window, predict_window, step,
