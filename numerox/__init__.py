@@ -31,6 +31,7 @@ from numerox.run import Runner
 
 # numerai
 from numerox.numerai import download_dataset
+from numerox.numerai import dataset_url
 
 # misc
 from numerox.data import concat_data

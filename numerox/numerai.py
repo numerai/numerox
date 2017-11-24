@@ -7,9 +7,7 @@ def download_dataset(saved_filename, verbose=False):
     "Download the current Numerai dataset"
     if verbose:
         print("Download dataset {}".format(saved_filename))
-    api = Numerai()
-    query = "query {dataset}"
-    url = api.call(query)['data']['dataset']
+    url = dataset_url()
     r = requests.get(url)
     if r.status_code != 200:
         msg = 'failed to download dataset (staus code {}))'
@@ -17,6 +15,14 @@ def download_dataset(saved_filename, verbose=False):
     with open(saved_filename, 'wb') as fd:
         for chunk in r.iter_content(chunk_size=1024):
             fd.write(chunk)
+
+
+def dataset_url():
+    "URL of current Numerai dataset"
+    api = Numerai()
+    query = "query {dataset}"
+    url = api.call(query)['data']['dataset']
+    return url
 
 
 class Numerai(object):
