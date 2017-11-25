@@ -81,6 +81,25 @@ def test_data_pca():
         ok_(corr < 1e-5, "features are not orthogonal")
 
 
+def test_data_balance():
+    "test data.balance"
+    d = micro_data()
+    b = d.balance(train_only=False)
+    for era in b.unique_era():
+        if era != 'eraX':
+            y = b[era].y
+            n0 = (y == 0).sum()
+            n1 = (y == 1).sum()
+            ok_(n0 == n1, "y is not balanced")
+    b = d.balance(train_only=True)
+    eras = np.unique(b.era[b.region == 'train'])
+    for era in eras:
+        y = b[era].y
+        n0 = (y == 0).sum()
+        n1 = (y == 1).sum()
+        ok_(n0 == n1, "y is not balanced")
+
+
 def test_empty_data():
     "test empty data"
     d = micro_data()

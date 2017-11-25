@@ -5,8 +5,10 @@ Release Notes
 
 - v0.0.7 (not yet released)
 
+  * Add ``data.balance``
   * Add ``dataset_url`` function
-  * Refactor splitter.py
+  * All splitters now use a single base class
+  * More unit tests
 
 - v0.0.6
 

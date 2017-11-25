@@ -236,6 +236,67 @@ class Data(object):
         data = self.xnew(x)
         return data
 
+    def balance(self, train_only=True, seed=0):
+        """
+        Copy of data where specified eras have mean y of 0.5.
+
+        Parameters
+        ----------
+        train_only : {True, False}, optional
+            By default (True) only train eras are y balanced. No matter what
+            the setting of `train_only` any era that contains a y that is NaN
+            is not balanced.
+        seed : int, optional
+            Seed used by random number generator that selects which rows to
+            keep. Default is 0.
+
+        Returns
+        -------
+        data : Data
+            A copy of data where specified eras have mean y of 0.5.
+        """
+        # This function is not written in a strightforward manner.
+        # A few speed optimizations have been made.
+        data = self
+        if train_only:
+            eras = np.unique(data.era_float[data.region_float == 0]).tolist()
+        else:
+            eras = data.unique_era(as_str=False).tolist()
+        era = data.era_float
+        y = data.y
+        index = np.arange(y.size)
+        remove = []
+        rs = np.random.RandomState(seed)
+        for e in eras:
+            idx = era == e
+            yi = y[idx]
+            indexi = index[idx]
+            n1 = yi.sum()
+            if np.isnan(n1):
+                continue
+            n1 = int(n1)
+            n0 = yi.size - n1
+            if n0 == n1:
+                pass
+            elif n0 > n1:
+                ix = indexi[yi == 0]
+                ix = rs.choice(ix, size=n0-n1, replace=False)
+                remove.append(ix)
+            elif n0 < n1:
+                ix = indexi[yi == 1]
+                ix = rs.choice(ix, size=n1-n0, replace=False)
+                remove.append(ix)
+            else:
+                raise RuntimeError("balance should not reach this line")
+            idx = ~idx
+            era = era[idx]
+            y = y[idx]
+            index = index[idx]
+        keep = set(range(data.shape[0])) - set(np.concatenate(remove))
+        keep = list(keep)
+        df = data.df.take(keep)
+        return Data(df)
+
     # misc ------------------------------------------------------------------
 
     def copy(self):
@@ -385,3 +446,16 @@ def concat_data(datas):
         # object, the id overlaps that it prints can be very long so
         raise IndexError("Overlap in ids found")
     return Data(df)
+
+
+if __name__ == '__main__':
+    import numerox as nx
+    data = nx.load_data('/data/nx/dataset.h5')
+    if False:
+        splitter = nx.CVSplitter(data)
+        dfit, dpre = splitter.next()
+        dfit.balance()
+        dfit.balance2()
+    else:
+        d = data.balance()
+        d = data.balance2()
