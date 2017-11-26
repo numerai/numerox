@@ -6,6 +6,7 @@ Release Notes
 - v0.0.7 (not yet released)
 
   * Add ``data.balance``
+  * Add ``data.subsample``
   * Add ``dataset_url`` function
   * All splitters now use a single base class
   * More unit tests

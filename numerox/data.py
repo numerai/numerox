@@ -255,7 +255,7 @@ class Data(object):
         data : Data
             A copy of data where specified eras have mean y of 0.5.
         """
-        # This function is not written in a strightforward manner.
+        # This function is not written in a straightforward manner.
         # A few speed optimizations have been made.
         data = self
         if train_only:
@@ -296,6 +296,31 @@ class Data(object):
         keep = list(keep)
         df = data.df.take(keep)
         return Data(df)
+
+    def subsample(self, fraction, balance=True, seed=0):
+        """
+        Randomly sample `fraction` of each era's rows.
+
+        data.y is optionally balanced. The default is to balance y. Balancing
+        is achieved by removing rows so the number of rows will likely be
+        less than expected using `fraction` if `balance` is True.
+        """
+        rs = np.random.RandomState(seed)
+        data_index = np.arange(len(self))
+        era = self.era_float
+        eras = self.unique_era(as_str=False)
+        index = []
+        for e in eras:
+            idx = data_index[era == e]
+            n = int(fraction * idx.size)
+            idx = rs.choice(idx, n, replace=False)
+            index.append(idx)
+        index = np.concatenate(index)
+        df = self.df.take(index)
+        data = Data(df)
+        if balance:
+            data = data.balance(seed=seed)
+        return data
 
     # misc ------------------------------------------------------------------
 
