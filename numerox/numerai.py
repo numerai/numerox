@@ -1,4 +1,7 @@
 import requests
+import tempfile
+
+import numerox as nx
 
 API_TOURNAMENT_URL = 'https://api-tournament.numer.ai'
 
@@ -23,6 +26,14 @@ def dataset_url():
     query = "query {dataset}"
     url = api.call(query)['data']['dataset']
     return url
+
+
+def download_data_object():
+    "Used by numerox to avoid hard coding paths; probably not useful to users"
+    with tempfile.NamedTemporaryFile() as temp:
+        download_dataset(temp.name)
+        data = nx.load_zip(temp.name)
+    return data
 
 
 class Numerai(object):

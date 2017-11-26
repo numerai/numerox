@@ -9,6 +9,7 @@ Release Notes
   * Add ``data.subsample``
   * Add ``dataset_url`` function
   * All splitters now use a single base class
+  * Add ``download_data_object`` to avoid hard coding path in examples
   * More unit tests
 
 - v0.0.6
