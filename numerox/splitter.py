@@ -2,6 +2,9 @@ import sys
 
 import numpy as np
 from sklearn.model_selection import KFold
+from sklearn.model_selection import StratifiedKFold
+
+import numerox as nx
 
 
 class Splitter(object):
@@ -123,6 +126,38 @@ class CVSplitter(Splitter):
         dpredict = data.era_isin(era_predict)
         self.count += 1
         return dfit, dpredict
+
+
+class IgnoreEraCVSplitter(Splitter):
+    "K-fold cross validation fit-predict splits ignoring eras and balancing y"
+
+    def __init__(self, data, kfold=5, seed=0, train_only=True):
+        self.p = {'data': data,
+                  'kfold': kfold,
+                  'seed': seed,
+                  'train_only': train_only}
+        self.cv = None
+        self.reset()
+
+    def next(self):
+        if self.count >= self.p['kfold']:
+            raise StopIteration
+        data = self.p['data']
+        if self.count == 0:
+            if self.p['train_only']:
+                data = data['train']
+            cv = StratifiedKFold(n_splits=self.p['kfold'],
+                                 random_state=self.p['seed'],
+                                 shuffle=True)
+            self.cv = cv.split(data.x, data.y)
+        if sys.version_info[0] == 2:
+            fit_index, pre_index = self.cv.next()
+        else:
+            fit_index, pre_index = self.cv.__next__()
+        dfit = nx.Data(data.df.take(fit_index))
+        dpre = nx.Data(data.df.take(pre_index))
+        self.count += 1
+        return dfit, dpre
 
 
 class RollSplitter(Splitter):

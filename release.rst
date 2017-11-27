@@ -8,6 +8,7 @@ Release Notes
   * Add ``data.balance``
   * Add ``data.subsample``
   * Add ``data.hash``
+  * Add ``IgnoreEraCVSplitter``
   * Add ``dataset_url`` function
   * All splitters now use a single base class
   * Add ``download_data_object`` to avoid hard coding path in examples

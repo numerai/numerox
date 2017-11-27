@@ -3,16 +3,16 @@ from nose.tools import ok_
 import numpy as np
 
 import numerox as nx
-from numerox.testing import micro_data, play_data
 
 
 def test_splitter_overlap():
     "prediction data should not overlap"
-    d = micro_data()
+    d = nx.play_data()
     splitters = [nx.TournamentSplitter(d),
                  nx.ValidationSplitter(d),
                  nx.CheatSplitter(d),
-                 nx.CVSplitter(d, kfold=2),
+                 nx.CVSplitter(d),
+                 nx.IgnoreEraCVSplitter(d),
                  nx.SplitSplitter(d, fit_fraction=0.5)]
     for splitter in splitters:
         predict_ids = []
@@ -23,11 +23,12 @@ def test_splitter_overlap():
 
 def test_splitter_reset():
     "splitter reset should not change results"
-    d = micro_data()
+    d = nx.play_data()
     splitters = [nx.TournamentSplitter(d),
                  nx.ValidationSplitter(d),
                  nx.CheatSplitter(d),
-                 nx.CVSplitter(d, kfold=2),
+                 nx.CVSplitter(d),
+                 nx.IgnoreEraCVSplitter(d),
                  nx.SplitSplitter(d, fit_fraction=0.5)]
     for splitter in splitters:
         ftups = [[], []]
@@ -43,7 +44,7 @@ def test_splitter_reset():
 
 def test_cvsplitter_kfold():
     "make sure cvsplitter runs k folds"
-    d = play_data()
+    d = nx.play_data()
     for k in (2, 3):
         splitter = nx.CVSplitter(d, kfold=k)
         count = 0
@@ -54,7 +55,7 @@ def test_cvsplitter_kfold():
 
 def test_rollsplitter():
     "make sure rollsplitter has no overlaps"
-    d = play_data()
+    d = nx.play_data()
     splitter = nx.RollSplitter(d, fit_window=15, predict_window=10, step=15)
     for dfit, dpre in splitter:
         fera = dfit.unique_era()
