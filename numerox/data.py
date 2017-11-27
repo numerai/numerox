@@ -329,13 +329,11 @@ class Data(object):
         """
         Hash of data object.
 
-        This function is slow. It can take a second to run on a full dataset.
-
-        Loading from Numerai (string) zip archive is unlikely to give same
-        hash value across different computers (OS etc) due to different
-        rounding when the values cannot be fit exactly into 64 bits.
+        The hash is unlikely to be the same across different computers (OS,
+        Python version, etc). But should be the same for the same dataset on
+        the same system.
         """
-        b = self.df.values.tobytes()
+        b = self.df.values.tobytes(order='A')
         h = hash(b)
         return h
 
