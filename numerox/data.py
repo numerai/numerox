@@ -324,6 +324,28 @@ class Data(object):
 
     # misc ------------------------------------------------------------------
 
+    def hash(self):
+        """
+        Hash of data object.
+
+        Loading from Numerai (string) zip archive is unlikely to give same
+        hash value across different computers (OS etc) due to different
+        rounding when the values cannot be fit exactly into 64 bits.
+        """
+        a = self.df.values
+        state = a.flags.writeable
+        a.flags.writeable = False
+        try:
+            h = hash(a.data)
+        except:
+            # probably array is not contiguous
+            a = a.copy()
+            a.flags.writeable = False
+            h = hash(a.data)
+        finally:
+            a.flags.writeable = state
+        return h
+
     def copy(self):
         "Copy of data"
         # df.copy(deep=True) doesn't copy index. So:
@@ -471,16 +493,3 @@ def concat_data(datas):
         # object, the id overlaps that it prints can be very long so
         raise IndexError("Overlap in ids found")
     return Data(df)
-
-
-if __name__ == '__main__':
-    import numerox as nx
-    data = nx.load_data('/data/nx/dataset.h5')
-    if False:
-        splitter = nx.CVSplitter(data)
-        dfit, dpre = splitter.next()
-        dfit.balance()
-        dfit.balance2()
-    else:
-        d = data.balance()
-        d = data.balance2()

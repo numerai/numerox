@@ -100,6 +100,14 @@ def test_data_balance():
         ok_(n0 == n1, "y is not balanced")
 
 
+def test_data_hash():
+    "test data.hash"
+    d = nx.play_data()
+    ok_(d.hash() == d.hash(), "data.hash not reproduceable")
+    d2 = nx.Data(d.df[::2])
+    ok_(d2.hash() == d2.hash(), "data.hash not reproduceable")
+
+
 def test_empty_data():
     "test empty data"
     d = micro_data()
