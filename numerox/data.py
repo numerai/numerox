@@ -259,7 +259,8 @@ class Data(object):
         # A few speed optimizations have been made.
         data = self
         if train_only:
-            eras = np.unique(data.era_float[data.region_float == 0]).tolist()
+            f = REGION_STR_TO_FLOAT['train']
+            eras = np.unique(data.era_float[data.region_float == f]).tolist()
         else:
             eras = data.unique_era(as_str=False).tolist()
         era = data.era_float
