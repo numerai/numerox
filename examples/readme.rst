@@ -10,6 +10,7 @@ Numerox examples
 - `Transform features`_ (``data.x``)
 - Calculate `concordance`_
 - `Run multiple models`_ through a single data splitter
+- Numerai's `CV warning`_ (hold out eras not rows)
 
 
 .. _model: https://github.com/kwgoodman/numerox/blob/master/numerox/model.py
@@ -21,3 +22,4 @@ Numerox examples
 .. _Transform features: https://github.com/kwgoodman/numerox/blob/master/examples/transform.rst
 .. _concordance: https://github.com/kwgoodman/numerox/blob/master/examples/concordance_example.py
 .. _run multiple models: https://github.com/kwgoodman/numerox/blob/master/examples/runner_example.py
+.. _cv warning: https://github.com/kwgoodman/numerox/blob/master/examples/cv_warning.rst

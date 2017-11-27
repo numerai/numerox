@@ -5,6 +5,7 @@ Release Notes
 
 - v0.0.8 (not yet released)
 
+  * Example of Numerai's cross validation warning (hold out eras not rows)
 
 - v0.0.7
 
