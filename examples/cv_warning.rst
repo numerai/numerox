@@ -27,10 +27,6 @@ calculating a significance (which I didn't do) the results are not very
 meaningful. But casual observation of the first 10 runs, if I remember
 correctly, showed that cv won logloss every time.
 
-Note that the bet size (ystd), which is the standard deviation of the
-predictions for a single cross validation run, is larger for cve. So the model
-is more confident, as expected, when we have to fit data from fewer eras.
-
 Not shown in the results but seen when watching the results accumulate, the
 logloss of cv is less noisy than that of cve. That makes sense too. In cv
 there is very likely to be fit and predict data from every era in every cross
