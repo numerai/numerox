@@ -3,6 +3,9 @@
 Release Notes
 =============
 
+- v0.0.8 (not yet released)
+
+
 - v0.0.7
 
   * Add ``data.balance``
