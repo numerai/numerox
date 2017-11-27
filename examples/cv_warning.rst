@@ -27,13 +27,13 @@ meaningful. But casual observation of the first 10 runs, if I remember
 correctly, showed that cv won logloss every time.
 
 Note that the bet size (ystd), which is the standard deviation of the
-predictions for a single cross validation run, is larger for cv. So the model
-is more confident, as expected, when we ignore eras. That's because data from
-the same eras appear in the fit data and the predict data.
+predictions for a single cross validation run, is larger for cve. So the model
+is more confident, as expected, when we have to fit data from fewer eras.
 
 Not shown in the results but seen when watching the results accumulate, the
 logloss of cv is less noisy than that of cve. That makes sense too. In cv
-there is very likely to be fit and predict data from every era.
+there is very likely to be fit and predict data from every era in every cross
+validation run.
 
 
 .. _here: https://github.com/kwgoodman/numerox/blob/master/examples/cv_warning.py
