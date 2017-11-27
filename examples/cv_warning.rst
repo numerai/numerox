@@ -11,7 +11,8 @@ regression with the default regularization). The code for this example is
 `here`_.
 
 We will do 100 cross validations that uses eras as Numerai recommends (cve)
-and 100 with a traditional cross validation that ignores eras (cv)::
+and 100 with a traditional cross validation that ignores eras (cv). Here are
+the mean results::
 
     100 runs
                   cve        cv
