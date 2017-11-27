@@ -10,6 +10,8 @@ Release Notes
   * Add ``dataset_url`` function
   * All splitters now use a single base class
   * Add ``download_data_object`` to avoid hard coding path in examples
+  * ``play_data`` is now ``data.y`` balanced
+  * Rewrote ``update_play_data``
   * More unit tests
 
 - v0.0.6

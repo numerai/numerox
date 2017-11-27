@@ -83,8 +83,9 @@ def play_data():
     return nx.load_data(TEST_DATA)
 
 
-def update_play_data(numerai_zip_path):
+def update_play_data(data=None, fraction=0.01):
     "Create and save data used by play_data function"
-    data = nx.load_zip(numerai_zip_path)
-    play = data.subsample(fraction=0.01, seed=0)
+    if data is None:
+        data = nx.numerai.download_data_object()
+    play = data.subsample(fraction=fraction, balance=True, seed=0)
     play.save(TEST_DATA)

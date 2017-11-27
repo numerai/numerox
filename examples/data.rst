@@ -124,4 +124,4 @@ Numerox comes with a small dataset to play with::
     y         mean 0.502646, fraction missing 0.3126
 
 It is about 1% of a regular Numerai dataset, so contains around 60 rows per
-era. The data (``data.y``) is not balanced.
+era. The data (``data.y``) is balanced.

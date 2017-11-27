@@ -319,7 +319,7 @@ class Data(object):
         df = self.df.take(index)
         data = Data(df)
         if balance:
-            data = data.balance(seed=seed)
+            data = data.balance(train_only=False, seed=seed)
         return data
 
     # misc ------------------------------------------------------------------
