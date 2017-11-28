@@ -65,15 +65,6 @@ def test_data_xnew():
     assert_raises(ValueError, d.xnew, x[:4])
 
 
-def test_data_xnew_inplace():
-    "test data.xnew_inplace"
-    d = nx.testing.micro_data()
-    x = d.x.copy()
-    d.xnew_inplace(2 * x)
-    assert_array_equal(2 * x, d.x, "data.xnew_inplace corrupted the values")
-    assert_raises(ValueError, d.xnew_inplace, x[:, 1:])
-
-
 def test_data_pca():
     "test data.pca"
     d = nx.play_data()

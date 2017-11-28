@@ -5,10 +5,8 @@ Release Notes
 
 - v0.0.8 (not yet released)
 
-  * Add ``data.xnew_inplace``
   * Example of Numerai's cross validation warning (hold out eras not rows)
   * Bugfix: import error in cv_warning.py
-  * More unit tests
 
 - v0.0.7
 
