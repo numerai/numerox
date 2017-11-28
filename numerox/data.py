@@ -181,6 +181,12 @@ class Data(object):
         df.index = df.index.copy(deep=True)
         return Data(df)
 
+    def xnew_inplace(self, x_array):
+        "Inplace change of data.x to `x_array`; must have same shape"
+        if x_array.shape != self.xshape:
+            raise ValueError("`x_array` must have same shape as data.x")
+        self.df.iloc[:, 2:-1] = x_array
+
     def _x_names(self):
         "Return list of column names of features, x, in dataframe"
         cols = self._column_list()

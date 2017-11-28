@@ -44,4 +44,9 @@ Let's double the number of features::
     >>> x = np.hstack((x, x * x))
     >>> data2 = data.xnew(x)
 
-OK, you get the idea.
+It's faster if you change the features inplace. To do so you cannot change the
+number of columns (by the way you can never change the number of rows with
+xnew or xnew_inplace). For example::
+
+    >>> x = 2 * data.x
+    >>> data.xnew_inplace(x)
