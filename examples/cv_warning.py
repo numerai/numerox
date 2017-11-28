@@ -43,6 +43,6 @@ def cv_warning(data, nsamples=100):
 
 
 if __name__ == '__main__':
-    data = nx.testing.download_data_object()
+    data = nx.numerai.download_data_object()
     data = data['train']
     cv_warning(data)
