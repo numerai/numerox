@@ -10,7 +10,9 @@ Numerox is a Numerai tournament toolbox written in Python.
 All you have to do is create a model. Take a look at `model.py`_ for examples.
 
 Once you have a model numerox will do the rest. First download the Numerai
-dataset and then load it::
+dataset and then load it.
+
+.. code:: python
 
     >>> import numerox as nx
     >>> nx.download_dataset('numerai_dataset.zip')
@@ -23,7 +25,9 @@ dataset and then load it::
     y         mean 0.499961, fraction missing 0.3109
 
 Let's use the logistic regression model in numerox to run 5-fold cross
-validation on the training data::
+validation on the training data.
+
+.. code:: python
 
     >>> model = nx.model.logistic()
     >>> prediction = nx.backtest(model, data, verbosity=1)
@@ -36,7 +40,9 @@ validation on the training data::
 
 OK, results are good enough for a demo so let's make a submission file for the
 tournament. We will fit the model on the train data and make our predictions
-for the tournament data::
+for the tournament data.
+
+.. code:: python
 
     >>> prediction = nx.production(model, data)
     logistic(inverse_l2=1e-05)
@@ -60,7 +66,9 @@ Install with pip::
     $ pip install numerox
 
 After you have installed numerox, run the unit tests (please report any
-failures)::
+failures).
+
+.. code:: python
 
     >>> import numerox as nx
     >>> nx.test()
