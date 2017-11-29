@@ -172,13 +172,16 @@ class Data(object):
         if x_array.shape[0] != len(self):
             msg = "`x_array` must have the same number of rows as data"
             raise ValueError(msg)
-        df = pd.DataFrame()
-        df['era'] = self.df['era'].copy()
-        df['region'] = self.df['region'].copy()
-        for i in range(x_array.shape[1]):
-            df['x' + str(i + 1)] = x_array[:, i]
-        df['y'] = self.df['y'].copy()
-        df.index = df.index.copy(deep=True)
+        shape = (x_array.shape[0], x_array.shape[1] + 3)
+        cols = ['x'+str(i) for i in range(x_array.shape[1])]
+        cols = ['era', 'region'] + cols + ['y']
+        df = pd.DataFrame(data=np.empty(shape, dtype=np.float64),
+                          index=self.df.index.copy(deep=True),
+                          columns=cols)
+        df['era'] = self.df['era'].values.copy()
+        df['region'] = self.df['region'].values.copy()
+        df.values[:, 2:-1] = x_array
+        df['y'] = self.df['y'].values.copy()
         return Data(df)
 
     def _x_names(self):
