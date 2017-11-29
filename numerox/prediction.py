@@ -105,7 +105,7 @@ class Prediction(object):
             return 0
         return self.df.__len__()
 
-    def _column_list(self):
+    def column_list(self):
         "Return column names of dataframe as a list"
         return self.df.columns.tolist()
 

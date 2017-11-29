@@ -159,7 +159,7 @@ def test_data_properties():
     ok_((d.y[idx] == d.df.y[idx]).all(), "y is corrupted")
 
     x = d.x
-    for i, name in enumerate(d._x_names()):
+    for i, name in enumerate(d.column_list(x_only=True)):
         ok_((x[:, i] == d.df[name]).all(), "%s is corrupted" % name)
 
 

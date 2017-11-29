@@ -25,7 +25,7 @@ def shares_memory(data1, data_or_array2):
     "True if `data1` shares memory with `data_or_array2`; False otherwise"
     isdata_like = isinstance(data_or_array2, nx.Data)
     isdata_like = isdata_like or isinstance(data_or_array2, nx.Prediction)
-    cols = data1._column_list() + ['ids']
+    cols = data1.column_list() + ['ids']
     for col in cols:
         if col == 'ids':
             a1 = data1.df.index.values

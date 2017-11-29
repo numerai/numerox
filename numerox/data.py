@@ -184,19 +184,11 @@ class Data(object):
         df['y'] = self.df['y'].values.copy()
         return Data(df)
 
-    def _x_names(self):
-        "Return list of column names of features, x, in dataframe"
-        cols = self._column_list()
-        names = [n for n in cols if n.startswith('x')]
-        if len(names) == 0:
-            raise IndexError("Could not find any features (x)")
-        return names
-
     @property
     def xshape(self):
-        "Shape (nrows, ncols) of x"
+        "Shape (nrows, ncols) of x; faster than data.x.shape"
         rows = self.df.shape[0]
-        cols = len(self._x_names())
+        cols = len(self.column_list(x_only=True))
         return (rows, cols)
 
     # y ---------------------------------------------------------------------
@@ -357,9 +349,14 @@ class Data(object):
         else:
             self.df.to_hdf(path_or_buf, HDF_DATA_KEY)
 
-    def _column_list(self):
+    def column_list(self, x_only=False):
         "Return column names of dataframe as a list"
-        return self.df.columns.tolist()
+        cols = self.df.columns.tolist()
+        if x_only:
+            cols = [n for n in cols if n.startswith('x')]
+            if len(cols) == 0:
+                raise IndexError("Could not find any features (x)")
+        return cols
 
     @property
     def size(self):
