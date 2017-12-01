@@ -41,25 +41,20 @@ def download_data_object():
 
 def show_stakes(round_number=None):
     "Display info on staking"
-    df = get_stakes_df(round_number=round_number)
-    df0 = df[df.c == 0]
-    df = df[df.c != 0]  # drop zero confidences for now
-    df = df.sort_values(['c', 'days'], axis=0, ascending=[False, False])
-    df.insert(3, 'cumsum', df.soc.cumsum(axis=0))
+    df, c_zero_users = get_stakes(round_number=round_number)
     df['days'] = df['days'].round(4)
     df['s'] = df['s'].astype(int)
     df['soc'] = df['soc'].astype(int)
     df['cumsum'] = df['cumsum'].astype(int)
     with pd.option_context('display.colheader_justify', 'left'):
         print(df.to_string(index=False))
-    if len(df) > 0:
-        z = df0.user.tolist()
-        z = ','.join(z)
-        print('C=0: {}'.format(z))
+    if len(c_zero_users) > 0:
+        c_zero_users = ','.join(c_zero_users)
+        print('C=0: {}'.format(c_zero_users))
 
 
-def get_stakes_df(round_number=None):
-    "Download stakes data, modify it, return as dataframe"
+def get_stakes(round_number=None):
+    "Download stakes, modify it to make it more useful, return as dataframe"
 
     # get raw stakes; eventually use numerapi for this block
     api = Numerai()
@@ -111,7 +106,16 @@ def get_stakes_df(round_number=None):
     stakes = pd.DataFrame(stakes)
     stakes = stakes[['days', 's', 'soc', 'c', 'user']]
 
-    return stakes
+    # remove C=0 stakers
+    c_zero_users = stakes.user[stakes.c == 0].tolist()
+    stakes = stakes[stakes.c != 0]
+
+    # sort in prize pool order; add s/c cumsum
+    stakes = stakes.sort_values(['c', 'days'], axis=0,
+                                ascending=[False, False])
+    stakes.insert(3, 'cumsum', stakes.soc.cumsum(axis=0))
+
+    return stakes, c_zero_users
 
 
 class Numerai(object):

@@ -8,6 +8,7 @@ Release Notes
   * ``data.xnew`` is 3 times faster
   * ``data.column_list(x_only=False)`` replaces _column_list and _x_names
   * Add ``show_stakes``
+  * Add ``get_stakes``
   * Example of Numerai's cross validation warning (hold out eras not rows)
   * Bugfix: ``data.xnew`` output didn't use contiguous memory
   * Bugfix: import error in cv_warning.py
