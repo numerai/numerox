@@ -3,6 +3,8 @@
 Release Notes
 =============
 
+- v0.0.9 (not yet released)
+
 - v0.0.8
 
   * Add ``show_stakes``
