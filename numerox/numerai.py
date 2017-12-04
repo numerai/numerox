@@ -40,7 +40,7 @@ def download_data_object():
 
 
 def show_stakes(round_number=None):
-    "Display info on staking"
+    "Display info on staking; cumsum is dollars above you"
     df, c_zero_users = get_stakes(round_number=round_number)
     df['days'] = df['days'].round(4)
     df['s'] = df['s'].astype(int)
@@ -54,7 +54,11 @@ def show_stakes(round_number=None):
 
 
 def get_stakes(round_number=None):
-    "Download stakes, modify it to make it more useful, return as dataframe"
+    """
+    Download stakes, modify it to make it more useful, return as dataframe.
+
+    cumsum is dollars ABOVE you.
+    """
 
     # get raw stakes; eventually use numerapi for this block
     api = Numerai()
@@ -113,7 +117,8 @@ def get_stakes(round_number=None):
     # sort in prize pool order; add s/c cumsum
     stakes = stakes.sort_values(['c', 'days'], axis=0,
                                 ascending=[False, False])
-    stakes.insert(3, 'cumsum', stakes.soc.cumsum(axis=0))
+    cumsum = stakes.soc.cumsum(axis=0) - stakes.soc  # dollars above you
+    stakes.insert(3, 'cumsum', cumsum)
 
     return stakes, c_zero_users
 

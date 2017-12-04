@@ -5,6 +5,8 @@ Release Notes
 
 - v0.0.9 (not yet released)
 
+  * Cumsum in ``show_stakes`` and ``get_stakes`` now dollars above you
+
 - v0.0.8
 
   * Add ``show_stakes``
