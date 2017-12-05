@@ -83,7 +83,10 @@ def test_data_pca():
 
 def test_data_balance():
     "test data.balance"
+
     d = micro_data()
+
+    # check balance
     b = d.balance(train_only=False)
     for era in b.unique_era():
         if era != 'eraX':
@@ -91,6 +94,8 @@ def test_data_balance():
             n0 = (y == 0).sum()
             n1 = (y == 1).sum()
             ok_(n0 == n1, "y is not balanced")
+
+    # check balance
     b = d.balance(train_only=True)
     eras = np.unique(b.era[b.region == 'train'])
     for era in eras:
@@ -98,6 +103,9 @@ def test_data_balance():
         n0 = (y == 0).sum()
         n1 = (y == 1).sum()
         ok_(n0 == n1, "y is not balanced")
+
+    # balance already balanced data (regression test)
+    d.balance().balance()
 
 
 def test_data_hash():

@@ -288,10 +288,14 @@ class Data(object):
             era = era[idx]
             y = y[idx]
             index = index[idx]
-        keep = set(range(data.shape[0])) - set(np.concatenate(remove))
-        keep = list(keep)
-        df = data.df.take(keep)
-        return Data(df)
+        if len(remove) == 0:
+            data = data.copy()
+        else:
+            keep = set(range(data.shape[0])) - set(np.concatenate(remove))
+            keep = list(keep)
+            df = data.df.take(keep)
+            data = Data(df)
+        return data
 
     def subsample(self, fraction, balance=True, seed=0):
         """
