@@ -6,6 +6,8 @@ Release Notes
 - v0.0.9 (not yet released)
 
   * Cumsum in ``show_stakes`` and ``get_stakes`` now dollars above you
+  * ``model.hash`` combined hash of data, model name, and model parameters
+  * More unit tests
 
 - v0.0.8
 

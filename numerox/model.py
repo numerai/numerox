@@ -1,3 +1,5 @@
+import json
+
 import numpy as np
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import ExtraTreesClassifier as ETC
@@ -26,6 +28,22 @@ OK, now go make money!
 
 
 class Model(object):
+
+    def hash(self, data_fit, data_predict):
+        """"
+        Hash of data, model name, and parameters dictionary if you have one.
+
+        And if you are hashing it is a good idea to have a parameters
+        dictionary.
+        """
+        h = []
+        h.append(data_fit.hash())
+        h.append(data_predict.hash())
+        h.append(self.__class__.__name__)
+        if hasattr(self, "p"):
+            h.append(json.dumps(self.p, sort_keys=True))
+        h = tuple(h)
+        return hash(h)
 
     def __repr__(self):
         msg = ""
