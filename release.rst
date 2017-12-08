@@ -5,6 +5,7 @@ Release Notes
 
 - v0.0.9 (not yet released)
 
+  * Data splitters now hide the y you are trying to predict when doing CV
   * Cumsum in ``show_stakes`` and ``get_stakes`` now dollars above you
   * ``model.hash`` combined hash of data, model name, and model parameters
   * Bugfix: crash when balancing already balanced data

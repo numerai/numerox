@@ -10,10 +10,6 @@ import numerox as nx
 class Splitter(object):
     "Base class used by data splitters; cannot be used as a splitter by itself"
 
-    def __init__(self, data):
-        self.data = data
-        self.reset()
-
     def reset(self):
         self.count = 0
 
@@ -21,11 +17,12 @@ class Splitter(object):
         return self
 
     def next(self):
-        if self.count > 0:
+        if self.count > self.max_count:
             raise StopIteration
-        tup = self.next_split()
+        dfit, dpre = self.next_split()
+        dpre.df = dpre.df.assign(y=np.nan)
         self.count += 1
-        return tup
+        return dfit, dpre
 
     # py3 compat
     def __next__(self):
@@ -50,6 +47,11 @@ class Splitter(object):
 class TournamentSplitter(Splitter):
     "Single split of data into train, tournament"
 
+    def __init__(self, data):
+        self.data = data
+        self.max_count = 0
+        self.reset()
+
     def next_split(self):
         return self.data['train'], self.data['tournament']
 
@@ -57,12 +59,22 @@ class TournamentSplitter(Splitter):
 class ValidationSplitter(Splitter):
     "Single split of data into train, validation"
 
+    def __init__(self, data):
+        self.data = data
+        self.max_count = 0
+        self.reset()
+
     def next_split(self):
         return self.data['train'], self.data['validation']
 
 
 class CheatSplitter(Splitter):
     "Single split of data into train+validation, tournament"
+
+    def __init__(self, data):
+        self.data = data
+        self.max_count = 0
+        self.reset()
 
     def next_split(self):
         dfit = self.data.region_isin(['train', 'validation'])
@@ -78,6 +90,7 @@ class SplitSplitter(Splitter):
                   'fit_fraction': fit_fraction,
                   'seed': seed,
                   'train_only': train_only}
+        self.max_count = 0
         self.reset()
 
     def next_split(self):
@@ -103,11 +116,10 @@ class CVSplitter(Splitter):
                   'train_only': train_only}
         self.eras = None
         self.cv = None
+        self.max_count = kfold
         self.reset()
 
-    def next(self):
-        if self.count >= self.p['kfold']:
-            raise StopIteration
+    def next_split(self):
         data = self.p['data']
         if self.count == 0:
             if self.p['train_only']:
@@ -124,7 +136,6 @@ class CVSplitter(Splitter):
         era_predict = [self.eras[i] for i in predict_index]
         dfit = data.era_isin(era_fit)
         dpredict = data.era_isin(era_predict)
-        self.count += 1
         return dfit, dpredict
 
 
@@ -137,11 +148,10 @@ class IgnoreEraCVSplitter(Splitter):
                   'seed': seed,
                   'train_only': train_only}
         self.cv = None
+        self.max_count = kfold
         self.reset()
 
-    def next(self):
-        if self.count >= self.p['kfold']:
-            raise StopIteration
+    def next_split(self):
         data = self.p['data']
         if self.count == 0:
             if self.p['train_only']:
@@ -156,7 +166,6 @@ class IgnoreEraCVSplitter(Splitter):
             fit_index, pre_index = self.cv.__next__()
         dfit = nx.Data(data.df.take(fit_index))
         dpre = nx.Data(data.df.take(pre_index))
-        self.count += 1
         return dfit, dpre
 
 
@@ -172,9 +181,10 @@ class RollSplitter(Splitter):
                   'train_only': train_only}
         self.eras = None
         self.cv = None
+        self.max_count = np.inf  # don't let Splitter signal end of iterations
         self.reset()
 
-    def next(self):
+    def next_split(self):
         data = self.p['data']
         if self.count == 0:
             if self.p['train_only']:
@@ -201,5 +211,5 @@ class RollSplitter(Splitter):
                 raise RuntimeError("You found a RollSplitter bug!")
         dfit = data.era_isin(era_fit)
         dpre = data.era_isin(era_pre)
-        self.count += 1
+        dpre.df = dpre.df.assign(y=np.nan)
         return dfit, dpre
