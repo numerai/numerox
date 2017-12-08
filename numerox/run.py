@@ -2,6 +2,8 @@ import os
 import time
 import pprint
 
+import numpy as np
+
 from numerox import Prediction, TournamentSplitter, CVSplitter
 
 
@@ -29,12 +31,15 @@ def run(model, splitter, verbosity=2):
     data = None
     prediction = Prediction()
     for data_fit, data_predict in splitter:
-        ids, yhat = model.fit_predict(data_fit, data_predict)
-        prediction.append(ids, yhat)
         if data is None:
             data = data_predict.copy()
         else:
             data = data + data_predict
+        # the following line of code hides from your model the y
+        # that you are trying to predict to prevent accidental cheating
+        data_predict.df = data_predict.df.assign(y=np.nan)
+        ids, yhat = model.fit_predict(data_fit, data_predict)
+        prediction.append(ids, yhat)
         if verbosity > 1:
             prediction.performance(data.region_isnotin(['test', 'live']))
     if verbosity == 1:
