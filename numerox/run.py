@@ -31,10 +31,11 @@ def run(model, splitter, verbosity=2):
     data = None
     prediction = Prediction()
     for data_fit, data_predict in splitter:
-        if data is None:
-            data = data_predict.copy()
-        else:
-            data = data + data_predict
+        if verbosity > 0:
+            if data is None:
+                data = data_predict.copy()
+            else:
+                data = data + data_predict
         # the following line of code hides from your model the y
         # that you are trying to predict to prevent accidental cheating
         data_predict.df = data_predict.df.assign(y=np.nan)
