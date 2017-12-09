@@ -6,9 +6,9 @@ Release Notes
 - v0.0.9 (not yet released)
 
   * ``run`` now hides from your model the y you are trying to predict
-  * Tiny speed up in ``run`` when verbosity=0: ~4% for 5-fold CV on fast model
   * Cumsum in ``show_stakes`` and ``get_stakes`` now dollars above you
   * ``model.hash`` combined hash of data, model name, and model parameters
+  * Gentle refactor of splitters to reuse code
   * Bugfix: crash when balancing already balanced data
   * More unit tests
 

@@ -12,6 +12,7 @@ class Splitter(object):
 
     def __init__(self, data):
         self.data = data
+        self.max_count = 0
         self.reset()
 
     def reset(self):
@@ -21,7 +22,7 @@ class Splitter(object):
         return self
 
     def next(self):
-        if self.count > 0:
+        if self.count > self.max_count:
             raise StopIteration
         tup = self.next_split()
         self.count += 1
@@ -66,8 +67,8 @@ class CheatSplitter(Splitter):
 
     def next_split(self):
         dfit = self.data.region_isin(['train', 'validation'])
-        dpredict = self.data['validation']
-        return dfit, dpredict
+        dpre = self.data['validation']
+        return dfit, dpre
 
 
 class SplitSplitter(Splitter):
@@ -78,6 +79,7 @@ class SplitSplitter(Splitter):
                   'fit_fraction': fit_fraction,
                   'seed': seed,
                   'train_only': train_only}
+        self.max_count = 0
         self.reset()
 
     def next_split(self):
@@ -88,9 +90,9 @@ class SplitSplitter(Splitter):
         rs = np.random.RandomState(self.p['seed'])
         rs.shuffle(eras)
         nfit = int(self.p['fit_fraction'] * eras.size + 0.5)
-        data_fit = data.era_isin(eras[:nfit])
-        data_predict = data.era_isin(eras[nfit:])
-        return data_fit, data_predict
+        dfit = data.era_isin(eras[:nfit])
+        dpre = data.era_isin(eras[nfit:])
+        return dfit, dpre
 
 
 class CVSplitter(Splitter):
@@ -103,11 +105,10 @@ class CVSplitter(Splitter):
                   'train_only': train_only}
         self.eras = None
         self.cv = None
+        self.max_count = kfold
         self.reset()
 
-    def next(self):
-        if self.count >= self.p['kfold']:
-            raise StopIteration
+    def next_split(self):
         data = self.p['data']
         if self.count == 0:
             if self.p['train_only']:
@@ -123,9 +124,8 @@ class CVSplitter(Splitter):
         era_fit = [self.eras[i] for i in fit_index]
         era_predict = [self.eras[i] for i in predict_index]
         dfit = data.era_isin(era_fit)
-        dpredict = data.era_isin(era_predict)
-        self.count += 1
-        return dfit, dpredict
+        dpre = data.era_isin(era_predict)
+        return dfit, dpre
 
 
 class IgnoreEraCVSplitter(Splitter):
@@ -137,11 +137,10 @@ class IgnoreEraCVSplitter(Splitter):
                   'seed': seed,
                   'train_only': train_only}
         self.cv = None
+        self.max_count = kfold
         self.reset()
 
-    def next(self):
-        if self.count >= self.p['kfold']:
-            raise StopIteration
+    def next_split(self):
         data = self.p['data']
         if self.count == 0:
             if self.p['train_only']:
@@ -156,7 +155,6 @@ class IgnoreEraCVSplitter(Splitter):
             fit_index, pre_index = self.cv.__next__()
         dfit = nx.Data(data.df.take(fit_index))
         dpre = nx.Data(data.df.take(pre_index))
-        self.count += 1
         return dfit, dpre
 
 
@@ -172,9 +170,10 @@ class RollSplitter(Splitter):
                   'train_only': train_only}
         self.eras = None
         self.cv = None
+        self.max_count = np.inf  # prevent Splitter for stoping iteration
         self.reset()
 
-    def next(self):
+    def next_split(self):
         data = self.p['data']
         if self.count == 0:
             if self.p['train_only']:
@@ -201,5 +200,4 @@ class RollSplitter(Splitter):
                 raise RuntimeError("You found a RollSplitter bug!")
         dfit = data.era_isin(era_fit)
         dpre = data.era_isin(era_pre)
-        self.count += 1
         return dfit, dpre
