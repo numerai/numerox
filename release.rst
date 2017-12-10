@@ -3,6 +3,8 @@
 Release Notes
 =============
 
+- v0.1.0 (not yet released)
+
 - v0.0.9
 
   * Add ability to work with new (round 85) Numerai datasets
