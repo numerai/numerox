@@ -117,11 +117,10 @@ Try it
 Numerox comes with a small dataset to play with::
 
     >>> nx.play_data()
-    region    live, test, train, validation
-    rows      8795
-    era       98, [era1, eraX]
-    x         50, min 0.0259, mean 0.4995, max 0.9913
-    y         mean 0.502646, fraction missing 0.3126
+    region    train, validation, test, live
+    rows      5690
+    era       133, [era1, eraX]
+    x         50, min 0.0106, mean 0.5025, max 0.9855
+    y         mean 0.500000, fraction missing 0.3466
 
-It is about 1% of a regular Numerai dataset, so contains around 60 rows per
-era. The data (``data.y``) is balanced.
+It is about 1% of a regular Numerai dataset. The data (``data.y``) is balanced.

@@ -5,7 +5,8 @@ Release Notes
 
 - v0.0.9 (not yet released)
 
-  * Add ability to load new Numerai datasets
+  * Add ability to work with new (round 85) Numerai datasets
+  * Update ``play_data`` with new numerai dataset
   * ``run`` now hides from your model the y you are trying to predict
   * Cumsum in ``show_stakes`` and ``get_stakes`` now dollars above you
   * ``model.hash`` combined hash of data, model name, and model parameters
