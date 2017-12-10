@@ -3,7 +3,7 @@
 Release Notes
 =============
 
-- v0.0.9 (not yet released)
+- v0.0.9
 
   * Add ability to work with new (round 85) Numerai datasets
   * Update ``play_data`` with new numerai dataset
