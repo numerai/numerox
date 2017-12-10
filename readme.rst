@@ -16,11 +16,11 @@ dataset and then load it::
     >>> nx.download_dataset('numerai_dataset.zip')
     >>> data = nx.load_zip('numerai_dataset.zip')
     >>> data
-    region    live, test, train, validation
-    rows      884544
-    era       98, [era1, eraX]
-    x         50, min 0.0000, mean 0.4993, max 1.0000
-    y         mean 0.499961, fraction missing 0.3109
+    region    train, validation, test, live
+    rows      637205
+    era       133, [era1, eraX]
+    x         50, min 0.0000, mean 0.5025, max 1.0000
+    y         mean 0.499924, fraction missing 0.3095
 
 Let's use the logistic regression model in numerox to run 5-fold cross
 validation on the training data::
@@ -29,10 +29,10 @@ validation on the training data::
     >>> prediction = nx.backtest(model, data, verbosity=1)
     logistic(inverse_l2=1e-05)
           logloss   auc     acc     ystd
-    mean  0.692974  0.5226  0.5159  0.0023  |  region   train
-    std   0.000224  0.0272  0.0205  0.0002  |  eras     85
-    min   0.692360  0.4550  0.4660  0.0020  |  consis   0.7647
-    max   0.693589  0.5875  0.5606  0.0027  |  75th     0.6931
+    mean  0.693103  0.5159  0.5114  0.0008  |  region   train
+    std   0.000080  0.0289  0.0219  0.0000  |  eras     120
+    min   0.692874  0.4384  0.4446  0.0007  |  consis   0.7000
+    max   0.693323  0.5962  0.5626  0.0009  |  75th     0.6932
 
 OK, results are good enough for a demo so let's make a submission file for the
 tournament. We will fit the model on the train data and make our predictions
@@ -41,10 +41,12 @@ for the tournament data::
     >>> prediction = nx.production(model, data)
     logistic(inverse_l2=1e-05)
           logloss   auc     acc     ystd
-    mean  0.692993  0.5157  0.5115  0.0028  |  region   validation
-    std   0.000225  0.0224  0.0172  0.0000  |  eras     12
-    min   0.692440  0.4853  0.4886  0.0028  |  consis   0.7500
-    max   0.693330  0.5734  0.5555  0.0028  |  75th     0.6931
+    logistic(inverse_l2=1e-05)
+          logloss   auc     acc     ystd
+    mean  0.693090  0.5178  0.5137  0.0010  |  region   validation
+    std   0.000060  0.0171  0.0140  0.0000  |  eras     12
+    min   0.692950  0.4891  0.4927  0.0010  |  consis   0.9167
+    max   0.693192  0.5556  0.5350  0.0010  |  75th     0.6931
     >>> prediction.to_csv('logistic.csv')  # 6 decimal places by default
 
 Examples
