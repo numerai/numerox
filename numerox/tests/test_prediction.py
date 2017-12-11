@@ -13,7 +13,7 @@ from numerox.testing import (play_data, shares_memory, micro_prediction,
 def test_prediction_roundtrip():
     "save/load roundtrip shouldn't change prediction"
     d = micro_data()
-    m = nx.model.logistic()
+    m = nx.logistic()
     p = nx.production(m, d, verbosity=0)
     with tempfile.NamedTemporaryFile() as temp:
         p.save(temp.name)

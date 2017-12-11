@@ -18,7 +18,7 @@ def main():
     data = nx.load_zip('numerai_dataset.zip', verbose=True)
 
     # we will use logistic regression; you will want to write your own model
-    model = nx.model.logistic()
+    model = nx.logistic()
 
     # fit model with train data and make predictions for tournament data
     prediction = nx.production(model, data)

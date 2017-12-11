@@ -9,7 +9,7 @@ import numerox as nx
 
 def backtest_example():
     data = nx.play_data()
-    model = nx.model.logistic()
+    model = nx.logistic()
     prediction = nx.backtest(model, data)  # noqa
 
 

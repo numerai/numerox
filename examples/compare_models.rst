@@ -4,7 +4,7 @@ Comparing model performance
 Let's use the logistic regression model in numerox to run 5-fold cross
 validation on the training data::
 
-    >>> model = nx.model.logistic()
+    >>> model = nx.logistic()
     >>> prediction1 = nx.backtest(model, data, verbosity=1)
     logistic(inverse_l2=1e-05)
           logloss   auc     acc     ystd

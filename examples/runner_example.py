@@ -13,11 +13,11 @@ def runner_example():
     splitter = nx.CVSplitter(data)
 
     # let's run 3 models
-    m1 = {'model': nx.model.logistic(),
+    m1 = {'model': nx.logistic(),
           'prediction_file': None,
           'csv_file': None}
-    m2 = {'model': nx.model.logistic(1e-4)}
-    m3 = {'model': nx.model.extratrees()}
+    m2 = {'model': nx.logistic(1e-4)}
+    m3 = {'model': nx.extratrees()}
     run_list = [m1, m2, m3]
 
     # we won't save anything, just display the results

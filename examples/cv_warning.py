@@ -6,7 +6,7 @@ import numerox as nx
 
 def cv_warning(data, nsamples=100):
 
-    model = nx.model.logistic()
+    model = nx.logistic()
 
     for i in range(nsamples):
 

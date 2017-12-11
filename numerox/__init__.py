@@ -4,10 +4,12 @@
 from numerox.data import Data
 from numerox.prediction import Prediction
 from numerox.report import Report
-from numerox.model import Model
 
 # models
-import numerox.model
+from numerox.model import Model
+from numerox.model import logistic
+from numerox.model import extratrees
+from numerox.model import randomforest
 
 # load
 from numerox.data import load_data, load_zip

@@ -11,7 +11,7 @@ import numerox as nx
 
 def concordance_example():
     data = nx.play_data()
-    model = nx.model.logistic()
+    model = nx.logistic()
     prediction = nx.production(model, data)
     concord = nx.concordance(data, prediction)
     print("concordance {:.4f} (less than 0.12 is passing)".format(concord))
