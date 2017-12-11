@@ -65,7 +65,7 @@ class Model(object):
 
 class logistic(Model):
 
-    def __init__(self, inverse_l2=0.00001):
+    def __init__(self, inverse_l2=0.0001):
         self.p = {'inverse_l2': inverse_l2}
 
     def fit_predict(self, data_fit, data_predict):
