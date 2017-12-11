@@ -3,6 +3,7 @@ import json
 import numpy as np
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import ExtraTreesClassifier as ETC
+from sklearn.ensemble import RandomForestClassifier as RFC
 
 """
 
@@ -48,12 +49,15 @@ class Model(object):
     def __repr__(self):
         msg = ""
         model = self.__class__.__name__
-        msg += model + "("
         if hasattr(self, "p"):
-            for name, value in self.p.items():
-                msg += name + "=" + str(value) + ", "
-            msg = msg[:-2]
-            msg += ")"
+            if len(self.p) == 0:
+                msg += model + "()"
+            else:
+                msg += model + "("
+                for name, value in self.p.items():
+                    msg += name + "=" + str(value) + ", "
+                msg = msg[:-2]
+                msg += ")"
         else:
             msg += model + "()"
         return msg
@@ -84,7 +88,28 @@ class extratrees(Model):
                   max_features=self.p['nfeatures'],
                   max_depth=self.p['depth'],
                   n_estimators=self.p['ntrees'],
-                  random_state=self.p['seed'])
+                  random_state=self.p['seed'],
+                  n_jobs=-1)
+        clf.fit(data_fit.x, data_fit.y)
+        yhat = clf.predict_proba(data_predict.x)[:, 1]
+        return data_predict.ids, yhat
+
+
+class randomforest(Model):
+
+    def __init__(self, ntrees=100, depth=3, max_features=2, seed=0):
+        self.p = {'ntrees': ntrees,
+                  'depth': depth,
+                  'max_features': max_features,
+                  'seed': seed}
+
+    def fit_predict(self, data_fit, data_predict):
+        clf = RFC(criterion='gini',
+                  max_features=self.p['max_features'],
+                  max_depth=self.p['depth'],
+                  n_estimators=self.p['ntrees'],
+                  random_state=self.p['seed'],
+                  n_jobs=-1)
         clf.fit(data_fit.x, data_fit.y)
         yhat = clf.predict_proba(data_predict.x)[:, 1]
         return data_predict.ids, yhat
