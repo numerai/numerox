@@ -93,16 +93,8 @@ class logistic(Model):
 
 
 class pipeline(Model):
-    def __init__(self, models: List[Model]):
-        self._models = [(model.__class__.__name__, model) for model in models]
-
-    @property
-    def models(self) -> list:
-        return list(self._models)
-
-    @models.setter
-    def models(self, models):
-        self._models = models
+    def __init__(self, models):
+        self.models = [(model.__class__.__name__, model) for model in models]
 
     def fit_predict(self, data_fit, data_predict):
         from sklearn.pipeline import Pipeline
