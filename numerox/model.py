@@ -1,9 +1,10 @@
 import json
+from typing import List
 
 import numpy as np
-from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import ExtraTreesClassifier as ETC
 from sklearn.ensemble import RandomForestClassifier as RFC
+from sklearn.linear_model import LogisticRegression
 
 try:
     from xgboost.sklearn import XGBClassifier
@@ -70,12 +71,42 @@ class Model(object):
 
 
 class logistic(Model):
-
     def __init__(self, inverse_l2=0.0001):
         self.p = {'inverse_l2': inverse_l2}
+        self.clf = None
 
     def fit_predict(self, data_fit, data_predict):
-        model = LogisticRegression(C=self.p['inverse_l2'])
+        self.fit(data_fit.x, data_fit.y)
+        yhat = self.predict_proba(data_predict.x)[:, 1]
+        return data_predict.ids, yhat
+
+    def get_model(self):
+        return LogisticRegression(C=self.p['inverse_l2'])
+
+    def fit(self, x, y):
+        if self.clf is None:
+            self.clf = self.get_model()
+        self.clf.fit(x, y)
+
+    def predict_proba(self, x):
+        return self.clf.predict_proba(x)
+
+
+class pipeline(Model):
+    def __init__(self, models: List[Model]):
+        self._models = [(model.__class__.__name__, model) for model in models]
+
+    @property
+    def models(self) -> list:
+        return list(self._models)
+
+    @models.setter
+    def models(self, models):
+        self._models = models
+
+    def fit_predict(self, data_fit, data_predict):
+        from sklearn.pipeline import Pipeline
+        model = Pipeline(steps=self.models)
         model.fit(data_fit.x, data_fit.y)
         yhat = model.predict_proba(data_predict.x)[:, 1]
         return data_predict.ids, yhat
