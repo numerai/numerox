@@ -1,5 +1,4 @@
 import json
-from typing import List
 
 import numpy as np
 from sklearn.ensemble import ExtraTreesClassifier as ETC
