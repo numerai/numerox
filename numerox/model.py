@@ -5,6 +5,12 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import ExtraTreesClassifier as ETC
 from sklearn.ensemble import RandomForestClassifier as RFC
 
+try:
+    from xgboost.sklearn import XGBClassifier
+    HAS_XGBOOST = True
+except ImportError:
+    HAS_XGBOOST = False
+
 """
 
 Make your own model
@@ -110,6 +116,30 @@ class randomforest(Model):
                   n_estimators=self.p['ntrees'],
                   random_state=self.p['seed'],
                   n_jobs=-1)
+        clf.fit(data_fit.x, data_fit.y)
+        yhat = clf.predict_proba(data_predict.x)[:, 1]
+        return data_predict.ids, yhat
+
+
+class xgboost(Model):
+
+    def __init__(self, learning_rate=0.1, subsample=0.4, max_depth=5,
+                 n_estimators=5, seed=0):
+        self.p = {'learning_rate': learning_rate,
+                  'subsample': subsample,
+                  'max_depth': max_depth,
+                  'n_estimators': n_estimators,
+                  'seed': seed}
+        if not HAS_XGBOOST:
+            raise ImportError("You must install xgboost to use this model")
+
+    def fit_predict(self, data_fit, data_predict):
+        clf = XGBClassifier(learning_rate=self.p['learning_rate'],
+                            subsample=self.p['subsample'],
+                            max_depth=self.p['max_depth'],
+                            n_estimators=self.p['n_estimators'],
+                            seed=self.p['seed'],
+                            nthread=-1)
         clf.fit(data_fit.x, data_fit.y)
         yhat = clf.predict_proba(data_predict.x)[:, 1]
         return data_predict.ids, yhat

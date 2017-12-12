@@ -5,9 +5,10 @@ Release Notes
 
 - v0.1.0 (not yet released)
 
+  * Add ``xgboost`` model
   * Add ``randomforest`` model
   * Models at top level: ``nx.extatrees`` instead of nx.model.extratrees, etc
-  * ``logistic`` now uses less regularization by default
+  * ``logistic`` model now uses less regularization by default
   * Bugfix: display model name correctly when parameter dictionary is empty
 
 - v0.0.9

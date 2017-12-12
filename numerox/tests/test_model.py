@@ -1,29 +1,33 @@
-from numerox.model import logistic, extratrees
-from numerox.testing import micro_data
+import numerox as nx
+from numerox.model import HAS_XGBOOST
+
+
+def get_models():
+    models = [nx.logistic(), nx.extratrees(), nx.randomforest()]
+    if HAS_XGBOOST:
+        models.append(nx.xgboost())
+    return models
 
 
 def test_model_repr():
     "Make sure Model.__repr__ runs"
-    models = [logistic(), extratrees()]
-    for model in models:
+    for model in get_models():
         model.__repr__()
 
 
 def test_model_hash():
     "Make sure Model.hash runs"
-    d = micro_data()
+    d = nx.testing.micro_data()
     dt = d['train']
     dp = d['tournament']
-    models = [logistic(), extratrees()]
-    for model in models:
+    for model in get_models():
         model.hash(dt, dp)
 
 
 def test_model_run():
     "Make sure models run"
-    d = micro_data()
+    d = nx.play_data()
     d_fit = d['train']
     d_predict = d['tournament']
-    models = [logistic(), extratrees(nfeatures=2)]
-    for model in models:
+    for model in get_models():
         model.fit_predict(d_fit, d_predict)

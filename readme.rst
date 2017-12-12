@@ -70,6 +70,8 @@ failures)::
 Requirements: python, setuptools, numpy, pandas, pytables, sklearn, requests,
 nose.
 
+Optional: xgboost
+
 Resources
 =========
 
