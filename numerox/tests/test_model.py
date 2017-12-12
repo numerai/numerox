@@ -31,3 +31,13 @@ def test_model_run():
     d_predict = d['tournament']
     for model in get_models():
         model.fit_predict(d_fit, d_predict)
+
+
+def test_pipeline():
+    d = nx.play_data()
+    d_fit = d['train']
+    d_predict = d['tournament']
+    model = nx.pipeline([
+        nx.logistic()
+    ])
+    model.fit_predict(d_fit, d_predict)
