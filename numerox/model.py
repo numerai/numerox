@@ -21,7 +21,7 @@ Make your own model
 First take a look at the logistic and extratrees models below.
 
 Your model MUST have a fit_predict method that takes two data objects as
-input. The first is training data, the second is prediction data.
+input. The first is training data (dfit), the second is prediction data (dpre).
 
 The fit_predict method MUST return two numpy arrays. The first contains the
 ids, the second the predictions. Make sure that these two arrays stay aligned!
@@ -43,7 +43,7 @@ OK, now go make money!
 
 class Model(object):
 
-    def hash(self, data_fit, data_predict):
+    def hash(self, dfit, dpre):
         """"
         Hash of data, model name, and parameters dictionary if you have one.
 
@@ -51,8 +51,8 @@ class Model(object):
         dictionary.
         """
         h = []
-        h.append(data_fit.hash())
-        h.append(data_predict.hash())
+        h.append(dfit.hash())
+        h.append(dpre.hash())
         h.append(self.__class__.__name__)
         if hasattr(self, "p"):
             h.append(json.dumps(self.p, sort_keys=True))
@@ -81,11 +81,11 @@ class logistic(Model):
     def __init__(self, inverse_l2=0.0001):
         self.p = {'inverse_l2': inverse_l2}
 
-    def fit_predict(self, data_fit, data_predict):
+    def fit_predict(self, dfit, dpre):
         model = LogisticRegression(C=self.p['inverse_l2'])
-        model.fit(data_fit.x, data_fit.y)
-        yhat = model.predict_proba(data_predict.x)[:, 1]
-        return data_predict.ids, yhat
+        model.fit(dfit.x, dfit.y)
+        yhat = model.predict_proba(dpre.x)[:, 1]
+        return dpre.ids, yhat
 
 
 class extratrees(Model):
@@ -96,16 +96,16 @@ class extratrees(Model):
                   'nfeatures': nfeatures,
                   'seed': seed}
 
-    def fit_predict(self, data_fit, data_predict):
+    def fit_predict(self, dfit, dpre):
         clf = ETC(criterion='gini',
                   max_features=self.p['nfeatures'],
                   max_depth=self.p['depth'],
                   n_estimators=self.p['ntrees'],
                   random_state=self.p['seed'],
                   n_jobs=-1)
-        clf.fit(data_fit.x, data_fit.y)
-        yhat = clf.predict_proba(data_predict.x)[:, 1]
-        return data_predict.ids, yhat
+        clf.fit(dfit.x, dfit.y)
+        yhat = clf.predict_proba(dpre.x)[:, 1]
+        return dpre.ids, yhat
 
 
 class randomforest(Model):
@@ -116,16 +116,16 @@ class randomforest(Model):
                   'max_features': max_features,
                   'seed': seed}
 
-    def fit_predict(self, data_fit, data_predict):
+    def fit_predict(self, dfit, dpre):
         clf = RFC(criterion='gini',
                   max_features=self.p['max_features'],
                   max_depth=self.p['depth'],
                   n_estimators=self.p['ntrees'],
                   random_state=self.p['seed'],
                   n_jobs=-1)
-        clf.fit(data_fit.x, data_fit.y)
-        yhat = clf.predict_proba(data_predict.x)[:, 1]
-        return data_predict.ids, yhat
+        clf.fit(dfit.x, dfit.y)
+        yhat = clf.predict_proba(dpre.x)[:, 1]
+        return dpre.ids, yhat
 
 
 class xgboost(Model):
@@ -140,16 +140,16 @@ class xgboost(Model):
         if not HAS_XGBOOST:
             raise ImportError("You must install xgboost to use this model")
 
-    def fit_predict(self, data_fit, data_predict):
+    def fit_predict(self, dfit, dpre):
         clf = XGBClassifier(learning_rate=self.p['learning_rate'],
                             subsample=self.p['subsample'],
                             max_depth=self.p['max_depth'],
                             n_estimators=self.p['n_estimators'],
                             seed=self.p['seed'],
                             nthread=-1)
-        clf.fit(data_fit.x, data_fit.y)
-        yhat = clf.predict_proba(data_predict.x)[:, 1]
-        return data_predict.ids, yhat
+        clf.fit(dfit.x, dfit.y)
+        yhat = clf.predict_proba(dpre.x)[:, 1]
+        return dpre.ids, yhat
 
 
 # sklearn pipeline example
@@ -159,12 +159,12 @@ class logisticPCA(Model):
         self.p = {'inverse_l2': inverse_l2,
                   'nfeatures': nfeatures}
 
-    def fit_predict(self, data_fit, data_predict):
+    def fit_predict(self, dfit, dpre):
         pipe = Pipeline([('pca', PCA(n_components=self.p['nfeatures'])),
                          ("lr", LogisticRegression(C=self.p['inverse_l2']))])
-        pipe.fit(data_fit.x, data_fit.y)
-        yhat = pipe.predict_proba(data_predict.x)[:, 1]
-        return data_predict.ids, yhat
+        pipe.fit(dfit.x, dfit.y)
+        yhat = pipe.predict_proba(dpre.x)[:, 1]
+        return dpre.ids, yhat
 
 
 # fast model for testing; always predicts 0.5
@@ -173,6 +173,6 @@ class fifty(Model):
     def __init__(self):
         self.p = {}
 
-    def fit_predict(self, data_fit, data_predict):
-        yhat = 0.5 * np.ones(len(data_predict))
-        return data_predict.ids, yhat
+    def fit_predict(self, dfit, dpre):
+        yhat = 0.5 * np.ones(len(dpre))
+        return dpre.ids, yhat
