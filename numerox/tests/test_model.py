@@ -3,7 +3,8 @@ from numerox.model import HAS_XGBOOST
 
 
 def get_models():
-    models = [nx.logistic(), nx.extratrees(), nx.randomforest()]
+    models = [nx.logistic(), nx.extratrees(), nx.randomforest(),
+              nx.logisticPCA()]
     if HAS_XGBOOST:
         models.append(nx.xgboost())
     return models

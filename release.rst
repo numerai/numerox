@@ -7,6 +7,7 @@ Release Notes
 
   * Add ``xgboost`` model
   * Add ``randomforest`` model
+  * Add ``logisticPCA`` model
   * Models at top level: ``nx.extatrees`` instead of nx.model.extratrees, etc
   * ``logistic`` model now uses less regularization by default
   * Bugfix: display model name correctly when parameter dictionary is empty

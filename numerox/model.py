@@ -4,6 +4,8 @@ import numpy as np
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import ExtraTreesClassifier as ETC
 from sklearn.ensemble import RandomForestClassifier as RFC
+from sklearn.pipeline import Pipeline
+from sklearn.decomposition import PCA
 
 try:
     from xgboost.sklearn import XGBClassifier
@@ -28,6 +30,11 @@ The models below inherit from The Model class. That is optional. But if you do
 inherit from Model and if you place your parameters in self.p as is done in
 the models below then you will get a nice printout (model name and parameters)
 when you run your model.
+
+None of the models below will be competitive in the Numerai tournament. You'll
+have to make your own model. What numerox does is pass data to your model and
+keep track of your predictions. If you already have a model then you can
+make a thin wrapper around it, as is done below, to get it to run with numerox.
 
 OK, now go make money!
 
@@ -142,6 +149,21 @@ class xgboost(Model):
                             nthread=-1)
         clf.fit(data_fit.x, data_fit.y)
         yhat = clf.predict_proba(data_predict.x)[:, 1]
+        return data_predict.ids, yhat
+
+
+# sklearn pipeline example
+class logisticPCA(Model):
+
+    def __init__(self, nfeatures=10, inverse_l2=1e-4):
+        self.p = {'inverse_l2': inverse_l2,
+                  'nfeatures': nfeatures}
+
+    def fit_predict(self, data_fit, data_predict):
+        pipe = Pipeline([('pca', PCA(n_components=self.p['nfeatures'])),
+                         ("lr", LogisticRegression(C=self.p['inverse_l2']))])
+        pipe.fit(data_fit.x, data_fit.y)
+        yhat = pipe.predict_proba(data_predict.x)[:, 1]
         return data_predict.ids, yhat
 
 

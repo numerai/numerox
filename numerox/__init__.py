@@ -11,6 +11,7 @@ from numerox.model import logistic
 from numerox.model import extratrees
 from numerox.model import randomforest
 from numerox.model import xgboost
+from numerox.model import logisticPCA
 
 # load
 from numerox.data import load_data, load_zip
