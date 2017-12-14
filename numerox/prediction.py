@@ -56,6 +56,12 @@ class Prediction(object):
         else:
             self.df.to_hdf(path_or_buf, HDF_PREDICTION_KEY)
 
+    def consistency(self, data):
+        "Consistency over eras in `data`"
+        logloss = metrics_per_era(data, self, columns=['logloss'])
+        c = (logloss['yhat'].values < np.log(2)).mean()
+        return c
+
     def performance(self, data):
         metrics = metrics_per_era(data, self)
         metrics = metrics['yhat']

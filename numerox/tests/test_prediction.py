@@ -21,6 +21,22 @@ def test_prediction_roundtrip():
         ade(p, p2, "prediction corrupted during roundtrip")
 
 
+def test_prediction_consistency():
+    "make sure prediction.consistency runs"
+
+    d = play_data()
+    p = Prediction()
+
+    rs = np.random.RandomState(0)
+    yhat = 0.005 * rs.randn(len(d)) + 0.5
+    yhat += 0.0005 * (d.y - 0.5)
+    p.append(d.ids, yhat)
+
+    c = p.consistency(d['train'])
+    ok_(c > 0, "consistency should (likely) be greater than zero")
+    ok_(c < 1, "consistency should (likely) be less than one")
+
+
 def test_prediction_copies():
     "prediction properties should be copies"
 

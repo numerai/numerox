@@ -5,7 +5,8 @@ from sklearn.cluster import MiniBatchKMeans
 from sklearn.metrics import log_loss, roc_auc_score, accuracy_score
 
 
-def metrics_per_era(data, pred_or_report, join='data'):
+def metrics_per_era(data, pred_or_report, join='data',
+                    columns=['logloss', 'auc', 'acc', 'ystd']):
 
     df = pred_or_report.df
 
@@ -36,10 +37,9 @@ def metrics_per_era(data, pred_or_report, join='data'):
         y = df_era['y'].values
         for model in models:
             yhat = df_era[model].values
-            m = calc_metrics_arrays(y, yhat)
+            m = calc_metrics_arrays(y, yhat, columns)
             metrics[model].append(m)
 
-    columns = ['logloss', 'auc', 'acc', 'ystd']
     for model in models:
         metrics[model] = pd.DataFrame(metrics[model], columns=columns,
                                       index=unique_eras)
@@ -47,37 +47,32 @@ def metrics_per_era(data, pred_or_report, join='data'):
     return metrics
 
 
-def calc_metrics_arrays(y, yhat):
+def calc_metrics_arrays(y, yhat, columns):
     "standard metrics for `yhat` array given actual outcome `y` array"
-
     metrics = []
-
-    # logloss
-    try:
-        m = log_loss(y, yhat)
-    except ValueError:
-        m = np.nan
-    metrics.append(m)
-
-    # auc
-    try:
-        m = roc_auc_score(y, yhat)
-    except ValueError:
-        m = np.nan
-    metrics.append(m)
-
-    # acc
-    yh = np.zeros(yhat.size)
-    yh[yhat >= 0.5] = 1
-    try:
-        m = accuracy_score(y, yh)
-    except ValueError:
-        m = np.nan
-    metrics.append(m)
-
-    # std(yhat)
-    metrics.append(yhat.std())
-
+    for col in columns:
+        if col == 'logloss':
+            try:
+                m = log_loss(y, yhat)
+            except ValueError:
+                m = np.nan
+        elif col == 'auc':
+            try:
+                m = roc_auc_score(y, yhat)
+            except ValueError:
+                m = np.nan
+        elif col == 'acc':
+            yh = np.zeros(yhat.size)
+            yh[yhat >= 0.5] = 1
+            try:
+                m = accuracy_score(y, yh)
+            except ValueError:
+                m = np.nan
+        elif col == 'ystd':
+            m = yhat.std()
+        else:
+            raise ValueError("unknown metric ({})".format(col))
+        metrics.append(m)
     return metrics
 
 

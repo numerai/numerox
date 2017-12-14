@@ -5,6 +5,8 @@ Release Notes
 
 - v0.1.0 (not yet released)
 
+  * Add ``prediction.consistency``
+  * Can now specify which metrics to calculate in ``metrics_per_era``
   * Add ``xgboost`` model
   * Add ``randomforest`` model
   * Add ``logisticPCA`` model
@@ -12,6 +14,7 @@ Release Notes
   * ``logistic`` model now uses less regularization by default
   * Use pprint to format model name and input variables used in a run
   * Bugfix: display model name correctly when parameter dictionary is empty
+  * More unit tests
 
 - v0.0.9
 
