@@ -1,4 +1,5 @@
 import json
+import pprint
 
 import numpy as np
 from sklearn.linear_model import LogisticRegression
@@ -73,7 +74,7 @@ class Model(object):
                 msg += ")"
         else:
             msg += model + "()"
-        return msg
+        return pprint.pformat(msg)
 
 
 class logistic(Model):
