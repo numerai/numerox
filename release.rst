@@ -6,6 +6,7 @@ Release Notes
 - v0.1.0 (not yet released)
 
   * Add ``prediction.consistency``
+  * Add ``prediction.metric_per_era``
   * Can now specify which metrics to calculate in ``metrics_per_era``
   * Add ``xgboost`` model
   * Add ``randomforest`` model

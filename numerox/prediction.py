@@ -58,9 +58,16 @@ class Prediction(object):
 
     def consistency(self, data):
         "Consistency over eras in `data`"
-        logloss = metrics_per_era(data, self, columns=['logloss'])
-        c = (logloss['yhat'].values < np.log(2)).mean()
+        logloss = self.metric_per_era(data, metric='logloss')
+        c = (logloss.values < np.log(2)).mean()
         return c
+
+    def metric_per_era(self, data, metric='logloss'):
+        "DataFrame of a single metric (logloss, auc, etc) versus era"
+        metric = metrics_per_era(data, self, columns=[metric],
+                                 era_as_str=True)
+        metric = metric['yhat']
+        return metric
 
     def performance(self, data):
         metrics = metrics_per_era(data, self)

@@ -4,9 +4,12 @@ import numpy as np
 from sklearn.cluster import MiniBatchKMeans
 from sklearn.metrics import log_loss, roc_auc_score, accuracy_score
 
+from numerox.data import ERA_INT_TO_STR
+
 
 def metrics_per_era(data, pred_or_report, join='data',
-                    columns=['logloss', 'auc', 'acc', 'ystd']):
+                    columns=['logloss', 'auc', 'acc', 'ystd'],
+                    era_as_str=False):
 
     df = pred_or_report.df
 
@@ -40,6 +43,11 @@ def metrics_per_era(data, pred_or_report, join='data',
             m = calc_metrics_arrays(y, yhat, columns)
             metrics[model].append(m)
 
+    if era_as_str:
+        ueras = []
+        for e in unique_eras:
+            ueras.append(ERA_INT_TO_STR[e])
+        unique_eras = np.array(ueras)
     for model in models:
         metrics[model] = pd.DataFrame(metrics[model], columns=columns,
                                       index=unique_eras)
