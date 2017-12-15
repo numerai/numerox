@@ -82,6 +82,27 @@ class Report(object):
 
         return df
 
+    def correlation(self, model_name=None):
+        "Correlation of predictions; by default reports given for each model"
+        if model_name is None:
+            models = self.models
+        else:
+            models = [model_name]
+        z = self.df.values
+        zmodels = self.models
+        idx = np.isfinite(z.sum(axis=1))
+        z = z[idx]
+        z = (z - z.mean(axis=0)) / z.std(axis=0)
+        for model in models:
+            print(model)
+            idx = zmodels.index(model)
+            corr = np.dot(z[:, idx], z) / z.shape[0]
+            index = (-corr).argsort()
+            for ix in index:
+                zmodel = zmodels[ix]
+                if model != zmodel:
+                    print("   {:.4f} {}".format(corr[ix], zmodel))
+
 
 def load_report(prediction_dir, extension='pred'):
     "Load Prediction objects (hdf) in `prediction_dir`; return Report object"

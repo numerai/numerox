@@ -45,7 +45,7 @@ def run(model, splitter, verbosity=2):
             prediction.performance(data.region_isnotin(['test', 'live']))
     if verbosity == 1:
         prediction.performance(data.region_isnotin(['test', 'live']))
-    if verbosity > 2:
+    if verbosity > 1:
         minutes = (time.time() - t0) / 60
         print('Done in {:.2f} minutes'.format(minutes))
     return prediction
