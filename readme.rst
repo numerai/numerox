@@ -41,8 +41,6 @@ for the tournament data::
     >>> prediction = nx.production(model, data)
     logistic(inverse_l2=1e-05)
           logloss   auc     acc     ystd
-    logistic(inverse_l2=1e-05)
-          logloss   auc     acc     ystd
     mean  0.693090  0.5178  0.5137  0.0010  |  region   validation
     std   0.000060  0.0171  0.0140  0.0000  |  eras     12
     min   0.692950  0.4891  0.4927  0.0010  |  consis   0.9167
