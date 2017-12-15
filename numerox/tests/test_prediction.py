@@ -1,6 +1,7 @@
 import tempfile
 
 import numpy as np
+from numpy.testing import assert_array_equal
 from nose.tools import ok_, assert_raises
 
 import numerox as nx
@@ -35,6 +36,20 @@ def test_prediction_consistency():
     c = p.consistency(d['train'])
     ok_(c > 0, "consistency should (likely) be greater than zero")
     ok_(c < 1, "consistency should (likely) be less than one")
+
+
+def test_prediction_yhatnew():
+    "changing preidction.yhat"
+
+    d = play_data()
+    p = Prediction()
+    p.append(d.ids, d.y)
+
+    y = 2 * p.yhat
+    pnew = p.yhatnew(y)
+    ok_(not shares_memory(p, pnew), "prediction.yhatnew should return a copy")
+    assert_array_equal(pnew.yhat, y, "prediction.yhatneww corrupted values")
+    assert_raises(ValueError, p.yhatnew, y[:4])
 
 
 def test_prediction_copies():

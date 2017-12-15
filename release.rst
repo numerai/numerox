@@ -8,6 +8,7 @@ Release Notes
   * Add ``prediction.consistency``
   * Add ``prediction.metric_per_era``
   * Can now specify which metrics to calculate in ``metrics_per_era``
+  * Add ``prediction.yhatnew``
   * Add ``xgboost`` model
   * Add ``randomforest`` model
   * Add ``logisticPCA`` model

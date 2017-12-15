@@ -23,6 +23,19 @@ class Prediction(object):
         "View of yhat as a 1d numpy float array"
         return self.df['yhat'].values
 
+    def yhatnew(self, y_array):
+        "Copy of prediction but with prediction.yhat=`y_array`"
+        if y_array.shape[0] != len(self):
+            msg = "`y_array` must have the same number of rows as prediction"
+            raise ValueError(msg)
+        if y_array.ndim != 1:
+            raise ValueError("`y_array` must be 1 dimensional")
+        df = pd.DataFrame(data=np.empty((y_array.shape[0],), dtype=np.float64),
+                          index=self.df.index.copy(deep=True),
+                          columns=['yhat'])
+        df['yhat'] = y_array
+        return Prediction(df)
+
     def append(self, ids, yhat):
         df = pd.DataFrame(data={'yhat': yhat}, index=ids)
         if self.df is None:
