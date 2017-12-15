@@ -18,7 +18,10 @@ except ImportError:
 Make your own model
 -------------------
 
-First take a look at the logistic and extratrees models below.
+First take a look at the logistic regression model below (named logistic). The
+model is just a thin wrapper around sklearn's LogisticRegression. The wrapper
+allows LogisticRegression to receive data from numerox and for numerox to keep
+track of its predictions.
 
 Your model MUST have a fit_predict method that takes two data objects as
 input. The first is training data (dfit), the second is prediction data (dpre).
@@ -32,9 +35,8 @@ the models below then you will get a nice printout (model name and parameters)
 when you run your model.
 
 None of the models below will be competitive in the Numerai tournament. You'll
-have to make your own model. What numerox does is pass data to your model and
-keep track of your predictions. If you already have a model then you can
-make a thin wrapper around it, as is done below, to get it to run with numerox.
+have to make your own model. If you already have a model then you can make a
+thin wrapper around it, as is done below, to get it to run with numerox.
 
 OK, now go make money!
 
