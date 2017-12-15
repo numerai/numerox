@@ -7,7 +7,7 @@ Release Notes
 
   * Add ``report.correlation``
   * Add ``prediction.consistency``
-  * Add ``prediction.metric_per_era``
+  * Add ``prediction.metrics_per_era``
   * Can now specify which metrics to calculate in ``metrics_per_era``
   * Add ``prediction.yhatnew``
   * Add ``xgboost`` model
