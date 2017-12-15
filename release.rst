@@ -14,7 +14,6 @@ Release Notes
   * Add ``logisticPCA`` model
   * Models at top level: ``nx.extatrees`` instead of nx.model.extratrees, etc
   * ``logistic`` model now uses less regularization by default
-  * Use pprint to format model name and input variables used in a run
   * Bugfix: display model name correctly when parameter dictionary is empty
   * More unit tests
 
