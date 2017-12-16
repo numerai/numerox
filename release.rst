@@ -9,6 +9,7 @@ Release Notes
   * Add ``prediction.consistency``
   * Add ``prediction.metrics_per_era``
   * Can now specify which metrics to calculate in ``metrics_per_era``
+  * Add sort_by to ``show_stakes``
   * Add ``prediction.yhatnew``
   * Add ``xgboost`` model
   * Add ``randomforest`` model

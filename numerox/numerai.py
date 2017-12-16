@@ -39,9 +39,23 @@ def download_data_object():
     return data
 
 
-def show_stakes(round_number=None):
+def show_stakes(round_number=None, sort_by='prize pool'):
     "Display info on staking; cumsum is dollars above you"
     df, c_zero_users = get_stakes(round_number=round_number)
+    if sort_by == 'prize pool':
+        pass
+    elif sort_by == 'c':
+        df = df.sort_values(['c'], ascending=[False])
+    elif sort_by == 's':
+        df = df.sort_values(['s'], ascending=[False])
+    elif sort_by == 'soc':
+        df = df.sort_values(['soc'], ascending=[False])
+    elif sort_by == 'days':
+        df = df.sort_values(['days'], ascending=[True])
+    elif sort_by == 'user':
+        df = df.sort_values(['user'], ascending=[True])
+    else:
+        raise ValueError("`sort_by` key not recognized")
     df['days'] = df['days'].round(4)
     df['s'] = df['s'].astype(int)
     df['soc'] = df['soc'].astype(int)
