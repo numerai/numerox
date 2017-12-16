@@ -3,7 +3,7 @@
 Release Notes
 =============
 
-- v0.1.0 (not yet released)
+- v0.1.0
 
   * Add ``report.correlation``
   * Add ``prediction.consistency``
