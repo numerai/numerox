@@ -3,6 +3,8 @@
 Release Notes
 =============
 
+- v0.1.1 (not yet released)
+
 - v0.1.0
 
   * Add ``report.correlation``
