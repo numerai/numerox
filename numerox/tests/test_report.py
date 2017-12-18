@@ -19,6 +19,7 @@ def test_report_performance_df():
     r.append_prediction(p, 'model2')
     r.append_prediction(p, 'model3')
 
-    df = r.performance_df(d)
+    df, info = r.performance_df(d)
 
     ok_(isinstance(df, pd.DataFrame), 'expecting a dataframe')
+    ok_(isinstance(info, dict), 'expecting a dictionary')

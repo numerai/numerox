@@ -5,11 +5,13 @@ from sklearn.cluster import MiniBatchKMeans
 from sklearn.metrics import log_loss, roc_auc_score, accuracy_score
 
 from numerox.data import ERA_INT_TO_STR
+from numerox.data import REGION_INT_TO_STR
 
 
 def metrics_per_era(data, pred_or_report, join='data',
                     columns=['logloss', 'auc', 'acc', 'ystd'],
-                    era_as_str=False):
+                    era_as_str=False, region_as_str=False):
+    "Dataframe with columns era, model, and specified metrics. And region list"
 
     df = pred_or_report.df
 
@@ -27,32 +29,30 @@ def metrics_per_era(data, pred_or_report, join='data',
     df = pd.merge(data_df, yhats_df, left_index=True, right_index=True,
                   how=how)
 
-    models = yhats_df.columns.values
-    metrics = {}
-    for model in models:
-        metrics[model] = []
+    regions = df['region'].unique().tolist()
+    if region_as_str:
+        regions = [REGION_INT_TO_STR[r] for r in regions]
 
     # calc metrics for each era
+    models = yhats_df.columns.values
+    metrics = []
     unique_eras = df.era.unique()
     for era in unique_eras:
         idx = df.era.isin([era])
         df_era = df[idx]
         y = df_era['y'].values
+        if era_as_str:
+            era = ERA_INT_TO_STR[era]
         for model in models:
             yhat = df_era[model].values
             m = calc_metrics_arrays(y, yhat, columns)
-            metrics[model].append(m)
+            m = [era, model] + m
+            metrics.append(m)
 
-    if era_as_str:
-        ueras = []
-        for e in unique_eras:
-            ueras.append(ERA_INT_TO_STR[e])
-        unique_eras = np.array(ueras)
-    for model in models:
-        metrics[model] = pd.DataFrame(metrics[model], columns=columns,
-                                      index=unique_eras)
+    columns = ['era', 'model'] + columns
+    metrics = pd.DataFrame(metrics, columns=columns)
 
-    return metrics
+    return metrics, regions
 
 
 def calc_metrics_arrays(y, yhat, columns):

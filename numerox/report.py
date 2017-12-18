@@ -42,7 +42,7 @@ class Report(object):
             print(df.to_string())
 
     def performance(self, data, sort_by='logloss'):
-        df = self.performance_df(data)
+        df, info = self.performance_df(data)
         if sort_by == 'logloss':
             df = df.sort_values(by='logloss', ascending=True)
         elif sort_by == 'auc':
@@ -51,36 +51,44 @@ class Report(object):
             df = df.sort_values(by='acc', ascending=False)
         elif sort_by == 'ystd':
             df = df.sort_values(by='ystd', ascending=False)
+        elif sort_by == 'sharpe':
+            df = df.sort_values(by='sharpe', ascending=False)
         elif sort_by == 'consis':
             df = df.sort_values(by=['consis', 'logloss'],
                                 ascending=[False, True])
         else:
             raise ValueError("`sort_by` name not recognized")
         df = df.round(decimals={'logloss': 6, 'auc': 4, 'acc': 4, 'ystd': 4,
-                                'consis': 4})
+                                'sharpe': 4, 'consis': 4})
+        info_str = ', '.join(info['region']) + '; '
+        info_str += '{} eras'.format(len(info['era']))
+        print(info_str)
         with pd.option_context('display.colheader_justify', 'left'):
-            print(df.to_string(index=False))
+            print(df.to_string(index=True))
 
-    def performance_df(self, data):
+    def performance_df(self, data, era_as_str=True, region_as_str=True):
 
         # calc performance
-        metrics = metrics_per_era(data, self)
-        regions = data.unique_region().tolist()
-        models = list(metrics.keys())
-        nera = metrics[models[0]].shape[0]
-        regera = ', '.join(regions) + '; %d' % nera + ' eras'
+        metrics, regions = metrics_per_era(data, self, era_as_str=era_as_str,
+                                           region_as_str=region_as_str)
 
-        # create dataframe of performance
-        cols = ['logloss', 'auc', 'acc', 'ystd', 'consis', '(%s)' % regera]
-        df = pd.DataFrame(columns=cols)
-        for i, model in enumerate(models):
-            metric_df = metrics[model]
-            metric = metric_df.mean(axis=0).tolist()
-            consis = (metric_df['logloss'] < np.log(2)).mean()
-            metric.extend([consis, model])
-            df.loc[i] = metric
+        # gather info
+        era = metrics['era'].unique().tolist()
+        info = {'era': era, 'region': regions}
 
-        return df
+        # consistency and "Sharpe" ratio
+        pivot = metrics.pivot(index='era', columns='model', values='logloss')
+        consistency = (pivot < np.log(2)).mean(axis=0)
+        sharpe = (np.log(2) - pivot).mean(axis=0) / pivot.std(axis=0)
+
+        # mean metrics across eras
+        metrics = metrics.groupby('model').mean()
+
+        # insert consistency and sharpe
+        metrics.insert(metrics.shape[1], 'sharpe', sharpe)
+        metrics.insert(metrics.shape[1], 'consis', consistency)
+
+        return metrics, info
 
     def correlation(self, model_name=None):
         "Correlation of predictions; by default reports given for each model"

@@ -1,5 +1,3 @@
-import warnings
-
 import pandas as pd
 import numpy as np
 
@@ -75,32 +73,47 @@ class Prediction(object):
         c = (logloss.values < np.log(2)).mean()
         return c
 
-    def metrics_per_era(self, data, metrics=['logloss']):
+    def metrics_per_era(self, data, metrics=['logloss'], era_as_str=True):
         "DataFrame containing given metrics versus era"
-        metrics = metrics_per_era(data, self, columns=metrics,
-                                  era_as_str=True)
-        metrics = metrics['yhat']
+        metrics, regions = metrics_per_era(data, self, columns=metrics,
+                                           era_as_str=era_as_str)
+        metrics.index = metrics['era']
+        metrics = metrics.drop(['era', 'model'], axis=1)
         return metrics
 
     def performance(self, data):
-        metrics = metrics_per_era(data, self)
-        metrics = metrics['yhat']
-        regions = data.unique_region().tolist()
-        regions = ', '.join(regions)
-        print("      logloss   auc     acc     ystd")
-        fmt = "{:<4}  {:8.6f}  {:6.4f}  {:6.4f}  {:6.4f}{extra}"
-        extra = "  |  {:<7}  {:<}".format('region', regions)
-        print(fmt.format('mean', *metrics.mean(axis=0), extra=extra))
-        extra = "  |  {:<7}  {:<}".format('eras', metrics.shape[0])
-        print(fmt.format('std', *metrics.std(axis=0), extra=extra))
-        consistency = (metrics['logloss'] < np.log(2)).mean()
-        extra = "  |  {:<7}  {:<.4f}".format('consis', consistency)
-        print(fmt.format('min', *metrics.min(axis=0), extra=extra))
-        with warnings.catch_warnings():
-            warnings.filterwarnings('ignore', '', RuntimeWarning)
-            prctile = np.percentile(metrics['logloss'], 75)
-        extra = "  |  {:<7}  {:<.4f}".format('75th', prctile)
-        print(fmt.format('max', *metrics.max(axis=0), extra=extra))
+        df = self.performance_df(data)
+        df = df.round(decimals={'logloss': 6, 'auc': 4, 'acc': 4, 'ystd': 4})
+        with pd.option_context('display.colheader_justify', 'left'):
+            print(df.to_string(index=True))
+
+    def performance_df(self, data):
+
+        # metrics
+        metrics, regions = metrics_per_era(data, self, region_as_str=True)
+        metrics = metrics.drop(['era', 'model'], axis=1)
+
+        # additional metrics
+        region_str = ', '.join(regions)
+        nera = metrics.shape[0]
+        logloss = metrics['logloss']
+        consis = (logloss < np.log(2)).mean()
+        sharpe = (np.log(2) - logloss).mean() / logloss.std()
+
+        # summary of metrics
+        m1 = metrics.mean(axis=0).tolist() + ['region', region_str]
+        m2 = metrics.std(axis=0).tolist() + ['eras', nera]
+        m3 = metrics.min(axis=0).tolist() + ['sharpe', sharpe]
+        m4 = metrics.max(axis=0).tolist() + ['consis', consis]
+        data = [m1, m2, m3, m4]
+
+        # make dataframe
+        columns = metrics.columns.tolist() + ['stats', '']
+        df = pd.DataFrame(data=data,
+                          index=['mean', 'std', 'min', 'max'],
+                          columns=columns)
+
+        return df
 
     def copy(self):
         "Copy of prediction"

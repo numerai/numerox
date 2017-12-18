@@ -5,6 +5,9 @@ Release Notes
 
 - v0.1.1 (not yet released)
 
+  * Complete rewrite of all performance metrics
+  * Add ``prediction.performance_df``
+
 - v0.1.0
 
   * Add ``report.correlation``
