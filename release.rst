@@ -7,6 +7,7 @@ Release Notes
 
   * Complete rewrite of all performance metrics
   * Add ``prediction.performance_df``
+  * Rewrite examples of comparing performance of multiple models
 
 - v0.1.0
 

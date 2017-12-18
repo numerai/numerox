@@ -1,66 +1,64 @@
 Comparing model performance
 ===========================
 
-Let's use the logistic regression model in numerox to run 5-fold cross
-validation on the training data::
+Let's run multiple models through a simple cross validation on the training
+data and then compare the performance of the models. The code for this
+example is `here`_.
 
-    >>> model = nx.logistic()
-    >>> prediction1 = nx.backtest(model, data, verbosity=1)
-    logistic(inverse_l2=1e-05)
-          logloss   auc     acc     ystd
-    mean  0.692974  0.5226  0.5159  0.0023  |  region   train
-    std   0.000224  0.0272  0.0205  0.0002  |  eras     85
-    min   0.692360  0.4550  0.4660  0.0020  |  consis   0.7647
-    max   0.693589  0.5875  0.5606  0.0027  |  75th     0.6931
+First perform the cross validation::
 
-Let's take a peek at performance on the validation data::
+    >>> runner = nx.Runner(run_list, splitter, save_dir, verbosity=1)
+    >>> runner.run()
+    logistic(inverse_l2=0.0001)
+          logloss   auc     acc     ystd   stats            
+    mean  0.692885  0.5165  0.5116  0.0056  region     train
+    std   0.000536  0.0281  0.0215  0.0003    eras       120
+    min   0.691360  0.4478  0.4540  0.0050  sharpe  0.488866
+    max   0.694202  0.5944  0.5636  0.0061  consis  0.691667
+    extratrees(depth=3, ntrees=100, seed=0, nfeatures=7)
+          logloss   auc     acc     ystd   stats            
+    mean  0.692948  0.5155  0.5108  0.0044  region     train
+    std   0.000453  0.0296  0.0227  0.0003    eras       120
+    min   0.691592  0.4322  0.4422  0.0039  sharpe  0.440766
+    max   0.694299  0.5986  0.5767  0.0050  consis     0.675
+    randomforest(max_features=2, depth=3, ntrees=100, seed=0)
+          logloss   auc     acc     ystd   stats            
+    mean  0.692899  0.5160  0.5114  0.0056  region     train
+    std   0.000570  0.0293  0.0218  0.0003    eras       120
+    min   0.691133  0.4389  0.4529  0.0051  sharpe  0.435935
+    max   0.694459  0.6026  0.5734  0.0061  consis  0.691667
+    xgboost(n_estimators=5, subsample=0.4, learning_rate=0.1, seed=0, max_depth=5)
+          logloss   auc     acc     ystd   stats            
+    mean  0.692895  0.5136  0.5093  0.0087  region     train
+    std   0.000633  0.0224  0.0170  0.0004    eras       120
+    min   0.691090  0.4523  0.4592  0.0078  sharpe  0.398632
+    max   0.694656  0.5730  0.5501  0.0095  consis  0.666667
+    logisticPCA(nfeatures=10, inverse_l2=0.0001)
+          logloss   auc     acc     ystd   stats            
+    mean  0.692898  0.5159  0.5110  0.0055  region     train
+    std   0.000475  0.0255  0.0196  0.0003    eras       120
+    min   0.691492  0.4497  0.4590  0.0050  sharpe  0.525184
+    max   0.694138  0.5887  0.5653  0.0060  consis  0.708333
 
-    >>> prediction2 = nx.production(model, data)
-    logistic(inverse_l2=1e-05)
-          logloss   auc     acc     ystd
-    mean  0.692993  0.5157  0.5115  0.0028  |  region   validation
-    std   0.000225  0.0224  0.0172  0.0000  |  eras     12
-    min   0.692440  0.4853  0.4886  0.0028  |  consis   0.7500
-    max   0.693330  0.5734  0.5555  0.0028  |  75th     0.6931
-    >>> prediction2.to_csv('logistic.csv')  # 6 decimal places by default
+Notice how the predictions from the models are highly correlated::
 
-There is no overlap in ids between prediction1 (train) and prediction2
-(tournament) so you can add (concatenate) them if you're into that and let's
-go ahead and save the result::
+    >>> report.correlation('logistic')
+    logistic
+       0.9837 logisticPCA
+       0.9514 extratrees
+       0.9303 randomforest
+       0.6666 xgboost
 
-    >>> prediction = prediction1 + prediction2
-    >>> prediction.save('logloss_1e-05.pred')  # HDF5
+Comparison of model performance::
 
-Once you have run and saved several predictions, you can make a report::
+    >>> report.performance(data, sort_by='logloss')
+    train; 120 eras
+                  logloss   auc     acc     ystd    sharpe  consis
+    model                                                         
+    logistic      0.692885  0.5165  0.5116  0.0056  0.4889  0.6917
+    xgboost       0.692895  0.5136  0.5093  0.0087  0.3986  0.6667
+    logisticPCA   0.692898  0.5159  0.5110  0.0055  0.5252  0.7083
+    randomforest  0.692899  0.5160  0.5114  0.0056  0.4359  0.6917
+    extratrees    0.692948  0.5155  0.5108  0.0044  0.4408  0.6750
 
-    >>> report = nx.report.load_report('/round79', extension='pred')
-    >>> report.performance(data['train'], sort_by='logloss')
-    logloss   auc     acc     ystd    consis (train; 85 eras)
-    0.692455  0.5215  0.5149  0.0219  0.6824        logistic_1e-03
-    0.692487  0.5224  0.5159  0.0121  0.7294        logistic_1e-04
-    0.692565  0.5236  0.5162  0.0086  0.7294  extratrees_nfeature7
-    0.692581  0.5206  0.5143  0.0253  0.6000        logistic_1e-02
-    0.692629  0.5240  0.5164  0.0074  0.7294  extratrees_nfeature5
-    0.692704  0.5200  0.5140  0.0273  0.5412        logistic_1e-01
-    0.692747  0.5232  0.5162  0.0055  0.7647  extratrees_nfeature3
-    0.692831  0.5238  0.5163  0.0042  0.7647  extratrees_nfeature2
-    0.692974  0.5226  0.5159  0.0023  0.7647        logistic_1e-05
-
-The lowest logloss on the train data was by ``logistic_1e-03``. Let's look at
-its per era performance on the validation data::
-
-    >>> report.performance_per_era(data['validation'], 'logistic_1e-03')
-    logistic_1e-03
-           logloss   auc     acc     ystd
-    era86  0.691499  0.5322  0.5296  0.0220
-    era87  0.689715  0.5552  0.5371  0.0219
-    era88  0.692501  0.5189  0.5167  0.0220
-    era89  0.694544  0.4954  0.4916  0.0218
-    era90  0.691133  0.5349  0.5230  0.0221
-    era91  0.692794  0.5140  0.5061  0.0218
-    era92  0.694579  0.4933  0.4906  0.0217
-    era93  0.694098  0.4983  0.4954  0.0218
-    era94  0.688417  0.5752  0.5591  0.0218
-    era95  0.691734  0.5265  0.5224  0.0216
-    era96  0.693184  0.5119  0.5092  0.0215
-    era97  0.693276  0.5077  0.5089  0.0215
+.. _here: https://github.com/kwgoodman/numerox/blob/master/examples/runner_example.py

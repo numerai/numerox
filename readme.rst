@@ -16,8 +16,7 @@ dataset and then load it::
     >>> nx.download_dataset('numerai_dataset.zip')
     >>> data = nx.load_zip('numerai_dataset.zip')
     >>> data
-    region    train, validation, test, live
-    rows      637205
+    rows      637184
     era       133, [era1, eraX]
     x         50, min 0.0000, mean 0.5025, max 1.0000
     y         mean 0.499924, fraction missing 0.3095
@@ -27,24 +26,24 @@ validation on the training data::
 
     >>> model = nx.logistic()
     >>> prediction = nx.backtest(model, data, verbosity=1)
-    logistic(inverse_l2=1e-05)
-          logloss   auc     acc     ystd
-    mean  0.693103  0.5159  0.5114  0.0008  |  region   train
-    std   0.000080  0.0289  0.0219  0.0000  |  eras     120
-    min   0.692874  0.4384  0.4446  0.0007  |  consis   0.7000
-    max   0.693323  0.5962  0.5626  0.0009  |  75th     0.6932
+    logistic(inverse_l2=0.0001)
+          logloss   auc     acc     ystd   stats            
+    mean  0.692885  0.5165  0.5116  0.0056  region     train
+    std   0.000536  0.0281  0.0215  0.0003    eras       120
+    min   0.691360  0.4478  0.4540  0.0050  sharpe  0.488866
+    max   0.694202  0.5944  0.5636  0.0061  consis  0.691667
 
 OK, results are good enough for a demo so let's make a submission file for the
 tournament. We will fit the model on the train data and make our predictions
 for the tournament data::
 
-    >>> prediction = nx.production(model, data)
-    logistic(inverse_l2=1e-05)
-          logloss   auc     acc     ystd
-    mean  0.693090  0.5178  0.5137  0.0010  |  region   validation
-    std   0.000060  0.0171  0.0140  0.0000  |  eras     12
-    min   0.692950  0.4891  0.4927  0.0010  |  consis   0.9167
-    max   0.693192  0.5556  0.5350  0.0010  |  75th     0.6931
+    >>> prediction = nx.production(model, data, verbosity=1)
+    logistic(inverse_l2=0.0001)
+          logloss   auc     acc     ystd   stats              
+    mean  0.692808  0.5194  0.5142  0.0063  region  validation
+    std   0.000375  0.0168  0.0137  0.0001    eras          12
+    min   0.691961  0.4903  0.4925  0.0062  sharpe    0.903277
+    max   0.693460  0.5553  0.5342  0.0064  consis    0.916667
     >>> prediction.to_csv('logistic.csv')  # 6 decimal places by default
 
 Examples
