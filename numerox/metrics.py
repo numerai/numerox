@@ -4,6 +4,7 @@ import numpy as np
 from sklearn.cluster import MiniBatchKMeans
 from sklearn.metrics import log_loss, roc_auc_score, accuracy_score
 
+import numerox as nx
 from numerox.data import ERA_INT_TO_STR
 from numerox.data import REGION_INT_TO_STR
 
@@ -53,6 +54,66 @@ def metrics_per_era(data, pred_or_report, join='data',
     metrics = pd.DataFrame(metrics, columns=columns)
 
     return metrics, regions
+
+
+def metrics_per_model(data, report, join='data',
+                      columns=['logloss', 'auc', 'acc', 'ystd'],
+                      era_as_str=True, region_as_str=True):
+
+    if not isinstance(report, nx.Report):
+        raise TypeError("`report` must be a nx.Report object")
+
+    # calc metrics per era
+    skip = ['sharpe', 'consis']
+    cols = [c for c in columns if c not in skip]
+    if 'sharpe' in columns or 'consis' in columns:
+        if 'logloss' not in cols:
+            cols.append('logloss')
+    mpe, regions = metrics_per_era(data, report, join=join, columns=cols)
+
+    # gather some info
+    info = {}
+    info['era'] = mpe['era'].unique().tolist()
+    info['region'] = regions
+    if era_as_str:
+        info['era'] = [ERA_INT_TO_STR[e] for e in info['era']]
+    if region_as_str:
+        info['region'] = [REGION_INT_TO_STR[r] for r in info['region']]
+
+    # pivot is a dataframe with:
+    #     era for rows
+    #     model for columns
+    #     logloss for cell values
+    pivot = mpe.pivot(index='era', columns='model', values='logloss')
+
+    # mm is a dataframe with:
+    #    model as rows
+    #    `cols` as columns
+    mm = mpe.groupby('model').mean()
+
+    # metrics is the output with:
+    #    model as rows
+    #    `columns` as columns
+    metrics = pd.DataFrame(index=pivot.columns, columns=columns)
+
+    for col in columns:
+        if col == 'consis':
+            m = (pivot < np.log(2)).mean(axis=0)
+        elif col == 'sharpe':
+            m = (np.log(2) - pivot).mean(axis=0) / pivot.std(axis=0)
+        elif col == 'logloss':
+            m = mm['logloss']
+        elif col == 'auc':
+            m = mm['auc']
+        elif col == 'acc':
+            m = mm['acc']
+        elif col == 'ystd':
+            m = mm['ystd']
+        else:
+            raise ValueError("unknown metric ({})".format(col))
+        metrics[col] = m
+
+    return metrics, info
 
 
 def calc_metrics_arrays(y, yhat, columns):

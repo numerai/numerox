@@ -42,6 +42,7 @@ from numerox.numerai import dataset_url
 from numerox.data import concat_data
 from numerox.metrics import concordance
 from numerox.metrics import metrics_per_era
+from numerox.metrics import metrics_per_model
 from numerox.numerai import show_stakes
 from numerox.version import __version__
 

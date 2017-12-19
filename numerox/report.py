@@ -6,6 +6,7 @@ import numpy as np
 
 from numerox.prediction import load_prediction
 from numerox.metrics import metrics_per_era
+from numerox.metrics import metrics_per_model
 
 
 class Report(object):
@@ -67,27 +68,12 @@ class Report(object):
             print(df.to_string(index=True))
 
     def performance_df(self, data, era_as_str=True, region_as_str=True):
-
-        # calc performance
-        metrics, regions = metrics_per_era(data, self, era_as_str=era_as_str,
-                                           region_as_str=region_as_str)
-
-        # gather info
-        era = metrics['era'].unique().tolist()
-        info = {'era': era, 'region': regions}
-
-        # consistency and "Sharpe" ratio
-        pivot = metrics.pivot(index='era', columns='model', values='logloss')
-        consistency = (pivot < np.log(2)).mean(axis=0)
-        sharpe = (np.log(2) - pivot).mean(axis=0) / pivot.std(axis=0)
-
-        # mean metrics across eras
-        metrics = metrics.groupby('model').mean()
-
-        # insert consistency and sharpe
-        metrics.insert(metrics.shape[1], 'sharpe', sharpe)
-        metrics.insert(metrics.shape[1], 'consis', consistency)
-
+        cols = ['logloss', 'auc', 'acc', 'ystd', 'sharpe', 'consis']
+        metrics, info = metrics_per_model(data,
+                                          self,
+                                          columns=cols,
+                                          era_as_str=era_as_str,
+                                          region_as_str=region_as_str)
         return metrics, info
 
     def correlation(self, model_name=None):
