@@ -10,7 +10,7 @@ from numerox.model import Model
 from numerox.model import logistic
 from numerox.model import extratrees
 from numerox.model import randomforest
-from numerox.model import xgboost
+from numerox.model import mlpc
 from numerox.model import logisticPCA
 
 # load

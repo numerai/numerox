@@ -10,6 +10,8 @@ Release Notes
   * Add ``report.dominance``
   * Add ``report.dominance_df``
   * Add ``prediction.performance_df``
+  * Add ``mlpc`` model
+  * Remove ``xgboost`` model to remove optional xgboost dependency
   * Rewrite examples of comparing performance of multiple models
   * More unit tests
 

@@ -31,10 +31,10 @@ def dataset_url():
     return url
 
 
-def download_data_object():
+def download_data_object(verbose=False):
     "Used by numerox to avoid hard coding paths; probably not useful to users"
     with tempfile.NamedTemporaryFile() as temp:
-        download_dataset(temp.name)
+        download_dataset(temp.name, verbose=verbose)
         data = nx.load_zip(temp.name)
     return data
 

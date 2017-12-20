@@ -2,16 +2,11 @@ import json
 
 import numpy as np
 from sklearn.linear_model import LogisticRegression
+from sklearn.neural_network import MLPClassifier as MLPC
 from sklearn.ensemble import ExtraTreesClassifier as ETC
 from sklearn.ensemble import RandomForestClassifier as RFC
 from sklearn.pipeline import Pipeline
 from sklearn.decomposition import PCA
-
-try:
-    from xgboost.sklearn import XGBClassifier
-    HAS_XGBOOST = True
-except ImportError:
-    HAS_XGBOOST = False
 
 """
 
@@ -130,25 +125,23 @@ class randomforest(Model):
         return dpre.ids, yhat
 
 
-class xgboost(Model):
+class mlpc(Model):
 
-    def __init__(self, learning_rate=0.1, subsample=0.4, max_depth=5,
-                 n_estimators=5, seed=0):
-        self.p = {'learning_rate': learning_rate,
-                  'subsample': subsample,
-                  'max_depth': max_depth,
-                  'n_estimators': n_estimators,
+    def __init__(self, alpha=0.11, layers=[5, 3], activation='tanh',
+                 learn=0.002, seed=0):
+        self.p = {'alpha': alpha,
+                  'layers': layers,
+                  'activation': activation,
+                  'learn': learn,
                   'seed': seed}
-        if not HAS_XGBOOST:
-            raise ImportError("You must install xgboost to use this model")
 
     def fit_predict(self, dfit, dpre):
-        clf = XGBClassifier(learning_rate=self.p['learning_rate'],
-                            subsample=self.p['subsample'],
-                            max_depth=self.p['max_depth'],
-                            n_estimators=self.p['n_estimators'],
-                            seed=self.p['seed'],
-                            nthread=-1)
+        clf = MLPC(hidden_layer_sizes=self.p['layers'],
+                   alpha=self.p['alpha'],
+                   activation=self.p['activation'],
+                   learning_rate_init=self.p['learn'],
+                   random_state=self.p['seed'],
+                   max_iter=200)
         clf.fit(dfit.x, dfit.y)
         yhat = clf.predict_proba(dpre.x)[:, 1]
         return dpre.ids, yhat
