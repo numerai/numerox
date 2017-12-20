@@ -23,9 +23,18 @@ def runner_example(save_dir, data):
     m5 = {'model': nx.logisticPCA(), 'prediction_file': 'logisticPCA.pred'}
     run_list = [m1, m2, m3, m4, m5]
 
-    # we won't save anything, just display the results
+    # run all models and save results
     runner = nx.Runner(run_list, splitter, save_dir, verbosity=1)
     runner.run()
+
+    # Alternatively:
+    #
+    # Instead of using splitter, run_list, and nx.Runner, you can do:
+    #
+    #     prediction = nx.backtest(nx.logistic(), data)
+    #     prediction.save(filename)
+    #
+    # And similarly for the other models
 
     # load report
     report = nx.load_report(save_dir)
