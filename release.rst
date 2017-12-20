@@ -7,8 +7,11 @@ Release Notes
 
   * Complete rewrite of all performance metrics
   * Add ``metrics_per_model``
+  * Add ``report.dominance``
+  * Add ``report.dominance_df``
   * Add ``prediction.performance_df``
   * Rewrite examples of comparing performance of multiple models
+  * More unit tests
 
 - v0.1.0
 

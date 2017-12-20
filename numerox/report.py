@@ -76,6 +76,38 @@ class Report(object):
                                           region_as_str=region_as_str)
         return metrics, info
 
+    def dominance(self, data, sort_by='logloss'):
+        "Mean (across eras) of fraction of models bested per era"
+        df = self.dominance_df(data)
+        df = df.sort_values([sort_by], ascending=[False])
+        df = df.round(decimals=4)
+        with pd.option_context('display.colheader_justify', 'left'):
+            print(df.to_string(index=True))
+
+    def dominance_df(self, data):
+        "Mean (across eras) of fraction of models bested per era"
+        columns = ['logloss', 'auc', 'acc']
+        mpe, regions = metrics_per_era(data, self, columns=columns)
+        dfs = []
+        for i, col in enumerate(columns):
+            pivot = mpe.pivot(index='era', columns='model', values=col)
+            models = pivot.columns.tolist()
+            a = pivot.values
+            n = a.shape[1] - 1.0
+            if n == 0:
+                raise ValueError("Must have at least two models")
+            m = []
+            for j in range(pivot.shape[1]):
+                if col == 'logloss':
+                    z = (a[:, j].reshape(-1, 1) < a).sum(axis=1) / n
+                else:
+                    z = (a[:, j].reshape(-1, 1) > a).sum(axis=1) / n
+                m.append(z.mean())
+            df = pd.DataFrame(data=m, index=models, columns=[col])
+            dfs.append(df)
+        df = pd.concat(dfs, axis=1)
+        return df
+
     def correlation(self, model_name=None):
         "Correlation of predictions; by default reports given for each model"
         if model_name is None:

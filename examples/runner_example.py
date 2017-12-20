@@ -38,6 +38,10 @@ def runner_example(save_dir, data):
     print('\nPerformance comparison:\n')
     report.performance(data, sort_by='logloss')
 
+    # dominance of models
+    print('\nModel dominance:\n')
+    report.dominance(data, sort_by='logloss')
+
 
 if __name__ == '__main__':
     data = nx.numerai.download_data_object()
