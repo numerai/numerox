@@ -3,7 +3,7 @@
 Release Notes
 =============
 
-- v0.1.1 (not yet released)
+- v0.1.1
 
   * Complete rewrite of all performance metrics
   * Add ``metrics_per_model``
