@@ -86,4 +86,7 @@ originality::
     mlpc           True   True      True
     logisticPCA   False  False     False
 
+Typically you would use ``report.originality`` with tournament predictions.
+Here the predictions are on the training data.
+
 .. _here: https://github.com/kwgoodman/numerox/blob/master/examples/runner_example.py
