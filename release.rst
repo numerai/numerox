@@ -3,6 +3,8 @@
 Release Notes
 =============
 
+- v0.1.2 (not yet released)
+
 - v0.1.1
 
   * Complete rewrite of all performance metrics
