@@ -75,4 +75,15 @@ worst performer in every era::
     randomforest  0.5042   0.4938  0.5333
     extratrees    0.3542   0.4688  0.4396
 
+Let's say you have already submitted the predictions of the logistic model.
+Which of your other models will that submission prevent from passing
+originality::
+
+    >>> print(report.originality(['logistic']))
+                   corr     ks  original
+    randomforest   True  False     False
+    extratrees    False   True     False
+    mlpc           True   True      True
+    logisticPCA   False  False     False
+
 .. _here: https://github.com/kwgoodman/numerox/blob/master/examples/runner_example.py

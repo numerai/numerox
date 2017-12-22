@@ -5,6 +5,9 @@ Release Notes
 
 - v0.1.2 (not yet released)
 
+  * Add ``report.originality``
+  * More unit tests
+
 - v0.1.1
 
   * Complete rewrite of all performance metrics

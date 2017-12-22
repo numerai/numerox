@@ -51,6 +51,10 @@ def runner_example(save_dir, data):
     print('\nModel dominance:\n')
     report.dominance(data, sort_by='logloss')
 
+    # originality given that logistic model has already been submitted
+    print('\nModel originality (versus logistic):\n')
+    print(report.originality(['logistic']))
+
 
 if __name__ == '__main__':
     data = nx.numerai.download_data_object(verbose=True)
