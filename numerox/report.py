@@ -7,6 +7,8 @@ import numpy as np
 from numerox.prediction import load_prediction
 from numerox.metrics import metrics_per_era
 from numerox.metrics import metrics_per_model
+from numerox.metrics import pearsonr
+from numerox.metrics import ks_2samp
 
 
 class Report(object):
@@ -128,6 +130,33 @@ class Report(object):
                 zmodel = zmodels[ix]
                 if model != zmodel:
                     print("   {:.4f} {}".format(corr[ix], zmodel))
+
+    def original(self, submitted_models):
+        "Which models are original given the models already submitted?"
+
+        # predictions of models already submitted
+        yhats = self.df[submitted_models].values
+
+        # models that have not been submitted; we will report on these
+        models = self.models
+        models = [m for m in models if m not in submitted_models]
+
+        # originality
+        df = pd.DataFrame(index=models, columns=['corr', 'ks', 'original'])
+        for model in models:
+            corr = True
+            ks = True
+            yhat = self.df[model].values
+            for i in range(yhats.shape[1]):
+                if corr and pearsonr(yhat, yhats[:, i]) > 0.95:
+                   corr = False
+                if ks and ks_2samp(yhat, yhats[:, i]) <= 0.03:
+                    ks = False
+            df.loc[model, 'corr'] = corr
+            df.loc[model, 'ks'] = ks
+            df.loc[model, 'original'] = corr and ks
+
+        return df
 
 
 def load_report(prediction_dir, extension='pred'):
