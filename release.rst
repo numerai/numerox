@@ -6,6 +6,7 @@ Release Notes
 - v0.1.2 (not yet released)
 
   * Add ``report.originality``
+  * Add report indexing (``report.__getitem__``)
   * More unit tests
 
 - v0.1.1

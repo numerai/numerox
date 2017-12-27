@@ -158,6 +158,10 @@ class Report(object):
 
         return df
 
+    def __getitem__(self, index):
+        "Report indexing is by model names (i.e. columns)"
+        return Report(self.df[index])
+
 
 def load_report(prediction_dir, extension='pred'):
     "Load Prediction objects (hdf) in `prediction_dir`; return Report object"

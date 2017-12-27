@@ -25,6 +25,24 @@ def test_report_performance_df():
     ok_(isinstance(info, dict), 'expecting a dictionary')
 
 
+def test_report_getitem():
+    "report.__getitem__"
+
+    d = micro_data()
+    p = nx.Prediction()
+    p.append(d.ids, d.y)
+
+    r = nx.Report()
+    r.append_prediction(p, 'model1')
+    r.append_prediction(p, 'model2')
+    r.append_prediction(p, 'model3')
+
+    r2 = r[['model3', 'model1']]
+
+    ok_(isinstance(r2, nx.Report), 'expecting a report')
+    ok_(r2.models == ['model3', 'model1'], 'expecting a dictionary')
+
+
 def test_report_dominance_df():
     "make sure report.dominance_df runs"
 
