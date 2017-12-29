@@ -110,6 +110,19 @@ Or, let's go crazy::
     x         50, min 0.0000, mean 0.4992, max 1.0000
     y         mean 0.499960, fraction missing 0.3544
 
+You can also index by Numerai row ids::
+
+    >>> data = nx.play_data()
+    >>> ids = data.ids[10:12]
+    >>> ids
+    array(['ne04fa6947fd4485', 'nfa60f9e305a34a8'],
+          dtype='|S16')
+    >>> data.loc[ids]
+    region    train
+    rows      2
+    era       1, [era1, era1]
+    x         50, min 0.2088, mean 0.4964, max 0.7633
+    y         mean 0.500000, fraction missing 0.0000
 
 Try it
 ------
