@@ -5,6 +5,7 @@ Release Notes
 
 - v0.1.2 (not yet released)
 
+  * Add ``data.loc`` for indexing by Numerai row ids
   * Add ``report.originality``
   * Add report indexing (``report.__getitem__``)
   * More unit tests

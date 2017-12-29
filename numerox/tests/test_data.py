@@ -53,6 +53,16 @@ def test_data_indexing():
     ade(d[d.era == 'era4'], micro_data([6]), msg)
 
 
+def test_data_loc():
+    "test data.loc"
+    d = micro_data()
+    msg = 'data.loc indexing error'
+    ade(d.loc[['index1']], micro_data([1]), msg)
+    ade(d.loc[['index4']], micro_data([4]), msg)
+    ade(d.loc[['index4', 'index0']], micro_data([4, 0]), msg)
+    ade(d.loc[['index4', 'index0', 'index2']], micro_data([4, 0, 2]), msg)
+
+
 def test_data_xnew():
     "test data.xnew"
     d = nx.testing.micro_data()

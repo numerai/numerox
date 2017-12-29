@@ -391,6 +391,11 @@ class Data(object):
         else:
             raise IndexError('indexing type not recognized')
 
+    @property
+    def loc(self):
+        "indexing by row ids"
+        return Loc(self)
+
     def __len__(self):
         "Number of rows"
         return self.df.__len__()
@@ -488,3 +493,13 @@ def concat_data(datas):
         # object, the id overlaps that it prints can be very long so
         raise IndexError("Overlap in ids found")
     return Data(df)
+
+
+class Loc(object):
+    "Utility class for the loc method."
+
+    def __init__(self, data):
+        self.data = data
+
+    def __getitem__(self, index):
+        return Data(self.data.df.loc[index])
