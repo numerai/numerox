@@ -20,6 +20,16 @@ class Report(object):
     def models(self):
         return self.df.columns.tolist()
 
+    def __getitem__(self, model):
+        "Report indexing is by model names (i.e. columns)"
+        return Report(self.df[model])
+
+    def __setitem__(self, model, prediction):
+        "Add (or replace) a prediction"
+        if self.df is None:
+            self.append_prediction(prediction, model)
+        self.df[model] = prediction.df
+
     def append_prediction(self, prediction, model_name):
         df = prediction.df
         df = df.rename(columns={'yhat': model_name})
@@ -157,10 +167,6 @@ class Report(object):
             df.loc[model, 'original'] = corr and ks
 
         return df
-
-    def __getitem__(self, index):
-        "Report indexing is by model names (i.e. columns)"
-        return Report(self.df[index])
 
 
 def load_report(prediction_dir, extension='pred'):

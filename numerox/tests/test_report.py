@@ -62,6 +62,27 @@ def test_report_dominance_df():
     ok_(isinstance(df, pd.DataFrame), 'expecting a dataframe')
 
 
+def test_report_setitem():
+    "report.__setitem__"
+
+    data = nx.play_data()
+    p1 = nx.production(nx.logistic(), data, verbosity=0)
+    p2 = nx.production(nx.logistic(1e-5), data, verbosity=0)
+    p3 = nx.production(nx.logistic(1e-6), data, verbosity=0)
+
+    r = nx.Report()
+    r['model1'] = p1
+    r['model2'] = p2
+    r['model3'] = p3
+
+    r2 = nx.Report()
+    r2.append_prediction(p1, 'model1')
+    r2.append_prediction(p2, 'model2')
+    r2.append_prediction(p3, 'model3')
+
+    pd.testing.assert_frame_equal(r.df, r2.df)
+
+
 def test_report_originality():
     "make sure report.originality runs"
 
