@@ -7,8 +7,12 @@ example is `here`_.
 
 First perform the cross validation::
 
-    >>> runner = nx.Runner(run_list, splitter, save_dir, verbosity=1)
-    >>> runner.run()
+    >>> report = nx.Report()
+    >>> report['logistic'] = nx.backtest(nx.logistic(), data, verbosity=1)
+    >>> report['extratrees'] = nx.backtest(nx.extratrees(), data, verbosity=1)
+    >>> report['randomforest'] = nx.backtest(nx.randomforest(), data, verbosity=1)
+    >>> report['mlpc'] = nx.backtest(nx.mlpc(), data, verbosity=1)
+    >>> report['logisticPCA'] = nx.backtest(nx.logisticPCA(), data, verbosity=1)
     logistic(inverse_l2=0.0001)
           logloss   auc     acc     ystd   stats
     mean  0.692885  0.5165  0.5116  0.0056  region     train
@@ -89,4 +93,4 @@ originality::
 Typically you would use ``report.originality`` with tournament predictions.
 Here the predictions are on the training data.
 
-.. _here: https://github.com/kwgoodman/numerox/blob/master/examples/runner_example.py
+.. _here: https://github.com/kwgoodman/numerox/blob/master/examples/compare_models.py

@@ -5,12 +5,10 @@ Run multiple models through simple cross validation on the training data.
 Then compare performance of the models
 """
 
-import tempfile
-import shutil
 import numerox as nx
 
 
-def runner_example(save_dir, data):
+def compare_models(data):
 
     # we'll look at 5 models
     report = nx.Report()
@@ -39,7 +37,4 @@ def runner_example(save_dir, data):
 
 if __name__ == '__main__':
     data = nx.numerai.download_data_object(verbose=True)
-    data = data['train']
-    save_dir = tempfile.mkdtemp()
-    runner_example(save_dir, data)
-    shutil.rmtree(save_dir)
+    compare_models(data['train'])
