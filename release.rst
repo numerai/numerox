@@ -6,6 +6,8 @@ Release Notes
 - v0.1.2 (not yet released)
 
   * Numerox now uses (and requires) NumerAPI
+  * Add file overwrite protection option to ``download_dataset``
+  * Beware: ``download_dataset`` will now raise by default if file exists
   * Add ``report.__setitem__``
   * Add ``report.__contains__``
   * Add ``data.loc`` for indexing by Numerai row ids
