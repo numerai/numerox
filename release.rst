@@ -5,6 +5,7 @@ Release Notes
 
 - v0.1.2 (not yet released)
 
+  * Numerox now uses (and requires) NumerAPI
   * Add ``report.__setitem__``
   * Add ``report.__contains__``
   * Add ``data.loc`` for indexing by Numerai row ids

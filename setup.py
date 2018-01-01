@@ -43,6 +43,7 @@ REQUIRES = ['numpy',
             'pandas',
             'tables',
             'scikit-learn',
+            'numerapi',
             'requests',
             'nose']
 

@@ -3,14 +3,13 @@ import tempfile
 import datetime
 
 import pandas as pd
+from numerapi.numerapi import NumerAPI
 
 import numerox as nx
 
-API_TOURNAMENT_URL = 'https://api-tournament.numer.ai'
-
 
 def download_dataset(saved_filename, verbose=False):
-    "Download the current Numerai dataset"
+    "Download the current Numerai dataset; will overwrite"
     if verbose:
         print("Download dataset {}".format(saved_filename))
     url = dataset_url()
@@ -25,9 +24,9 @@ def download_dataset(saved_filename, verbose=False):
 
 def dataset_url():
     "URL of current Numerai dataset"
-    api = Numerai()
+    napi = NumerAPI()
     query = "query {dataset}"
-    url = api.call(query)['data']['dataset']
+    url = napi.raw_query(query)['data']['dataset']
     return url
 
 
@@ -75,7 +74,7 @@ def get_stakes(round_number=None):
     """
 
     # get raw stakes; eventually use numerapi for this block
-    api = Numerai()
+    napi = NumerAPI()
     query = '''
         query stakes($number: Int!){
           rounds(number: $number){
@@ -94,7 +93,8 @@ def get_stakes(round_number=None):
     if round_number is None:
         round_number = 0
     arguments = {'number': round_number}
-    stakes = api.call(query, arguments)  # ~92% of time spent on this line
+    # ~92% of time spent on the following line
+    stakes = napi.raw_query(query, arguments)
 
     # massage raw stakes
     stakes = stakes['data']['rounds'][0]['leaderboard']
@@ -135,32 +135,3 @@ def get_stakes(round_number=None):
     stakes.insert(3, 'cumsum', cumsum)
 
     return stakes, c_zero_users
-
-
-class Numerai(object):
-
-    def __init__(self, public_id=None, secret_key=None):
-        if public_id and secret_key:
-            self.token = (public_id, secret_key)
-        elif not public_id and not secret_key:
-            self.token = None
-        else:
-            print("You supply both a public id and a secret key.")
-            self.token = None
-
-    def has_token(self):
-        if self.token is not None:
-            return True
-        return False
-
-    def call(self, query, variables=None):
-        body = {'query': query,
-                'variables': variables}
-        headers = {'Content-type': 'application/json',
-                   'Accept': 'application/json'}
-        if self.token:
-            public_id, secret_key = self.token
-            headers['Authorization'] = \
-                'Token {}${}'.format(public_id, secret_key)
-        r = requests.post(API_TOURNAMENT_URL, json=body, headers=headers)
-        return r.json()
