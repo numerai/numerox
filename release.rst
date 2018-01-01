@@ -5,7 +5,8 @@ Release Notes
 
 - v0.1.2 (not yet released)
 
-  * Add ``report.__setitem__``; see examples/compare_models.py for demo
+  * Add ``report.__setitem__``
+  * Add ``report.__contains__``
   * Add ``data.loc`` for indexing by Numerai row ids
   * Add ``report.originality``
   * Add report indexing (``report.__getitem__``)

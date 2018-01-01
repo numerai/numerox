@@ -26,16 +26,34 @@ class Report(object):
 
     def __setitem__(self, model, prediction):
         "Add (or replace) a prediction"
-        if self.df is None:
-            self.append_prediction(prediction, model)
-        self.df[model] = prediction.df
+        self.append_prediction(prediction, model)
+
+    def __contains__(self, model):
+        "Is `model` already in report? True or False"
+        return model in self.df
 
     def append_prediction(self, prediction, model_name):
         df = prediction.df
-        df = df.rename(columns={'yhat': model_name})
-        dfs = [self.df, df]
-        df = pd.concat(dfs, axis=1, verify_integrity=True, copy=False)
-        self.df = df
+        if self.df is None:
+            # empty report
+            self.df = df.rename(columns={'yhat': model_name})
+        elif model_name not in self:
+            # inserting predictions from a model not already in report
+            df = df.rename(columns={'yhat': model_name})
+            self.df = pd.merge(self.df, df, how='outer',
+                               left_index=True, right_index=True)
+        else:
+            # add more predictions from an existing model
+            y = self.df[model_name]
+            y = y.dropna()
+            s = df.iloc[0]
+            s = s.dropna()
+            s = pd.concat([s, y], join='outer', ignore_index=False,
+                          verify_integrity=True)
+            df = s.to_frame(model_name)
+            self.df[model_name] = np.nan
+            self.df = pd.merge(self.df, df, how='outer', on=model_name,
+                               left_index=True, right_index=True)
 
     def append_prediction_dict(self, prediction_dict):
         dfs = []

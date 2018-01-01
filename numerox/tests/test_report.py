@@ -1,4 +1,6 @@
 from nose.tools import ok_
+from nose.tools import assert_raises
+
 import pandas as pd
 
 import numerox as nx
@@ -69,18 +71,25 @@ def test_report_setitem():
     p1 = nx.production(nx.logistic(), data, verbosity=0)
     p2 = nx.production(nx.logistic(1e-5), data, verbosity=0)
     p3 = nx.production(nx.logistic(1e-6), data, verbosity=0)
+    p4 = nx.backtest(nx.logistic(2e-4), data, verbosity=0)
 
     r = nx.Report()
     r['model1'] = p1
     r['model2'] = p2
     r['model3'] = p3
+    r['model4'] = p4
+    r['model1'] = p4
 
     r2 = nx.Report()
     r2.append_prediction(p1, 'model1')
     r2.append_prediction(p2, 'model2')
     r2.append_prediction(p3, 'model3')
+    r2.append_prediction(p4, 'model4')
+    r2.append_prediction(p4, 'model1')
 
     pd.testing.assert_frame_equal(r.df, r2.df)
+
+    assert_raises(ValueError, r.__setitem__, 'model1', p1)
 
 
 def test_report_originality():
