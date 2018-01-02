@@ -3,6 +3,8 @@
 Release Notes
 =============
 
+- v0.1.3 (not yet released)
+
 - v0.1.2
 
   * Numerox now uses (and requires) NumerAPI
