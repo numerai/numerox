@@ -32,7 +32,6 @@ from numerox.splitter import RollSplitter
 from numerox.run import production
 from numerox.run import backtest
 from numerox.run import run
-from numerox.run import Runner
 
 # numerai
 from numerox.numerai import download_dataset
