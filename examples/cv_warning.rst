@@ -16,11 +16,12 @@ the mean results::
 
     100 runs
                   cve        cv
-    logloss  0.692963  0.692947
-    auc      0.523808  0.525560
-    acc      0.516598  0.517803
-    ystd     0.002315  0.002305
-    consis   0.781529  0.789882
+    logloss  0.692899  0.692813
+    auc      0.515948  0.520311
+    acc      0.511405  0.514947
+    ystd     0.005586  0.005455
+    sharpe   0.453231  0.662968
+    consis   0.692333  0.783167
 
 Every measure does better (that's the over fit) by ignoring eras (cv). Without
 calculating a significance (which I didn't do) the results are not very

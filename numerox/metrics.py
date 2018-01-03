@@ -61,7 +61,7 @@ def metrics_per_model(data, prediction, join='data',
                       era_as_str=True, region_as_str=True):
 
     if not isinstance(prediction, nx.Prediction):
-        raise TypeError("`report` must be a nx.Prediction object")
+        raise TypeError("`prediction` must be a nx.Prediction object")
 
     # calc metrics per era
     skip = ['sharpe', 'consis']

@@ -16,7 +16,6 @@ from numerox.model import logisticPCA
 from numerox.data import load_data, load_zip
 from numerox.testing import play_data
 from numerox.prediction import load_prediction
-from numerox.report import load_report
 
 # splitters
 from numerox.splitter import TournamentSplitter
