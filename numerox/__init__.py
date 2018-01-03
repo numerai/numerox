@@ -3,7 +3,6 @@
 # classes
 from numerox.data import Data
 from numerox.prediction import Prediction
-from numerox.report import Report
 
 # models
 from numerox.model import Model
