@@ -25,26 +25,14 @@ class Prediction(object):
 
     @property
     def names(self):
+        if self.df is None:
+            return []
         return self.df.columns.tolist()
 
-    def __getitem__(self, name):
-        "Prediction indexing is by model name(s)"
-        if isinstance(name, base_string):
-            p = Prediction(self.df[name].to_frame(name))
-        else:
-            p = Prediction(self.df[name])
-        return p
-
-    def __setitem__(self, name, prediction):
-        "Add (or replace) a prediction"
-        if prediction.df.shape[1] != 1:
-            raise ValueError("Can only insert a single model at a time")
-        prediction.df.columns = [name]
-        self.append_prediction(prediction)
-
-    def __contains__(self, name):
-        "Is `name` already in prediction? True or False"
-        return name in self.df
+    def iter(self):
+        "Yield a prediction object with only one model at a time"
+        for name in self.names:
+            yield self[name]
 
     def append_arrays(self, ids, yhat, name):
         "Append numpy arrays ids and yhat with name prediction_name"
@@ -231,6 +219,43 @@ class Prediction(object):
             df.loc[name, 'original'] = corr and ks
 
         return df
+
+    def __getitem__(self, name):
+        "Prediction indexing is by model name(s)"
+        if isinstance(name, base_string):
+            p = Prediction(self.df[name].to_frame(name))
+        else:
+            p = Prediction(self.df[name])
+        return p
+
+    def __setitem__(self, name, prediction):
+        "Add (or replace) a prediction"
+        if prediction.df.shape[1] != 1:
+            raise ValueError("Can only insert a single model at a time")
+        prediction.df.columns = [name]
+        self.append_prediction(prediction)
+
+    def __contains__(self, name):
+        "Is `name` already in prediction? True or False"
+        return name in self.df
+
+    @property
+    def size(self):
+        if self.df is None:
+            return 0
+        return self.df.size
+
+    @property
+    def shape(self):
+        if self.df is None:
+            return tuple()
+        return self.df.shape
+
+    def __len__(self):
+        "Number of rows"
+        if self.df is None:
+            return 0
+        return self.df.__len__()
 
 
 def load_report(prediction_dir, extension='pred'):

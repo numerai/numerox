@@ -148,38 +148,46 @@ def calc_metrics_arrays(y, yhat, columns):
 def concordance(data, prediction):
     "Concordance; less than 0.12 is passing; data should be the full dataset."
 
-    # all data
-    x = [data.x]
-    yhat = [None]
+    concords = pd.DataFrame(columns=['concordance'], index=prediction.names)
 
-    # data for each region
-    regions = ['validation', 'test', 'live']
-    for region in regions:
-        d = data[region]
-        x.append(d.x)
-        yh = prediction.df.yhat[d.df.index].values  # align
-        yhat.append(yh)
-
-    # make clusters
+    # fit clusters
     kmeans = MiniBatchKMeans(n_clusters=5, random_state=1337)
-    kmeans.fit(x[0])
-    c1 = kmeans.predict(x[1])
-    c2 = kmeans.predict(x[2])
-    c3 = kmeans.predict(x[3])
+    kmeans.fit(data.x)
 
-    # cross cluster distance (KS distance)
-    ks = []
-    for i in set(c1):
-        yhat1 = yhat[1][c1 == i]
-        yhat2 = yhat[2][c2 == i]
-        yhat3 = yhat[3][c3 == i]
-        d = [ks_2samp(yhat1, yhat2),
-             ks_2samp(yhat1, yhat3),
-             ks_2samp(yhat3, yhat2)]
-        ks.append(max(d))
-    concord = np.mean(ks)
+    for pred in prediction.iter():
 
-    return concord
+        # all data
+        x = [None]
+        yhat = [None]
+
+        # data for each region
+        regions = ['validation', 'test', 'live']
+        for region in regions:
+            d = data[region]
+            x.append(d.x)
+            yh = pred.df.loc[d.df.index].values  # align
+            yhat.append(yh.reshape(-1))
+
+        # assign clusters
+        c1 = kmeans.predict(x[1])
+        c2 = kmeans.predict(x[2])
+        c3 = kmeans.predict(x[3])
+
+        # cross cluster distance (KS distance)
+        ks = []
+        for i in set(c1):
+            yhat1 = yhat[1][c1 == i]
+            yhat2 = yhat[2][c2 == i]
+            yhat3 = yhat[3][c3 == i]
+            d = [ks_2samp(yhat1, yhat2),
+                 ks_2samp(yhat1, yhat3),
+                 ks_2samp(yhat3, yhat2)]
+            ks.append(max(d))
+        concord = np.mean(ks)
+
+        concords.loc[pred.names[0]] = concord
+
+    return concords
 
 
 # copied from scipy to avoid scipy dependency; modified for use in numerox
