@@ -28,7 +28,7 @@ class Prediction(object):
         return self.df.columns.tolist()
 
     def __getitem__(self, name):
-        "Prediction indexing is by model names (i.e. columns)"
+        "Prediction indexing is by model name(s)"
         if isinstance(name, base_string):
             p = Prediction(self.df[name].to_frame(name))
         else:
@@ -37,7 +37,10 @@ class Prediction(object):
 
     def __setitem__(self, name, prediction):
         "Add (or replace) a prediction"
-        self.append_prediction(prediction, name)
+        if prediction.df.shape[1] != 1:
+            raise ValueError("Can only insert a single model at a time")
+        prediction.df.columns = [name]
+        self.append_prediction(prediction)
 
     def __contains__(self, name):
         "Is `name` already in prediction? True or False"
@@ -181,51 +184,51 @@ class Prediction(object):
         df = pd.concat(dfs, axis=1)
         return df
 
-    def correlation(self, model_name=None):
+    def correlation(self, name=None):
         "Correlation of predictions; by default reports given for each model"
-        if model_name is None:
-            models = self.models
+        if name is None:
+            names = self.names
         else:
-            models = [model_name]
+            names = [name]
         z = self.df.values
-        zmodels = self.models
+        znames = self.names
         idx = np.isfinite(z.sum(axis=1))
         z = z[idx]
         z = (z - z.mean(axis=0)) / z.std(axis=0)
-        for model in models:
-            print(model)
-            idx = zmodels.index(model)
+        for name in names:
+            print(name)
+            idx = znames.index(name)
             corr = np.dot(z[:, idx], z) / z.shape[0]
             index = (-corr).argsort()
             for ix in index:
-                zmodel = zmodels[ix]
-                if model != zmodel:
-                    print("   {:.4f} {}".format(corr[ix], zmodel))
+                zname = znames[ix]
+                if name != zname:
+                    print("   {:.4f} {}".format(corr[ix], zname))
 
-    def originality(self, submitted_models):
+    def originality(self, submitted_names):
         "Which models are original given the models already submitted?"
 
         # predictions of models already submitted
-        yhats = self.df[submitted_models].values
+        yhats = self.df[submitted_names].values
 
         # models that have not been submitted; we will report on these
-        models = self.models
-        models = [m for m in models if m not in submitted_models]
+        names = self.names
+        names = [m for m in names if m not in submitted_names]
 
         # originality
-        df = pd.DataFrame(index=models, columns=['corr', 'ks', 'original'])
-        for model in models:
+        df = pd.DataFrame(index=names, columns=['corr', 'ks', 'original'])
+        for name in names:
             corr = True
             ks = True
-            yhat = self.df[model].values
+            yhat = self.df[name].values
             for i in range(yhats.shape[1]):
                 if corr and pearsonr(yhat, yhats[:, i]) > 0.95:
                     corr = False
                 if ks and ks_2samp(yhat, yhats[:, i]) <= 0.03:
                     ks = False
-            df.loc[model, 'corr'] = corr
-            df.loc[model, 'ks'] = ks
-            df.loc[model, 'original'] = corr and ks
+            df.loc[name, 'corr'] = corr
+            df.loc[name, 'ks'] = ks
+            df.loc[name, 'original'] = corr and ks
 
         return df
 
