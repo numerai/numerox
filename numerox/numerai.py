@@ -1,4 +1,3 @@
-import os
 import requests
 import tempfile
 import datetime
@@ -9,11 +8,8 @@ from numerapi.numerapi import NumerAPI
 import numerox as nx
 
 
-def download_dataset(saved_filename, overwrite=False, verbose=False):
-    "Download the current Numerai dataset; by default raise if file exists"
-    if not overwrite and os.path.exists(saved_filename):
-        msg = "`saved_filename` already exists: {}"
-        raise ValueError(msg.format(saved_filename))
+def download_dataset(saved_filename, verbose=False):
+    "Download the current Numerai dataset; overwrites if file exists"
     if verbose:
         print("Download dataset {}".format(saved_filename))
     url = dataset_url()

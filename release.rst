@@ -5,6 +5,8 @@ Release Notes
 
 - v0.1.3 (not yet released)
 
+  * ``download_dataset`` removed overwrite protection; failed with temp files
+
 - v0.1.2
 
   * Numerox now uses (and requires) NumerAPI
