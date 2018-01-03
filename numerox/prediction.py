@@ -61,15 +61,14 @@ class Prediction(object):
             self.df = pd.merge(self.df, prediction.df, how='outer',
                                left_index=True, right_index=True)
         else:
-            # add more predictions from an existing model
+            # add more yhats from a model whose name already exists
             y = self.df[name]
             y = y.dropna()
-            s = prediction.df.iloc[0]
+            s = prediction.df.iloc[:, 0]
             s = s.dropna()
             s = pd.concat([s, y], join='outer', ignore_index=False,
                           verify_integrity=True)
             df = s.to_frame(name)
-            self.df[name] = np.nan
             self.df = pd.merge(self.df, df, how='outer', on=name,
                                left_index=True, right_index=True)
 
