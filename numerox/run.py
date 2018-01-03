@@ -6,28 +6,28 @@ import numpy as np
 from numerox import Prediction, TournamentSplitter, CVSplitter
 
 
-def production(model, data, prediction_name=None, verbosity=2):
+def production(model, data, name=None, verbosity=2):
     "Fit a model with train data; make prediction on tournament data"
     splitter = TournamentSplitter(data)
-    prediction = run(model, splitter, prediction_name, verbosity=verbosity)
+    prediction = run(model, splitter, name, verbosity=verbosity)
     return prediction
 
 
-def backtest(model, data, prediction_name=None, kfold=5, seed=0, verbosity=2):
+def backtest(model, data, name=None, kfold=5, seed=0, verbosity=2):
     "K-fold cross validation of model through train data"
     splitter = CVSplitter(data, kfold=kfold, seed=seed, train_only=True)
-    prediction = run(model, splitter, prediction_name, verbosity)
+    prediction = run(model, splitter, name, verbosity)
     return prediction
 
 
-def run(model, splitter, prediction_name=None, verbosity=2):
+def run(model, splitter, name=None, verbosity=2):
     "Run a single model through a data splitter"
     t0 = time.time()
-    if prediction_name is None:
-        prediction_name = model.__class__.__name__
+    if name is None:
+        name = model.__class__.__name__
     else:
         if verbosity > 2:
-            print(prediction_name)
+            print(name)
     if verbosity > 2:
         print(splitter)
     if verbosity > 0:
@@ -44,11 +44,11 @@ def run(model, splitter, prediction_name=None, verbosity=2):
         # that you are trying to predict to prevent accidental cheating
         data_predict.df = data_predict.df.assign(y=np.nan)
         ids, yhat = model.fit_predict(data_fit, data_predict)
-        prediction.append_arrays(ids, yhat, prediction_name)
+        prediction.append_arrays(ids, yhat, name)
         if verbosity > 1:
-            prediction.summary(data.region_isnotin(['test', 'live']))
+            prediction.summary(data.region_isnotin(['test', 'live']), name)
     if verbosity == 1:
-        prediction.summary(data.region_isnotin(['test', 'live']))
+        prediction.summary(data.region_isnotin(['test', 'live']), name)
     if verbosity > 1:
         minutes = (time.time() - t0) / 60
         print('Done in {:.2f} minutes'.format(minutes))

@@ -1,4 +1,5 @@
 import os
+import sys
 import glob
 
 import pandas as pd
@@ -9,66 +10,108 @@ from numerox.metrics import metrics_per_model
 from numerox.metrics import pearsonr
 from numerox.metrics import ks_2samp
 
+if sys.version_info[0] == 2:
+    base_string = basestring
+else:
+    base_string = str
+
 HDF_PREDICTION_KEY = 'numerox_prediction'
 
 
-class Report(object):
+class Prediction(object):
 
     def __init__(self, df=None):
         self.df = df
 
     @property
-    def models(self):
+    def names(self):
         return self.df.columns.tolist()
 
-    def __getitem__(self, model):
-        "Report indexing is by model names (i.e. columns)"
-        return Report(self.df[model])
+    def __getitem__(self, name):
+        "Prediction indexing is by model names (i.e. columns)"
+        if isinstance(name, base_string):
+            p = Prediction(self.df[name].to_frame(name))
+        else:
+            p = Prediction(self.df[name])
+        return p
 
-    def __setitem__(self, model, prediction):
+    def __setitem__(self, name, prediction):
         "Add (or replace) a prediction"
-        self.append_prediction(prediction, model)
+        self.append_prediction(prediction, name)
 
-    def __contains__(self, model):
-        "Is `model` already in report? True or False"
-        return model in self.df
+    def __contains__(self, name):
+        "Is `name` already in prediction? True or False"
+        return name in self.df
 
-    def append_prediction(self, prediction, model_name):
-        df = prediction.df
+    def append_arrays(self, ids, yhat, name):
+        "Append numpy arrays ids and yhat with name prediction_name"
+        df = pd.DataFrame(data={name: yhat}, index=ids)
+        prediction = Prediction(df)
+        self.append_prediction(prediction)
+
+    def append_prediction(self, prediction):
+        if prediction.df.shape[1] != 1:
+            raise NotImplementedError("TODO: handle more than one model")
+        name = prediction.names[0]
         if self.df is None:
-            # empty report
-            self.df = df.rename(columns={'yhat': model_name})
-        elif model_name not in self:
+            # empty prediction
+            self.df = prediction.df
+        elif name not in self:
             # inserting predictions from a model not already in report
-            df = df.rename(columns={'yhat': model_name})
-            self.df = pd.merge(self.df, df, how='outer',
+            self.df = pd.merge(self.df, prediction.df, how='outer',
                                left_index=True, right_index=True)
         else:
             # add more predictions from an existing model
-            y = self.df[model_name]
+            y = self.df[name]
             y = y.dropna()
-            s = df.iloc[0]
+            s = prediction.df.iloc[0]
             s = s.dropna()
             s = pd.concat([s, y], join='outer', ignore_index=False,
                           verify_integrity=True)
-            df = s.to_frame(model_name)
-            self.df[model_name] = np.nan
-            self.df = pd.merge(self.df, df, how='outer', on=model_name,
+            df = s.to_frame(name)
+            self.df[name] = np.nan
+            self.df = pd.merge(self.df, df, how='outer', on=name,
                                left_index=True, right_index=True)
 
-    def append_prediction_dict(self, prediction_dict):
-        dfs = []
-        for model in prediction_dict:
-            df = prediction_dict[model].df
-            df.rename(columns={'yhat': model}, inplace=True)
-            dfs.append(df)
-        df = pd.concat(dfs, axis=1, verify_integrity=True, copy=False)
-        self.df = df
+    def summary(self, data, name):
+        df = self.summary_df(data, name)
+        df = df.round(decimals={'logloss': 6, 'auc': 4, 'acc': 4, 'ystd': 4})
+        with pd.option_context('display.colheader_justify', 'left'):
+            print(df.to_string(index=True))
 
-    def performance_per_era(self, data, model_name):
-        print(model_name)
-        df = self.df[model_name].to_frame(model_name)
-        df = metrics_per_era(data, Report(df))[model_name]
+    def summary_df(self, data, name):
+
+        # metrics
+        pred = self[name]
+        metrics, regions = metrics_per_era(data, pred, region_as_str=True)
+        metrics = metrics.drop(['era', 'model'], axis=1)
+
+        # additional metrics
+        region_str = ', '.join(regions)
+        nera = metrics.shape[0]
+        logloss = metrics['logloss']
+        consis = (logloss < np.log(2)).mean()
+        sharpe = (np.log(2) - logloss).mean() / logloss.std()
+
+        # summary of metrics
+        m1 = metrics.mean(axis=0).tolist() + ['region', region_str]
+        m2 = metrics.std(axis=0).tolist() + ['eras', nera]
+        m3 = metrics.min(axis=0).tolist() + ['sharpe', sharpe]
+        m4 = metrics.max(axis=0).tolist() + ['consis', consis]
+        data = [m1, m2, m3, m4]
+
+        # make dataframe
+        columns = metrics.columns.tolist() + ['stats', '']
+        df = pd.DataFrame(data=data,
+                          index=['mean', 'std', 'min', 'max'],
+                          columns=columns)
+
+        return df
+
+    def performance_per_era(self, data, name):
+        print(name)
+        df = self.df[name].to_frame(name)
+        df = metrics_per_era(data, Prediction(df))[name]
         df = df.round(decimals={'logloss': 6, 'auc': 4, 'acc': 4, 'ystd': 4})
         with pd.option_context('display.colheader_justify', 'left'):
             print(df.to_string())
@@ -189,7 +232,7 @@ class Report(object):
 
 
 def load_report(prediction_dir, extension='pred'):
-    "Load Prediction objects (hdf) in `prediction_dir`; return Report object"
+    "Load Prediction objects (hdf) in `prediction_dir`"
     original_dir = os.getcwd()
     os.chdir(prediction_dir)
     predictions = {}
@@ -200,12 +243,12 @@ def load_report(prediction_dir, extension='pred'):
             predictions[model] = prediction
     finally:
         os.chdir(original_dir)
-    report = Report()
+    report = Prediction()
     report.append_prediction_dict(predictions)
     return report
 
 
-class Prediction(object):
+class Prediction_OLD(object):
 
     def __init__(self, df=None):
         self.df = df

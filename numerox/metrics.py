@@ -9,14 +9,14 @@ from numerox.data import ERA_INT_TO_STR
 from numerox.data import REGION_INT_TO_STR
 
 
-def metrics_per_era(data, pred_or_report, join='data',
+def metrics_per_era(data, prediction, join='data',
                     columns=['logloss', 'auc', 'acc', 'ystd'],
                     era_as_str=False, region_as_str=False):
     "Dataframe with columns era, model, and specified metrics. And region list"
 
-    df = pred_or_report.df
+    df = prediction.df
 
-    # merge prediction or report with data (remove features x)
+    # merge prediction with data (remove features x)
     if join == 'data':
         how = 'left'
     elif join == 'yhat':
@@ -56,12 +56,12 @@ def metrics_per_era(data, pred_or_report, join='data',
     return metrics, regions
 
 
-def metrics_per_model(data, report, join='data',
+def metrics_per_model(data, prediction, join='data',
                       columns=['logloss', 'auc', 'acc', 'ystd'],
                       era_as_str=True, region_as_str=True):
 
-    if not isinstance(report, nx.Report):
-        raise TypeError("`report` must be a nx.Report object")
+    if not isinstance(prediction, nx.Prediction):
+        raise TypeError("`report` must be a nx.Prediction object")
 
     # calc metrics per era
     skip = ['sharpe', 'consis']
@@ -69,7 +69,7 @@ def metrics_per_model(data, report, join='data',
     if 'sharpe' in columns or 'consis' in columns:
         if 'logloss' not in cols:
             cols.append('logloss')
-    mpe, regions = metrics_per_era(data, report, join=join, columns=cols)
+    mpe, regions = metrics_per_era(data, prediction, join=join, columns=cols)
 
     # gather some info
     info = {}
