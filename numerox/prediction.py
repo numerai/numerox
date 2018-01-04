@@ -6,7 +6,7 @@ import pandas as pd
 import numpy as np
 
 from numerox.metrics import metrics_per_era
-from numerox.metrics import metrics_per_model
+from numerox.metrics import metrics_per_name
 from numerox.metrics import pearsonr
 from numerox.metrics import ks_2samp
 from numerox.metrics import concordance
@@ -75,7 +75,7 @@ class Prediction(object):
         # metrics
         pred = self[name]
         metrics, regions = metrics_per_era(data, pred, region_as_str=True)
-        metrics = metrics.drop(['era', 'model'], axis=1)
+        metrics = metrics.drop(['era', 'name'], axis=1)
 
         # additional metrics
         region_str = ', '.join(regions)
@@ -99,13 +99,14 @@ class Prediction(object):
 
         return df
 
-    def performance_per_era(self, data, name):
-        print(name)
-        df = self.df[name].to_frame(name)
-        df = metrics_per_era(data, Prediction(df))[name]
-        df = df.round(decimals={'logloss': 6, 'auc': 4, 'acc': 4, 'ystd': 4})
-        with pd.option_context('display.colheader_justify', 'left'):
-            print(df.to_string())
+    def metrics_per_era(self, data, metrics=['logloss', 'auc', 'acc', 'ystd'],
+                        era_as_str=True):
+        "DataFrame containing given metrics versus era (as index)"
+        metrics, regions = metrics_per_era(data, self, columns=metrics,
+                                           era_as_str=era_as_str)
+        metrics.index = metrics['era']
+        metrics = metrics.drop(['era'], axis=1)
+        return metrics
 
     def performance(self, data, sort_by='logloss'):
         df, info = self.performance_df(data)
@@ -134,11 +135,11 @@ class Prediction(object):
 
     def performance_df(self, data, era_as_str=True, region_as_str=True):
         cols = ['logloss', 'auc', 'acc', 'ystd', 'sharpe', 'consis']
-        metrics, info = metrics_per_model(data,
-                                          self,
-                                          columns=cols,
-                                          era_as_str=era_as_str,
-                                          region_as_str=region_as_str)
+        metrics, info = metrics_per_name(data,
+                                         self,
+                                         columns=cols,
+                                         era_as_str=era_as_str,
+                                         region_as_str=region_as_str)
         return metrics, info
 
     def dominance(self, data, sort_by='logloss'):
@@ -155,12 +156,12 @@ class Prediction(object):
         mpe, regions = metrics_per_era(data, self, columns=columns)
         dfs = []
         for i, col in enumerate(columns):
-            pivot = mpe.pivot(index='era', columns='model', values=col)
-            models = pivot.columns.tolist()
+            pivot = mpe.pivot(index='era', columns='name', values=col)
+            names = pivot.columns.tolist()
             a = pivot.values
             n = a.shape[1] - 1.0
             if n == 0:
-                raise ValueError("Must have at least two models")
+                raise ValueError("Must have at least two names")
             m = []
             for j in range(pivot.shape[1]):
                 if col == 'logloss':
@@ -168,7 +169,7 @@ class Prediction(object):
                 else:
                     z = (a[:, j].reshape(-1, 1) > a).sum(axis=1) / n
                 m.append(z.mean())
-            df = pd.DataFrame(data=m, index=models, columns=[col])
+            df = pd.DataFrame(data=m, index=names, columns=[col])
             dfs.append(df)
         df = pd.concat(dfs, axis=1)
         return df
@@ -363,7 +364,7 @@ class Prediction_OLD(object):
         metrics, regions = metrics_per_era(data, self, columns=metrics,
                                            era_as_str=era_as_str)
         metrics.index = metrics['era']
-        metrics = metrics.drop(['era', 'model'], axis=1)
+        metrics = metrics.drop(['era', 'name'], axis=1)
         return metrics
 
     def performance(self, data):
@@ -376,7 +377,7 @@ class Prediction_OLD(object):
 
         # metrics
         metrics, regions = metrics_per_era(data, self, region_as_str=True)
-        metrics = metrics.drop(['era', 'model'], axis=1)
+        metrics = metrics.drop(['era', 'name'], axis=1)
 
         # additional metrics
         region_str = ', '.join(regions)

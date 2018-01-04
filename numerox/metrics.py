@@ -35,7 +35,7 @@ def metrics_per_era(data, prediction, join='data',
         regions = [REGION_INT_TO_STR[r] for r in regions]
 
     # calc metrics for each era
-    models = yhats_df.columns.values
+    names = yhats_df.columns.values
     metrics = []
     unique_eras = df.era.unique()
     for era in unique_eras:
@@ -44,21 +44,21 @@ def metrics_per_era(data, prediction, join='data',
         y = df_era['y'].values
         if era_as_str:
             era = ERA_INT_TO_STR[era]
-        for model in models:
-            yhat = df_era[model].values
+        for name in names:
+            yhat = df_era[name].values
             m = calc_metrics_arrays(y, yhat, columns)
-            m = [era, model] + m
+            m = [era, name] + m
             metrics.append(m)
 
-    columns = ['era', 'model'] + columns
+    columns = ['era', 'name'] + columns
     metrics = pd.DataFrame(metrics, columns=columns)
 
     return metrics, regions
 
 
-def metrics_per_model(data, prediction, join='data',
-                      columns=['logloss', 'auc', 'acc', 'ystd'],
-                      era_as_str=True, region_as_str=True):
+def metrics_per_name(data, prediction, join='data',
+                     columns=['logloss', 'auc', 'acc', 'ystd'],
+                     era_as_str=True, region_as_str=True):
 
     if not isinstance(prediction, nx.Prediction):
         raise TypeError("`prediction` must be a nx.Prediction object")
@@ -82,17 +82,17 @@ def metrics_per_model(data, prediction, join='data',
 
     # pivot is a dataframe with:
     #     era for rows
-    #     model for columns
+    #     name for columns
     #     logloss for cell values
-    pivot = mpe.pivot(index='era', columns='model', values='logloss')
+    pivot = mpe.pivot(index='era', columns='name', values='logloss')
 
     # mm is a dataframe with:
-    #    model as rows
+    #    name as rows
     #    `cols` as columns
-    mm = mpe.groupby('model').mean()
+    mm = mpe.groupby('name').mean()
 
     # metrics is the output with:
-    #    model as rows
+    #    name as rows
     #    `columns` as columns
     metrics = pd.DataFrame(index=pivot.columns, columns=columns)
 
