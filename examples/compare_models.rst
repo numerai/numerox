@@ -7,12 +7,14 @@ example is `here`_.
 
 First perform the cross validation::
 
-    >>> p = nx.Prediction()
-    >>> p['logistic'] = nx.backtest(nx.logistic(), data, verbosity=1)
-    >>> p['extratrees'] = nx.backtest(nx.extratrees(), data, verbosity=1)
-    >>> p['randomforest'] = nx.backtest(nx.randomforest(), data, verbosity=1)
-    >>> p['mlpc'] = nx.backtest(nx.mlpc(), data, verbosity=1)
-    >>> p['logisticPCA'] = nx.backtest(nx.logisticPCA(), data, verbosity=1)
+    >>> prediction = nx.backtest(nx.logistic(), data, verbosity=1)
+    >>> prediction += nx.backtest(nx.extratrees(), data, verbosity=1)
+    >>> prediction += nx.backtest(nx.randomforest(), data, verbosity=1)
+    >>> prediction += nx.backtest(nx.mlpc(), data, verbosity=1)
+    >>> prediction += nx.backtest(nx.logisticPCA(), data, verbosity=1)
+
+which gives the output::
+
     logistic(inverse_l2=0.0001)
           logloss   auc     acc     ystd   stats
     mean  0.692885  0.5165  0.5116  0.0056  region     train
@@ -46,16 +48,19 @@ First perform the cross validation::
 
 Notice how the predictions from the models are highly correlated::
 
-    >>> p.correlation('logistic')
+    >>> prediction.correlation('logistic')
     logistic
        0.9837 logisticPCA
        0.9514 extratrees
        0.9303 randomforest
        0.8392 mlpc
 
+Also notice that the name of the prediction is by default the name of the
+model (you can pick another name).
+
 Comparison of model performance::
 
-    >>> p.performance(data, sort_by='logloss')
+    >>> prediction.performance(data, sort_by='logloss')
     train; 120 eras
                   logloss   auc     acc     ystd    sharpe  consis
     model
@@ -71,7 +76,7 @@ each model across all eras. Repeat for auc and acc. A score of 1 means the
 model was the top performer in every era; a score of 0 means the model was the
 worst performer in every era::
 
-    >>> p.dominance(data, sort_by='logloss')
+    >>> prediction.dominance(data, sort_by='logloss')
                   logloss  auc     acc
     mlpc          0.5771   0.5479  0.4625
     logistic      0.5417   0.5250  0.5312
@@ -83,14 +88,14 @@ Let's say you have already submitted the predictions of the logistic model.
 Which of your other models will that submission prevent from passing
 originality::
 
-    >>> print(p.originality(['logistic']))
+    >>> print(prediction.originality(['logistic']))
                    corr     ks  original
     randomforest   True  False     False
     extratrees    False   True     False
     mlpc           True   True      True
     logisticPCA   False  False     False
 
-Typically you would use ``p.originality`` with tournament predictions.
+Typically you would use ``prediction.originality`` with tournament predictions.
 Here the predictions are on the training data.
 
 .. _here: https://github.com/kwgoodman/numerox/blob/master/examples/compare_models.py

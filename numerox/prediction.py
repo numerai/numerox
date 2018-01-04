@@ -42,6 +42,7 @@ class Prediction(object):
         self.append(prediction)
 
     def append(self, prediction):
+        "Append prediction"
         if prediction.df.shape[1] != 1:
             raise NotImplementedError("TODO: handle more than one model")
         name = prediction.names[0]
@@ -251,6 +252,16 @@ class Prediction(object):
             raise ValueError("Can only insert a single model at a time")
         prediction.df.columns = [name]
         self.append(prediction)
+
+    def __add__(self, prediction):
+        "Append right-hand prediction to left-hand prediction"
+        self.append(prediction)
+        return self
+
+    def __iadd__(self, prediction):
+        "Append right-hand prediction to left-hand prediction"
+        self.append(prediction)
+        return self
 
     def __contains__(self, name):
         "Is `name` already in prediction? True or False"
