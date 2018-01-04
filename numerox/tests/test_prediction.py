@@ -31,7 +31,7 @@ def test_prediction_consistency():
     rs = np.random.RandomState(0)
     yhat = 0.005 * rs.randn(len(d)) + 0.5
     yhat += 0.0005 * (d.y - 0.5)
-    p.append(d.ids, yhat)
+    p.merge(d.ids, yhat)
 
     c = p.consistency(d['train'])
     ok_(c > 0, "consistency should (likely) be greater than zero")
@@ -43,7 +43,7 @@ def test_prediction_yhatnew():
 
     d = play_data()
     p = Prediction()
-    p.append(d.ids, d.y)
+    p.merge(d.ids, d.y)
 
     y = 2 * p.yhat
     pnew = p.yhatnew(y)
@@ -57,7 +57,7 @@ def test_prediction_copies():
 
     d = play_data()
     p = Prediction()
-    p.append(d.ids, d.y)
+    p.merge(d.ids, d.y)
 
     ok_(shares_memory(p, p), "looks like shares_memory failed")
     ok_(shares_memory(p, p.ids), "p.ids should be a view")
@@ -70,7 +70,7 @@ def test_data_properties():
 
     d = play_data()
     p = Prediction()
-    p.append(d.ids, d.y)
+    p.merge(d.ids, d.y)
 
     ok_((p.ids == p.df.index).all(), "ids is corrupted")
     ok_((p.ids == d.df.index).all(), "ids is corrupted")
@@ -90,8 +90,8 @@ def test_prediction_add():
     rs = np.random.RandomState(0)
     yhat1 = 0.2 * (rs.rand(len(d1)) - 0.5) + 0.5
     yhat2 = 0.2 * (rs.rand(len(d2)) - 0.5) + 0.5
-    p1.append(d1.ids, yhat1)
-    p2.append(d2.ids, yhat2)
+    p1.merge(d1.ids, yhat1)
+    p2.merge(d2.ids, yhat2)
 
     p = p1 + p2  # just make sure that it runs
 

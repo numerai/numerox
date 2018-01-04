@@ -44,7 +44,7 @@ def run(model, splitter, name=None, verbosity=2):
         # that you are trying to predict to prevent accidental cheating
         data_predict.df = data_predict.df.assign(y=np.nan)
         ids, yhat = model.fit_predict(data_fit, data_predict)
-        prediction.append_arrays(ids, yhat, name)
+        prediction.merge_arrays(ids, yhat, name)
         if verbosity > 1:
             prediction.summary(data.region_isnotin(['test', 'live']), name)
     if verbosity == 1:

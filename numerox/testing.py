@@ -74,7 +74,7 @@ def micro_prediction(index=None):
     rs = np.random.RandomState(0)
     yhat = 0.2 * (rs.rand(n) - 0.5) + 0.5
     prediction = nx.Prediction()
-    prediction.append(d.ids, yhat)
+    prediction.merge_arrays(d.ids, yhat)
     return prediction
 
 

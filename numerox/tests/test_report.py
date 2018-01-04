@@ -14,12 +14,12 @@ def test_report_performance_df():
     d = d['train'] + d['validation']
 
     p = nx.Prediction()
-    p.append(d.ids, d.y)
+    p.merge(d.ids, d.y)
 
     r = nx.Report()
-    r.append(p, 'model1')
-    r.append(p, 'model2')
-    r.append(p, 'model3')
+    r.merge(p, 'model1')
+    r.merge(p, 'model2')
+    r.merge(p, 'model3')
 
     df, info = r.performance_df(d)
 
@@ -32,12 +32,12 @@ def test_report_getitem():
 
     d = micro_data()
     p = nx.Prediction()
-    p.append(d.ids, d.y)
+    p.merge(d.ids, d.y)
 
     r = nx.Report()
-    r.append(p, 'model1')
-    r.append(p, 'model2')
-    r.append(p, 'model3')
+    r.merge(p, 'model1')
+    r.merge(p, 'model2')
+    r.merge(p, 'model3')
 
     r2 = r[['model3', 'model1']]
 
@@ -52,12 +52,12 @@ def test_report_dominance_df():
     d = d['validation']
 
     p = nx.Prediction()
-    p.append(d.ids, d.y)
+    p.merge(d.ids, d.y)
 
     r = nx.Report()
-    r.append(p, 'model1')
-    r.append(p, 'model2')
-    r.append(p, 'model3')
+    r.merge(p, 'model1')
+    r.merge(p, 'model2')
+    r.merge(p, 'model3')
 
     df = r.dominance_df(d)
 
@@ -81,11 +81,11 @@ def test_report_setitem():
     r['model1'] = p4
 
     r2 = nx.Report()
-    r2.append(p1, 'model1')
-    r2.append(p2, 'model2')
-    r2.append(p3, 'model3')
-    r2.append(p4, 'model4')
-    r2.append(p4, 'model1')
+    r2.merge(p1, 'model1')
+    r2.merge(p2, 'model2')
+    r2.merge(p3, 'model3')
+    r2.merge(p4, 'model4')
+    r2.merge(p4, 'model1')
 
     pd.testing.assert_frame_equal(r.df, r2.df)
 
@@ -99,12 +99,12 @@ def test_report_originality():
     d = d['validation']
 
     p = nx.Prediction()
-    p.append(d.ids, d.y)
+    p.merge(d.ids, d.y)
 
     r = nx.Report()
-    r.append(p, 'model1')
-    r.append(p, 'model2')
-    r.append(p, 'model3')
+    r.merge(p, 'model1')
+    r.merge(p, 'model2')
+    r.merge(p, 'model3')
 
     df = r.originality(['model1'])
 
