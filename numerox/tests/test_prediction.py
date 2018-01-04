@@ -104,6 +104,39 @@ def test_prediction_dominance_df():
     ok_(isinstance(df, pd.DataFrame), 'expecting a dataframe')
 
 
+def test_prediction_originality():
+    "make sure prediction.originality runs"
+    p = testing.micro_prediction()
+    df = p.originality(['model1'])
+    ok_(isinstance(df, pd.DataFrame), 'expecting a dataframe')
+
+
+def test_prediction_setitem():
+    "comapre prediction._setitem__ with merge"
+
+    data = nx.play_data()
+    p1 = nx.production(nx.logistic(), data, 'model1', verbosity=0)
+    p2 = nx.production(nx.logistic(1e-5), data, 'model2',  verbosity=0)
+    p3 = nx.production(nx.logistic(1e-6), data, 'model3',  verbosity=0)
+    p4 = nx.backtest(nx.logistic(), data, 'model1',  verbosity=0)
+
+    p = nx.Prediction()
+    p['model1'] = p1
+    p['model2'] = p2
+    p['model3'] = p3
+    p['model1'] = p4
+
+    pp = nx.Prediction()
+    pp.merge(p1)
+    pp.merge(p2)
+    pp.merge(p3)
+    pp.merge(p4)
+
+    pd.testing.assert_frame_equal(p.df, pp.df)
+
+    assert_raises(ValueError, p.__setitem__, 'model1', p1)
+
+
 def test_prediction_repr():
     "make sure prediction.__repr__() runs"
     p = testing.micro_prediction()
