@@ -68,13 +68,14 @@ def micro_data(index=None):
     return data
 
 
-def micro_prediction(index=None):
+def micro_prediction(index=None, n_names=3):
     d = micro_data(index)
     n = len(d)
     rs = np.random.RandomState(0)
-    yhat = 0.2 * (rs.rand(n) - 0.5) + 0.5
     prediction = nx.Prediction()
-    prediction.merge_arrays(d.ids, yhat)
+    for i in range(n_names):
+        yhat = 0.2 * (rs.rand(n) - 0.5) + 0.5
+        prediction.merge_arrays(d.ids, yhat, 'model' + str(i))
     return prediction
 
 
