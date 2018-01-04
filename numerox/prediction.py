@@ -39,9 +39,9 @@ class Prediction(object):
         "Append numpy arrays ids and yhat with name prediction_name"
         df = pd.DataFrame(data={name: yhat}, index=ids)
         prediction = Prediction(df)
-        self.append_prediction(prediction)
+        self.append(prediction)
 
-    def append_prediction(self, prediction):
+    def append(self, prediction):
         if prediction.df.shape[1] != 1:
             raise NotImplementedError("TODO: handle more than one model")
         name = prediction.names[0]
@@ -250,7 +250,7 @@ class Prediction(object):
         if prediction.df.shape[1] != 1:
             raise ValueError("Can only insert a single model at a time")
         prediction.df.columns = [name]
-        self.append_prediction(prediction)
+        self.append(prediction)
 
     def __contains__(self, name):
         "Is `name` already in prediction? True or False"
@@ -288,7 +288,7 @@ def load_report(prediction_dir, extension='pred'):
     finally:
         os.chdir(original_dir)
     report = Prediction()
-    report.append_prediction_dict(predictions)
+    report.append_dict(predictions)
     return report
 
 
