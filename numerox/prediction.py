@@ -44,13 +44,13 @@ class Prediction(object):
             yield self[name]
 
     def merge_arrays(self, ids, yhat, name):
-        "Append numpy arrays ids and yhat with name prediction_name"
+        "Merge numpy arrays ids and yhat with name prediction_name"
         df = pd.DataFrame(data={name: yhat}, index=ids)
         prediction = Prediction(df)
         self.merge(prediction)
 
     def merge(self, prediction):
-        "Append prediction"
+        "Merge prediction"
         if prediction.df.shape[1] != 1:
             raise NotImplementedError("TODO: handle more than one model")
         name = prediction.names[0]
@@ -287,12 +287,12 @@ class Prediction(object):
         self.merge(prediction)
 
     def __add__(self, prediction):
-        "Append right-hand prediction to left-hand prediction"
+        "Merge predictions"
         self.merge(prediction)
         return self
 
     def __iadd__(self, prediction):
-        "Append right-hand prediction to left-hand prediction"
+        "Merge predictions"
         self.merge(prediction)
         return self
 
