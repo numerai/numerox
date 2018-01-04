@@ -276,7 +276,7 @@ class Prediction(object):
     @property
     def shape(self):
         if self.df is None:
-            return tuple()
+            return (0, 0)
         return self.df.shape
 
     def __len__(self):
@@ -284,6 +284,15 @@ class Prediction(object):
         if self.df is None:
             return 0
         return self.df.__len__()
+
+    def __repr__(self):
+        shape = self.shape
+        if shape[1] == 0:
+            frac_miss = 0.0
+        else:
+            frac_miss = self.df.isna().mean()[0]
+        fmt = 'Prediction({} rows x {} names; {:.4f} missing)'
+        return fmt.format(shape[0], shape[1], frac_miss)
 
 
 def load_report(prediction_dir, extension='pred'):
