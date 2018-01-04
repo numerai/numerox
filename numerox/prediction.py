@@ -83,6 +83,21 @@ class Prediction(object):
         else:
             self.df.to_hdf(path_or_buf, HDF_PREDICTION_KEY)
 
+    def to_csv(self, path_or_buf=None, name=None, decimals=6, verbose=False):
+        "Save a csv file of predictions for later upload to Numerai"
+        if name is None:
+            if self.shape[1] != 1:
+                msg = ("`name` can be None only if prediction contains only "
+                       "one name")
+                raise ValueError(msg)
+            name = self.names[0]
+        df = self.df[name].to_frame('probability')
+        df.index.rename('id', inplace=True)
+        float_format = "%.{}f".format(decimals)
+        df.to_csv(path_or_buf, float_format=float_format)
+        if verbose:
+            print("Save {}".format(path_or_buf))
+
     def summary(self, data, name):
         df = self.summary_df(data, name)
         df = df.round(decimals={'logloss': 6, 'auc': 4, 'acc': 4, 'ystd': 4})
@@ -317,35 +332,3 @@ def load_prediction(filename):
     "Load prediction object from hdf archive"
     df = pd.read_hdf(filename, key=HDF_PREDICTION_KEY)
     return Prediction(df)
-
-
-class Prediction_OLD(object):
-
-    def yhatnew(self, y_array):
-        "Copy of prediction but with prediction.yhat=`y_array`"
-        if y_array.shape[0] != len(self):
-            msg = "`y_array` must have the same number of rows as prediction"
-            raise ValueError(msg)
-        if y_array.ndim != 1:
-            raise ValueError("`y_array` must be 1 dimensional")
-        df = pd.DataFrame(data=np.empty((y_array.shape[0],), dtype=np.float64),
-                          index=self.df.index.copy(deep=True),
-                          columns=['yhat'])
-        df['yhat'] = y_array
-        return Prediction(df)
-
-    def to_csv(self, path_or_buf=None, decimals=6, verbose=False):
-        "Save a csv file of predictions for later upload to Numerai"
-        df = self.df.copy()
-        df.index.rename('id', inplace=True)
-        df.rename(columns={'yhat': 'probability'}, inplace=True)
-        float_format = "%.{}f".format(decimals)
-        df.to_csv(path_or_buf, float_format=float_format)
-        if verbose:
-            print("Save {}".format(path_or_buf))
-
-    def consistency(self, data):
-        "Consistency over eras in `data`"
-        logloss = self.metrics_per_era(data, metrics=['logloss'])
-        c = (logloss.values < np.log(2)).mean()
-        return c
