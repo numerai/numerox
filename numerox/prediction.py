@@ -280,7 +280,7 @@ class Prediction(object):
         return p
 
     def __setitem__(self, name, prediction):
-        "Add (or replace) a prediction"
+        "Add (or replace) a prediction by name"
         if prediction.df.shape[1] != 1:
             raise ValueError("Can only insert a single model at a time")
         prediction.df.columns = [name]
@@ -299,6 +299,10 @@ class Prediction(object):
     def __contains__(self, name):
         "Is `name` already in prediction? True or False"
         return name in self.df
+
+    def __eq__(self, prediction):
+        "Check if prediction objects are equal or not; order matters"
+        return self.df.equals(prediction.df)
 
     @property
     def size(self):
