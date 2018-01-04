@@ -1,6 +1,4 @@
-import os
 import sys
-import glob
 
 import pandas as pd
 import numpy as np
@@ -64,6 +62,16 @@ class Prediction(object):
             df = s.to_frame(name)
             self.df = pd.merge(self.df, df, how='outer', on=name,
                                left_index=True, right_index=True)
+
+    def save(self, path_or_buf, compress=True):
+        "Save prediction as an hdf archive; raises if nothing to save"
+        if self.df is None:
+            raise ValueError("Prediction object is empty; nothing to save")
+        if compress:
+            self.df.to_hdf(path_or_buf, HDF_PREDICTION_KEY,
+                           complib='zlib', complevel=4)
+        else:
+            self.df.to_hdf(path_or_buf, HDF_PREDICTION_KEY)
 
     def summary(self, data, name):
         df = self.summary_df(data, name)
@@ -295,21 +303,10 @@ class Prediction(object):
         return fmt.format(shape[0], shape[1], frac_miss)
 
 
-def load_report(prediction_dir, extension='pred'):
-    "Load Prediction objects (hdf) in `prediction_dir`"
-    original_dir = os.getcwd()
-    os.chdir(prediction_dir)
-    predictions = {}
-    try:
-        for filename in glob.glob("*{}".format(extension)):
-            prediction = load_prediction(filename)
-            model = filename[:-len(extension) - 1]
-            predictions[model] = prediction
-    finally:
-        os.chdir(original_dir)
-    report = Prediction()
-    report.append_dict(predictions)
-    return report
+def load_prediction(filename):
+    "Load prediction object from hdf archive"
+    df = pd.read_hdf(filename, key=HDF_PREDICTION_KEY)
+    return Prediction(df)
 
 
 class Prediction_OLD(object):
@@ -454,10 +451,6 @@ class Prediction_OLD(object):
         "Return column names of dataframe as a list"
         return self.df.columns.tolist()
 
-    def __add__(self, other_prediction):
-        "Concatenate two prediction objects that have no overlap in ids"
-        return concat_prediction([self, other_prediction])
-
     def __repr__(self):
         if self.df is None:
             return ''
@@ -471,21 +464,3 @@ class Prediction_OLD(object):
         t.append(fmt.format('rows', len(self.df)))
         t.append(fmt.format('nulls', y.isnull().sum()))
         return '\n'.join(t)
-
-
-def load_prediction(file_path):
-    "Load prediction object from hdf archive; return Prediction"
-    df = pd.read_hdf(file_path, key=HDF_PREDICTION_KEY)
-    return Prediction(df)
-
-
-def concat_prediction(predictions):
-    "Concatenate list-like of prediction objects; ids must not overlap"
-    dfs = [d.df for d in predictions]
-    try:
-        df = pd.concat(dfs, verify_integrity=True, copy=True)
-    except ValueError:
-        # pandas doesn't raise expected IndexError and for our large data
-        # object, the id overlaps that it prints can be very long so
-        raise IndexError("Overlap in ids found")
-    return Prediction(df)
