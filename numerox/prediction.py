@@ -9,6 +9,7 @@ from numerox.metrics import metrics_per_era
 from numerox.metrics import metrics_per_model
 from numerox.metrics import pearsonr
 from numerox.metrics import ks_2samp
+from numerox.metrics import concordance
 
 if sys.version_info[0] == 2:
     base_string = basestring
@@ -172,6 +173,10 @@ class Prediction(object):
         df = pd.concat(dfs, axis=1)
         return df
 
+    def concordance(self, data):
+        "Less than 0.12 is passing; data should be the full dataset."
+        return concordance(data, self)
+
     def correlation(self, name=None):
         "Correlation of predictions; by default reports given for each model"
         if name is None:
@@ -219,6 +224,17 @@ class Prediction(object):
             df.loc[name, 'original'] = corr and ks
 
         return df
+
+    def copy(self):
+        "Copy of prediction"
+        if self.df is None:
+            return Prediction(None)
+        # df.copy(deep=True) doesn't copy index. So:
+        df = self.df
+        df = pd.DataFrame(df.values.copy(),
+                          df.index.copy(deep=True),
+                          df.columns.copy())
+        return Prediction(df)
 
     def __getitem__(self, name):
         "Prediction indexing is by model name(s)"
