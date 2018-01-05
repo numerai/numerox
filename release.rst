@@ -3,9 +3,12 @@
 Release Notes
 =============
 
-- v0.1.3 (not yet released)
+- v0.2.0 (not yet released)
 
-  * ``download_dataset`` removed overwrite protection; failed with temp files
+  * This release makes a large change to the numerox API
+  * There are now 3 main classes instead of 4
+  * The Report class has been merged into the Prediction class
+  * New features have been added to the Prediction class
 
 - v0.1.2
 

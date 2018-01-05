@@ -54,6 +54,20 @@ And you can save one model's predictions to csv for future upload to Numerai::
 
     >>> prediction._to_csv('rf_d3.csv', name='rf_d3')
 
+I forget, did I try a depth of 5::
+
+    >>> 'rf_d5' in prediction
+    False
+
+If you only want to look at the performance of one run::
+
+    >>> prediction['rf_d3'].performance(data['validation'])
+
+Or compare two models for dominance::
+
+    >>> prediction[['rf_d2', 'rf_d3']].dominance(data['validation'])
+
+
 .. _example: https://github.com/kwgoodman/numerox/blob/master/examples/compare_models.py
 .. _documentation: https://github.com/kwgoodman/numerox/blob/master/examples/compare_models.rst
 

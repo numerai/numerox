@@ -6,12 +6,18 @@ Numerox is a Numerai tournament toolbox written in Python.
 Main classes
 ------------
 
+**Data** holds the Numerai dataset, parts of which are passed to a **Model**
+which makes a **Prediction** that is stored and analyzed.
+
 - `Data`_
 - `Model`_
 - `Prediction`_
 
 Run model
 ---------
+
+Running your model involves passing data to it and collecting its predictions,
+tasks that numerox automates.
 
 - `Compare model`_ performances
 - Your `first tournament`_
