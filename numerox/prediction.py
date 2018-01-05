@@ -35,8 +35,20 @@ class Prediction(object):
 
     @property
     def yhat(self):
-        "View of yhat as a 1d numpy float array"
+        "View of yhat as a 2d numpy float array"
         return self.df.values
+
+    def yhatnew(self, y_array):
+        "Copy of prediction but with prediction.yhat=`y_array`"
+        if y_array.shape != self.shape:
+            msg = "`y_array` must have the same shape as prediction"
+            raise ValueError(msg)
+        if y_array.ndim != 2:
+            raise ValueError("`y_array` must be 2 dimensional")
+        df = pd.DataFrame(data=y_array,
+                          index=self.df.index.copy(deep=True),
+                          columns=self.df.columns.copy())
+        return Prediction(df)
 
     def iter(self):
         "Yield a prediction object with only one model at a time"
