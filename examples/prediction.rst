@@ -36,11 +36,23 @@ A prediction object can hold predictions from more than one model::
     >>> prediction += nx.production(nx.randomforest(), data)
 
 Or::
-    
+
     >>> prediction = nx.Prediction()
     >>> prediction['rf_d1'] = nx.production(nx.randomforest(depth=1), data)
     >>> prediction['rf_d2'] = nx.production(nx.randomforest(depth=2), data)
     >>> prediction['rf_d3'] = nx.production(nx.randomforest(depth=3), data)
+
+You can save your predictions for later use::
+
+    >>> prediction.save('mypredictions.h5')
+
+And then load them::
+
+    >>> prediction = nx.load_prediction('mypredictions.h5')
+
+And you can save one model's predictions to csv for future upload to Numerai::
+
+    >>> prediction._to_csv('rf_d3.csv', name='rf_d3')
 
 .. _example: https://github.com/kwgoodman/numerox/blob/master/examples/compare_models.py
 .. _documentation: https://github.com/kwgoodman/numerox/blob/master/examples/compare_models.rst
