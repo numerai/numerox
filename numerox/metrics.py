@@ -9,14 +9,14 @@ from numerox.data import ERA_INT_TO_STR
 from numerox.data import REGION_INT_TO_STR
 
 
-def metrics_per_era(data, pred_or_report, join='data',
+def metrics_per_era(data, prediction, join='data',
                     columns=['logloss', 'auc', 'acc', 'ystd'],
                     era_as_str=False, region_as_str=False):
     "Dataframe with columns era, model, and specified metrics. And region list"
 
-    df = pred_or_report.df
+    df = prediction.df
 
-    # merge prediction or report with data (remove features x)
+    # merge prediction with data (remove features x)
     if join == 'data':
         how = 'left'
     elif join == 'yhat':
@@ -35,7 +35,7 @@ def metrics_per_era(data, pred_or_report, join='data',
         regions = [REGION_INT_TO_STR[r] for r in regions]
 
     # calc metrics for each era
-    models = yhats_df.columns.values
+    names = yhats_df.columns.values
     metrics = []
     unique_eras = df.era.unique()
     for era in unique_eras:
@@ -44,24 +44,24 @@ def metrics_per_era(data, pred_or_report, join='data',
         y = df_era['y'].values
         if era_as_str:
             era = ERA_INT_TO_STR[era]
-        for model in models:
-            yhat = df_era[model].values
+        for name in names:
+            yhat = df_era[name].values
             m = calc_metrics_arrays(y, yhat, columns)
-            m = [era, model] + m
+            m = [era, name] + m
             metrics.append(m)
 
-    columns = ['era', 'model'] + columns
+    columns = ['era', 'name'] + columns
     metrics = pd.DataFrame(metrics, columns=columns)
 
     return metrics, regions
 
 
-def metrics_per_model(data, report, join='data',
-                      columns=['logloss', 'auc', 'acc', 'ystd'],
-                      era_as_str=True, region_as_str=True):
+def metrics_per_name(data, prediction, join='data',
+                     columns=['logloss', 'auc', 'acc', 'ystd'],
+                     era_as_str=True, region_as_str=True):
 
-    if not isinstance(report, nx.Report):
-        raise TypeError("`report` must be a nx.Report object")
+    if not isinstance(prediction, nx.Prediction):
+        raise TypeError("`prediction` must be a nx.Prediction object")
 
     # calc metrics per era
     skip = ['sharpe', 'consis']
@@ -69,7 +69,7 @@ def metrics_per_model(data, report, join='data',
     if 'sharpe' in columns or 'consis' in columns:
         if 'logloss' not in cols:
             cols.append('logloss')
-    mpe, regions = metrics_per_era(data, report, join=join, columns=cols)
+    mpe, regions = metrics_per_era(data, prediction, join=join, columns=cols)
 
     # gather some info
     info = {}
@@ -82,17 +82,17 @@ def metrics_per_model(data, report, join='data',
 
     # pivot is a dataframe with:
     #     era for rows
-    #     model for columns
+    #     name for columns
     #     logloss for cell values
-    pivot = mpe.pivot(index='era', columns='model', values='logloss')
+    pivot = mpe.pivot(index='era', columns='name', values='logloss')
 
     # mm is a dataframe with:
-    #    model as rows
+    #    name as rows
     #    `cols` as columns
-    mm = mpe.groupby('model').mean()
+    mm = mpe.groupby('name').mean()
 
     # metrics is the output with:
-    #    model as rows
+    #    name as rows
     #    `columns` as columns
     metrics = pd.DataFrame(index=pivot.columns, columns=columns)
 
@@ -148,38 +148,46 @@ def calc_metrics_arrays(y, yhat, columns):
 def concordance(data, prediction):
     "Concordance; less than 0.12 is passing; data should be the full dataset."
 
-    # all data
-    x = [data.x]
-    yhat = [None]
+    concords = pd.DataFrame(columns=['concordance'], index=prediction.names)
 
-    # data for each region
-    regions = ['validation', 'test', 'live']
-    for region in regions:
-        d = data[region]
-        x.append(d.x)
-        yh = prediction.df.yhat[d.df.index].values  # align
-        yhat.append(yh)
-
-    # make clusters
+    # fit clusters
     kmeans = MiniBatchKMeans(n_clusters=5, random_state=1337)
-    kmeans.fit(x[0])
-    c1 = kmeans.predict(x[1])
-    c2 = kmeans.predict(x[2])
-    c3 = kmeans.predict(x[3])
+    kmeans.fit(data.x)
 
-    # cross cluster distance (KS distance)
-    ks = []
-    for i in set(c1):
-        yhat1 = yhat[1][c1 == i]
-        yhat2 = yhat[2][c2 == i]
-        yhat3 = yhat[3][c3 == i]
-        d = [ks_2samp(yhat1, yhat2),
-             ks_2samp(yhat1, yhat3),
-             ks_2samp(yhat3, yhat2)]
-        ks.append(max(d))
-    concord = np.mean(ks)
+    for pred in prediction.iter():
 
-    return concord
+        # all data
+        x = [None]
+        yhat = [None]
+
+        # data for each region
+        regions = ['validation', 'test', 'live']
+        for region in regions:
+            d = data[region]
+            x.append(d.x)
+            yh = pred.df.loc[d.df.index].values  # align
+            yhat.append(yh.reshape(-1))
+
+        # assign clusters
+        c1 = kmeans.predict(x[1])
+        c2 = kmeans.predict(x[2])
+        c3 = kmeans.predict(x[3])
+
+        # cross cluster distance (KS distance)
+        ks = []
+        for i in set(c1):
+            yhat1 = yhat[1][c1 == i]
+            yhat2 = yhat[2][c2 == i]
+            yhat3 = yhat[3][c3 == i]
+            d = [ks_2samp(yhat1, yhat2),
+                 ks_2samp(yhat1, yhat3),
+                 ks_2samp(yhat3, yhat2)]
+            ks.append(max(d))
+        concord = np.mean(ks)
+
+        concords.loc[pred.names[0]] = concord
+
+    return concords
 
 
 # copied from scipy to avoid scipy dependency; modified for use in numerox

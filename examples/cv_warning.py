@@ -7,34 +7,26 @@ import numerox as nx
 def cv_warning(data, nsamples=100):
 
     model = nx.logistic()
+    results_cve = pd.DataFrame()
+    results_cv = pd.DataFrame()
 
     for i in range(nsamples):
-
-        report = nx.Report()
 
         # cv across eras
         cve = nx.CVSplitter(data, seed=i)
         prediction = nx.run(model, cve, verbosity=0)
-        report.append_prediction(prediction, 'cve')
+        df, info = prediction.performance_df(data)
+        results_cve = results_cve.append(df, ignore_index=True)
 
         # cv ignoring eras but y balanced
         cv = nx.IgnoreEraCVSplitter(data, seed=i)
         prediction = nx.run(model, cv, verbosity=0)
-        report.append_prediction(prediction, 'cv')
-
-        # save performance results
-        df = report.performance_df(data)
-        cols = df.columns.tolist()
-        cols[-1] = 'cv_type'
-        df.columns = cols
-        if i == 0:
-            results = df
-        else:
-            results = results.append(df, ignore_index=True)
+        df, info = prediction.performance_df(data)
+        results_cv = results_cv.append(df, ignore_index=True)
 
         # display results
-        rcve = results[results.cv_type == 'cve'].mean(axis=0)
-        rcv = results[results.cv_type == 'cv'].mean(axis=0)
+        rcve = results_cve.mean(axis=0)
+        rcv = results_cv.mean(axis=0)
         rcve.name = 'cve'
         rcv.name = 'cv'
         r = pd.concat([rcve, rcv], axis=1)
@@ -43,6 +35,6 @@ def cv_warning(data, nsamples=100):
 
 
 if __name__ == '__main__':
-    data = nx.numerai.download_data_object()
+    data = nx.numerai.download_data_object(verbose=True)
     data = data['train']
     cv_warning(data)

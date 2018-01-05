@@ -11,28 +11,27 @@ import numerox as nx
 def compare_models(data):
 
     # we'll look at 5 models
-    report = nx.Report()
-    report['logistic'] = nx.backtest(nx.logistic(), data, verbosity=1)
-    report['extratrees'] = nx.backtest(nx.extratrees(), data, verbosity=1)
-    report['randomforest'] = nx.backtest(nx.randomforest(), data, verbosity=1)
-    report['mlpc'] = nx.backtest(nx.mlpc(), data, verbosity=1)
-    report['logisticPCA'] = nx.backtest(nx.logisticPCA(), data, verbosity=1)
+    prediction = nx.backtest(nx.logistic(), data, verbosity=1)
+    prediction += nx.backtest(nx.extratrees(), data, verbosity=1)
+    prediction += nx.backtest(nx.randomforest(), data, verbosity=1)
+    prediction += nx.backtest(nx.mlpc(), data, verbosity=1)
+    prediction += nx.backtest(nx.logisticPCA(), data, verbosity=1)
 
     # correlation of models with logistic regression
     print('\nCorrelation:\n')
-    report.correlation('logistic')
+    prediction.correlation('logistic')
 
     # compare performance of models
     print('\nPerformance comparison:\n')
-    report.performance(data, sort_by='logloss')
+    prediction.performance(data, sort_by='logloss')
 
     # dominance of models
     print('\nModel dominance:\n')
-    report.dominance(data, sort_by='logloss')
+    prediction.dominance(data, sort_by='logloss')
 
     # originality given that logistic model has already been submitted
     print('\nModel originality (versus logistic):\n')
-    print(report.originality(['logistic']))
+    print(prediction.originality(['logistic']))
 
 
 if __name__ == '__main__':

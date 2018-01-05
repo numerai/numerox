@@ -9,10 +9,10 @@ from numerox.data import ERA_STR_TO_FLOAT, REGION_STR_TO_FLOAT
 TEST_DATA = os.path.join(os.path.dirname(__file__), 'tests', 'test_data.hdf')
 
 
-def assert_data_equal(data1, data2, msg=None):
-    "Assert that two data objects are equal"
+def assert_data_equal(obj1, obj2, msg=None):
+    "Assert that two data (or prediction) objects are equal"
     try:
-        pd.testing.assert_frame_equal(data1.df, data2.df)
+        pd.testing.assert_frame_equal(obj1.df, obj2.df)
     except AssertionError as e:
         # pd.testing.assert_frame_equal doesn't take an error message as input
         if msg is not None:
@@ -23,9 +23,16 @@ def assert_data_equal(data1, data2, msg=None):
 
 def shares_memory(data1, data_or_array2):
     "True if `data1` shares memory with `data_or_array2`; False otherwise"
+
     isdata_like = isinstance(data_or_array2, nx.Data)
     isdata_like = isdata_like or isinstance(data_or_array2, nx.Prediction)
-    cols = data1.column_list() + ['ids']
+
+    if hasattr(data1, 'column_list'):
+        cols = data1.column_list()
+    else:
+        cols = data1.names
+    cols += ['ids']
+
     for col in cols:
         if col == 'ids':
             a1 = data1.df.index.values
@@ -68,13 +75,14 @@ def micro_data(index=None):
     return data
 
 
-def micro_prediction(index=None):
+def micro_prediction(index=None, n_names=3):
     d = micro_data(index)
     n = len(d)
     rs = np.random.RandomState(0)
-    yhat = 0.2 * (rs.rand(n) - 0.5) + 0.5
     prediction = nx.Prediction()
-    prediction.append(d.ids, yhat)
+    for i in range(n_names):
+        yhat = 0.2 * (rs.rand(n) - 0.5) + 0.5
+        prediction.merge_arrays(d.ids, yhat, 'model' + str(i))
     return prediction
 
 
