@@ -17,7 +17,7 @@ You can create a data object from the zip archive provided by Numerai::
     x         50, min 0.0000, mean 0.4993, max 1.0000
     y         mean 0.499961, fraction missing 0.3109
 
-But that is slow (~9 seconds) which is painful for dedicated overfitters.
+But that is slow (~6 seconds) which is painful for dedicated overfitters.
 Let's create an HDF5 archive::
 
     >>> data.save('numerai_dataset.hdf')
@@ -38,6 +38,9 @@ as numpy float arrays use ``data.era_float``, ``data.region_float``.
 
 Indexing
 --------
+
+I'm going to show you a lot of indexing examples. If you are new to numerox
+don't worry. You do not need to know them all to get started.
 
 Data indexing is done by rows, not columns::
 
@@ -137,3 +140,10 @@ Numerox comes with a small dataset to play with::
     y         mean 0.500000, fraction missing 0.3466
 
 It is about 1% of a regular Numerai dataset. The data (``data.y``) is balanced.
+It was created using the following function::
+
+    play_data = data.subsample(fraction=0.01, balance=True, seed=0)
+
+If you have a long-running model then you can use subsample to create a
+small dataset to quickly check that your code runs without crashing before
+leaving it to run overnight.
