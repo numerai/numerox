@@ -40,7 +40,7 @@ Indexing
 --------
 
 I'm going to show you a lot of indexing examples. If you are new to numerox
-don't worry. You do not need to know them all to get started.
+don't worry. You do not need to know them to get started.
 
 Data indexing is done by rows, not columns::
 

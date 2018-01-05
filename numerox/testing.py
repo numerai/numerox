@@ -27,7 +27,6 @@ def shares_memory(data1, data_or_array2):
     isdata_like = isinstance(data_or_array2, nx.Data)
     isdata_like = isdata_like or isinstance(data_or_array2, nx.Prediction)
 
-    # TODO data and prediction should have same name for column access
     if hasattr(data1, 'column_list'):
         cols = data1.column_list()
     else:
