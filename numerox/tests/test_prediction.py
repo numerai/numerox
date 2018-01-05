@@ -24,7 +24,7 @@ def test_prediction_copies():
     p = testing.micro_prediction()
     ok_(testing.shares_memory(p, p), "looks like shares_memory failed")
     ok_(testing.shares_memory(p, p.ids), "p.ids should be a view")
-    ok_(testing.shares_memory(p, p.yhat), "p.yhat should be a view")
+    ok_(testing.shares_memory(p, p.y), "p.y should be a view")
     ok_(not testing.shares_memory(p, p.copy()), "should be a copy")
 
 
@@ -38,8 +38,8 @@ def test_data_properties():
 
     ok_((p.ids == p.df.index).all(), "ids is corrupted")
     ok_((p.ids == d.df.index).all(), "ids is corrupted")
-    ok_((p.yhat[:, 0] == d.df.y).all(), "yhat is corrupted")
-    ok_((p.yhat[:, 1] == d.df.y).all(), "yhat is corrupted")
+    ok_((p.y[:, 0] == d.df.y).all(), "y is corrupted")
+    ok_((p.y[:, 1] == d.df.y).all(), "y is corrupted")
 
 
 def test_prediction_add():
@@ -51,10 +51,10 @@ def test_prediction_add():
     d1 = d['train']
     d2 = d['tournament']
     rs = np.random.RandomState(0)
-    yhat1 = 0.2 * (rs.rand(len(d1)) - 0.5) + 0.5
-    yhat2 = 0.2 * (rs.rand(len(d2)) - 0.5) + 0.5
-    p1.merge_arrays(d1.ids, yhat1, 'model1')
-    p2.merge_arrays(d2.ids, yhat2, 'model1')
+    y1 = 0.2 * (rs.rand(len(d1)) - 0.5) + 0.5
+    y2 = 0.2 * (rs.rand(len(d2)) - 0.5) + 0.5
+    p1.merge_arrays(d1.ids, y1, 'model1')
+    p2.merge_arrays(d2.ids, y2, 'model1')
 
     p = p1 + p2  # just make sure that it runs
 

@@ -34,12 +34,12 @@ class Prediction(object):
         return self.df.index.values
 
     @property
-    def yhat(self):
-        "View of yhat as a 2d numpy float array"
+    def y(self):
+        "View of y as a 2d numpy float array"
         return self.df.values
 
-    def yhatnew(self, y_array):
-        "Copy of prediction but with prediction.yhat=`y_array`"
+    def ynew(self, y_array):
+        "Copy of prediction but with prediction.y=`y_array`"
         if y_array.shape != self.shape:
             msg = "`y_array` must have the same shape as prediction"
             raise ValueError(msg)
@@ -55,9 +55,9 @@ class Prediction(object):
         for name in self.names:
             yield self[name]
 
-    def merge_arrays(self, ids, yhat, name):
-        "Merge numpy arrays ids and yhat with name prediction_name"
-        df = pd.DataFrame(data={name: yhat}, index=ids)
+    def merge_arrays(self, ids, y, name):
+        "Merge numpy arrays `ids` and `y` with name `name`"
+        df = pd.DataFrame(data={name: y}, index=ids)
         prediction = Prediction(df)
         self.merge(prediction)
 
@@ -74,7 +74,7 @@ class Prediction(object):
             self.df = pd.merge(self.df, prediction.df, how='outer',
                                left_index=True, right_index=True)
         else:
-            # add more yhats from a model whose name already exists
+            # add more ys from a model whose name already exists
             y = self.df[name]
             y = y.dropna()
             s = prediction.df.iloc[:, 0]
@@ -249,7 +249,7 @@ class Prediction(object):
         "Which models are original given the models already submitted?"
 
         # predictions of models already submitted
-        yhats = self.df[submitted_names].values
+        ys = self.df[submitted_names].values
 
         # models that have not been submitted; we will report on these
         names = self.names
@@ -260,11 +260,11 @@ class Prediction(object):
         for name in names:
             corr = True
             ks = True
-            yhat = self.df[name].values
-            for i in range(yhats.shape[1]):
-                if corr and pearsonr(yhat, yhats[:, i]) > 0.95:
+            y = self.df[name].values
+            for i in range(ys.shape[1]):
+                if corr and pearsonr(y, ys[:, i]) > 0.95:
                     corr = False
-                if ks and ks_2samp(yhat, yhats[:, i]) <= 0.03:
+                if ks and ks_2samp(y, ys[:, i]) <= 0.03:
                     ks = False
             df.loc[name, 'corr'] = corr
             df.loc[name, 'ks'] = ks
