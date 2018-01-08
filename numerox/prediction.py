@@ -65,7 +65,7 @@ class Prediction(object):
         "Merge numpy arrays `ids` and `y` with name `name`"
         df = pd.DataFrame(data={name: y}, index=ids)
         prediction = Prediction(df)
-        self.merge(prediction)
+        return self.merge(prediction)
 
     def merge(self, prediction):
         "Merge prediction"
@@ -74,11 +74,11 @@ class Prediction(object):
         name = prediction.names[0]
         if self.df is None:
             # empty prediction
-            self.df = prediction.df
+            df = prediction.df
         elif name not in self:
             # inserting predictions from a model not already in report
-            self.df = pd.merge(self.df, prediction.df, how='outer',
-                               left_index=True, right_index=True)
+            df = pd.merge(self.df, prediction.df, how='outer',
+                          left_index=True, right_index=True)
         else:
             # add more ys from a model whose name already exists
             y = self.df[name]
@@ -88,8 +88,9 @@ class Prediction(object):
             s = pd.concat([s, y], join='outer', ignore_index=False,
                           verify_integrity=True)
             df = s.to_frame(name)
-            self.df = pd.merge(self.df, df, how='outer', on=name,
-                               left_index=True, right_index=True)
+            df = pd.merge(self.df, df, how='outer', on=name,
+                          left_index=True, right_index=True)
+        return Prediction(df)
 
     def save(self, path_or_buf, compress=True):
         "Save prediction as an hdf archive; raises if nothing to save"
@@ -302,17 +303,15 @@ class Prediction(object):
         if prediction.df.shape[1] != 1:
             raise ValueError("Can only insert a single model at a time")
         prediction.df.columns = [name]
-        self.merge(prediction)
+        self.df = self.merge(prediction).df
 
     def __add__(self, prediction):
         "Merge predictions"
-        self.merge(prediction)
-        return self
+        return self.merge(prediction)
 
     def __iadd__(self, prediction):
         "Merge predictions"
-        self.merge(prediction)
-        return self
+        return self.merge(prediction)
 
     def __contains__(self, name):
         "Is `name` already in prediction? True or False"

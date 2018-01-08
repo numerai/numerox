@@ -33,8 +33,8 @@ def test_data_properties():
 
     d = testing.micro_data()
     p = nx.Prediction()
-    p.merge_arrays(d.ids, d.y, 'model1')
-    p.merge_arrays(d.ids, d.y, 'model2')
+    p = p.merge_arrays(d.ids, d.y, 'model1')
+    p = p.merge_arrays(d.ids, d.y, 'model2')
 
     ok_((p.ids == p.df.index).all(), "ids is corrupted")
     ok_((p.ids == d.df.index).all(), "ids is corrupted")
@@ -68,8 +68,8 @@ def test_prediction_add():
     rs = np.random.RandomState(0)
     y1 = 0.2 * (rs.rand(len(d1)) - 0.5) + 0.5
     y2 = 0.2 * (rs.rand(len(d2)) - 0.5) + 0.5
-    p1.merge_arrays(d1.ids, y1, 'model1')
-    p2.merge_arrays(d2.ids, y2, 'model1')
+    p1 = p1.merge_arrays(d1.ids, y1, 'model1')
+    p2 = p2.merge_arrays(d2.ids, y2, 'model1')
 
     p = p1 + p2  # just make sure that it runs
 
@@ -93,9 +93,9 @@ def test_prediction_performance_df():
     d = d['train'] + d['validation']
 
     p = nx.Prediction()
-    p.merge_arrays(d.ids, d.y, 'model1')
-    p.merge_arrays(d.ids, d.y, 'model2')
-    p.merge_arrays(d.ids, d.y, 'model3')
+    p = p.merge_arrays(d.ids, d.y, 'model1')
+    p = p.merge_arrays(d.ids, d.y, 'model2')
+    p = p.merge_arrays(d.ids, d.y, 'model3')
 
     df, info = p.performance_df(d)
 
@@ -110,9 +110,9 @@ def test_prediction_dominance_df():
     d = d['validation']
 
     p = nx.Prediction()
-    p.merge_arrays(d.ids, d.y, 'model1')
-    p.merge_arrays(d.ids, d.y, 'model2')
-    p.merge_arrays(d.ids, d.y, 'model3')
+    p = p.merge_arrays(d.ids, d.y, 'model1')
+    p = p.merge_arrays(d.ids, d.y, 'model2')
+    p = p.merge_arrays(d.ids, d.y, 'model3')
 
     df = p.dominance_df(d)
 
@@ -127,7 +127,7 @@ def test_prediction_originality():
 
 
 def test_prediction_setitem():
-    "comapre prediction._setitem__ with merge"
+    "compare prediction._setitem__ with merge"
 
     data = nx.play_data()
     p1 = nx.production(nx.logistic(), data, 'model1', verbosity=0)
@@ -142,10 +142,10 @@ def test_prediction_setitem():
     p['model1'] = p4
 
     pp = nx.Prediction()
-    pp.merge(p1)
-    pp.merge(p2)
-    pp.merge(p3)
-    pp.merge(p4)
+    pp = pp.merge(p1)
+    pp = pp.merge(p2)
+    pp = pp.merge(p3)
+    pp = pp.merge(p4)
 
     pd.testing.assert_frame_equal(p.df, pp.df)
 

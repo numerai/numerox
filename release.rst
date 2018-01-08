@@ -6,6 +6,8 @@ Release Notes
 - v0.2.1 (not yet released)
 
   * Add ``prediction.rename``
+  * ``prediction.merge`` is no longer an inplace operation
+  * ``prediction.merge_arrays`` is no longer an inplace operation
   * More unit tests
 
 - v0.2.0

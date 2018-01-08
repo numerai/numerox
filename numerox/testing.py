@@ -82,7 +82,7 @@ def micro_prediction(index=None, n_names=3):
     prediction = nx.Prediction()
     for i in range(n_names):
         yhat = 0.2 * (rs.rand(n) - 0.5) + 0.5
-        prediction.merge_arrays(d.ids, yhat, 'model' + str(i))
+        prediction = prediction.merge_arrays(d.ids, yhat, 'model' + str(i))
     return prediction
 
 
