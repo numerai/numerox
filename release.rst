@@ -8,6 +8,8 @@ Release Notes
   * Add ``prediction.rename``
   * ``prediction.merge`` is no longer an inplace operation
   * ``prediction.merge_arrays`` is no longer an inplace operation
+  * Python package requests is no longer a dependency
+  * Make more use of numerapi
   * More unit tests
 
 - v0.2.0

@@ -1,25 +1,21 @@
-import requests
+import os
 import tempfile
 import datetime
 
 import pandas as pd
 from numerapi.numerapi import NumerAPI
+from numerapi.utils import download_file
 
 import numerox as nx
 
 
-def download_dataset(saved_filename, verbose=False):
+def download_dataset(filename, verbose=False):
     "Download the current Numerai dataset; overwrites if file exists"
     if verbose:
-        print("Download dataset {}".format(saved_filename))
+        print("Download dataset {}".format(filename))
     url = dataset_url()
-    r = requests.get(url)
-    if r.status_code != 200:
-        msg = 'failed to download dataset (staus code {}))'
-        raise IOError(msg.format(r.status_code))
-    with open(saved_filename, 'wb') as fd:
-        for chunk in r.iter_content(chunk_size=1024):
-            fd.write(chunk)
+    filename = os.path.expanduser(filename)  # expand ~/tmp to /home/...
+    download_file(url, filename)
 
 
 def dataset_url():
