@@ -3,7 +3,7 @@
 Release Notes
 =============
 
-- v0.2.0 (not yet released)
+- v0.2.0
 
   * This release makes a large change to the numerox API
   * There are now 3 main classes instead of 4
