@@ -24,9 +24,15 @@ class Prediction(object):
 
     @property
     def names(self):
+        "List (copy) of names in prediction object"
         if self.df is None:
             return []
         return self.df.columns.tolist()
+
+    def rename(self, names_dict):
+        "Rename predictions using dict with old name as key, new as value"
+        df = self.df.rename(columns=names_dict, copy=True)
+        return Prediction(df)
 
     @property
     def ids(self):

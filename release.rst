@@ -5,6 +5,9 @@ Release Notes
 
 - v0.2.1 (not yet released)
 
+  * Add ``prediction.rename``
+  * More unit tests
+
 - v0.2.0
 
   * This release makes a large change to the numerox API

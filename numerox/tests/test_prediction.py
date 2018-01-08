@@ -42,6 +42,21 @@ def test_data_properties():
     ok_((p.y[:, 1] == d.df.y).all(), "y is corrupted")
 
 
+def test_prediction_rename():
+    "prediction.rename"
+    p = testing.micro_prediction()
+    rename_dict = {}
+    names = []
+    original_names = p.names
+    for i in range(p.shape[1]):
+        key = original_names[i]
+        value = 'm_%d' % i
+        names.append(value)
+        rename_dict[key] = value
+    p2 = p.rename(rename_dict)
+    ok_(p2.names == names, 'prediction.rename failed')
+
+
 def test_prediction_add():
     "add two predictions together"
 
