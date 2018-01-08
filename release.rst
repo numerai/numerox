@@ -8,6 +8,7 @@ Release Notes
   * This release makes a large change to the numerox API
   * There are now 3 main classes instead of 4
   * The Report class has been merged into the Prediction class
+  * The Prediction class can now hold the predictions from multiple models
   * New features have been added to the Prediction class
 
 - v0.1.2
