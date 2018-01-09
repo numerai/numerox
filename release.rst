@@ -13,6 +13,7 @@ Release Notes
   * ``prediction.concordance`` now sorts by concordance
   * ``prediction.merge`` is no longer an inplace operation
   * ``prediction.merge_arrays`` is no longer an inplace operation
+  * Remove ``model.hash``
   * Python package requests is no longer a dependency
   * Make more use of numerapi
   * More unit tests

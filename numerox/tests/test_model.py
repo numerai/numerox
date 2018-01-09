@@ -13,15 +13,6 @@ def test_model_repr():
         model.__repr__()
 
 
-def test_model_hash():
-    "Make sure Model.hash runs"
-    d = nx.testing.micro_data()
-    dt = d['train']
-    dp = d['tournament']
-    for model in get_models():
-        model.hash(dt, dp)
-
-
 def test_model_run():
     "Make sure models run"
     d = nx.play_data()
