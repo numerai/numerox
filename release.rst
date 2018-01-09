@@ -5,6 +5,7 @@ Release Notes
 
 - v0.2.1 (not yet released)
 
+  * Add ``upload`` to make submissions
   * Add ``prediction.rename``
   * Add ``prediction.drop``
   * ``prediction.merge`` is no longer an inplace operation

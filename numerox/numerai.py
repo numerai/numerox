@@ -1,4 +1,5 @@
 import os
+import time
 import tempfile
 import datetime
 
@@ -8,6 +9,9 @@ from numerapi.utils import download_file
 
 import numerox as nx
 
+
+# ---------------------------------------------------------------------------
+# download dataset
 
 def download_dataset(filename, verbose=False):
     "Download the current Numerai dataset; overwrites if file exists"
@@ -33,6 +37,68 @@ def download_data_object(verbose=False):
         data = nx.load_zip(temp.name)
     return data
 
+
+# ---------------------------------------------------------------------------
+# upload submission
+
+def upload(filename, public_id, secret_key, block=True):
+    """
+    Upload tournament submission (csv file) to Numerai.
+
+    If block is True (default) then the scope of your token must be both
+    upload_submission and read_submission_info. If block is False then only
+    upload_submission is needed.
+    """
+    napi = NumerAPI(public_id=public_id, secret_key=secret_key,
+                    verbosity='warning')
+    upload_id = napi.upload_predictions(filename)
+    if block:
+        status = status_block(upload_id, public_id, secret_key)
+    else:
+        status = upload_status(upload_id, public_id, secret_key)
+    return upload_id, status
+
+
+def upload_status(upload_id, public_id, secret_key):
+    "Dictionary containing the status of upload"
+    napi = NumerAPI(public_id=public_id, secret_key=secret_key,
+                    verbosity='warning')
+    status_raw = napi.submission_status(upload_id)
+    status = {}
+    for key, value in status_raw.items():
+        if isinstance(value, dict):
+            value = value['value']
+        status[key] = value
+    return status
+
+
+def status_block(upload_id, public_id, secret_key, verbose=True):
+    """
+    Block until status completes; then return status dictionary.
+
+    The scope of your token must must include read_submission_info.
+    """
+    t0 = time.time()
+    seen = []
+    fmt = "{:>10.6f}  {:<.4f}  {:<}"
+    while True:
+        status = upload_status(upload_id, public_id, secret_key)
+        t = time.time()
+        for key, value in status.items():
+            if value is not None and key not in seen:
+                seen.append(key)
+                minutes = (t - t0) / 60
+                if verbose:
+                    print(fmt.format(value, minutes, key))
+        if len(status) == len(seen):
+            break
+        seconds = min(5 + int((t - t0) / 100.0), 30)
+        time.sleep(seconds)
+    return status
+
+
+# ---------------------------------------------------------------------------
+# stakes
 
 def show_stakes(round_number=None, sort_by='prize pool'):
     "Display info on staking; cumsum is dollars above you"

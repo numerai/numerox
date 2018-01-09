@@ -23,8 +23,12 @@ def main():
     # fit model with train data and make predictions for tournament data
     prediction = nx.production(model, data)
 
-    # save predictions to csv file for later upload to numerai
+    # save predictions to csv file
     prediction.to_csv('logistic.csv', verbose=True)
+
+    # upload predictions to Numerai to enter the tournament
+    # you create the public_id and secret_key on the Numerai website
+    # nx.upload('logistic.csv', public_id, secret_key)
 
 
 if __name__ == '__main__':
