@@ -10,6 +10,8 @@ from cv_warning import cv_warning
 
 
 def print_source(func):
+    print('-' * 70)
+    print('\n{}\n'.format(func.__name__.upper()))
     lines = inspect.getsourcelines(func)
     print("".join(lines[0]))
 
@@ -18,22 +20,14 @@ if __name__ == '__main__':
 
     data = nx.numerai.download_data_object(verbose=True)
 
-    print('-' * 70)
-    print('\nBACKTEST EXAMPLE\n')
     print_source(backtest_example)
     backtest_example(data)
 
-    print('-' * 70)
-    print('\nCONCORDANCE EXAMPLE\n')
     print_source(concordance_example)
     concordance_example(data)
 
-    print('-' * 70)
-    print('\nCOMPARE MODELS\n')
     print_source(compare_models)
     compare_models(data)
 
-    print('-' * 70)
-    print('\nCV WARNING\n')
     print_source(cv_warning)
     cv_warning(data['train'], nsamples=2)
