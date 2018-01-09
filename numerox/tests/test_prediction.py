@@ -57,6 +57,13 @@ def test_prediction_rename():
     ok_(p2.names == names, 'prediction.rename failed')
 
 
+def test_prediction_drop():
+    "prediction.drop"
+    p = testing.micro_prediction()
+    p = p.drop(['model1'])
+    ok_(p.names == ['model0', 'model2'], 'prediction.drop failed')
+
+
 def test_prediction_add():
     "add two predictions together"
 

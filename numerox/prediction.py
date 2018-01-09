@@ -34,6 +34,11 @@ class Prediction(object):
         df = self.df.rename(columns=names_dict, copy=True)
         return Prediction(df)
 
+    def drop(self, name):
+        "Drop name (str) or names (e.g. a list of names) from prediction"
+        df = self.df.drop(columns=name)
+        return Prediction(df)
+
     @property
     def ids(self):
         "View of ids as a numpy str array"
