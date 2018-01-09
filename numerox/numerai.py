@@ -13,7 +13,7 @@ import numerox as nx
 # ---------------------------------------------------------------------------
 # download dataset
 
-def download_dataset(filename, verbose=False):
+def download(filename, verbose=False):
     "Download the current Numerai dataset; overwrites if file exists"
     if verbose:
         print("Download dataset {}".format(filename))
@@ -33,7 +33,7 @@ def dataset_url():
 def download_data_object(verbose=False):
     "Used by numerox to avoid hard coding paths; probably not useful to users"
     with tempfile.NamedTemporaryFile() as temp:
-        download_dataset(temp.name, verbose=verbose)
+        download(temp.name, verbose=verbose)
         data = nx.load_zip(temp.name)
     return data
 

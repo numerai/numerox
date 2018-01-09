@@ -32,7 +32,7 @@ from numerox.run import backtest
 from numerox.run import run
 
 # numerai
-from numerox.numerai import download_dataset
+from numerox.numerai import download
 from numerox.numerai import upload
 from numerox.numerai import dataset_url
 

@@ -13,7 +13,7 @@ Once you have a model numerox will do the rest. First download the Numerai
 dataset and then load it::
 
     >>> import numerox as nx
-    >>> nx.download_dataset('numerai_dataset.zip')
+    >>> nx.download('numerai_dataset.zip')
     >>> data = nx.load_zip('numerai_dataset.zip')
     >>> data
     rows      637184

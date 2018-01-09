@@ -12,7 +12,7 @@ import numerox as nx
 def main():
 
     # download dataset from numerai
-    nx.download_dataset('numerai_dataset.zip', verbose=True)
+    nx.download('numerai_dataset.zip', verbose=True)
 
     # load numerai dataset
     data = nx.load_zip('numerai_dataset.zip', verbose=True)
