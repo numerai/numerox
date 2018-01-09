@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Run multiple models through simple cross validation on the training data.
+Run multiple models: fit on training data, predict for tournament data.
 Then compare performance of the models
 """
 
@@ -11,11 +11,11 @@ import numerox as nx
 def compare_models(data):
 
     # we'll look at 5 models
-    prediction = nx.backtest(nx.logistic(), data, verbosity=1)
-    prediction += nx.backtest(nx.extratrees(), data, verbosity=1)
-    prediction += nx.backtest(nx.randomforest(), data, verbosity=1)
-    prediction += nx.backtest(nx.mlpc(), data, verbosity=1)
-    prediction += nx.backtest(nx.logisticPCA(), data, verbosity=1)
+    prediction = nx.production(nx.logistic(), data, verbosity=1)
+    prediction += nx.production(nx.extratrees(), data, verbosity=1)
+    prediction += nx.production(nx.randomforest(), data, verbosity=1)
+    prediction += nx.production(nx.mlpc(), data, verbosity=1)
+    prediction += nx.production(nx.logisticPCA(), data, verbosity=1)
 
     # correlation of models with logistic regression
     print('\nCorrelation:\n')
@@ -23,17 +23,25 @@ def compare_models(data):
 
     # compare performance of models
     print('\nPerformance comparison:\n')
-    prediction.performance(data, sort_by='logloss')
+    prediction.performance(data['validation'], sort_by='logloss')
 
     # dominance of models
     print('\nModel dominance:\n')
-    prediction.dominance(data, sort_by='logloss')
+    prediction.dominance(data['validation'], sort_by='logloss')
+
+    # dominace between two models
+    print('\nModel dominance between two models:\n')
+    prediction[['logistic', 'logisticPCA']].dominance(data['validation'])
 
     # originality given that logistic model has already been submitted
     print('\nModel originality (versus logistic):\n')
     print(prediction.originality(['logistic']))
 
+    # concordance
+    print('\nConcordance:\n')
+    print(prediction.concordance(data))
+
 
 if __name__ == '__main__':
     data = nx.numerai.download_data_object(verbose=True)
-    compare_models(data['train'])
+    compare_models(data)

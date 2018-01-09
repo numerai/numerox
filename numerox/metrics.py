@@ -187,6 +187,8 @@ def concordance(data, prediction):
 
         concords.loc[pred.names[0]] = concord
 
+    concords = concords.sort_values('concordance')
+
     return concords
 
 

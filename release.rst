@@ -7,8 +7,10 @@ Release Notes
 
   * Add ``upload`` to make submissions
   * ``download`` is the new name for ``download_dataset``
+  * Redo compare_models example
   * Add ``prediction.rename``
   * Add ``prediction.drop``
+  * ``prediction.concordance`` now sorts by concordance
   * ``prediction.merge`` is no longer an inplace operation
   * ``prediction.merge_arrays`` is no longer an inplace operation
   * Python package requests is no longer a dependency
