@@ -1,8 +1,8 @@
 # flake8: noqa
 
-from run_all_examples import run_all_examples
-from first_tournament import first_tournament
-from backtest_example import backtest_example
-from concordance_example import concordance_example
-from compare_models import compare_models
-from cv_warning import cv_warning
+from numerox.examples.run_all_examples import run_all_examples
+from numerox.examples.first_tournament import first_tournament
+from numerox.examples.backtest_example import backtest_example
+from numerox.examples.concordance_example import concordance_example
+from numerox.examples.compare_models import compare_models
+from numerox.examples.cv_warning import cv_warning
