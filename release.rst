@@ -11,6 +11,7 @@ Release Notes
   * Examples can now be run after installation: nx.examples.run_all_examples()
   * Add ``prediction.rename``
   * Add ``prediction.drop``
+  * ``prediction.concordance`` 3x faster when prediction contains 10 names
   * ``prediction.concordance`` now sorts by concordance
   * ``prediction.merge`` is no longer an inplace operation
   * ``prediction.merge_arrays`` is no longer an inplace operation

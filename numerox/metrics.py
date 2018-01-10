@@ -154,38 +154,29 @@ def concordance(data, prediction):
     kmeans = MiniBatchKMeans(n_clusters=5, random_state=1337)
     kmeans.fit(data.x)
 
-    for pred in prediction.iter():
+    # yhats and clusters for each region
+    yhats = []
+    clusters = []
+    for region in ['validation', 'test', 'live']:
+        d = data[region]
+        cluster = kmeans.predict(d.x)
+        clusters.append(cluster)
+        yh = prediction.df.loc[d.df.index].values  # align
+        yhats.append(yh)
 
-        # all data
-        x = [None]
-        yhat = [None]
-
-        # data for each region
-        regions = ['validation', 'test', 'live']
-        for region in regions:
-            d = data[region]
-            x.append(d.x)
-            yh = pred.df.loc[d.df.index].values  # align
-            yhat.append(yh.reshape(-1))
-
-        # assign clusters
-        c1 = kmeans.predict(x[1])
-        c2 = kmeans.predict(x[2])
-        c3 = kmeans.predict(x[3])
-
-        # cross cluster distance (KS distance)
+    # cross cluster distance (KS distance)
+    for i, name in enumerate(prediction.names):
         ks = []
-        for i in set(c1):
-            yhat1 = yhat[1][c1 == i]
-            yhat2 = yhat[2][c2 == i]
-            yhat3 = yhat[3][c3 == i]
-            d = [ks_2samp(yhat1, yhat2),
-                 ks_2samp(yhat1, yhat3),
-                 ks_2samp(yhat3, yhat2)]
+        for j in set(clusters[0]):
+            yhat0 = yhats[0][:, i][clusters[0] == j]
+            yhat1 = yhats[1][:, i][clusters[1] == j]
+            yhat2 = yhats[2][:, i][clusters[2] == j]
+            d = [ks_2samp(yhat0, yhat1),
+                 ks_2samp(yhat0, yhat2),
+                 ks_2samp(yhat2, yhat1)]
             ks.append(max(d))
         concord = np.mean(ks)
-
-        concords.loc[pred.names[0]] = concord
+        concords.loc[name] = concord
 
     concords = concords.sort_values('concordance')
 
