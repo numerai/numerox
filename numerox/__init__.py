@@ -37,6 +37,7 @@ from numerox.numerai import upload
 from numerox.numerai import dataset_url
 
 # misc
+from numerox import examples
 from numerox.data import concat_data
 from numerox.numerai import show_stakes
 from numerox.version import __version__

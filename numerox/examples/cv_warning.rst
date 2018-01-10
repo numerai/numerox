@@ -34,4 +34,4 @@ there is very likely to be fit and predict data from every era in every cross
 validation run.
 
 
-.. _here: https://github.com/kwgoodman/numerox/blob/master/examples/cv_warning.py
+.. _here: https://github.com/kwgoodman/numerox/blob/master/numerox/examples/cv_warning.py

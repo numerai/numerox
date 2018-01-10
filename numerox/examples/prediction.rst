@@ -68,6 +68,6 @@ Or compare two models for dominance::
     >>> prediction[['rf_d2', 'rf_d3']].dominance(data['validation'])
 
 
-.. _example: https://github.com/kwgoodman/numerox/blob/master/examples/compare_models.py
-.. _documentation: https://github.com/kwgoodman/numerox/blob/master/examples/compare_models.rst
+.. _example: https://github.com/kwgoodman/numerox/blob/master/numerox/examples/compare_models.py
+.. _documentation: https://github.com/kwgoodman/numerox/blob/master/numerox/examples/compare_models.rst
 

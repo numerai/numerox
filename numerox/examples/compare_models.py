@@ -1,14 +1,11 @@
-#!/usr/bin/env python
-
-"""
-Run multiple models: fit on training data, predict for tournament data.
-Then compare performance of the models
-"""
-
 import numerox as nx
 
 
 def compare_models(data):
+    """
+    Run multiple models: fit on training data, predict for tournament data.
+    Then compare performance of the models
+    """
 
     # we'll look at 5 models
     prediction = nx.production(nx.logistic(), data, verbosity=1)
@@ -40,8 +37,3 @@ def compare_models(data):
     # concordance
     print('\nConcordance:\n')
     print(prediction.concordance(data))
-
-
-if __name__ == '__main__':
-    data = nx.numerai.download_data_object(verbose=True)
-    compare_models(data)

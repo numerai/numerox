@@ -1,11 +1,11 @@
-#!/usr/bin/env python
-
 import pandas as pd
 import numerox as nx
 
 
 def cv_warning(data, nsamples=100):
+    "Hold out a sample of eras not rows when doing cross validation."
 
+    data = data['train']
     model = nx.logistic()
     results_cve = pd.DataFrame()
     results_cv = pd.DataFrame()
@@ -32,9 +32,3 @@ def cv_warning(data, nsamples=100):
         r = pd.concat([rcve, rcv], axis=1)
         print("\n{} runs".format(i+1))
         print(r)
-
-
-if __name__ == '__main__':
-    data = nx.numerai.download_data_object(verbose=True)
-    data = data['train']
-    cv_warning(data)

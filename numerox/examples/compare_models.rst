@@ -115,4 +115,4 @@ Concordance::
     mlpc           0.0369206
     logistic       0.0392527
 
-.. _here: https://github.com/kwgoodman/numerox/blob/master/examples/compare_models.py
+.. _here: https://github.com/kwgoodman/numerox/blob/master/numerox/examples/compare_models.py
