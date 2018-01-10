@@ -97,7 +97,7 @@ numerox. Their licenses appear in the licenses directory.
 
 
 .. _model.py: https://github.com/kwgoodman/numerox/blob/master/numerox/model.py
-.. _examples: https://github.com/kwgoodman/numerox/blob/master/examples/readme.rst
+.. _examples: https://github.com/kwgoodman/numerox/blob/master/numerox/examples/readme.rst
 .. _chat: https://community.numer.ai/channel/numerox
 .. _bugs: https://github.com/kwgoodman/numerox/issues
 .. _what's new: https://github.com/kwgoodman/numerox/blob/master/release.rst

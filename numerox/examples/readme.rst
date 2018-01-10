@@ -47,7 +47,7 @@ You can run all the examples [1]_::
 
 .. _compare model: https://github.com/kwgoodman/numerox/blob/master/numerox/examples/compare_models.rst
 .. _first tournament: https://github.com/kwgoodman/numerox/blob/master/numerox/examples/first_tournament.py
-.. _backtest: https://github.com/kwgoodman/numerox/blob/master/examples/numerox/backtest_example.py
+.. _backtest: https://github.com/kwgoodman/numerox/blob/master/numerox/examples/backtest_example.py
 .. _run and splitter: https://github.com/kwgoodman/numerox/blob/master/numerox/examples/run.rst
 
 .. _Transform features: https://github.com/kwgoodman/numerox/blob/master/numerox/examples/transform.rst
