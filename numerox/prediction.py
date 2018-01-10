@@ -107,32 +107,30 @@ class Prediction(object):
         else:
             self.df.to_hdf(path_or_buf, HDF_PREDICTION_KEY)
 
-    def to_csv(self, path_or_buf=None, name=None, decimals=6, verbose=False):
-        "Save a csv file of predictions for later upload to Numerai"
-        if name is None:
-            if self.shape[1] != 1:
-                msg = ("`name` can be None only if prediction contains only "
-                       "one name")
-                raise ValueError(msg)
-            name = self.names[0]
-        df = self.df[name].to_frame('probability')
+    def to_csv(self, path_or_buf=None, decimals=6, verbose=False):
+        "Save a csv file of predictions; predictin must contain only one name"
+        if self.shape[1] != 1:
+            raise ValueError("prediction must contain a single name")
+        df = self.df.iloc[:, 0].to_frame('probability')
         df.index.rename('id', inplace=True)
         float_format = "%.{}f".format(decimals)
         df.to_csv(path_or_buf, float_format=float_format)
         if verbose:
             print("Save {}".format(path_or_buf))
 
-    def summary(self, data, name):
-        df = self.summary_df(data, name)
+    def summary(self, data):
+        df = self.summary_df(data)
         df = df.round(decimals={'logloss': 6, 'auc': 4, 'acc': 4, 'ystd': 4})
         with pd.option_context('display.colheader_justify', 'left'):
             print(df.to_string(index=True))
 
-    def summary_df(self, data, name):
+    def summary_df(self, data):
+
+        if self.shape[1] != 1:
+            raise ValueError("prediction must contain a single name")
 
         # metrics
-        pred = self[name]
-        metrics, regions = metrics_per_era(data, pred, region_as_str=True)
+        metrics, regions = metrics_per_era(data, self, region_as_str=True)
         metrics = metrics.drop(['era', 'name'], axis=1)
 
         # additional metrics

@@ -46,9 +46,9 @@ def run(model, splitter, name=None, verbosity=2):
         ids, yhat = model.fit_predict(data_fit, data_predict)
         prediction = prediction.merge_arrays(ids, yhat, name)
         if verbosity > 1:
-            prediction.summary(data.region_isnotin(['test', 'live']), name)
+            prediction.summary(data.region_isnotin(['test', 'live']))
     if verbosity == 1:
-        prediction.summary(data.region_isnotin(['test', 'live']), name)
+        prediction.summary(data.region_isnotin(['test', 'live']))
     if verbosity > 1:
         minutes = (time.time() - t0) / 60
         print('Done in {:.2f} minutes'.format(minutes))

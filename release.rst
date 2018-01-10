@@ -14,9 +14,12 @@ Release Notes
   * ``prediction.concordance`` now sorts by concordance
   * ``prediction.merge`` is no longer an inplace operation
   * ``prediction.merge_arrays`` is no longer an inplace operation
+  * ``prediction.to_csv`` no longer take ``name`` as input
+  * ``prediction.summary`` no longer take ``name`` as input
+  * ``prediction.summary_df`` no longer take ``name`` as input
   * Remove ``model.hash``
-  * Python package requests is no longer a dependency
   * Make more use of numerapi
+  * Python package requests is no longer a dependency
   * More unit tests
 
 - v0.2.0

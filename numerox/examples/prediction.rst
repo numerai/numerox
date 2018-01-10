@@ -52,7 +52,7 @@ And then load them::
 
 And you can save one model's predictions to csv for future upload to Numerai::
 
-    >>> prediction._to_csv('rf_d3.csv', name='rf_d3')
+    >>> prediction['rf3_d3']._to_csv('rf_d3.csv')
 
 I forget, did I try a depth of 5::
 
