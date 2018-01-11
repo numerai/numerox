@@ -93,6 +93,17 @@ def test_prediction_getitem():
     ok_(p2.names == names, 'names corrcupted')
 
 
+def test_prediction_loc():
+    "test prediction.loc"
+    mp = testing.micro_prediction
+    p = mp()
+    msg = 'prediction.loc indexing error'
+    ade(p.loc[['index1']], mp([1]), msg)
+    ade(p.loc[['index4']], mp([4]), msg)
+    ade(p.loc[['index4', 'index0']], mp([4, 0]), msg)
+    ade(p.loc[['index4', 'index0', 'index2']], mp([4, 0, 2]), msg)
+
+
 def test_prediction_performance_df():
     "make sure prediction.performance_df runs"
 

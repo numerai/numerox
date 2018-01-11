@@ -75,14 +75,24 @@ def micro_data(index=None):
     return data
 
 
-def micro_prediction(index=None, n_names=3):
-    d = micro_data(index)
-    n = len(d)
-    rs = np.random.RandomState(0)
-    prediction = nx.Prediction()
-    for i in range(n_names):
-        yhat = 0.2 * (rs.rand(n) - 0.5) + 0.5
-        prediction = prediction.merge_arrays(d.ids, yhat, 'model' + str(i))
+def micro_prediction(index=None):
+    "Returns a tiny prediction object for use in unit testing"
+    cols = ['model0', 'model1', 'model2']
+    df = pd.DataFrame(columns=cols)
+    df.loc['index0'] = [0.00, 0.01, 0.02]
+    df.loc['index1'] = [0.10, 0.11, 0.12]
+    df.loc['index2'] = [0.20, 0.21, 0.22]
+    df.loc['index3'] = [0.30, 0.31, 0.32]
+    df.loc['index4'] = [0.40, 0.41, 0.42]
+    df.loc['index5'] = [0.50, 0.51, 0.52]
+    df.loc['index6'] = [0.60, 0.61, 0.62]
+    df.loc['index7'] = [0.70, 0.71, 0.72]
+    df.loc['index8'] = [0.80, 0.81, 0.82]
+    df.loc['index9'] = [0.90, 0.91, 0.92]
+    if index is not None:
+        df = df.iloc[index]
+    df = df.copy()  # assure contiguous memory
+    prediction = nx.Prediction(df)
     return prediction
 
 

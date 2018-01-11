@@ -7,20 +7,22 @@ Release Notes
 
   * Add ``upload`` to make submissions
   * ``download`` is the new name for ``download_dataset``
-  * Redo compare_models example
-  * Examples can now be run after installation: nx.examples.run_all_examples()
+  * Add ``prediction.compare``
+  * Add ``prediction.loc`` for indexing by Numerai row ids
   * Add ``prediction.rename``
   * Add ``prediction.drop``
   * ``prediction.concordance`` 3x faster when prediction contains 10 names
   * ``prediction.concordance`` now sorts by concordance
   * ``prediction.merge`` is no longer an inplace operation
   * ``prediction.merge_arrays`` is no longer an inplace operation
-  * ``prediction.to_csv`` no longer take ``name`` as input
-  * ``prediction.summary`` no longer take ``name`` as input
-  * ``prediction.summary_df`` no longer take ``name`` as input
+  * No longer take ``name`` as input: ``prediction.to_csv``,
+    ``prediction.summary``, ``prediction.summary_df``
   * Remove ``model.hash``
+  * Examples can now be run after installation: nx.examples.run_all_examples()
+  * Redo compare_models example
   * Make more use of numerapi
   * Python package requests is no longer a dependency
+  * Rewrite ``testing.micro_prediction`` for better unit testing
   * More unit tests
 
 - v0.2.0

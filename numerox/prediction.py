@@ -282,6 +282,51 @@ class Prediction(object):
 
         return df
 
+    def compare(self, data, prediction):
+        "Compare performance of predictions with the same names"
+        cols = ['logloss1', 'logloss2', 'll_win1',
+                'corr', 'maxdiff', 'ystd1', 'ystd2']
+        comp = pd.DataFrame(columns=cols)
+        names = []
+        for name in self.names:
+            if name in prediction:
+                names.append(name)
+        if len(names) == 0:
+            return comp
+        ids = data.ids
+        df1 = self.loc[ids]
+        df2 = prediction.loc[ids]
+        p1 = self[names]
+        p2 = prediction[names]
+        m1 = p1.metrics_per_era(data, metrics=['logloss', 'auc', 'ystd'],
+                                era_as_str=False)
+        m2 = p2.metrics_per_era(data, metrics=['logloss', 'auc', 'ystd'],
+                                era_as_str=False)
+        for name in names:
+
+            m1i = m1[m1.name == name]
+            m2i = m2[m2.name == name]
+
+            if (m1i.index != m2i.index).any():
+                raise IndexError("Can only handle aligned eras")
+
+            logloss1 = m1i.logloss.mean()
+            logloss2 = m2i.logloss.mean()
+            ll_win1 = (m1i.logloss < m2i.logloss).mean()
+
+            y1 = df1[name].y.reshape(-1)
+            y2 = df2[name].y.reshape(-1)
+
+            corr = np.corrcoef(y1, y2)[0, 1]
+            maxdiff = np.abs(y1 - y2).max()
+            ystd1 = y1.std()
+            ystd2 = y2.std()
+
+            m = [logloss1, logloss2, ll_win1, corr, maxdiff, ystd1, ystd2]
+            comp.loc[name] = m
+
+        return comp
+
     def copy(self):
         "Copy of prediction"
         if self.df is None:
@@ -307,6 +352,11 @@ class Prediction(object):
             raise ValueError("Can only insert a single model at a time")
         prediction.df.columns = [name]
         self.df = self.merge(prediction).df
+
+    @property
+    def loc(self):
+        "indexing by row ids"
+        return Loc(self)
 
     def __add__(self, prediction):
         "Merge predictions"
@@ -356,3 +406,13 @@ def load_prediction(filename):
     "Load prediction object from hdf archive"
     df = pd.read_hdf(filename, key=HDF_PREDICTION_KEY)
     return Prediction(df)
+
+
+class Loc(object):
+    "Utility class for the loc method."
+
+    def __init__(self, prediction):
+        self.prediction = prediction
+
+    def __getitem__(self, index):
+        return Prediction(self.prediction.df.loc[index])
