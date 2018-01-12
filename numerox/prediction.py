@@ -284,7 +284,7 @@ class Prediction(object):
 
     def compare(self, data, prediction):
         "Compare performance of predictions with the same names"
-        cols = ['logloss1', 'logloss2', 'll_win1',
+        cols = ['logloss1', 'logloss2', 'win1',
                 'corr', 'maxdiff', 'ystd1', 'ystd2']
         comp = pd.DataFrame(columns=cols)
         names = []
@@ -312,7 +312,7 @@ class Prediction(object):
 
             logloss1 = m1i.logloss.mean()
             logloss2 = m2i.logloss.mean()
-            ll_win1 = (m1i.logloss < m2i.logloss).mean()
+            win1 = (m1i.logloss < m2i.logloss).mean()
 
             y1 = df1[name].y.reshape(-1)
             y2 = df2[name].y.reshape(-1)
@@ -322,7 +322,7 @@ class Prediction(object):
             ystd1 = y1.std()
             ystd2 = y2.std()
 
-            m = [logloss1, logloss2, ll_win1, corr, maxdiff, ystd1, ystd2]
+            m = [logloss1, logloss2, win1, corr, maxdiff, ystd1, ystd2]
             comp.loc[name] = m
 
         return comp
