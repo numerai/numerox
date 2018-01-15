@@ -3,6 +3,8 @@
 Release Notes
 =============
 
+- v0.3.1 (not yet released)
+
 - v0.3.0
 
   * Add ``upload`` to make submissions
