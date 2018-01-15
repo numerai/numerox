@@ -3,7 +3,7 @@
 Release Notes
 =============
 
-- v0.2.1 (not yet released)
+- v0.3.0
 
   * Add ``upload`` to make submissions
   * ``download`` is the new name for ``download_dataset``
