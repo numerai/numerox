@@ -44,6 +44,7 @@ def test_data_properties():
 
 def test_prediction_rename():
     "prediction.rename"
+
     p = testing.micro_prediction()
     rename_dict = {}
     names = []
@@ -55,6 +56,11 @@ def test_prediction_rename():
         rename_dict[key] = value
     p2 = p.rename(rename_dict)
     ok_(p2.names == names, 'prediction.rename failed')
+
+    p = testing.micro_prediction()
+    p = p['model1']
+    p2 = p.rename('modelX')
+    ok_(p2.names[0] == 'modelX', 'prediction.rename failed')
 
 
 def test_prediction_drop():

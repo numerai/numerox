@@ -29,9 +29,27 @@ class Prediction(object):
             return []
         return self.df.columns.tolist()
 
-    def rename(self, names_dict):
-        "Rename predictions using dict with old name as key, new as value"
-        df = self.df.rename(columns=names_dict, copy=True)
+    def rename(self, mapper):
+        """
+        Rename prediction name(s).
+
+        Parameters
+        ----------
+        mapper : {dict-like, str}
+            You can rename using a dictionary with old name as key, new as
+            value. Or, if the prediction contains a single name, then `mapper`
+            can be a string containing the new name.
+
+        Returns
+        -------
+        renamed : Prediction
+            A copy of the prediction with renames names.
+        """
+        if isinstance(mapper, base_string):
+            if self.shape[1] != 1:
+                raise ValueError("prediction must contain a single name")
+            mapper = {self.names[0]: mapper}
+        df = self.df.rename(columns=mapper, copy=True)
         return Prediction(df)
 
     def drop(self, name):
