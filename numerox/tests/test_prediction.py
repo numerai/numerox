@@ -31,6 +31,16 @@ def test_prediction_roundtrip():
         ade(p, p2, "prediction corrupted during roundtrip")
 
 
+def test_prediction_to_csv():
+    "make sure prediction.to_csv runs"
+    p = testing.micro_prediction()
+    with tempfile.NamedTemporaryFile() as temp:
+        p['model1'].to_csv(temp.name)
+        with testing.HiddenPrints():
+            p['model1'].to_csv(temp.name, verbose=True)
+    assert_raises(ValueError, p.to_csv, 'unused')
+
+
 def test_prediction_copies():
     "prediction properties should be copies"
     p = testing.micro_prediction()
@@ -70,6 +80,8 @@ def test_prediction_rename():
     ok_(p2.names == names, 'prediction.rename failed')
 
     p = testing.micro_prediction()
+    assert_raises(ValueError, p.rename, 'modelX')
+
     p = p['model1']
     p2 = p.rename('modelX')
     ok_(p2.names[0] == 'modelX', 'prediction.rename failed')
@@ -145,6 +157,12 @@ def test_prediction_performance():
     p = testing.micro_prediction()
     with testing.HiddenPrints():
         p.performance(d)
+        p.performance(d, sort_by='auc')
+        p.performance(d, sort_by='acc')
+        p.performance(d, sort_by='ystd')
+        p.performance(d, sort_by='sharpe')
+        p.performance(d, sort_by='consis')
+    assert_raises(ValueError, p.performance, d, 'unknown')
 
 
 def test_prediction_performance_df():
@@ -154,6 +172,7 @@ def test_prediction_performance_df():
     df, info = p.performance_df(d)
     ok_(isinstance(df, pd.DataFrame), 'expecting a dataframe')
     ok_(isinstance(info, dict), 'expecting a dictionary')
+    assert_raises(ValueError, p['model1'].dominance_df, d)
 
 
 def test_prediction_dominance():
@@ -241,6 +260,15 @@ def test_prediction_setitem():
     pd.testing.assert_frame_equal(p.df, pp.df)
 
     assert_raises(ValueError, p.__setitem__, 'model1', p1)
+
+
+def test_prediction_ynew():
+    "test prediction.ynew"
+    p = testing.micro_prediction()
+    y = p.y.copy()
+    y2 = np.random.rand(*y.shape)
+    p2 = p.ynew(y2)
+    np.testing.assert_array_equal(p2.y, y2, 'prediction.ynew failed')
 
 
 def test_prediction_repr():

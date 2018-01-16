@@ -5,7 +5,7 @@ Release Notes
 
 - v0.3.1 (not yet released)
 
-  * Unit test coverage 80%, up from 65%
+  * Unit test coverage 83%, up from 65%
   * Add ``testing.HiddenPrints``
   * Bug fix: checking for equality of empty Predictions crashes
   * More unit tests
