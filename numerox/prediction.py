@@ -72,8 +72,6 @@ class Prediction(object):
         if y_array.shape != self.shape:
             msg = "`y_array` must have the same shape as prediction"
             raise ValueError(msg)
-        if y_array.ndim != 2:
-            raise ValueError("`y_array` must be 2 dimensional")
         df = pd.DataFrame(data=y_array,
                           index=self.df.index.copy(deep=True),
                           columns=self.df.columns.copy())

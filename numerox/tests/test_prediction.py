@@ -260,6 +260,7 @@ def test_prediction_setitem():
     pd.testing.assert_frame_equal(p.df, pp.df)
 
     assert_raises(ValueError, p.__setitem__, 'model1', p1)
+    assert_raises(ValueError, p.__setitem__, 'model1', p)
 
 
 def test_prediction_ynew():
@@ -269,6 +270,20 @@ def test_prediction_ynew():
     y2 = np.random.rand(*y.shape)
     p2 = p.ynew(y2)
     np.testing.assert_array_equal(p2.y, y2, 'prediction.ynew failed')
+    assert_raises(ValueError, p.ynew, y2[:3])
+    assert_raises(ValueError, p.ynew, y2[:, :2])
+    assert_raises(ValueError, p.ynew, y2.reshape(-1))
+
+
+def test_prediction_iter():
+    "test prediction.iter"
+    p = testing.micro_prediction()
+    names = []
+    for pi in p.iter():
+        n = pi.names
+        ok_(len(n) == 1, 'should only yield a single name')
+        names.append(n[0])
+    ok_(p.names == names, 'prediction.iter failed')
 
 
 def test_prediction_repr():
