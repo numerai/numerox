@@ -154,6 +154,8 @@ def get_stakes(round_number=None):
     '''
     if round_number is None:
         round_number = 0
+    elif round_number < 61:
+        raise ValueError('First staking was in round 61')
     arguments = {'number': round_number}
     # ~92% of time spent on the following line
     stakes = napi.raw_query(query, arguments)

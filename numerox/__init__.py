@@ -40,6 +40,7 @@ from numerox.numerai import dataset_url
 from numerox import examples
 from numerox.data import concat_data
 from numerox.numerai import show_stakes
+from numerox.numerai import get_stakes
 from numerox.version import __version__
 
 try:
