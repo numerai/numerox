@@ -110,8 +110,25 @@ def test_prediction_loc():
     ade(p.loc[['index4', 'index0', 'index2']], mp([4, 0, 2]), msg)
 
 
+def test_prediction_summary():
+    "make sure prediction.summary runs"
+    d = testing.micro_data()
+    p = testing.micro_prediction()
+    with testing.HiddenPrints():
+        p['model1'].summary(d)
+    assert_raises(ValueError, p.summary, d)
+
+
+def test_prediction_summary_df():
+    "make sure prediction.summary_df runs"
+    d = testing.micro_data()
+    p = testing.micro_prediction()
+    df = p['model1'].summary_df(d)
+    ok_(isinstance(df, pd.DataFrame), 'expecting a dataframe')
+
+
 def test_prediction_performance():
-    "make sure prediction.performance_df runs"
+    "make sure prediction.performance runs"
     d = testing.micro_data()
     p = testing.micro_prediction()
     with testing.HiddenPrints():
@@ -120,19 +137,26 @@ def test_prediction_performance():
 
 def test_prediction_performance_df():
     "make sure prediction.performance_df runs"
-
     d = testing.micro_data()
-    d = d['train'] + d['validation']
+    p = testing.micro_prediction()
+    df, info = p.performance_df(d)
+    ok_(isinstance(df, pd.DataFrame), 'expecting a dataframe')
+    ok_(isinstance(info, dict), 'expecting a dictionary')
+
+
+def test_prediction_dominance():
+    "make sure prediction.dominance runs"
+
+    d = nx.play_data()
+    d = d['validation']
 
     p = nx.Prediction()
     p = p.merge_arrays(d.ids, d.y, 'model1')
     p = p.merge_arrays(d.ids, d.y, 'model2')
     p = p.merge_arrays(d.ids, d.y, 'model3')
 
-    df, info = p.performance_df(d)
-
-    ok_(isinstance(df, pd.DataFrame), 'expecting a dataframe')
-    ok_(isinstance(info, dict), 'expecting a dictionary')
+    with testing.HiddenPrints():
+        p.dominance(d)
 
 
 def test_prediction_dominance_df():
@@ -155,6 +179,29 @@ def test_prediction_originality():
     "make sure prediction.originality runs"
     p = testing.micro_prediction()
     df = p.originality(['model1'])
+    ok_(isinstance(df, pd.DataFrame), 'expecting a dataframe')
+
+
+def test_prediction_correlation():
+    "make sure prediction.correlation runs"
+    p = testing.micro_prediction()
+    with testing.HiddenPrints():
+        p.correlation()
+
+
+def test_prediction_concordance():
+    "make sure prediction.concordance runs"
+    d = testing.play_data()
+    p = nx.production(nx.logistic(), d, 'model1', verbosity=0)
+    df = p.concordance(d)
+    ok_(isinstance(df, pd.DataFrame), 'expecting a dataframe')
+
+
+def test_prediction_compare():
+    "make sure prediction.compare runs"
+    d = testing.micro_data()
+    p = testing.micro_prediction()
+    df = p.compare(d, p)
     ok_(isinstance(df, pd.DataFrame), 'expecting a dataframe')
 
 
