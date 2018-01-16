@@ -5,7 +5,7 @@ Let's run multiple models, fitting to the training data and predicting the
 validation data. Then we'll compare the performance of the models. The code
 for this example is `here`_.
 
-First perform the cross validation::
+First run the models::
 
     >>> prediction = nx.production(nx.logistic(), data, verbosity=1)
     >>> prediction += nx.production(nx.extratrees(), data, verbosity=1)
@@ -102,10 +102,7 @@ originality::
     mlpc          False   True     False
     logisticPCA   False  False     False
 
-Typically you would use ``prediction.originality`` with tournament predictions.
-Here the predictions are on the training data.
-
-Concordance::
+A concordance if less than 0.12 is needed to pass Numerai's test::
 
     >>> print(prediction.concordance(data))
                  concordance
