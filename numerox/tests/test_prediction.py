@@ -10,6 +10,18 @@ from numerox import testing
 from numerox.testing import assert_data_equal as ade
 
 
+def test_empty_prediction():
+    "Test handling of empty predictions"
+    p = nx.Prediction()
+    ok_(p.names == [], "wrong name")
+    assert_raises(ValueError, p.save, 'not_used')
+    ok_(p.copy() == p, 'empty copy')
+    ok_(p.size == 0, 'empty size')
+    ok_(p.shape == (0, 0), 'empty shape')
+    ok_(len(p) == 0, 'empty length')
+    p.__repr__()
+
+
 def test_prediction_roundtrip():
     "save/load roundtrip shouldn't change prediction"
     p = testing.micro_prediction()

@@ -390,6 +390,8 @@ class Prediction(object):
 
     def __eq__(self, prediction):
         "Check if prediction objects are equal or not; order matters"
+        if self.df is None and prediction.df is None:
+            return True
         return self.df.equals(prediction.df)
 
     @property
