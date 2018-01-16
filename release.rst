@@ -5,7 +5,7 @@ Release Notes
 
 - v0.3.1 (not yet released)
 
-  * Unit test coverage 65%, up from 65%
+  * Unit test coverage 76%, up from 65%
   * Add ``testing.HiddenPrints``
   * More unit tests
 
