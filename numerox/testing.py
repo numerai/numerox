@@ -1,4 +1,5 @@
 import os
+import sys
 
 import pandas as pd
 import numpy as np
@@ -107,3 +108,14 @@ def update_play_data(data=None, fraction=0.01):
         data = nx.numerai.download_data_object()
     play = data.subsample(fraction=fraction, balance=True, seed=0)
     play.save(TEST_DATA)
+
+
+# taken from https://stackoverflow.com/a/45669280
+class HiddenPrints(object):
+
+    def __enter__(self):
+        self._original_stdout = sys.stdout
+        sys.stdout = open(os.devnull, 'w')
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        sys.stdout = self._original_stdout

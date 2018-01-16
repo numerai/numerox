@@ -110,6 +110,14 @@ def test_prediction_loc():
     ade(p.loc[['index4', 'index0', 'index2']], mp([4, 0, 2]), msg)
 
 
+def test_prediction_performance():
+    "make sure prediction.performance_df runs"
+    d = testing.micro_data()
+    p = testing.micro_prediction()
+    with testing.HiddenPrints():
+        p.performance(d)
+
+
 def test_prediction_performance_df():
     "make sure prediction.performance_df runs"
 

@@ -9,6 +9,7 @@ help:
 	@echo "flake8  -->  Check for pep8 errors"
 	@echo "sdist   -->  Make source distribution"
 	@echo "pypi    -->  Upload to pypi"
+	@echo "coverage-->  html unit test coverage report"
 	@echo "clean   -->  Remove all the build files for a fresh start"
 
 test:
@@ -24,6 +25,11 @@ sdist: clean
 pypi: clean
 	${PYTHON} setup.py sdist upload -r pypi
 	git status
+
+coverage:
+	rm -rf cover
+	nosetests --with-coverage --cover-html --cover-package=numerox .
+	firefox cover/index.html
 
 clean:
 	rm -f MANIFEST
