@@ -2,5 +2,6 @@ include readme.rst
 include release.rst
 include LICENSE
 include numerox/tests/test_data.hdf
+include numerox/tests/tiny_dataset_csv.zip
 recursive-include numerox *.rst
 recursive-include licenses *
