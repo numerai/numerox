@@ -5,7 +5,7 @@ Release Notes
 
 - v0.3.1 (not yet released)
 
-  * Unit test coverage 87%, up from 65%
+  * Unit test coverage 88%, up from 65%
   * Add ``testing.HiddenPrints``
   * Bug fix: checking for equality of empty Predictions crashes
   * ``get_stakes`` informative error message when round_number < 61

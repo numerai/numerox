@@ -1,3 +1,4 @@
+import os
 import tempfile
 
 import numpy as np
@@ -7,8 +8,12 @@ from nose.tools import ok_
 from nose.tools import assert_raises
 
 import numerox as nx
+from numerox import testing
 from numerox.testing import shares_memory, micro_data
 from numerox.testing import assert_data_equal as ade
+
+TINY_DATASET_CSV = os.path.join(os.path.dirname(__file__),
+                                'tiny_dataset_csv.zip')
 
 
 def test_data_roundtrip():
@@ -136,16 +141,6 @@ def test_data_hash():
     ok_(d2.hash() == d2.hash(), "data.hash not reproduceable")
 
 
-def test_concat_data():
-    "test concat_data"
-    d = nx.testing.micro_data()
-    d1 = nx.testing.micro_data(slice(0, 5))
-    d2 = nx.testing.micro_data(slice(5, None))
-    d12 = nx.concat_data([d1, d2])
-    ade(d12, d, "concat_data corrupted adta")
-    assert_raises(IndexError, nx.concat_data, [d, d])
-
-
 def test_empty_data():
     "test empty data"
     d = micro_data()
@@ -205,3 +200,30 @@ def test_data_repr():
     "make sure data__repr__() runs"
     d = micro_data()
     d.__repr__()
+
+
+# ---------------------------------------------------------------------------
+# data functions
+
+def test_concat_data():
+    "test concat_data"
+    d = nx.testing.micro_data()
+    d1 = nx.testing.micro_data(slice(0, 5))
+    d2 = nx.testing.micro_data(slice(5, None))
+    d12 = nx.concat_data([d1, d2])
+    ade(d12, d, "concat_data corrupted adta")
+    assert_raises(IndexError, nx.concat_data, [d, d])
+
+
+def test_load_zip():
+    "test nx.load_zip"
+    for i in (0, 1):
+        if i == 0:
+            d = nx.load_zip(TINY_DATASET_CSV)
+        else:
+            with testing.HiddenPrints():
+                d = nx.load_zip(TINY_DATASET_CSV, verbose=True)
+        ok_(len(d) == 11, "wrong number of rows")
+        ok_(d.shape == (11, 53), 'data has wrong shape')
+        ok_(d.x.shape == (11, 50), 'x has wrong shape')
+        ok_(d.df.iloc[2, 3] == 0.34143, 'wrong feature value')
