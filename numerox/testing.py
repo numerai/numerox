@@ -111,6 +111,7 @@ def update_play_data(data=None, fraction=0.01):
 
 
 # taken from https://stackoverflow.com/a/45669280
+# modified for use in numerox
 class HiddenPrints(object):
 
     def __enter__(self):
@@ -118,4 +119,5 @@ class HiddenPrints(object):
         sys.stdout = open(os.devnull, 'w')
 
     def __exit__(self, exc_type, exc_val, exc_tb):
+        sys.stdout.close()
         sys.stdout = self._original_stdout
