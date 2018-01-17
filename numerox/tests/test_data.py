@@ -118,12 +118,32 @@ def test_data_balance():
     d.balance().balance()
 
 
+def test_data_subsample():
+    "test data.subsample"
+    d = nx.play_data()
+    d2 = d.subsample(0.5, balance=True)
+    for era, idx in d2.era_iter():
+        m = d2.y[idx].mean()
+        if np.isfinite(m):
+            ok_(d2.y[idx].mean() == 0.5, 'data is not balanced')
+
+
 def test_data_hash():
     "test data.hash"
     d = nx.play_data()
     ok_(d.hash() == d.hash(), "data.hash not reproduceable")
     d2 = nx.Data(d.df[::2])
     ok_(d2.hash() == d2.hash(), "data.hash not reproduceable")
+
+
+def test_concat_data():
+    "test concat_data"
+    d = nx.testing.micro_data()
+    d1 = nx.testing.micro_data(slice(0, 5))
+    d2 = nx.testing.micro_data(slice(5, None))
+    d12 = nx.concat_data([d1, d2])
+    ade(d12, d, "concat_data corrupted adta")
+    assert_raises(IndexError, nx.concat_data, [d, d])
 
 
 def test_empty_data():
