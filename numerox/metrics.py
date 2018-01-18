@@ -4,7 +4,6 @@ import numpy as np
 from sklearn.cluster import MiniBatchKMeans
 from sklearn.metrics import log_loss, roc_auc_score, accuracy_score
 
-import numerox as nx
 from numerox.data import ERA_INT_TO_STR
 from numerox.data import REGION_INT_TO_STR
 
@@ -59,9 +58,6 @@ def metrics_per_era(data, prediction, join='data',
 def metrics_per_name(data, prediction, join='data',
                      columns=['logloss', 'auc', 'acc', 'ystd'],
                      era_as_str=True, region_as_str=True):
-
-    if not isinstance(prediction, nx.Prediction):
-        raise TypeError("`prediction` must be a nx.Prediction object")
 
     # calc metrics per era
     skip = ['sharpe', 'consis']

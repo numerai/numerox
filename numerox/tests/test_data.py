@@ -57,6 +57,10 @@ def test_data_indexing():
     ade(d[d.y == 0], micro_data([0, 2, 4, 6, 8]), msg)
     ade(d[d.era == 'era4'], micro_data([6]), msg)
 
+    assert_raises(IndexError, d.__getitem__, 'era')
+    assert_raises(IndexError, d.__getitem__, 'wtf')
+    assert_raises(IndexError, d.__getitem__, None)
+
 
 def test_data_loc():
     "test data.loc"
