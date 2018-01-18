@@ -79,8 +79,11 @@ def status_block(upload_id, public_id, secret_key, verbose=True):
     The scope of your token must must include read_submission_info.
     """
     t0 = time.time()
+    if verbose:
+        print("metric                  value   minutes")
     seen = []
-    fmt = "{:>10.6f}  {:<.4f}  {:<}"
+    fmt_f = "{:<19} {:>9.4f}   {:<.4f}"
+    fmt_b = "{:<19} {:>9}   {:<.4f}"
     while True:
         status = upload_status(upload_id, public_id, secret_key)
         t = time.time()
@@ -89,12 +92,29 @@ def status_block(upload_id, public_id, secret_key, verbose=True):
                 seen.append(key)
                 minutes = (t - t0) / 60
                 if verbose:
-                    print(fmt.format(value, minutes, key))
+                    if key in ('originality', 'concordance'):
+                        print(fmt_b.format(key,  str(value), minutes))
+                    else:
+                        print(fmt_f.format(key,  value, minutes))
         if len(status) == len(seen):
             break
         seconds = min(5 + int((t - t0) / 100.0), 30)
         time.sleep(seconds)
+    if verbose:
+        t = time.time()
+        minutes = (t - t0) / 60
+        iscc = is_controlling_capital(status)
+        print(fmt_b.format('controlling capital', str(iscc), minutes))
     return status
+
+
+def is_controlling_capital(status):
+    "Did you get controlling capital? Pending status returns False."
+    if None in status.values():
+        return False
+    iscc = status['consistency'] >= 75 and status['originality']
+    iscc = iscc and status['concordance']
+    return iscc
 
 
 # ---------------------------------------------------------------------------

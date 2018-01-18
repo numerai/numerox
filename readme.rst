@@ -48,11 +48,13 @@ for the tournament data::
 Let's upload our predictions to enter the tournament::
 
     >>> prediction.to_csv('logistic.csv')  # 6 decimal places by default
-    >>> nx.upload('logistic.csv', public_id, secret_key)
-      1.000000  0.0908  concordance
-     75.000000  0.0908  consistency
-      0.692501  0.1776  validation_logloss
-      1.000000  0.2646  originality
+    >>> upload_id, status = nx.upload('logistic.csv', public_id, secret_key)
+    metric                  value   minutes
+    concordance              True   0.0898
+    consistency           91.6667   0.0898
+    originality             False   0.1783
+    validation_logloss     0.6928   0.1783
+    controlling capital     False   0.1783
 
 Examples
 ========
