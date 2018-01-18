@@ -196,6 +196,47 @@ def test_data_properties():
         ok_((x[:, i] == d.df[name]).all(), "%s is corrupted" % name)
 
 
+def test_data_era_isnotin():
+    "test data.era_isnotin"
+    d = micro_data()
+    eras = ['era3', 'eraX']
+    d0 = d.era_isnotin(eras)
+    d1 = d.era_isin(eras)
+    d01 = nx.concat_data([d0, d1])
+    d01 = d01.loc[d.ids]
+    ade(d01, d, "all rows not selected")
+
+
+def test_data_era_iter():
+    "test data.era_iter"
+    d = micro_data()
+    for as_str in (True, False):
+        era2 = []
+        for era, idx in d.era_iter(as_str=as_str):
+            era2.append(era)
+            n = np.unique(d[idx].era).size
+            ok_(n == 1, "expecting a single era")
+        era = d.unique_era(as_str=as_str).tolist()
+        era.sort()
+        era2.sort()
+        ok_(era2 == era, "era difference found")
+
+
+def test_data_region_iter():
+    "test data.region_iter"
+    d = micro_data()
+    for as_str in (True, False):
+        region2 = []
+        for region, idx in d.region_iter(as_str=as_str):
+            region2.append(region)
+            n = np.unique(d[idx].region).size
+            ok_(n == 1, "expecting a single region")
+        region = d.unique_region(as_str=as_str).tolist()
+        region.sort()
+        region2.sort()
+        ok_(region2 == region, "region difference found")
+
+
 def test_data_repr():
     "make sure data__repr__() runs"
     d = micro_data()
