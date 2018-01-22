@@ -3,6 +3,8 @@
 Release Notes
 =============
 
+- v0.3.2 (not yet released)
+
 - v0.3.1
 
   * Unit test coverage 89%, up from 65%
