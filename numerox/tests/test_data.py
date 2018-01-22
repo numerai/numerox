@@ -163,6 +163,15 @@ def test_empty_data():
     ok_(len(d2) == 0, "empty data should have length 0")
 
 
+def test_data_methods():
+    "test data methods"
+    d = micro_data()
+    ok_(len(d) == 10, "wrong length")
+    ok_(d.size == 60, "wrong size")
+    ok_(d.shape == (10, 6), "wrong shape")
+    ok_(d == d, "not equal")
+
+
 def test_data_copies():
     "data properties should be copies or views"
 

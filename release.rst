@@ -9,6 +9,7 @@ Release Notes
   * Add more columns to ``prediction.originality``
   * Add optional choice of columns in ``prediction.performance_df``
   * Column name changed to 'concord' in ``concordance`` function
+  * More unit tests
 
 - v0.3.1
 
