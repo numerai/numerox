@@ -16,6 +16,11 @@ else:
 
 HDF_PREDICTION_KEY = 'numerox_prediction'
 
+ORIGINALITY_CORR_LTE = 0.95
+ORIGINALITY_KS_GT = 0.03
+CONSISTENCY_GTE = 0.75
+CONCORDANCE_LT = 0.12
+
 
 class Prediction(object):
 
@@ -205,8 +210,10 @@ class Prediction(object):
         with pd.option_context('display.colheader_justify', 'left'):
             print(df.to_string(index=True))
 
-    def performance_df(self, data, era_as_str=True, region_as_str=True):
-        cols = ['logloss', 'auc', 'acc', 'ystd', 'sharpe', 'consis']
+    def performance_df(self, data, era_as_str=True, region_as_str=True,
+                       cols=['logloss', 'auc', 'acc', 'ystd', 'sharpe',
+                             'consis']):
+
         metrics, info = metrics_per_name(data,
                                          self,
                                          columns=cols,
@@ -282,19 +289,55 @@ class Prediction(object):
         names = [m for m in names if m not in submitted_names]
 
         # originality
-        df = pd.DataFrame(index=names, columns=['corr', 'ks', 'original'])
+        columns = ['corr', 'corrTF', 'ks', 'ksTF', 'original']
+        df = pd.DataFrame(index=names, columns=columns)
         for name in names:
-            corr = True
-            ks = True
+            corr = -np.inf
+            ks = np.inf
+            corrTF = True
+            ksTF = True
             y = self.df[name].values
             for i in range(ys.shape[1]):
-                if corr and pearsonr(y, ys[:, i]) > 0.95:
-                    corr = False
-                if ks and ks_2samp(y, ys[:, i]) <= 0.03:
-                    ks = False
+                c = np.abs(pearsonr(y, ys[:, i]))
+                if c > corr:
+                    corr = c
+                if corrTF and c > ORIGINALITY_CORR_LTE:
+                    corrTF = False
+                k = ks_2samp(y, ys[:, i])
+                if k < ks:
+                    ks = k
+                if ksTF and k <= ORIGINALITY_KS_GT:
+                    ksTF = False
             df.loc[name, 'corr'] = corr
             df.loc[name, 'ks'] = ks
-            df.loc[name, 'original'] = corr and ks
+            df.loc[name, 'corrTF'] = corrTF
+            df.loc[name, 'ksTF'] = ksTF
+            df.loc[name, 'original'] = corrTF and ksTF
+
+        return df
+
+    def check(self, submitted_names, data):
+        "Run all Numerai checks against the already submitted names list"
+
+        # concordance only defined for tournament predictions
+        ids = data['tournament'].ids
+        pred = self.loc[ids]
+
+        # run reports
+        df1 = pred.originality(submitted_names)[['corr', 'ks']]
+        df2 = pred.concordance(data)
+        df3, info = pred.performance_df(data['validation'], cols=['consis'])
+
+        # concatenate reports
+        df = pd.concat([df1, df2, df3], axis=1)
+        df = df.drop(submitted_names)
+
+        # add True/False columns (i.e. Pass/Fail)
+        df['corrTF'] = df['corr'] <= ORIGINALITY_CORR_LTE
+        df['ksTF'] = df['ks'] > ORIGINALITY_KS_GT
+        df['concordTF'] = df['concord'] < CONCORDANCE_LT
+        df['consisTF'] = df['consis'] >= CONSISTENCY_GTE
+        df['pass'] = df.all(axis=1)
 
         return df
 

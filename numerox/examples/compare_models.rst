@@ -105,7 +105,7 @@ originality::
 A concordance if less than 0.12 is needed to pass Numerai's test::
 
     >>> print(prediction.concordance(data))
-                 concordance
+                     concord
     randomforest    0.029362
     extratrees     0.0341881
     logisticPCA    0.0358237

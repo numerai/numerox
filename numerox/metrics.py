@@ -144,7 +144,7 @@ def calc_metrics_arrays(y, yhat, columns):
 def concordance(data, prediction):
     "Concordance; less than 0.12 is passing; data should be the full dataset."
 
-    concords = pd.DataFrame(columns=['concordance'], index=prediction.names)
+    concords = pd.DataFrame(columns=['concord'], index=prediction.names)
 
     # fit clusters
     kmeans = MiniBatchKMeans(n_clusters=5, random_state=1337)
@@ -174,7 +174,7 @@ def concordance(data, prediction):
         concord = np.mean(ks)
         concords.loc[name] = concord
 
-    concords = concords.sort_values('concordance')
+    concords = concords.sort_values('concord')
 
     return concords
 

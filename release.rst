@@ -5,6 +5,11 @@ Release Notes
 
 - v0.3.2 (not yet released)
 
+  * Add ``prediction.check``
+  * Add more columns to ``prediction.originality``
+  * Add optional choice of columns in ``prediction.performance_df``
+  * Column name changed to 'concord' in ``concordance`` function
+
 - v0.3.1
 
   * Unit test coverage 89%, up from 65%
