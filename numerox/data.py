@@ -283,7 +283,8 @@ class Data(object):
                 ix = rs.choice(ix, size=n1-n0, replace=False)
                 remove.append(ix)
             else:
-                raise RuntimeError("balance should not reach this line")
+                msg = "balance should not reach this line"  # pragma: no cover
+                raise RuntimeError(msg)  # pragma: no cover
             idx = ~idx
             era = era[idx]
             y = y[idx]

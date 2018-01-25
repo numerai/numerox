@@ -30,7 +30,7 @@ class Splitter(object):
 
     # py3 compat
     def __next__(self):
-        return self.next()
+        return self.next()  # pragma: no cover
 
     def __repr__(self):
         msg = ""
@@ -120,7 +120,7 @@ class CVSplitter(Splitter):
         if sys.version_info[0] == 2:
             fit_index, predict_index = self.cv.next()
         else:
-            fit_index, predict_index = self.cv.__next__()
+            fit_index, predict_index = self.cv.__next__()  # pragma: no cover
         era_fit = [self.eras[i] for i in fit_index]
         era_predict = [self.eras[i] for i in predict_index]
         dfit = data.era_isin(era_fit)
@@ -152,7 +152,7 @@ class IgnoreEraCVSplitter(Splitter):
         if sys.version_info[0] == 2:
             fit_index, pre_index = self.cv.next()
         else:
-            fit_index, pre_index = self.cv.__next__()
+            fit_index, pre_index = self.cv.__next__()  # pragma: no cover
         dfit = nx.Data(data.df.take(fit_index))
         dpre = nx.Data(data.df.take(pre_index))
         return dfit, dpre
@@ -197,7 +197,7 @@ class RollSplitter(Splitter):
                 era_pre.append(self.eras[i])
                 n_ifs += 1
             if n_ifs > 1:
-                raise RuntimeError("You found a RollSplitter bug!")
+                raise RuntimeError("RollSplitter bug!")  # pragma: no cover
         dfit = data.era_isin(era_fit)
         dpre = data.era_isin(era_pre)
         return dfit, dpre

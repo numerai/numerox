@@ -22,11 +22,25 @@ def test_empty_prediction():
     p.__repr__()
 
 
+def test_prediction_methods():
+    "test prediction methods"
+    p = nx.testing.micro_prediction()
+    ok_(len(p) == 10, "wrong length")
+    ok_(p.size == 30, "wrong size")
+    ok_(p.shape == (10, 3), "wrong shape")
+    ok_(p == p, "not equal")
+
+
 def test_prediction_roundtrip():
     "save/load roundtrip shouldn't change prediction"
     p = testing.micro_prediction()
     with tempfile.NamedTemporaryFile() as temp:
+
         p.save(temp.name)
+        p2 = nx.load_prediction(temp.name)
+        ade(p, p2, "prediction corrupted during roundtrip")
+
+        p.save(temp.name, compress=False)
         p2 = nx.load_prediction(temp.name)
         ade(p, p2, "prediction corrupted during roundtrip")
 

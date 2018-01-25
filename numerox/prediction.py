@@ -12,7 +12,7 @@ from numerox.metrics import concordance
 if sys.version_info[0] == 2:
     base_string = basestring
 else:
-    base_string = str
+    base_string = str  # pragma: no cover
 
 HDF_PREDICTION_KEY = 'numerox_prediction'
 
