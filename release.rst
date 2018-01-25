@@ -5,10 +5,13 @@ Release Notes
 
 - v0.3.2 (not yet released)
 
+  * Add ``merge_predictions``
   * Add ``prediction.check``
   * Add more columns to ``prediction.originality``
   * Add optional choice of columns in ``prediction.performance_df``
   * Column name changed to 'concord' in ``concordance`` function
+  * Bugfix: prediction.__repr__ sometimes showed wrong fraction of missing y
+  * Bugfix: merging predictions with same name but different ids may fail
   * More unit tests
 
 - v0.3.1

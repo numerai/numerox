@@ -299,3 +299,39 @@ def test_prediction_repr():
     "make sure prediction.__repr__() runs"
     p = testing.micro_prediction()
     p.__repr__()
+
+
+def test_merge_predictions():
+    "test merge_predictions"
+
+    p = testing.micro_prediction()
+    assert_raises(ValueError, nx.merge_predictions, [p, p])
+
+    p2 = nx.merge_predictions([p, nx.Prediction()])
+    ade(p2, p, 'corruption of merge predictions')
+
+    p1 = testing.micro_prediction([0, 1, 2, 3, 4])
+    p2 = testing.micro_prediction([5, 6, 7, 8, 9])
+    p12 = nx.merge_predictions([p1, p2])
+    ade(p12, p, 'corruption of merge predictions')
+
+    p1 = testing.micro_prediction([0, 1, 2, 3])
+    p2 = testing.micro_prediction([4, 5, 6])
+    p3 = testing.micro_prediction([7, 8, 9])
+    p123 = nx.merge_predictions([p1, p2, p3])
+    ade(p123, p, 'corruption of merge predictions')
+
+    p1 = testing.micro_prediction([9, 4, 3, 2])
+    p2 = testing.micro_prediction([1, 8, 7])
+    p3 = testing.micro_prediction([6, 5, 0])
+    p123 = nx.merge_predictions([p1, p2, p3])
+    ade(p123, p, 'corruption of merge predictions')
+
+    p1 = testing.micro_prediction([0, 1, 2, 3, 4])
+    p11 = p1[['model0', 'model1']]
+    p12 = p1['model2']
+    p2 = testing.micro_prediction([5, 6, 7, 8, 9])
+    p21 = p2['model0']
+    p22 = p2[['model1', 'model2']]
+    p12 = nx.merge_predictions([p11, p21, p22, p12])
+    ade(p12, p, 'corruption of merge predictions')

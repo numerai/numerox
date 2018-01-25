@@ -95,28 +95,7 @@ class Prediction(object):
 
     def merge(self, prediction):
         "Merge prediction"
-        if prediction.df.shape[1] != 1:
-            raise NotImplementedError("TODO: handle more than one model")
-        name = prediction.names[0]
-        if self.df is None:
-            # empty prediction
-            df = prediction.df
-        elif name not in self:
-            # inserting predictions from a model not already in report
-            df = pd.merge(self.df, prediction.df, how='outer',
-                          left_index=True, right_index=True)
-        else:
-            # add more ys from a model whose name already exists
-            y = self.df[name]
-            y = y.dropna()
-            s = prediction.df.iloc[:, 0]
-            s = s.dropna()
-            s = pd.concat([s, y], join='outer', ignore_index=False,
-                          verify_integrity=True)
-            df = s.to_frame(name)
-            df = pd.merge(self.df, df, how='outer', on=name,
-                          left_index=True, right_index=True)
-        return Prediction(df)
+        return merge_predictions([self, prediction])
 
     def save(self, path_or_buf, compress=True):
         "Save prediction as an hdf archive; raises if nothing to save"
@@ -458,7 +437,7 @@ class Prediction(object):
         if shape[1] == 0:
             frac_miss = 0.0
         else:
-            frac_miss = self.df.isna().mean()[0]
+            frac_miss = self.df.isna().mean().mean()
         fmt = 'Prediction({} rows x {} names; {:.4f} missing)'
         return fmt.format(shape[0], shape[1], frac_miss)
 
@@ -477,3 +456,45 @@ class Loc(object):
 
     def __getitem__(self, index):
         return Prediction(self.prediction.df.loc[index])
+
+
+def merge_predictions(prediction_list):
+    """
+    Merge a list of predictions.
+
+    Raises ValueError on overlapping predictions (same model name and same
+    row id).
+    """
+    p = prediction_list[0].copy()
+    for i in range(1, len(prediction_list)):
+        pi = prediction_list[i]
+        for name in pi.names:
+            p = _merge_predictions(p, pi[name])
+    return p
+
+
+def _merge_predictions(prediction1, prediction2):
+    "Merge a possibly multi-name prediction1 with a single-name prediction2"
+    if prediction2.shape[1] != 1:
+        raise ValueError("`prediction2` must contain a signle name")
+    name = prediction2.names[0]
+    if prediction1.df is None:
+        # empty prediction
+        df = prediction2.df
+    elif name not in prediction1:
+        # inserting predictions from a model not already in report
+        df = pd.merge(prediction1.df, prediction2.df, how='outer',
+                      left_index=True, right_index=True)
+    else:
+        # add more ys from a model whose name already exists
+        y = prediction1.df[name]
+        y = y.dropna()
+        s = prediction2.df.iloc[:, 0]
+        s = s.dropna()
+        s = pd.concat([s, y], join='outer', ignore_index=False,
+                      verify_integrity=True)
+        dfnew = s.to_frame(name)
+        df = pd.merge(prediction1.df, dfnew, how='outer', on=name,
+                      left_index=True, right_index=True)
+        df[name] = dfnew
+    return Prediction(df)
