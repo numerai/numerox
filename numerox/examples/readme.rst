@@ -19,10 +19,17 @@ Run model
 Running your model involves passing data to it and collecting its predictions,
 tasks that numerox automates.
 
-- `Compare model`_ performances
 - Your `first tournament`_
 - `Backtest`_ example
 - The `run and splitter`_ functions
+
+Performance
+-----------
+
+Is your model any good?
+
+- `Compare model`_ performances
+- Compare performance of a `single change` across several models
 
 Miscellaneous
 --------------
@@ -45,10 +52,12 @@ You can run all the examples [1]_::
 .. _model: https://github.com/kwgoodman/numerox/blob/master/numerox/model.py
 .. _prediction: https://github.com/kwgoodman/numerox/blob/master/numerox/examples/prediction.rst
 
-.. _compare model: https://github.com/kwgoodman/numerox/blob/master/numerox/examples/compare_models.rst
 .. _first tournament: https://github.com/kwgoodman/numerox/blob/master/numerox/examples/first_tournament.py
 .. _backtest: https://github.com/kwgoodman/numerox/blob/master/numerox/examples/backtest_example.py
 .. _run and splitter: https://github.com/kwgoodman/numerox/blob/master/numerox/examples/run.rst
+
+.. _compare model: https://github.com/kwgoodman/numerox/blob/master/numerox/examples/compare_models.rst
+.. _signle change: https://github.com/kwgoodman/numerox/blob/master/numerox/examples/compare_change.py
 
 .. _Transform features: https://github.com/kwgoodman/numerox/blob/master/numerox/examples/transform.rst
 .. _concordance: https://github.com/kwgoodman/numerox/blob/master/numerox/examples/concordance_example.py

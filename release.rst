@@ -10,6 +10,7 @@ Release Notes
   * Add more columns to ``prediction.originality``
   * Add optional choice of columns in ``prediction.performance_df``
   * Column name changed to 'concord' in ``concordance`` function
+  * Add example comparing performance of a single change across models
   * Add ``data.y_to_nan``
   * Bugfix: prediction.__repr__ sometimes showed wrong fraction of missing y
   * Bugfix: merging predictions with same name but different ids may fail

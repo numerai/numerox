@@ -20,6 +20,10 @@ def run_all_examples(data=None):
     print_source(compare_models)
     compare_models(data)
 
+    compare_change = nx.examples.compare_change
+    print_source(compare_change)
+    compare_change(data)
+
     cv_warning = nx.examples.cv_warning
     print_source(cv_warning)
     cv_warning(data['train'], nsamples=2)
