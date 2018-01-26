@@ -29,7 +29,7 @@ Performance
 Is your model any good?
 
 - `Compare model`_ performances
-- Compare performance of a `single change` across several models
+- Compare performance of a `single change`_ across several models
 
 Miscellaneous
 --------------
@@ -57,7 +57,7 @@ You can run all the examples [1]_::
 .. _run and splitter: https://github.com/kwgoodman/numerox/blob/master/numerox/examples/run.rst
 
 .. _compare model: https://github.com/kwgoodman/numerox/blob/master/numerox/examples/compare_models.rst
-.. _signle change: https://github.com/kwgoodman/numerox/blob/master/numerox/examples/compare_change.py
+.. _single change: https://github.com/kwgoodman/numerox/blob/master/numerox/examples/compare_change.py
 
 .. _Transform features: https://github.com/kwgoodman/numerox/blob/master/numerox/examples/transform.rst
 .. _concordance: https://github.com/kwgoodman/numerox/blob/master/numerox/examples/concordance_example.py
