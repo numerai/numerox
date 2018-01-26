@@ -139,7 +139,7 @@ def test_data_subsample():
 
 def test_data_hash():
     "test data.hash"
-    d = nx.play_data()
+    d = micro_data()
     ok_(d.hash() == d.hash(), "data.hash not reproduceable")
     d2 = nx.Data(d.df[::2])
     ok_(d2.hash() == d2.hash(), "data.hash not reproduceable")
@@ -161,6 +161,12 @@ def test_empty_data():
     ok_(d0.y.size == 0, "empty data should have d.y.size == 0")
     d2 = d['era0'] + d[idx]
     ok_(len(d2) == 0, "empty data should have length 0")
+
+
+def test_data_y_to_nan():
+    "test data_y_to_nan"
+    d = micro_data()
+    ok_(not np.isfinite(d.y_to_nan().y).any(), "not all y's are nan")
 
 
 def test_data_methods():

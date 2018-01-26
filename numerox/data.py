@@ -198,6 +198,12 @@ class Data(object):
         "View of y as a 1d numpy float array"
         return self.df['y'].values
 
+    def y_to_nan(self):
+        "Copy of data with y values set to NaN"
+        data = self.copy()
+        data.df = data.df.assign(y=np.nan)
+        return data
+
     # transforms ----------------------------------------------------------
 
     def pca(self, nfactor=None, data_fit=None):
