@@ -5,6 +5,8 @@ Release Notes
 
 - v0.4.1 (not yet released)
 
+  * ``prediction.save`` now has an append mode
+
 - v0.4.0
 
   * Numerox requires NumerAPI 0.8.1

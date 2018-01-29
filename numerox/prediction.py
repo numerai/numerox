@@ -3,6 +3,7 @@ import sys
 import pandas as pd
 import numpy as np
 
+import numerox as nx
 from numerox.metrics import metrics_per_era
 from numerox.metrics import metrics_per_name
 from numerox.metrics import pearsonr
@@ -97,10 +98,36 @@ class Prediction(object):
         "Merge prediction"
         return merge_predictions([self, prediction])
 
-    def save(self, path_or_buf, compress=True):
-        "Save prediction as an hdf archive; raises if nothing to save"
+    def save(self, path_or_buf, compress=True, mode='w'):
+        """
+        Save prediction as an hdf archive.
+
+        Raises a ValueError if the prediction is empty.
+
+        Parameters
+        ----------
+        path_or_buf : {str, HDFStore}
+            Full path filename (string) or HDFStore object.
+        compress : bool, optional
+            Whether or not to compress the archive. The default (True) is to
+            compress.
+        mode : str, optional
+            The save mode. By default ('w') the archive is overwritten if it
+            exists and created if not. With mode 'a' the prediction is
+            appended to the archive (the archive must already exist and it
+            must contain a prediction object).
+
+        Returns
+        -------
+        None
+        """
         if self.df is None:
             raise ValueError("Prediction object is empty; nothing to save")
+        if mode not in ('w', 'a'):
+            raise ValueError("`mode` must be 'w' or 'a'")
+        if mode == 'a':
+            p = nx.load_prediction(path_or_buf)
+            self = p.merge(self)
         if compress:
             self.df.to_hdf(path_or_buf, HDF_PREDICTION_KEY,
                            complib='zlib', complevel=4)

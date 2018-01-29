@@ -45,6 +45,18 @@ def test_prediction_roundtrip():
         ade(p, p2, "prediction corrupted during roundtrip")
 
 
+def test_prediction_save():
+    "test prediction.save with mode='a'"
+    p = testing.micro_prediction()
+    p1 = p['model0']
+    p2 = p[['model1', 'model2']]
+    with tempfile.NamedTemporaryFile() as temp:
+        p1.save(temp.name)
+        p2.save(temp.name, mode='a')
+        p12 = nx.load_prediction(temp.name)
+        ade(p, p12, "prediction corrupted during roundtrip")
+
+
 def test_prediction_to_csv():
     "make sure prediction.to_csv runs"
     p = testing.micro_prediction()
