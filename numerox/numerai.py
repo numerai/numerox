@@ -4,7 +4,7 @@ import tempfile
 import datetime
 
 import pandas as pd
-from numerapi.numerapi import NumerAPI
+from numerapi import NumerAPI
 from numerapi.utils import download_file
 
 import numerox as nx
@@ -17,17 +17,10 @@ def download(filename, verbose=False):
     "Download the current Numerai dataset; overwrites if file exists"
     if verbose:
         print("Download dataset {}".format(filename))
-    url = dataset_url()
+    napi = NumerAPI()
+    url = napi.get_dataset_url()
     filename = os.path.expanduser(filename)  # expand ~/tmp to /home/...
     download_file(url, filename)
-
-
-def dataset_url():
-    "URL of current Numerai dataset"
-    napi = NumerAPI()
-    query = "query {dataset}"
-    url = napi.raw_query(query)['data']['dataset']
-    return url
 
 
 def download_data_object(verbose=False):

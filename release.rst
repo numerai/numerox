@@ -3,8 +3,9 @@
 Release Notes
 =============
 
-- v0.3.2 (not yet released)
+- v0.4.0 (not yet released)
 
+  * Numerox requires NumerAPI 0.8.1
   * Add ``merge_predictions``
   * Add ``prediction.check``
   * Add more columns to ``prediction.originality``
