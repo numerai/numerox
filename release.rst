@@ -3,7 +3,9 @@
 Release Notes
 =============
 
-- v0.4.0 (not yet released)
+- v0.4.1 (not yet released)
+
+- v0.4.0
 
   * Numerox requires NumerAPI 0.8.1
   * Add ``merge_predictions``
