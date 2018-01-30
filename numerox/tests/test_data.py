@@ -3,6 +3,7 @@ import tempfile
 
 import numpy as np
 from numpy.testing import assert_array_equal
+import pandas as pd
 
 from nose.tools import ok_
 from nose.tools import assert_raises
@@ -287,3 +288,10 @@ def test_load_zip():
         ok_(d.shape == (11, 53), 'data has wrong shape')
         ok_(d.x.shape == (11, 50), 'x has wrong shape')
         ok_(d.df.iloc[2, 3] == 0.34143, 'wrong feature value')
+
+
+def test_compare_data():
+    "test compare_data"
+    d = nx.testing.micro_data()
+    df = nx.compare_data(d, d)
+    ok_(isinstance(df, pd.DataFrame), 'expecting a dataframe')

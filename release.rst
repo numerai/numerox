@@ -5,6 +5,7 @@ Release Notes
 
 - v0.4.1 (not yet released)
 
+  * Add ``compare_data``
   * ``prediction.save`` now has an append mode
   * Add ``show_stakes`` example
 

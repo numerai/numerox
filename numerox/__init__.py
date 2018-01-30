@@ -38,6 +38,7 @@ from numerox.numerai import upload
 # misc
 from numerox import examples
 from numerox.data import concat_data
+from numerox.data import compare_data
 from numerox.numerai import show_stakes
 from numerox.numerai import get_stakes
 from numerox.numerai import is_controlling_capital

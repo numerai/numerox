@@ -3,6 +3,7 @@ import zipfile
 import numpy as np
 import pandas as pd
 from sklearn.decomposition import PCA
+from sklearn.neighbors import NearestNeighbors
 
 TRAIN_FILE = 'numerai_training_data.csv'
 TOURNAMENT_FILE = 'numerai_tournament_data.csv'
@@ -500,6 +501,42 @@ def concat_data(datas):
         # object, the id overlaps that it prints can be very long so
         raise IndexError("Overlap in ids found")
     return Data(df)
+
+
+def compare_data(data1, data2, regions=None, n_jobs=1):
+    """
+    Compare two data objects, e.g., when the they are from different datasets.
+
+    The features, x, from the first dataset `data1` is used to fit a KNN tree.
+    The nearest neighbor (k=1) of each row of features in `data2` is then
+    found using the tree.
+
+    `y accuracy` is the fraction of rows for which the target y in `data2`
+    matches the target of its nearest neighbor in `data1`.
+
+    `x distance` is the mean distance between the row of features in `data2`
+    and its nearest neighbor row in `data1`.
+    """
+    if regions is None:
+        regions = ('train', 'validation', 'test', 'live')
+    df = pd.DataFrame(columns=regions)
+    nn = NearestNeighbors(n_neighbors=1,  n_jobs=n_jobs)
+    for region in regions:
+        d1 = data1[data1.region == region]
+        d2 = data2[data2.region == region]
+        nn.fit(d1.x)
+        dist, idx = nn.kneighbors(d2.x, n_neighbors=1, return_distance=True)
+        idx = idx.reshape(-1)
+        y1 = d1.y[idx]
+        y2 = d2.y
+        if np.isnan(y1).any() or np.isnan(y2).any():
+            y_acc = np.nan
+        else:
+            y_acc = (y1 == y2).mean()
+        x_dist = dist.mean()
+        df.loc['x distance', region] = x_dist
+        df.loc['y accuracy', region] = y_acc
+    return df
 
 
 class Loc(object):
