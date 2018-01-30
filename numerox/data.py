@@ -505,7 +505,7 @@ def concat_data(datas):
 
 def compare_data(data1, data2, regions=None, n_jobs=1):
     """
-    Compare two data objects, e.g., when the they are from different datasets.
+    Compare two data objects, e.g., when they are from different datasets.
 
     The features, x, from the first dataset `data1` is used to fit a KNN tree.
     The nearest neighbor (k=1) of each row of features in `data2` is then
