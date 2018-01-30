@@ -6,6 +6,7 @@ Release Notes
 - v0.4.1 (not yet released)
 
   * ``prediction.save`` now has an append mode
+  * Add ``show_stakes`` example
 
 - v0.4.0
 
