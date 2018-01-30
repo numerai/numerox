@@ -63,4 +63,4 @@ You can run all the examples [1]_::
 .. _Transform features: https://github.com/kwgoodman/numerox/blob/master/numerox/examples/transform.rst
 .. _concordance: https://github.com/kwgoodman/numerox/blob/master/numerox/examples/concordance_example.py
 .. _cv warning: https://github.com/kwgoodman/numerox/blob/master/numerox/examples/cv_warning.rst
-.. _stake information: https://github.com/kwgoodman/numerox/blob/master/numerox/examples/show_status.rst
+.. _stake information: https://github.com/kwgoodman/numerox/blob/master/numerox/examples/show_stakes.rst
