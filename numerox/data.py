@@ -517,6 +517,8 @@ def compare_data(data1, data2, regions=None, n_jobs=1):
     `y accuracy` is the fraction of rows for which the target y in `data2`
     matches the target of its nearest neighbor in `data1`.
 
+    `era accuracy` is similar to `y accuracy` but for era instead of y.
+
     `d1-d2 rows` is the number of rows in `data1` minus the number of rows in
     `data2`.
     """
@@ -537,8 +539,10 @@ def compare_data(data1, data2, regions=None, n_jobs=1):
         else:
             y_acc = (y1 == y2).mean()
         x_dist = dist.mean()
+        era_acc = (d1.era_float[idx] == d2.era_float).mean()
         df.loc['x distance', region] = x_dist
         df.loc['y accuracy', region] = y_acc
+        df.loc['era accuracy', region] = era_acc
         df.loc['d1-d2 rows', region] = len(d1) - len(d2)
     return df
 
