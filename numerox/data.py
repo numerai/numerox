@@ -511,11 +511,14 @@ def compare_data(data1, data2, regions=None, n_jobs=1):
     The nearest neighbor (k=1) of each row of features in `data2` is then
     found using the tree.
 
+    `x distance` is the mean distance between the row of features in `data2`
+    and its nearest neighbor row in `data1`.
+
     `y accuracy` is the fraction of rows for which the target y in `data2`
     matches the target of its nearest neighbor in `data1`.
 
-    `x distance` is the mean distance between the row of features in `data2`
-    and its nearest neighbor row in `data1`.
+    `d1-d2 rows` is the number of rows in `data1` minus the number of rows in
+    `data2`.
     """
     if regions is None:
         regions = ('train', 'validation', 'test', 'live')
@@ -536,6 +539,7 @@ def compare_data(data1, data2, regions=None, n_jobs=1):
         x_dist = dist.mean()
         df.loc['x distance', region] = x_dist
         df.loc['y accuracy', region] = y_acc
+        df.loc['d1-d2 rows', region] = len(d1) - len(d2)
     return df
 
 
