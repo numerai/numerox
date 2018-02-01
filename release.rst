@@ -14,6 +14,7 @@ Release Notes
   * Remove ``prediction.performance_df``
   * Remove ``prediction.dominance_df``
   * Remove ``prediction.summary_df``
+  * More prediction methods can now handle empty predictions
 
 - v0.4.0
 
