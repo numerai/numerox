@@ -10,6 +10,8 @@ Release Notes
   * Add ``show_stakes`` example
   * ``prediction.performance`` now returns a dataframe
   * Remove ``prediction.performance_df``
+  * ``prediction.dominance`` now returns a dataframe
+  * Remove ``prediction.dominance_df``
 
 - v0.4.0
 

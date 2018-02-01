@@ -201,25 +201,10 @@ def test_prediction_dominance():
     p = p.merge_arrays(d.ids, d.y, 'model2')
     p = p.merge_arrays(d.ids, d.y, 'model3')
 
-    with testing.HiddenPrints():
-        p.dominance(d)
-
-
-def test_prediction_dominance_df():
-    "make sure prediction.dominance_df runs"
-
-    d = nx.play_data()
-    d = d['validation']
-
-    p = nx.Prediction()
-    p = p.merge_arrays(d.ids, d.y, 'model1')
-    p = p.merge_arrays(d.ids, d.y, 'model2')
-    p = p.merge_arrays(d.ids, d.y, 'model3')
-
-    df = p.dominance_df(d)
+    df = p.dominance(d)
 
     ok_(isinstance(df, pd.DataFrame), 'expecting a dataframe')
-    assert_raises(ValueError, p['model1'].dominance_df, d)
+    assert_raises(ValueError, p['model1'].dominance, d)
 
 
 def test_prediction_originality():

@@ -24,11 +24,12 @@ def compare_models(data):
 
     # dominance of models
     print('\nModel dominance:\n')
-    prediction.dominance(data['validation'], sort_by='logloss')
+    print(prediction.dominance(data['validation'], sort_by='logloss'))
 
     # dominace between two models
     print('\nModel dominance between two models:\n')
-    prediction[['logistic', 'logisticPCA']].dominance(data['validation'])
+    df = prediction[['logistic', 'logisticPCA']].dominance(data['validation'])
+    print(df)
 
     # originality given that logistic model has already been submitted
     print('\nModel originality (versus logistic):\n')

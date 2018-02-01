@@ -219,14 +219,6 @@ class Prediction(object):
 
     def dominance(self, data, sort_by='logloss'):
         "Mean (across eras) of fraction of models bested per era"
-        df = self.dominance_df(data)
-        df = df.sort_values([sort_by], ascending=[False])
-        df = df.round(decimals=4)
-        with pd.option_context('display.colheader_justify', 'left'):
-            print(df.to_string(index=True))
-
-    def dominance_df(self, data):
-        "Mean (across eras) of fraction of models bested per era"
         columns = ['logloss', 'auc', 'acc']
         mpe, regions = metrics_per_era(data, self, columns=columns)
         dfs = []
@@ -247,6 +239,7 @@ class Prediction(object):
             df = pd.DataFrame(data=m, index=names, columns=[col])
             dfs.append(df)
         df = pd.concat(dfs, axis=1)
+        df = df.sort_values([sort_by], ascending=[False])
         return df
 
     def concordance(self, data):
