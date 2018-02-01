@@ -51,6 +51,8 @@ class Prediction(object):
         renamed : Prediction
             A copy of the prediction with renames names.
         """
+        if self.df is None:
+            raise ValueError("Cannot rename an empty prediction")
         if isinstance(mapper, base_string):
             if self.shape[1] != 1:
                 raise ValueError("prediction must contain a single name")
@@ -60,21 +62,29 @@ class Prediction(object):
 
     def drop(self, name):
         "Drop name (str) or names (e.g. a list of names) from prediction"
+        if self.df is None:
+            raise ValueError("Cannot drop a name from an empty prediction")
         df = self.df.drop(columns=name)
         return Prediction(df)
 
     @property
     def ids(self):
         "View of ids as a numpy str array"
+        if self.df is None:
+            return np.array([], dtype=str)
         return self.df.index.values
 
     @property
     def y(self):
         "View of y as a 2d numpy float array"
+        if self.df is None:
+            raise ValueError("prediction is empty")
         return self.df.values
 
     def ynew(self, y_array):
         "Copy of prediction but with prediction.y=`y_array`"
+        if self.df is None:
+            raise ValueError("prediction is empty")
         if y_array.shape != self.shape:
             msg = "`y_array` must have the same shape as prediction"
             raise ValueError(msg)
