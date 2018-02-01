@@ -164,16 +164,7 @@ def test_prediction_summary():
     "make sure prediction.summary runs"
     d = testing.micro_data()
     p = testing.micro_prediction()
-    with testing.HiddenPrints():
-        p['model1'].summary(d)
-    assert_raises(ValueError, p.summary, d)
-
-
-def test_prediction_summary_df():
-    "make sure prediction.summary_df runs"
-    d = testing.micro_data()
-    p = testing.micro_prediction()
-    df = p['model1'].summary_df(d)
+    df = p['model1'].summary(d)
     ok_(isinstance(df, pd.DataFrame), 'expecting a dataframe')
 
 

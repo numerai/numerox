@@ -6,12 +6,14 @@ Release Notes
 - v0.4.1 (not yet released)
 
   * Add ``compare_data``
-  * ``prediction.save`` now has an append mode
   * Add ``show_stakes`` example
+  * ``prediction.save`` now has an append mode
   * ``prediction.performance`` now returns a dataframe
-  * Remove ``prediction.performance_df``
   * ``prediction.dominance`` now returns a dataframe
+  * ``prediction.summary`` now returns a dataframe
+  * Remove ``prediction.performance_df``
   * Remove ``prediction.dominance_df``
+  * Remove ``prediction.summary_df``
 
 - v0.4.0
 

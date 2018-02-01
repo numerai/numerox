@@ -146,12 +146,7 @@ class Prediction(object):
             print("Save {}".format(path_or_buf))
 
     def summary(self, data):
-        df = self.summary_df(data)
-        df = df.round(decimals={'logloss': 6, 'auc': 4, 'acc': 4, 'ystd': 4})
-        with pd.option_context('display.colheader_justify', 'left'):
-            print(df.to_string(index=True))
-
-    def summary_df(self, data):
+        "Performance summary of prediction object that contains a single name"
 
         if self.shape[1] != 1:
             raise ValueError("prediction must contain a single name")
