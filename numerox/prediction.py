@@ -191,41 +191,31 @@ class Prediction(object):
         metrics = metrics.drop(['era'], axis=1)
         return metrics
 
-    def performance(self, data, sort_by='logloss'):
-        df, info = self.performance_df(data)
-        if sort_by == 'logloss':
-            df = df.sort_values(by='logloss', ascending=True)
-        elif sort_by == 'auc':
-            df = df.sort_values(by='auc', ascending=False)
-        elif sort_by == 'acc':
-            df = df.sort_values(by='acc', ascending=False)
-        elif sort_by == 'ystd':
-            df = df.sort_values(by='ystd', ascending=False)
-        elif sort_by == 'sharpe':
-            df = df.sort_values(by='sharpe', ascending=False)
-        elif sort_by == 'consis':
-            df = df.sort_values(by=['consis', 'logloss'],
-                                ascending=[False, True])
-        else:
-            raise ValueError("`sort_by` name not recognized")
-        df = df.round(decimals={'logloss': 6, 'auc': 4, 'acc': 4, 'ystd': 4,
-                                'sharpe': 4, 'consis': 4})
-        info_str = ', '.join(info['region']) + '; '
-        info_str += '{} eras'.format(len(info['era']))
-        print(info_str)
-        with pd.option_context('display.colheader_justify', 'left'):
-            print(df.to_string(index=True))
-
-    def performance_df(self, data, era_as_str=True, region_as_str=True,
-                       cols=['logloss', 'auc', 'acc', 'ystd', 'sharpe',
-                             'consis']):
-
-        metrics, info = metrics_per_name(data,
-                                         self,
-                                         columns=cols,
-                                         era_as_str=era_as_str,
-                                         region_as_str=region_as_str)
-        return metrics, info
+    def performance(self, data, era_as_str=True, region_as_str=True,
+                    cols=['logloss', 'auc', 'acc', 'ystd', 'sharpe',
+                          'consis'], sort_by='logloss'):
+        df, info = metrics_per_name(data,
+                                    self,
+                                    columns=cols,
+                                    era_as_str=era_as_str,
+                                    region_as_str=region_as_str)
+        if sort_by in cols:
+            if sort_by == 'logloss':
+                df = df.sort_values(by='logloss', ascending=True)
+            elif sort_by == 'auc':
+                df = df.sort_values(by='auc', ascending=False)
+            elif sort_by == 'acc':
+                df = df.sort_values(by='acc', ascending=False)
+            elif sort_by == 'ystd':
+                df = df.sort_values(by='ystd', ascending=False)
+            elif sort_by == 'sharpe':
+                df = df.sort_values(by='sharpe', ascending=False)
+            elif sort_by == 'consis':
+                df = df.sort_values(by=['consis', 'logloss'],
+                                    ascending=[False, True])
+            else:
+                raise ValueError("`sort_by` name not recognized")
+        return df
 
     def dominance(self, data, sort_by='logloss'):
         "Mean (across eras) of fraction of models bested per era"
@@ -332,7 +322,7 @@ class Prediction(object):
         # run reports
         df1 = pred.originality(submitted_names)[['corr', 'ks']]
         df2 = pred.concordance(data)
-        df3, info = pred.performance_df(data['validation'], cols=['consis'])
+        df3 = pred.performance(data['validation'], cols=['consis'])
 
         # concatenate reports
         df = pd.concat([df1, df2, df3], axis=1)

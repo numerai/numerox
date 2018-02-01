@@ -181,24 +181,13 @@ def test_prediction_performance():
     "make sure prediction.performance runs"
     d = testing.micro_data()
     p = testing.micro_prediction()
-    with testing.HiddenPrints():
-        p.performance(d)
-        p.performance(d, sort_by='auc')
-        p.performance(d, sort_by='acc')
-        p.performance(d, sort_by='ystd')
-        p.performance(d, sort_by='sharpe')
-        p.performance(d, sort_by='consis')
-    assert_raises(ValueError, p.performance, d, 'unknown')
-
-
-def test_prediction_performance_df():
-    "make sure prediction.performance_df runs"
-    d = testing.micro_data()
-    p = testing.micro_prediction()
-    df, info = p.performance_df(d)
+    df = p.performance(d)
     ok_(isinstance(df, pd.DataFrame), 'expecting a dataframe')
-    ok_(isinstance(info, dict), 'expecting a dictionary')
-    assert_raises(ValueError, p['model1'].dominance_df, d)
+    p.performance(d, sort_by='auc')
+    p.performance(d, sort_by='acc')
+    p.performance(d, sort_by='ystd')
+    p.performance(d, sort_by='sharpe')
+    p.performance(d, sort_by='consis')
 
 
 def test_prediction_dominance():
@@ -230,6 +219,7 @@ def test_prediction_dominance_df():
     df = p.dominance_df(d)
 
     ok_(isinstance(df, pd.DataFrame), 'expecting a dataframe')
+    assert_raises(ValueError, p['model1'].dominance_df, d)
 
 
 def test_prediction_originality():
@@ -240,7 +230,7 @@ def test_prediction_originality():
 
 
 def test_prediction_check():
-    "make sure prediction.originality runs"
+    "make sure prediction.check runs"
     d = nx.play_data()
     p = nx.production(nx.logistic(), d, verbosity=0)
     p += nx.production(nx.logisticPCA(), d, verbosity=0)

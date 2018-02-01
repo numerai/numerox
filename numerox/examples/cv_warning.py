@@ -15,13 +15,13 @@ def cv_warning(data, nsamples=100):
         # cv across eras
         cve = nx.CVSplitter(data, seed=i)
         prediction = nx.run(model, cve, verbosity=0)
-        df, info = prediction.performance_df(data)
+        df = prediction.performance(data)
         results_cve = results_cve.append(df, ignore_index=True)
 
         # cv ignoring eras but y balanced
         cv = nx.IgnoreEraCVSplitter(data, seed=i)
         prediction = nx.run(model, cv, verbosity=0)
-        df, info = prediction.performance_df(data)
+        df = prediction.performance(data)
         results_cv = results_cv.append(df, ignore_index=True)
 
         # display results

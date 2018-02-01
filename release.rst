@@ -8,6 +8,8 @@ Release Notes
   * Add ``compare_data``
   * ``prediction.save`` now has an append mode
   * Add ``show_stakes`` example
+  * ``prediction.performance`` now returns a dataframe
+  * Remove ``prediction.performance_df``
 
 - v0.4.0
 

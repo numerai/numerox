@@ -20,7 +20,7 @@ def compare_models(data):
 
     # compare performance of models
     print('\nPerformance comparison:\n')
-    prediction.performance(data['validation'], sort_by='logloss')
+    print(prediction.performance(data['validation'], sort_by='logloss'))
 
     # dominance of models
     print('\nModel dominance:\n')
