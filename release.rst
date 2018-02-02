@@ -3,7 +3,7 @@
 Release Notes
 =============
 
-- v0.4.1 (not yet released)
+- v0.5.0 (not yet released)
 
   * Add ``compare_data``
   * Add ``show_stakes`` example
