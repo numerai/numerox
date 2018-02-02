@@ -1,4 +1,4 @@
-Staking infortation
+Staking information
 ===================
 
 Numerox provides information about the staking tournament::
