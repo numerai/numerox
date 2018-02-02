@@ -202,14 +202,14 @@ class Prediction(object):
         return metrics
 
     def performance(self, data, era_as_str=True, region_as_str=True,
-                    cols=['logloss', 'auc', 'acc', 'ystd', 'sharpe',
-                          'consis'], sort_by='logloss'):
+                    columns=['logloss', 'auc', 'acc', 'ystd', 'sharpe',
+                             'consis'], sort_by='logloss'):
         df, info = metrics_per_name(data,
                                     self,
-                                    columns=cols,
+                                    columns=columns,
                                     era_as_str=era_as_str,
                                     region_as_str=region_as_str)
-        if sort_by in cols:
+        if sort_by in columns:
             if sort_by == 'logloss':
                 df = df.sort_values(by='logloss', ascending=True)
             elif sort_by == 'auc':
@@ -325,7 +325,7 @@ class Prediction(object):
         # run reports
         df1 = pred.originality(submitted_names)[['corr', 'ks']]
         df2 = pred.concordance(data)
-        df3 = pred.performance(data['validation'], cols=['consis'])
+        df3 = pred.performance(data['validation'], columns=['consis'])
 
         # concatenate reports
         df = pd.concat([df1, df2, df3], axis=1)
