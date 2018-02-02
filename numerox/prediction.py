@@ -155,7 +155,7 @@ class Prediction(object):
         if verbose:
             print("Save {}".format(path_or_buf))
 
-    def summary(self, data):
+    def summary(self, data, round_output=True):
         "Performance summary of prediction object that contains a single name"
 
         if self.shape[1] != 1:
@@ -184,6 +184,11 @@ class Prediction(object):
         df = pd.DataFrame(data=data,
                           index=['mean', 'std', 'min', 'max'],
                           columns=columns)
+
+        # make output (optionally) pretty
+        if round_output:
+            round_dict = {'logloss': 6, 'auc': 4, 'acc': 4, 'ystd': 4}
+            df = df.round(decimals=round_dict)
 
         return df
 
