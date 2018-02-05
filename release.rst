@@ -3,6 +3,8 @@
 Release Notes
 =============
 
+- v0.6.0 (not yet released)
+
 - v0.5.0
 
   * Add ``compare_data``
