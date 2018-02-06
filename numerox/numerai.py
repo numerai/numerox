@@ -221,7 +221,7 @@ def get_stakes(round_number=None):
 def ten99(user, year=2017):
     if year == 2017:
         r0 = 31
-        r1 = 88
+        r1 = 84
     else:
         raise ValueError("{} not yet implemented".format(year))
     df = download_earnings(r0, r1)
@@ -303,3 +303,39 @@ def raw_earnings_to_df(raw_earnings, round_number):
     columns = ['round', 'user', 'usd_main', 'usd_stake', 'nmr_main']
     df = pd.DataFrame(data=earnings, columns=columns)
     return df
+
+
+def nmr_price():
+    "Price of NMR in USD versus round number as a dataframe."
+    price = []
+    for n in range(31, 58):
+        price.append([n, 0.0])
+    price.append([58, 53.07])
+    price.append([59, 39.03])
+    price.append([60, 20.73])
+    price.append([61, 28.23])
+    price.append([62, 26.97])
+    price.append([63, 26.23])
+    price.append([64, 29.24])
+    price.append([65, 33.62])
+    price.append([66, 36.49])
+    price.append([67, 35.84])
+    price.append([68, 22.38])
+    price.append([69, 17.12])
+    price.append([70, 13.17])
+    price.append([71, 15.15])
+    price.append([72, 14.11])
+    price.append([73, 12.36])
+    price.append([74, 14.47])
+    price.append([75, 12.60])
+    price.append([76, 10.44])
+    price.append([77, 10.60])
+    price.append([78, 11.44])
+    price.append([79, 11.73])
+    price.append([81, 25.78])
+    price.append([82, 23.77])
+    price.append([83, 27.53])
+    price.append([84, 28.77])
+    price = pd.DataFrame(data=price, columns=['round', 'nmr_usd'])
+    price = price.set_index('round')
+    return price
