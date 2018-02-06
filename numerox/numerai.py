@@ -3,6 +3,7 @@ import time
 import tempfile
 import datetime
 
+import numpy as np
 import pandas as pd
 from numerapi import NumerAPI
 from numerapi.utils import download_file
@@ -148,7 +149,7 @@ def get_stakes(round_number=None):
     cumsum is dollars ABOVE you.
     """
 
-    # get raw stakes; eventually use numerapi for this block
+    # get raw stakes
     napi = NumerAPI()
     query = '''
         query stakes($number: Int!){
@@ -212,3 +213,79 @@ def get_stakes(round_number=None):
     stakes.insert(3, 'cumsum', cumsum)
 
     return stakes, c_zero_users
+
+
+# ---------------------------------------------------------------------------
+# leaderboard
+
+def get_leaderboard(round_start=None, round_end=None):
+    napi = NumerAPI(verbosity='warn')
+    if round_start is None and round_end is None:
+        r0 = napi.get_current_round()
+        r1 = r0
+    elif round_start is None:
+        r0 = napi.get_current_round()
+        r1 = round_end
+    elif round_end is None:
+        r0 = round_start
+        r1 = napi.get_current_round()
+    else:
+        r0 = round_start
+        r1 = round_end
+    for num in range(r0, r1 + 1):
+        lbi = napi.get_leaderboard(round_num=num)
+        dfi = raw_leaderboard_to_df(lbi, num)
+        if num == r0:
+            df = dfi
+        else:
+            df = pd.concat([df, dfi])
+    return df
+
+
+def raw_leaderboard_to_df(raw_leaderboard, round_number):
+    leaderboard = []
+    for x in raw_leaderboard:
+
+        # ignore non controlling capital
+        if x['consistency'] < 75:
+            continue
+        if x['originality'] is None:
+            continue
+        if x['originality']['pending'] or not x['originality']['value']:
+            continue
+        if x['concordance'] is None:
+            continue
+        if x['concordance']['pending'] or not x['concordance']['value']:
+            continue
+
+        user = {}
+        user['round'] = round_number
+        user['name'] = x['username']
+        user['validation'] = x['validationLogloss']
+        user['consistency'] = x['consistency']
+        if x['liveLogloss'] is None:
+            user['live'] = np.nan
+        else:
+            user['live'] = x['liveLogloss']
+
+        if x['paymentGeneral'] is not None:
+            user['usd_main'] = x['paymentGeneral']['usdAmount']
+            user['nmr_main'] = x['paymentGeneral']['nmrAmount']
+        else:
+            user['usd_main'] = 0
+            user['nmr_main'] = 0
+        if x['paymentStaking'] is not None:
+            user['usd_stake'] = x['paymentStaking']['usdAmount']
+            user['nmr_stake'] = x['paymentStaking']['nmrAmount']
+        else:
+            user['usd_stake'] = 0
+            user['nmr_stake'] = 0
+
+        leaderboard.append(user)
+
+    leaderboard = pd.DataFrame(leaderboard)
+    columns = ['round', 'name', 'consistency', 'validation', 'live',
+               'usd_main', 'nmr_main', 'usd_stake', 'nmr_stake']
+    leaderboard = leaderboard[columns]
+
+    return leaderboard
