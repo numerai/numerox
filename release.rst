@@ -5,6 +5,9 @@ Release Notes
 
 - v0.6.0 (not yet released)
 
+  * Add ``ten99``
+  * Add ``download_earnings``
+
 - v0.5.0
 
   * Add ``compare_data``

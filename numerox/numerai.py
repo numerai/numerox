@@ -314,7 +314,7 @@ def raw_earnings_to_df(raw_earnings, round_number):
 
 
 def nmr_price():
-    "Price of NMR in USD versus round number as a dataframe."
+    "Price of NMR in USD versus round number as a dataframe. 2017 only."
     price = []
     for n in range(31, 58):
         price.append([n, 0.0])

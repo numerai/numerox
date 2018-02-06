@@ -35,6 +35,7 @@ from numerox.run import run
 from numerox.numerai import download
 from numerox.numerai import upload
 from numerox.numerai import ten99
+from numerox.numerai import download_earnings
 
 # misc
 from numerox import examples
