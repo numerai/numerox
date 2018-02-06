@@ -219,6 +219,7 @@ def get_stakes(round_number=None):
 
 
 def ten99(user, year=2017):
+    "Generate unoffical 1099-MISC report"
     if year == 2017:
         r0 = 31
         r1 = 84
