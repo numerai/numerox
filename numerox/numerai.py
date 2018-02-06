@@ -228,6 +228,14 @@ def ten99(user, year=2017):
     df = df[df.user == user]
     df = df.drop('user', axis=1)
     df = df.set_index('round')
+    nmrprice = nmr_price()
+    price = []
+    for n in df.index:
+        price.append(nmrprice.loc[n][0])
+    df['nmr_usd'] = price
+    total = df['usd_main'].values + df['usd_stake'].values
+    total = total + df['nmr_main'].values * df['nmr_usd'].values
+    df['total'] = total
     return df
 
 
@@ -294,11 +302,11 @@ def raw_earnings_to_df(raw_earnings, round_number):
             continue
         x = [round_number, user['username'], 0.0, 0.0, 0.0]
         if main is not None:
-            x[2] = main['usdAmount']
+            x[2] = float(main['usdAmount'])
             if 'nmrAmount' in main:
-                x[3] = main['nmrAmount']
+                x[4] = float(main['nmrAmount'])
         if stake is not None:
-            x[4] = stake['usdAmount']
+            x[3] = float(stake['usdAmount'])
         earnings.append(x)
     columns = ['round', 'user', 'usd_main', 'usd_stake', 'nmr_main']
     df = pd.DataFrame(data=earnings, columns=columns)
@@ -332,6 +340,7 @@ def nmr_price():
     price.append([77, 10.60])
     price.append([78, 11.44])
     price.append([79, 11.73])
+    price.append([80, 15.27])
     price.append([81, 25.78])
     price.append([82, 23.77])
     price.append([83, 27.53])
