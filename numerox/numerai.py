@@ -225,8 +225,82 @@ def ten99(user, year):
         r1 = 88
     else:
         raise ValueError("{} not yet implemented".format(year))
-    df = get_leaderboard(r0, r1)
+    df = download_earnings(r0, r1)
     df = df[df.name == user][['round', 'usd_main', 'nmr_main', 'usd_stake']]
+    return df
+
+
+def download_earnings(round_start=None, round_end=None):
+    "Download earnings for specified round range."
+    napi = NumerAPI(verbosity='warn')
+    if round_start is None and round_end is None:
+        r0 = napi.get_current_round()
+        r1 = r0
+    elif round_start is None:
+        r0 = napi.get_current_round()
+        r1 = round_end
+    elif round_end is None:
+        r0 = round_start
+        r1 = napi.get_current_round()
+    else:
+        r0 = round_start
+        r1 = round_end
+    for num in range(r0, r1 + 1):
+        e = download_raw_earnings(round_number=num)
+        e = raw_earnings_to_df(e, num)
+        if num == r0:
+            df = e
+        else:
+            df = pd.concat([df, e])
+    return df
+
+
+def download_raw_earnings(round_number=None):
+    "Download earnings for given tournament number"
+    query = '''
+        query($number: Int!) {
+          rounds(number: $number) {
+            leaderboard {
+              username
+              paymentGeneral {
+                nmrAmount
+                usdAmount
+              }
+              paymentStaking {
+                nmrAmount
+                usdAmount
+              }
+              }
+            }
+          }
+    '''
+    napi = NumerAPI(verbosity='warn')
+    if round_number is None:
+        round_number = napi.get_current_round()
+    arguments = {'number': round_number}
+    earnings = napi.raw_query(query, arguments)
+    earnings = earnings['data']['rounds'][0]['leaderboard']
+    return earnings
+
+
+def raw_earnings_to_df(raw_earnings, round_number):
+    "Keep non-zero earnings and convert to dataframe"
+    earnings = []
+    for user in raw_earnings:
+        main = user['paymentGeneral']
+        stake = user['paymentStaking']
+        if main is None and stake is None:
+            continue
+        x = [round_number, user['username'], 0.0, 0.0, 0.0]
+        if main is not None:
+            x[2] = main['usdAmount']
+            if 'nmrAmount' in main:
+                x[3] = main['nmrAmount']
+        if stake is not None:
+            x[4] = stake['usdAmount']
+        earnings.append(x)
+    columns = ['round', 'user', 'usd_main', 'nmr_main', 'usd_stake']
+    df = pd.DataFrame(data=earnings, columns=columns)
     return df
 
 
