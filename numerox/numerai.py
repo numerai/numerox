@@ -218,7 +218,20 @@ def get_stakes(round_number=None):
 # ---------------------------------------------------------------------------
 # leaderboard
 
+
+def ten99(user, year):
+    if year == 2017:
+        r0 = 31
+        r1 = 88
+    else:
+        raise ValueError("{} not yet implemented".format(year))
+    df = get_leaderboard(r0, r1)
+    df = df[df.name == user][['round', 'usd_main', 'nmr_main', 'usd_stake']]
+    return df
+
+
 def get_leaderboard(round_start=None, round_end=None):
+    "Download leaderboards for specified rounds."
     napi = NumerAPI(verbosity='warn')
     if round_start is None and round_end is None:
         r0 = napi.get_current_round()
@@ -243,6 +256,7 @@ def get_leaderboard(round_start=None, round_end=None):
 
 
 def raw_leaderboard_to_df(raw_leaderboard, round_number):
+    "Convert raw leaderboard (list of dicts) to a dataframe."
     leaderboard = []
     for x in raw_leaderboard:
 
@@ -276,10 +290,8 @@ def raw_leaderboard_to_df(raw_leaderboard, round_number):
             user['nmr_main'] = 0
         if x['paymentStaking'] is not None:
             user['usd_stake'] = x['paymentStaking']['usdAmount']
-            user['nmr_stake'] = x['paymentStaking']['nmrAmount']
         else:
             user['usd_stake'] = 0
-            user['nmr_stake'] = 0
 
         leaderboard.append(user)
 
