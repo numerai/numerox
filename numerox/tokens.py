@@ -1,3 +1,4 @@
+import datetime
 import requests
 
 
@@ -22,9 +23,10 @@ def token_price_data(ticker='nmr'):
     r = requests.get(url)
     data = r.json()[0]
     price = {}
+    price['name'] = ticker
     price['price'] = float(data['price_usd'])
     price['ret1h'] = float(data['percent_change_1h']) / 100.0
     price['ret1d'] = float(data['percent_change_24h']) / 100.0
     price['ret7d'] = float(data['percent_change_7d']) / 100.0
-    price['time'] = int(data['last_updated'])
+    price['time'] = datetime.datetime.fromtimestamp(int(data['last_updated']))
     return price
