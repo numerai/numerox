@@ -3,6 +3,7 @@ import requests
 
 
 def nmr_at_addr(addr_str):
+    "Number of NMR (float) at given address."
     url = 'https://api.etherscan.io/api?module=account&action=tokenbalance&'
     url += 'contractaddress=0x1776e1F26f98b1A5dF9cD347953a26dd3Cb46671&'
     url += 'address=%s'
@@ -13,6 +14,7 @@ def nmr_at_addr(addr_str):
 
 
 def token_price_data(ticker='nmr'):
+    "Price (and return) information for given ticker."
     tickers = {'nmr': 'numeraire',
                'btc': 'bitcoin',
                'eth': 'ethereum',
@@ -28,5 +30,5 @@ def token_price_data(ticker='nmr'):
     price['ret1h'] = float(data['percent_change_1h']) / 100.0
     price['ret1d'] = float(data['percent_change_24h']) / 100.0
     price['ret7d'] = float(data['percent_change_7d']) / 100.0
-    price['time'] = datetime.datetime.fromtimestamp(int(data['last_updated']))
+    price['date'] = datetime.datetime.fromtimestamp(int(data['last_updated']))
     return price
