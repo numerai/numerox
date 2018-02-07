@@ -48,12 +48,18 @@ def test_raw_earnings_to_df():
     "make sure raw_earnings_to_df runs"
     e = [{u'paymentGeneral': {u'nmrAmount': u'0.97', u'usdAmount': u'0.00'},
           u'paymentStaking': None,
-          u'username': u'neela2'},
+          u'stake': {u'value': None},
+          u'stakeResolution': None,
+          u'username': u'truman35'},
          {u'paymentGeneral': {u'nmrAmount': u'0.93', u'usdAmount': u'0.00'},
           u'paymentStaking': None,
-          u'username': u'proldzh'},
-         {u'paymentGeneral': {u'nmrAmount': u'0.90', u'usdAmount': u'0.00'},
+          u'stake': {u'value': None},
+          u'stakeResolution': None,
+          u'username': u'kim1'},
+         {u'paymentGeneral': {u'nmrAmount': u'0.95', u'usdAmount': u'0.00'},
           u'paymentStaking': None,
-          u'username': u'avis'}]
-    df = raw_earnings_to_df(e, 88)
+          u'stake': {u'value': None},
+          u'stakeResolution': None,
+          u'username': u'hb'}]
+    df = raw_earnings_to_df(e, 89)
     ok_(isinstance(df, pd.DataFrame), 'expecting a dataframe')
