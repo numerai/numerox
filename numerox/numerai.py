@@ -240,6 +240,27 @@ def ten99(user, year=2017):
     return df
 
 
+def top_stakers(ntop=30):
+    "Earnings report of top stakers"
+    price = nx.token_price_data(ticker='nmr')['price']
+    df = download_earnings(round_start=61, round_end=None)
+    rn = df['round'].max()
+    print("Top stake earners (R61 - R{}) at {:.2f} usd/nmr".format(rn, price))
+    df = df[['user', 'usd_stake', 'nmr_burn']]
+    df = df.groupby('user').sum()
+    df = df.rename({'usd_stake': 'earn_usd', 'nmr_burn': 'burn_nmr'}, axis=1)
+    ratio = df['earn_usd'] / df['burn_nmr']
+    ratio = ratio.fillna(0)
+    df['earn/burn'] = ratio
+    df['profit_usd'] = df['earn_usd'] - price * df['burn_nmr']
+    df = df.sort_values('profit_usd', ascending=False)
+    df = df[:ntop]
+    round_dict = {'earn_usd': 2, 'burn_nmr': 2, 'earn/burn': 2,
+                  'profit_usd': 2}
+    df = df.round(decimals=round_dict)
+    print(df)
+
+
 def download_earnings(round_start=None, round_end=None):
     "Download earnings for specified round range."
     napi = NumerAPI(verbosity='warn')
