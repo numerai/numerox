@@ -37,6 +37,10 @@ from numerox.numerai import upload
 from numerox.numerai import ten99
 from numerox.numerai import download_earnings
 
+# tokens
+from numerox.tokens import nmr_at_addr
+from numerox.tokens import token_price_data
+
 # misc
 from numerox import examples
 from numerox.data import concat_data

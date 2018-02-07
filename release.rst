@@ -7,6 +7,8 @@ Release Notes
 
   * Add ``ten99``
   * Add ``download_earnings``
+  * Add ``nmr_at_addr``
+  * Add ``token_price_data``
 
 - v0.5.0
 
