@@ -227,7 +227,7 @@ def ten99(user, year=2017):
         raise ValueError("{} not yet implemented".format(year))
     df = download_earnings(r0, r1)
     df = df[df.user == user]
-    df = df.drop('user', axis=1)
+    df = df[['round', 'usd_main', 'usd_stake', 'nmr_main']]
     df = df.set_index('round')
     nmrprice = nmr_price()
     price = []
@@ -268,21 +268,27 @@ def download_earnings(round_start=None, round_end=None):
 def download_raw_earnings(round_number=None):
     "Download earnings for given tournament number"
     query = '''
-        query($number: Int!) {
-          rounds(number: $number) {
-            leaderboard {
-              username
-              paymentGeneral {
-                nmrAmount
-                usdAmount
-              }
-              paymentStaking {
-                nmrAmount
-                usdAmount
-              }
-              }
+            query($number: Int!) {
+                rounds(number: $number) {
+                    leaderboard {
+                        username
+                        paymentGeneral {
+                          nmrAmount
+                          usdAmount
+                        }
+                        paymentStaking {
+                          nmrAmount
+                          usdAmount
+                        }
+                        stake {
+                          value
+                        }
+                        stakeResolution {
+                          destroyed
+                        }
+                    }
+                }
             }
-          }
     '''
     napi = NumerAPI(verbosity='warn')
     if round_number is None:
@@ -299,17 +305,22 @@ def raw_earnings_to_df(raw_earnings, round_number):
     for user in raw_earnings:
         main = user['paymentGeneral']
         stake = user['paymentStaking']
-        if main is None and stake is None:
-            continue
-        x = [round_number, user['username'], 0.0, 0.0, 0.0]
-        if main is not None:
-            x[2] = float(main['usdAmount'])
-            if 'nmrAmount' in main:
-                x[4] = float(main['nmrAmount'])
-        if stake is not None:
-            x[3] = float(stake['usdAmount'])
-        earnings.append(x)
-    columns = ['round', 'user', 'usd_main', 'usd_stake', 'nmr_main']
+        burn = user['stakeResolution']
+        earned = main is not None or stake is not None
+        burned = burn is not None and burn['destroyed']
+        if earned or burned:
+            x = [round_number, user['username'], 0.0, 0.0, 0.0, 0.0]
+            if main is not None:
+                x[2] = float(main['usdAmount'])
+                if 'nmrAmount' in main:
+                    x[4] = float(main['nmrAmount'])
+            if stake is not None:
+                x[3] = float(stake['usdAmount'])
+            if burned:
+                x[5] = float(user['stake']['value'])
+            earnings.append(x)
+    columns = ['round', 'user', 'usd_main', 'usd_stake', 'nmr_main',
+               'nmr_burn']
     df = pd.DataFrame(data=earnings, columns=columns)
     return df
 
