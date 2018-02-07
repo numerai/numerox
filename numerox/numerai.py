@@ -255,9 +255,9 @@ def top_stakers(ntop=30):
     df['profit_usd'] = df['earn_usd'] - price * df['burn_nmr']
     df = df.sort_values('profit_usd', ascending=False)
     df = df[:ntop]
-    round_dict = {'earn_usd': 2, 'burn_nmr': 2, 'earn/burn': 2,
-                  'profit_usd': 2}
-    df = df.round(decimals=round_dict)
+    df = df.round()
+    cols = ['earn_usd', 'burn_nmr', 'profit_usd']
+    df[cols] = df[cols].astype(int)
     print(df)
 
 
