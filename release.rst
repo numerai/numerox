@@ -9,6 +9,7 @@ Release Notes
   * Add ``download_earnings``
   * Add ``nmr_at_addr``
   * Add ``token_price_data``
+  * Add ``historical_prices``
 
 - v0.5.0
 

@@ -1,6 +1,8 @@
 import datetime
 import requests
 
+import pandas as pd
+
 
 def nmr_at_addr(addr_str):
     "Number of NMR (float) at given address."
@@ -32,3 +34,27 @@ def token_price_data(ticker='nmr'):
     price['ret7d'] = float(data['percent_change_7d']) / 100.0
     price['date'] = datetime.datetime.fromtimestamp(int(data['last_updated']))
     return price
+
+
+def historical_prices(ticker):
+    "Historical daily price as a dataframe with date as index"
+    tickers = {'nmr': 'currencies/numeraire',
+               'btc': 'currencies/bitcoin',
+               'eth': 'currencies/ethereum',
+               'ltc': 'currencies/litecoin',
+               'mkt': 'global/marketcap-total'}
+    url = 'https://graphs2.coinmarketcap.com/%s'
+    r = requests.get(url % tickers[ticker])
+    data = r.json()
+    if ticker == 'mkt':
+        data = data['market_cap_by_available_supply']
+    else:
+        data = data['price_usd']
+    dates = []
+    prices = []
+    for date, price in data:
+        d = datetime.datetime.fromtimestamp(date / 1e3)
+        dates.append(d)
+        prices.append(price)
+    prices = pd.DataFrame(data=prices, columns=['usd'], index=dates)
+    return prices
