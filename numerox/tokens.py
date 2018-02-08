@@ -3,6 +3,8 @@ import requests
 
 import pandas as pd
 
+import numerox as nx
+
 
 def nmr_at_addr(addr_str):
     "Number of NMR (float) at given address."
@@ -74,3 +76,12 @@ def historical_price(ticker, one_per_day=False):
         dates = d
     prices = pd.DataFrame(data=prices, columns=['usd'], index=dates)
     return prices
+
+
+def nmr_resolution_price():
+    "Price of NMR in USD versus round number as a dataframe"
+    price = nx.historical_price('nmr', one_per_day=True)
+    dates = nx.round_resolution_date()
+    price = pd.merge(dates, price, how='inner', left_on='date',
+                     right_index=True)
+    return price

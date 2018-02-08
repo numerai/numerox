@@ -38,12 +38,12 @@ from numerox.numerai import ten99
 from numerox.numerai import top_stakers
 from numerox.numerai import download_earnings
 from numerox.numerai import round_resolution_date
-from numerox.numerai import nmr_resolution_price
 
 # tokens
 from numerox.tokens import nmr_at_addr
 from numerox.tokens import token_price_data
 from numerox.tokens import historical_price
+from numerox.tokens import nmr_resolution_price
 
 # misc
 from numerox import examples

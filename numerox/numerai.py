@@ -229,7 +229,7 @@ def ten99(user, year=2017):
     df = df[df.user == user]
     df = df[['round', 'usd_main', 'usd_stake', 'nmr_main']]
     df = df.set_index('round')
-    nmrprice = nmr_resolution_price()
+    nmrprice = nx.nmr_resolution_price()
     price = []
     for n in df.index:
         if n < 58:
@@ -349,15 +349,6 @@ def raw_earnings_to_df(raw_earnings, round_number):
                'nmr_burn']
     df = pd.DataFrame(data=earnings, columns=columns)
     return df
-
-
-def nmr_resolution_price():
-    "Price of NMR in USD versus round number as a dataframe"
-    price = nx.historical_price('nmr', one_per_day=True)
-    dates = round_resolution_date()
-    price = pd.merge(dates, price, how='inner', left_on='date',
-                     right_index=True)
-    return price
 
 
 # ---------------------------------------------------------------------------
