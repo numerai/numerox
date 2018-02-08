@@ -3,7 +3,7 @@
 Release Notes
 =============
 
-- v0.6.0 (not yet released)
+- v0.6.0
 
   * Add ``ten99``
   * Add ``top_stakers``
