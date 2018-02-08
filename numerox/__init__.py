@@ -41,6 +41,7 @@ from numerox.numerai import download_earnings
 # tokens
 from numerox.tokens import nmr_at_addr
 from numerox.tokens import token_price_data
+from numerox.tokens import historical_prices
 
 # misc
 from numerox import examples

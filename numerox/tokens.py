@@ -36,7 +36,7 @@ def token_price_data(ticker='nmr'):
     return price
 
 
-def historical_prices(ticker):
+def historical_prices(ticker, one_per_day=False):
     "Historical daily price as a dataframe with date as index"
     tickers = {'nmr': 'currencies/numeraire',
                'btc': 'currencies/bitcoin',
@@ -54,7 +54,20 @@ def historical_prices(ticker):
     prices = []
     for date, price in data:
         d = datetime.datetime.fromtimestamp(date / 1e3)
+        if one_per_day:
+            d = d.date()
         dates.append(d)
         prices.append(price)
+    if one_per_day:
+        p = []
+        d = []
+        for i in range(len(prices) - 1):
+            d1 = dates[i]
+            d2 = dates[i+1]
+            if d1 != d2:
+                p.append(prices[i])
+                d.append(d1)
+        prices = p
+        dates = d
     prices = pd.DataFrame(data=prices, columns=['usd'], index=dates)
     return prices
