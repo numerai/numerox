@@ -6,6 +6,7 @@ Release Notes
 - v0.6.0 (not yet released)
 
   * Add ``ten99``
+  * Add ``top_stakers``
   * Add ``download_earnings``
   * Add ``nmr_at_addr``
   * Add ``token_price_data``

@@ -16,7 +16,7 @@ def nmr_at_addr(addr_str):
 
 
 def token_price_data(ticker='nmr'):
-    "Price (and return) information for given ticker."
+    "Most recent price (and return) data for given ticker; returns dictionary."
     tickers = {'nmr': 'numeraire',
                'btc': 'bitcoin',
                'eth': 'ethereum',
@@ -37,7 +37,7 @@ def token_price_data(ticker='nmr'):
 
 
 def historical_prices(ticker, one_per_day=False):
-    "Historical daily price as a dataframe with date as index"
+    "Historical prices as a dataframe with date as index"
     tickers = {'nmr': 'currencies/numeraire',
                'btc': 'currencies/bitcoin',
                'eth': 'currencies/ethereum',

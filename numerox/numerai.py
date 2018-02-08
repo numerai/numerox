@@ -215,7 +215,7 @@ def get_stakes(round_number=None):
 
 
 # ---------------------------------------------------------------------------
-# leaderboard
+# earnings
 
 
 def ten99(user, year=2017):
