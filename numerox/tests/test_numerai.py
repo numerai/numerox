@@ -3,7 +3,6 @@ from nose.tools import ok_
 import pandas as pd
 
 import numerox as nx
-from numerox.numerai import nmr_price
 from numerox.numerai import raw_earnings_to_df
 
 
@@ -36,12 +35,6 @@ def test_is_controlling_capital():
     s = make_status()
     s['consistency'] = 74
     ok_(not iscc(s), msg)
-
-
-def test_nmr_price():
-    "make sure nmr_price runs"
-    df = nmr_price()
-    ok_(isinstance(df, pd.DataFrame), 'expecting a dataframe')
 
 
 def test_raw_earnings_to_df():

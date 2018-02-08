@@ -229,10 +229,15 @@ def ten99(user, year=2017):
     df = df[df.user == user]
     df = df[['round', 'usd_main', 'usd_stake', 'nmr_main']]
     df = df.set_index('round')
-    nmrprice = nmr_price()
+    nmrprice = nmr_resolution_price()
     price = []
     for n in df.index:
-        price.append(nmrprice.loc[n][0])
+        if n < 58:
+            # nmr not yet traded on bittrex
+            p = 0
+        else:
+            p = nmrprice.loc[n]['usd']
+        price.append(p)
     df['nmr_usd'] = price
     total = df['usd_main'].values + df['usd_stake'].values
     total = total + df['nmr_main'].values * df['nmr_usd'].values
@@ -346,40 +351,12 @@ def raw_earnings_to_df(raw_earnings, round_number):
     return df
 
 
-def nmr_price():
-    "Price of NMR in USD versus round number as a dataframe. 2017 only."
-    price = []
-    for n in range(31, 58):
-        price.append([n, 0.0])
-    price.append([58, 53.07])
-    price.append([59, 39.03])
-    price.append([60, 20.73])
-    price.append([61, 28.23])
-    price.append([62, 26.97])
-    price.append([63, 26.23])
-    price.append([64, 29.24])
-    price.append([65, 33.62])
-    price.append([66, 36.49])
-    price.append([67, 35.84])
-    price.append([68, 22.38])
-    price.append([69, 17.12])
-    price.append([70, 13.17])
-    price.append([71, 15.15])
-    price.append([72, 14.11])
-    price.append([73, 12.36])
-    price.append([74, 14.47])
-    price.append([75, 12.60])
-    price.append([76, 10.44])
-    price.append([77, 10.60])
-    price.append([78, 11.44])
-    price.append([79, 11.73])
-    price.append([80, 15.27])
-    price.append([81, 25.78])
-    price.append([82, 23.77])
-    price.append([83, 27.53])
-    price.append([84, 28.77])
-    price = pd.DataFrame(data=price, columns=['round', 'nmr_usd'])
-    price = price.set_index('round')
+def nmr_resolution_price():
+    "Price of NMR in USD versus round number as a dataframe"
+    price = nx.historical_price('nmr', one_per_day=True)
+    dates = round_resolution_date()
+    price = pd.merge(dates, price, how='inner', left_on='date',
+                     right_index=True)
     return price
 
 

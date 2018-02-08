@@ -6,6 +6,8 @@ Release Notes
 - v0.7.0 (not yet released)
 
   * Add ``round_resolution_date``
+  * Add ``nmr_resolution_price`` and get prices from coinmarketcap
+  * Remove ``nmr_price`` which hard coded prices
 
 - v0.6.0
 
