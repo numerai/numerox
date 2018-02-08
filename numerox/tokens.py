@@ -67,6 +67,9 @@ def historical_prices(ticker, one_per_day=False):
             if d1 != d2:
                 p.append(prices[i])
                 d.append(d1)
+        if dates[-1] != d[-1]:
+            p.append(prices[-1])
+            d.append(dates[-1])
         prices = p
         dates = d
     prices = pd.DataFrame(data=prices, columns=['usd'], index=dates)
