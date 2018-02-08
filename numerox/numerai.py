@@ -381,3 +381,21 @@ def nmr_price():
     price = pd.DataFrame(data=price, columns=['round', 'nmr_usd'])
     price = price.set_index('round')
     return price
+
+
+# ---------------------------------------------------------------------------
+# utilities
+
+
+def round_resolution_date():
+    "The date each round was resolved as a Dataframe with round as index."
+    napi = NumerAPI(verbosity='warn')
+    dates = napi.get_competitions()
+    dates = pd.DataFrame(dates)[['number', 'resolveTime']]
+    dates = dates.rename({'number': 'round', 'resolveTime': 'date'}, axis=1)
+    date = dates['date'].tolist()
+    date = [d.date() for d in date]
+    dates['date'] = date
+    dates = dates.set_index('round')
+    dates = dates.sort_index()
+    return dates

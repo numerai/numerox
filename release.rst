@@ -5,6 +5,8 @@ Release Notes
 
 - v0.7.0 (not yet released)
 
+  * Add ``round_resolution_date``
+
 - v0.6.0
 
   * Add ``ten99``

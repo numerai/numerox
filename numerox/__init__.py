@@ -37,6 +37,7 @@ from numerox.numerai import upload
 from numerox.numerai import ten99
 from numerox.numerai import top_stakers
 from numerox.numerai import download_earnings
+from numerox.numerai import round_resolution_date
 
 # tokens
 from numerox.tokens import nmr_at_addr
