@@ -36,7 +36,7 @@ def token_price_data(ticker='nmr'):
     return price
 
 
-def historical_prices(ticker, one_per_day=False):
+def historical_price(ticker, one_per_day=False):
     "Historical prices as a dataframe with date as index"
     tickers = {'nmr': 'currencies/numeraire',
                'btc': 'currencies/bitcoin',
