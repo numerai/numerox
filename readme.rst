@@ -75,7 +75,7 @@ failures)::
     >>> nx.test()
 
 Requirements: python, setuptools, numpy, pandas, pytables, sklearn, numerapi,
-nose.
+requests, nose.
 
 Resources
 =========
