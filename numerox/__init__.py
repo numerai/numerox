@@ -38,6 +38,7 @@ from numerox.numerai import ten99
 from numerox.numerai import top_stakers
 from numerox.numerai import download_earnings
 from numerox.numerai import tournament_resolution_date
+from numerox.numerai import year_to_tournament_range
 
 # tokens
 from numerox.tokens import nmr_at_addr

@@ -220,11 +220,7 @@ def get_stakes(tournament_number=None):
 
 def ten99(user, year=2017):
     "Generate unoffical 1099-MISC report"
-    if year == 2017:
-        r0 = 31
-        r1 = 84
-    else:
-        raise ValueError("{} not yet implemented".format(year))
+    r0, r1 = year_to_tournament_range(year)
     df = download_earnings(r0, r1)
     df = df[df.user == user]
     df = df[['tournament', 'usd_main', 'usd_stake', 'nmr_main']]
@@ -371,3 +367,20 @@ def tournament_resolution_date():
     dates = dates.set_index('tournament')
     dates = dates.sort_index()
     return dates
+
+
+def year_to_tournament_range(year):
+    "First and last (or latest) tournament number resolved in given year."
+    if year < 2016:
+        raise ValueError("`year` must be at least 2016")
+    year_now = datetime.datetime.now().year
+    if year > year_now:
+        raise ValueError("`year` cannot be greater than {}".format(year_now))
+    date = tournament_resolution_date()
+    dates = date['date'].tolist()
+    years = [d.year for d in dates]
+    date['year'] = years
+    date = date[date['year'] == year]
+    tournament1 = date.index.min()
+    tournament2 = date.index.max()
+    return tournament1, tournament2
