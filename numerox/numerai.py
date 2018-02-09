@@ -238,7 +238,7 @@ def ten99(user, year=2017):
     total = df['usd_main'].values + df['usd_stake'].values
     total = total + df['nmr_main'].values * df['nmr_usd'].values
     df['total'] = total
-    df = df[df['total'] != 0]
+    df = df[df['total'] != 0]  # burn only rounds show up as $0 total
     date = tournament_resolution_date()
     date = date.loc[df.index]
     df.insert(0, 'date', date)
@@ -259,9 +259,36 @@ def top_stakers(ntop=30):
     df['earn/burn'] = ratio
     df['profit_usd'] = df['earn_usd'] - price * df['burn_nmr']
     df = df.sort_values('profit_usd', ascending=False)
-    df = df[:ntop]
+    if ntop < 0:
+        df = df[ntop:]
+    else:
+        df = df[:ntop]
     df = df.round()
     cols = ['earn_usd', 'burn_nmr', 'profit_usd']
+    df[cols] = df[cols].astype(int)
+    print(df)
+
+
+def top_earners(tournament1, tournament2=None, ntop=20):
+    "Report on top earners"
+    price = nx.token_price_data(ticker='nmr')['price']
+    df = download_earnings(tournament1, tournament2)
+    t1 = df['tournament'].min()
+    t2 = df['tournament'].max()
+    fmt = "Top earners (R{} - R{}) at {:.2f} usd/nmr"
+    print(fmt.format(t1, t2, price))
+    df = df.drop('tournament', axis=1)
+    df = df.groupby('user').sum()
+    profit = df['usd_main'] + df['usd_stake']
+    profit += price * (df['nmr_main'] - df['nmr_burn'])
+    df['profit_usd'] = profit
+    df = df.sort_values('profit_usd', ascending=False)
+    if ntop < 0:
+        df = df[ntop:]
+    else:
+        df = df[:ntop]
+    df = df.round()
+    cols = ['usd_main', 'usd_stake', 'nmr_main', 'nmr_burn', 'profit_usd']
     df[cols] = df[cols].astype(int)
     print(df)
 

@@ -5,6 +5,7 @@ Release Notes
 
 - v0.7.0 (not yet released)
 
+  * Add ``top_earners``
   * Add ``round_resolution_date``
   * Add ``nmr_resolution_price`` and get prices from coinmarketcap
   * Add ``year_to_tournament_range``
