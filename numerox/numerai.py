@@ -242,6 +242,9 @@ def ten99(user, year=2017):
     total = df['usd_main'].values + df['usd_stake'].values
     total = total + df['nmr_main'].values * df['nmr_usd'].values
     df['total'] = total
+    date = tournament_resolution_date()
+    date = date.loc[df.index]
+    df.insert(0, 'date', date)
     return df
 
 
