@@ -75,7 +75,8 @@ Numerox provides information about the staking tournament::
     2.5177    1    33  16790     0.030                  bor2
     2.1559   25  1000  16823     0.025       glasperlenspiel
 
-You can optionally specify the round number and the column by which to sort.
+You can optionally specify the tournament number and the column by which to
+sort.
 
 You can add your own custom columns by grabbing the dataframe and inserting
 whatever columns you like::
