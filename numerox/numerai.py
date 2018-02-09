@@ -404,11 +404,20 @@ def year_to_tournament_range(year):
     year_now = datetime.datetime.now().year
     if year > year_now:
         raise ValueError("`year` cannot be greater than {}".format(year_now))
-    date = tournament_resolution_date()
-    dates = date['date'].tolist()
-    years = [d.year for d in dates]
-    date['year'] = years
-    date = date[date['year'] == year]
-    tournament1 = date.index.min()
-    tournament2 = date.index.max()
+    # numerai api incorrectly gives R32 as the first in 2017, so skip api
+    # for 2016 and 2017; faster too
+    if year == 2016:
+        tournament1 = 1
+        tournament2 = 31
+    elif year == 2017:
+        tournament1 = 32
+        tournament2 = 83
+    else:
+        date = tournament_resolution_date()
+        dates = date['date'].tolist()
+        years = [d.year for d in dates]
+        date['year'] = years
+        date = date[date['year'] == year]
+        tournament1 = date.index.min()
+        tournament2 = date.index.max()
     return tournament1, tournament2
