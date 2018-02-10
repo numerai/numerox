@@ -9,6 +9,7 @@ Release Notes
   * Add ``round_resolution_date``
   * Add ``nmr_resolution_price`` and get prices from coinmarketcap
   * Add ``year_to_tournament_range``
+  * Add more options to ``top_stakers``
   * Remove ``nmr_price`` which hard coded prices
   * ``round_number`` input variable renamed ``tournament_number``
 

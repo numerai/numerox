@@ -245,12 +245,14 @@ def ten99(user, year=2017):
     return df
 
 
-def top_stakers(ntop=30):
+def top_stakers(tournament1=61, tournament2=None, ntop=20):
     "Earnings report of top stakers"
     price = nx.token_price_data(ticker='nmr')['price']
-    df = download_earnings(tournament1=61, tournament2=None)
-    rn = df['tournament'].max()
-    print("Top stake earners (R61 - R{}) at {:.2f} usd/nmr".format(rn, price))
+    df = download_earnings(tournament1, tournament2)
+    t1 = df['tournament'].min()
+    t2 = df['tournament'].max()
+    fmt = "Top stake earners (R{} - R{}) at {:.2f} usd/nmr"
+    print(fmt.format(t1, t2, price))
     df = df[['user', 'usd_stake', 'nmr_burn']]
     df = df.groupby('user').sum()
     df = df.rename({'usd_stake': 'earn_usd', 'nmr_burn': 'burn_nmr'}, axis=1)
