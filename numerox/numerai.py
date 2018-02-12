@@ -238,7 +238,8 @@ def ten99(user, year=2017):
     total = df['usd_main'].values + df['usd_stake'].values
     total = total + df['nmr_main'].values * df['nmr_usd'].values
     df['total'] = total
-    df = df[df['total'] != 0]  # burn only rounds show up as $0 total
+    earn = df['usd_main'] + df['nmr_main'] + df['usd_stake']
+    df = df[earn != 0]  # remove burn only rounds
     date = tournament_resolution_date()
     date = date.loc[df.index]
     df.insert(0, 'date', date)
