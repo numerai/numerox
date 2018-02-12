@@ -3,7 +3,7 @@
 Release Notes
 =============
 
-- v0.7.0 (not yet released)
+- v0.7.0
 
   * Add ``top_earners``
   * Add ``round_resolution_date``
