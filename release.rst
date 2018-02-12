@@ -3,6 +3,8 @@
 Release Notes
 =============
 
+- v0.8.0 (not yet released)
+
 - v0.7.0
 
   * Add ``top_earners``
