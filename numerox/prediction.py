@@ -1,4 +1,5 @@
 import sys
+import os
 
 import pandas as pd
 import numpy as np
@@ -462,12 +463,6 @@ class Prediction(object):
         return fmt.format(shape[0], shape[1], frac_miss)
 
 
-def load_prediction(filename):
-    "Load prediction object from hdf archive"
-    df = pd.read_hdf(filename, key=HDF_PREDICTION_KEY)
-    return Prediction(df)
-
-
 class Loc(object):
     "Utility class for the loc method."
 
@@ -476,6 +471,25 @@ class Loc(object):
 
     def __getitem__(self, index):
         return Prediction(self.prediction.df.loc[index])
+
+
+def load_prediction(filename):
+    "Load prediction object from hdf archive"
+    df = pd.read_hdf(filename, key=HDF_PREDICTION_KEY)
+    return Prediction(df)
+
+
+def load_prediction_csv(filename, name=None):
+    "Load prediction object from a Numerai csv (text) tournament file"
+    df = pd.read_csv(filename, index_col='id')
+    if df.shape[1] != 1:
+        raise ValueError("csv file must contain on column of predictions")
+    if name is None:
+        name = os.path.split(filename)[-1]
+        if name.endswith('.csv'):
+            name = name[:-4]
+    df.columns = [name]
+    return Prediction(df)
 
 
 def merge_predictions(prediction_list):

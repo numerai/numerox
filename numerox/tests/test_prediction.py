@@ -69,6 +69,8 @@ def test_prediction_to_csv():
         p['model1'].to_csv(temp.name)
         with testing.HiddenPrints():
             p['model1'].to_csv(temp.name, verbose=True)
+        p2 = nx.load_prediction_csv(temp.name, 'model1')
+        ade(p2, p['model1'], "prediction corrupted during roundtrip")
     assert_raises(ValueError, p.to_csv, 'unused')
 
 

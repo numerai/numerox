@@ -42,7 +42,7 @@ Or::
     >>> prediction['rf_d2'] = nx.production(nx.randomforest(depth=2), data)
     >>> prediction['rf_d3'] = nx.production(nx.randomforest(depth=3), data)
 
-You can save your predictions for later use::
+You can save your predictions to a HDF5 file for later use::
 
     >>> prediction.save('mypredictions.h5')
 
@@ -52,7 +52,14 @@ And then load them::
 
 And you can save one model's predictions to csv for future upload to Numerai::
 
-    >>> prediction['rf3_d3']._to_csv('rf_d3.csv')
+    >>> prediction['rf3_d3'].to_csv('rf_d3.csv')
+
+It is better to load your predictions from ain HDF5 file (faster, no rounding
+errors, can contain predictions from multiple models) but you can load from
+an csv file which might be useful when checking a csv file that you submitted
+to Numerai::
+
+    >>> prediction2 = nx.load_prediction_csv('rf_d3.csv')
 
 I forget, did I try a depth of 5::
 

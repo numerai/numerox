@@ -5,6 +5,8 @@ Release Notes
 
 - v0.8.0 (not yet released)
 
+  * Add ``load_prediction_csv``
+
 - v0.7.0
 
   * Add ``top_earners``
