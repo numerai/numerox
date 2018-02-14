@@ -141,13 +141,12 @@ def show_stakes(tournament_number=None, sort_by='prize pool', mark_user=None):
 
     # mark user
     if mark_user is not None:
-        df['new'] = ''
+        df['mark'] = ''
         me = df[df.user == mark_user]['days']
         if len(me) == 1:
             me = me.iloc[0]
             idx = df.days < me
-            df.loc[idx, 'new'] = 'n'
-        df['mark'] = ''
+            df.loc[idx, 'mark'] = 'n'
         idx = df.user.isin([mark_user])
         df.loc[idx, 'mark'] = '<<<'
 
