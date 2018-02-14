@@ -113,8 +113,10 @@ def is_controlling_capital(status):
 # ---------------------------------------------------------------------------
 # stakes
 
-def show_stakes(tournament_number=None, sort_by='prize pool'):
+def show_stakes(tournament_number=None, sort_by='prize pool', mark_user=None):
     "Display info on staking; cumsum is dollars above you"
+
+    # get and sort stakes
     df, c_zero_users = get_stakes(tournament_number=tournament_number)
     if sort_by == 'prize pool':
         pass
@@ -130,12 +132,28 @@ def show_stakes(tournament_number=None, sort_by='prize pool'):
         df = df.sort_values(['user'], ascending=[True])
     else:
         raise ValueError("`sort_by` key not recognized")
+
+    # round stakes
     df['days'] = df['days'].round(4)
     df['s'] = df['s'].astype(int)
     df['soc'] = df['soc'].astype(int)
     df['cumsum'] = df['cumsum'].astype(int)
+
+    # mark user
+    if mark_user is not None:
+        df['new'] = ''
+        me = df[df.user == mark_user]['days']
+        if len(me) == 1:
+            me = me.iloc[0]
+            idx = df.days < me
+            df.loc[idx, 'new'] = 'n'
+        df['mark'] = ''
+        idx = df.user.isin([mark_user])
+        df.loc[idx, 'mark'] = '<<<'
+
     with pd.option_context('display.colheader_justify', 'left'):
         print(df.to_string(index=False))
+
     if len(c_zero_users) > 0:
         c_zero_users = ','.join(c_zero_users)
         print('C=0: {}'.format(c_zero_users))
