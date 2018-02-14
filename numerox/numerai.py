@@ -115,50 +115,15 @@ def is_controlling_capital(status):
 
 def show_stakes(tournament_number=None, sort_by='prize pool', mark_user=None):
     "Display info on staking; cumsum is dollars above you"
-
-    # get and sort stakes
-    df, c_zero_users = get_stakes(tournament_number=tournament_number)
-    if sort_by == 'prize pool':
-        pass
-    elif sort_by == 'c':
-        df = df.sort_values(['c'], ascending=[False])
-    elif sort_by == 's':
-        df = df.sort_values(['s'], ascending=[False])
-    elif sort_by == 'soc':
-        df = df.sort_values(['soc'], ascending=[False])
-    elif sort_by == 'days':
-        df = df.sort_values(['days'], ascending=[True])
-    elif sort_by == 'user':
-        df = df.sort_values(['user'], ascending=[True])
-    else:
-        raise ValueError("`sort_by` key not recognized")
-
-    # round stakes
-    df['days'] = df['days'].round(4)
-    df['s'] = df['s'].astype(int)
-    df['soc'] = df['soc'].astype(int)
-    df['cumsum'] = df['cumsum'].astype(int)
-
-    # mark user
-    if mark_user is not None:
-        df['mark'] = ''
-        me = df[df.user == mark_user]['days']
-        if len(me) == 1:
-            me = me.iloc[0]
-            idx = df.days < me
-            df.loc[idx, 'mark'] = 'n'
-        idx = df.user.isin([mark_user])
-        df.loc[idx, 'mark'] = '<<<'
-
+    df, c_zero_users = get_stakes(tournament_number, sort_by, mark_user)
     with pd.option_context('display.colheader_justify', 'left'):
-        print(df.to_string(index=False))
-
+        print(df.to_string(index=True))
     if len(c_zero_users) > 0:
         c_zero_users = ','.join(c_zero_users)
         print('C=0: {}'.format(c_zero_users))
 
 
-def get_stakes(tournament_number=None):
+def get_stakes(tournament_number=None, sort_by='prize pool', mark_user=None):
     """
     Download stakes, modify it to make it more useful, return as dataframe.
 
@@ -222,11 +187,44 @@ def get_stakes(tournament_number=None):
     c_zero_users = stakes.user[stakes.c == 0].tolist()
     stakes = stakes[stakes.c != 0]
 
+    # index by user
+    stakes = stakes.set_index('user')
+
     # sort in prize pool order; add s/c cumsum
     stakes = stakes.sort_values(['c', 'days'], axis=0,
                                 ascending=[False, False])
     cumsum = stakes.soc.cumsum(axis=0) - stakes.soc  # dollars above you
     stakes.insert(3, 'cumsum', cumsum)
+
+    # other sorting
+    if sort_by == 'prize pool':
+        pass
+    elif sort_by == 'c':
+        stakes = stakes.sort_values(['c'], ascending=[False])
+    elif sort_by == 's':
+        stakes = stakes.sort_values(['s'], ascending=[False])
+    elif sort_by == 'soc':
+        stakes = stakes.sort_values(['soc'], ascending=[False])
+    elif sort_by == 'days':
+        stakes = stakes.sort_values(['days'], ascending=[True])
+    elif sort_by == 'user':
+        stakes = stakes.sort_values(['user'], ascending=[True])
+    else:
+        raise ValueError("`sort_by` key not recognized")
+
+    # round stakes
+    stakes['days'] = stakes['days'].round(4)
+    stakes['s'] = stakes['s'].astype(int)
+    stakes['soc'] = stakes['soc'].astype(int)
+    stakes['cumsum'] = stakes['cumsum'].astype(int)
+
+    # mark user
+    if mark_user is not None:
+        stakes['mark'] = ''
+        me = stakes.loc[mark_user]['days']
+        idx = stakes.days < me
+        stakes.loc[idx, 'mark'] = 'new'
+        stakes.loc[mark_user, 'mark'] = '<<<<'
 
     return stakes, c_zero_users
 
