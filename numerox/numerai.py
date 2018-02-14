@@ -113,10 +113,10 @@ def is_controlling_capital(status):
 # ---------------------------------------------------------------------------
 # stakes
 
-def show_stakes(tournament_number=None, sort_by='prize pool', mark_user=None,
+def show_stakes(round_number=None, sort_by='prize pool', mark_user=None,
                 use_integers=True):
     "Display info on staking; cumsum is dollars above you"
-    df, c_zero_users = get_stakes(tournament_number, sort_by, mark_user,
+    df, c_zero_users = get_stakes(round_number, sort_by, mark_user,
                                   use_integers)
     with pd.option_context('display.colheader_justify', 'left'):
         print(df.to_string(index=True))
@@ -125,7 +125,7 @@ def show_stakes(tournament_number=None, sort_by='prize pool', mark_user=None,
         print('C=0: {}'.format(c_zero_users))
 
 
-def get_stakes(tournament_number=None, sort_by='prize pool', mark_user=None,
+def get_stakes(round_number=None, sort_by='prize pool', mark_user=None,
                use_integers=True):
     """
     Download stakes, modify it to make it more useful, return as dataframe.
@@ -150,11 +150,11 @@ def get_stakes(tournament_number=None, sort_by='prize pool', mark_user=None,
           }
         }
     '''
-    if tournament_number is None:
-        tournament_number = 0
-    elif tournament_number < 61:
-        raise ValueError('First staking was in tournament 61')
-    arguments = {'number': tournament_number}
+    if round_number is None:
+        round_number = 0
+    elif round_number < 61:
+        raise ValueError('First staking was in round 61')
+    arguments = {'number': round_number}
     # ~92% of time spent on the following line
     stakes = napi.raw_query(query, arguments)
 
@@ -239,11 +239,11 @@ def get_stakes(tournament_number=None, sort_by='prize pool', mark_user=None,
 
 def ten99(user, year=2017):
     "Generate unoffical 1099-MISC report"
-    r0, r1 = year_to_tournament_range(year)
+    r0, r1 = year_to_round_range(year)
     df = download_earnings(r0, r1)
     df = df[df.user == user]
-    df = df[['tournament', 'usd_main', 'usd_stake', 'nmr_main']]
-    df = df.set_index('tournament')
+    df = df[['round', 'usd_main', 'usd_stake', 'nmr_main']]
+    df = df.set_index('round')
     nmrprice = nx.nmr_resolution_price()
     price = []
     for n in df.index:
@@ -259,18 +259,18 @@ def ten99(user, year=2017):
     df['total'] = total
     earn = df['usd_main'] + df['nmr_main'] + df['usd_stake']
     df = df[earn != 0]  # remove burn only rounds
-    date = tournament_resolution_date()
+    date = round_resolution_date()
     date = date.loc[df.index]
     df.insert(0, 'date', date)
     return df
 
 
-def top_stakers(tournament1=61, tournament2=None, ntop=20):
+def top_stakers(round1=61, round2=None, ntop=20):
     "Earnings report of top stakers"
     price = nx.token_price_data(ticker='nmr')['price']
-    df = download_earnings(tournament1, tournament2)
-    t1 = df['tournament'].min()
-    t2 = df['tournament'].max()
+    df = download_earnings(round1, round2)
+    t1 = df['round'].min()
+    t2 = df['round'].max()
     fmt = "Top stake earners (R{} - R{}) at {:.2f} usd/nmr"
     print(fmt.format(t1, t2, price))
     df = df[['user', 'usd_stake', 'nmr_burn']]
@@ -291,15 +291,15 @@ def top_stakers(tournament1=61, tournament2=None, ntop=20):
     print(df)
 
 
-def top_earners(tournament1, tournament2=None, ntop=20):
+def top_earners(round1, round2=None, ntop=20):
     "Report on top earners"
     price = nx.token_price_data(ticker='nmr')['price']
-    df = download_earnings(tournament1, tournament2)
-    t1 = df['tournament'].min()
-    t2 = df['tournament'].max()
+    df = download_earnings(round1, round2)
+    t1 = df['round'].min()
+    t2 = df['round'].max()
     fmt = "Top earners (R{} - R{}) at {:.2f} usd/nmr"
     print(fmt.format(t1, t2, price))
-    df = df.drop('tournament', axis=1)
+    df = df.drop('round', axis=1)
     df = df.groupby('user').sum()
     profit = df['usd_main'] + df['usd_stake']
     profit += price * (df['nmr_main'] - df['nmr_burn'])
@@ -315,23 +315,23 @@ def top_earners(tournament1, tournament2=None, ntop=20):
     print(df)
 
 
-def download_earnings(tournament1=None, tournament2=None):
-    "Download earnings for specified tournament range."
+def download_earnings(round1=None, round2=None):
+    "Download earnings for specified round range."
     napi = NumerAPI(verbosity='warn')
-    if tournament1 is None and tournament2 is None:
+    if round1 is None and round2 is None:
         r0 = napi.get_current_round()
         r1 = r0
-    elif tournament1 is None:
+    elif round1 is None:
         r0 = napi.get_current_round()
-        r1 = tournament2
-    elif tournament2 is None:
-        r0 = tournament1
+        r1 = round2
+    elif round2 is None:
+        r0 = round1
         r1 = napi.get_current_round()
     else:
-        r0 = tournament1
-        r1 = tournament2
+        r0 = round1
+        r1 = round2
     for num in range(r0, r1 + 1):
-        e = download_raw_earnings(tournament_number=num)
+        e = download_raw_earnings(round_number=num)
         e = raw_earnings_to_df(e, num)
         if num == r0:
             df = e
@@ -340,8 +340,8 @@ def download_earnings(tournament1=None, tournament2=None):
     return df
 
 
-def download_raw_earnings(tournament_number=None):
-    "Download earnings for given tournament number"
+def download_raw_earnings(round_number=None):
+    "Download earnings for given round number"
     query = '''
             query($number: Int!) {
                 rounds(number: $number) {
@@ -366,15 +366,15 @@ def download_raw_earnings(tournament_number=None):
             }
     '''
     napi = NumerAPI(verbosity='warn')
-    if tournament_number is None:
-        tournament_number = napi.get_current_round()
-    arguments = {'number': tournament_number}
+    if round_number is None:
+        round_number = napi.get_current_round()
+    arguments = {'number': round_number}
     earnings = napi.raw_query(query, arguments)
     earnings = earnings['data']['rounds'][0]['leaderboard']
     return earnings
 
 
-def raw_earnings_to_df(raw_earnings, tournament_number):
+def raw_earnings_to_df(raw_earnings, round_number):
     "Keep non-zero earnings and convert to dataframe"
     earnings = []
     for user in raw_earnings:
@@ -384,7 +384,7 @@ def raw_earnings_to_df(raw_earnings, tournament_number):
         earned = main is not None or stake is not None
         burned = burn is not None and burn['destroyed']
         if earned or burned:
-            x = [tournament_number, user['username'], 0.0, 0.0, 0.0, 0.0]
+            x = [round_number, user['username'], 0.0, 0.0, 0.0, 0.0]
             if main is not None:
                 x[2] = float(main['usdAmount'])
                 if 'nmrAmount' in main:
@@ -394,7 +394,7 @@ def raw_earnings_to_df(raw_earnings, tournament_number):
             if burned:
                 x[5] = float(user['stake']['value'])
             earnings.append(x)
-    columns = ['tournament', 'user', 'usd_main', 'usd_stake', 'nmr_main',
+    columns = ['round', 'user', 'usd_main', 'usd_stake', 'nmr_main',
                'nmr_burn']
     df = pd.DataFrame(data=earnings, columns=columns)
     return df
@@ -404,23 +404,23 @@ def raw_earnings_to_df(raw_earnings, tournament_number):
 # utilities
 
 
-def tournament_resolution_date():
-    "The date each tournament was resolved as a Dataframe."
+def round_resolution_date():
+    "The date each round was resolved as a Dataframe."
     napi = NumerAPI(verbosity='warn')
     dates = napi.get_competitions()
     dates = pd.DataFrame(dates)[['number', 'resolveTime']]
-    rename_map = {'number': 'tournament', 'resolveTime': 'date'}
+    rename_map = {'number': 'round', 'resolveTime': 'date'}
     dates = dates.rename(rename_map, axis=1)
     date = dates['date'].tolist()
     date = [d.date() for d in date]
     dates['date'] = date
-    dates = dates.set_index('tournament')
+    dates = dates.set_index('round')
     dates = dates.sort_index()
     return dates
 
 
-def year_to_tournament_range(year):
-    "First and last (or latest) tournament number resolved in given year."
+def year_to_round_range(year):
+    "First and last (or latest) round number resolved in given year."
     if year < 2016:
         raise ValueError("`year` must be at least 2016")
     year_now = datetime.datetime.now().year
@@ -429,17 +429,17 @@ def year_to_tournament_range(year):
     # numerai api incorrectly gives R32 as the first in 2017, so skip api
     # for 2016 and 2017; faster too
     if year == 2016:
-        tournament1 = 1
-        tournament2 = 31
+        round1 = 1
+        round2 = 31
     elif year == 2017:
-        tournament1 = 32
-        tournament2 = 83
+        round1 = 32
+        round2 = 83
     else:
-        date = tournament_resolution_date()
+        date = round_resolution_date()
         dates = date['date'].tolist()
         years = [d.year for d in dates]
         date['year'] = years
         date = date[date['year'] == year]
-        tournament1 = date.index.min()
-        tournament2 = date.index.max()
-    return tournament1, tournament2
+        round1 = date.index.min()
+        round2 = date.index.max()
+    return round1, round2

@@ -8,6 +8,7 @@ Release Notes
   * ``show_stakes``: refactor, reformat output add more options
   * ``get_stakes``: refactor, reformat output add more options
   * Add ``load_prediction_csv``
+  * ``tournament_number`` input variable renamed ``round_number``
 
 - v0.7.0
 

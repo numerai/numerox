@@ -142,8 +142,7 @@ Numerox provides information about the staking tournament::
     1.4520    3  3000  65059   0.001          poppyasshole
     C=0: ainteven,ted,cryptobattle33,enigma9,dcb,leninet,sweatybear,leverage,chillee
 
-You can optionally specify the tournament number and the column by which to
-sort.
+You can optionally specify the round number and the column by which to sort.
 
 You can add your own custom columns by grabbing the dataframe and inserting
 whatever columns you like::

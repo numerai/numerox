@@ -38,8 +38,8 @@ from numerox.numerai import upload
 from numerox.numerai import ten99
 from numerox.numerai import top_stakers
 from numerox.numerai import download_earnings
-from numerox.numerai import tournament_resolution_date
-from numerox.numerai import year_to_tournament_range
+from numerox.numerai import round_resolution_date
+from numerox.numerai import year_to_round_range
 from numerox.numerai import top_earners
 
 # tokens
