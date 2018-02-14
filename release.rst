@@ -5,7 +5,8 @@ Release Notes
 
 - v0.8.0 (not yet released)
 
-  * Add mark_user option to ``show_stakes``
+  * ``show_stakes``: refactor, reformat output add more options
+  * ``get_stakes``: refactor, reformat output add more options
   * Add ``load_prediction_csv``
 
 - v0.7.0

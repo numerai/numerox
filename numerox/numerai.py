@@ -113,9 +113,11 @@ def is_controlling_capital(status):
 # ---------------------------------------------------------------------------
 # stakes
 
-def show_stakes(tournament_number=None, sort_by='prize pool', mark_user=None):
+def show_stakes(tournament_number=None, sort_by='prize pool', mark_user=None,
+                use_integers=True):
     "Display info on staking; cumsum is dollars above you"
-    df, c_zero_users = get_stakes(tournament_number, sort_by, mark_user)
+    df, c_zero_users = get_stakes(tournament_number, sort_by, mark_user,
+                                  use_integers)
     with pd.option_context('display.colheader_justify', 'left'):
         print(df.to_string(index=True))
     if len(c_zero_users) > 0:
@@ -123,7 +125,8 @@ def show_stakes(tournament_number=None, sort_by='prize pool', mark_user=None):
         print('C=0: {}'.format(c_zero_users))
 
 
-def get_stakes(tournament_number=None, sort_by='prize pool', mark_user=None):
+def get_stakes(tournament_number=None, sort_by='prize pool', mark_user=None,
+               use_integers=True):
     """
     Download stakes, modify it to make it more useful, return as dataframe.
 
@@ -213,10 +216,11 @@ def get_stakes(tournament_number=None, sort_by='prize pool', mark_user=None):
         raise ValueError("`sort_by` key not recognized")
 
     # round stakes
-    stakes['days'] = stakes['days'].round(4)
-    stakes['s'] = stakes['s'].astype(int)
-    stakes['soc'] = stakes['soc'].astype(int)
-    stakes['cumsum'] = stakes['cumsum'].astype(int)
+    if use_integers:
+        stakes['days'] = stakes['days'].round(4)
+        stakes['s'] = stakes['s'].astype(int)
+        stakes['soc'] = stakes['soc'].astype(int)
+        stakes['cumsum'] = stakes['cumsum'].astype(int)
 
     # mark user
     if mark_user is not None:
