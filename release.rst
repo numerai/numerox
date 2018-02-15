@@ -9,6 +9,8 @@ Release Notes
   * ``get_stakes``: refactor, reformat output add more options
   * Add ``load_prediction_csv``
   * ``tournament_number`` input variable renamed ``round_number``
+  * Can now handle nmr winnings in the staking tournament: ``ten99``,
+    ``top_stakers``, ``top_earners``, ``download_eranings``
 
 - v0.7.0
 

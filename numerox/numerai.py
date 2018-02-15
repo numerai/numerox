@@ -242,7 +242,7 @@ def ten99(user, year=2017):
     r0, r1 = year_to_round_range(year)
     df = download_earnings(r0, r1)
     df = df[df.user == user]
-    df = df[['round', 'usd_main', 'usd_stake', 'nmr_main']]
+    df = df[['round', 'usd_main', 'usd_stake', 'nmr_main', 'nmr_stake']]
     df = df.set_index('round')
     nmrprice = nx.nmr_resolution_price()
     price = []
@@ -255,13 +255,16 @@ def ten99(user, year=2017):
         price.append(p)
     df['nmr_usd'] = price
     total = df['usd_main'].values + df['usd_stake'].values
-    total = total + df['nmr_main'].values * df['nmr_usd'].values
+    nmr = df['nmr_main'].values + df['nmr_stake'].values
+    total = total + nmr * df['nmr_usd'].values
     df['total'] = total
-    earn = df['usd_main'] + df['nmr_main'] + df['usd_stake']
+    earn = df['usd_main'] + df['nmr_main'] + df['nmr_stake'] + df['usd_stake']
     df = df[earn != 0]  # remove burn only rounds
     date = round_resolution_date()
     date = date.loc[df.index]
     df.insert(0, 'date', date)
+    df['nmr_usd'] = df['nmr_usd'].round(2)
+    df['total'] = df['total'].round(2)
     return df
 
 
@@ -273,20 +276,17 @@ def top_stakers(round1=61, round2=None, ntop=20):
     t2 = df['round'].max()
     fmt = "Top stake earners (R{} - R{}) at {:.2f} usd/nmr"
     print(fmt.format(t1, t2, price))
-    df = df[['user', 'usd_stake', 'nmr_burn']]
+    df = df[['user', 'usd_stake', 'nmr_stake', 'nmr_burn']]
     df = df.groupby('user').sum()
-    df = df.rename({'usd_stake': 'earn_usd', 'nmr_burn': 'burn_nmr'}, axis=1)
-    ratio = df['earn_usd'] / df['burn_nmr']
-    ratio = ratio.fillna(0)
-    df['earn/burn'] = ratio
-    df['profit_usd'] = df['earn_usd'] - price * df['burn_nmr']
+    nmr = df['nmr_stake'] - df['nmr_burn']
+    df['profit_usd'] = df['usd_stake'] + price * nmr
     df = df.sort_values('profit_usd', ascending=False)
     if ntop < 0:
         df = df[ntop:]
     else:
         df = df[:ntop]
     df = df.round()
-    cols = ['earn_usd', 'burn_nmr', 'profit_usd']
+    cols = ['usd_stake', 'nmr_stake', 'nmr_burn', 'profit_usd']
     df[cols] = df[cols].astype(int)
     print(df)
 
@@ -302,7 +302,8 @@ def top_earners(round1, round2=None, ntop=20):
     df = df.drop('round', axis=1)
     df = df.groupby('user').sum()
     profit = df['usd_main'] + df['usd_stake']
-    profit += price * (df['nmr_main'] - df['nmr_burn'])
+    nmr = df['nmr_main'] + df['nmr_stake'] - df['nmr_burn']
+    profit += price * nmr
     df['profit_usd'] = profit
     df = df.sort_values('profit_usd', ascending=False)
     if ntop < 0:
@@ -384,18 +385,19 @@ def raw_earnings_to_df(raw_earnings, round_number):
         earned = main is not None or stake is not None
         burned = burn is not None and burn['destroyed']
         if earned or burned:
-            x = [round_number, user['username'], 0.0, 0.0, 0.0, 0.0]
+            x = [round_number, user['username'], 0.0, 0.0, 0.0, 0.0, 0.0]
             if main is not None:
                 x[2] = float(main['usdAmount'])
                 if 'nmrAmount' in main:
                     x[4] = float(main['nmrAmount'])
             if stake is not None:
                 x[3] = float(stake['usdAmount'])
+                x[5] = float(stake['nmrAmount'])
             if burned:
-                x[5] = float(user['stake']['value'])
+                x[6] = float(user['stake']['value'])
             earnings.append(x)
     columns = ['round', 'user', 'usd_main', 'usd_stake', 'nmr_main',
-               'nmr_burn']
+               'nmr_stake', 'nmr_burn']
     df = pd.DataFrame(data=earnings, columns=columns)
     return df
 
