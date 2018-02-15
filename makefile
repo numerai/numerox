@@ -34,6 +34,8 @@ coverage:
 clean:
 	rm -f MANIFEST
 	rm -rf cover
+	rm -rf *.lprof
+	rm -rf *.egg-info
 	rm -rf build dist some_sums.egg-info
 	find . -name \*.pyc -delete
 	rm -rf build

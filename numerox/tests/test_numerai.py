@@ -3,7 +3,7 @@ from nose.tools import ok_
 import pandas as pd
 
 import numerox as nx
-from numerox.numerai import raw_earnings_to_df
+from numerox.numerai import raw_leaderboard_to_df
 
 
 def make_status():
@@ -54,5 +54,5 @@ def test_raw_earnings_to_df():
           u'stake': {u'value': None},
           u'stakeResolution': None,
           u'username': u'hb'}]
-    df = raw_earnings_to_df(e, 89)
+    df = raw_leaderboard_to_df(e, 89)
     ok_(isinstance(df, pd.DataFrame), 'expecting a dataframe')

@@ -240,7 +240,7 @@ def get_stakes(round_number=None, sort_by='prize pool', mark_user=None,
 def ten99(user, year=2017):
     "Generate unoffical 1099-MISC report"
     r0, r1 = year_to_round_range(year)
-    df = download_earnings(r0, r1)
+    df = download_leaderboard(r0, r1)
     df = df[df.user == user]
     df = df[['round', 'usd_main', 'usd_stake', 'nmr_main', 'nmr_stake']]
     df = df.set_index('round')
@@ -271,7 +271,7 @@ def ten99(user, year=2017):
 def top_stakers(round1=61, round2=None, ntop=20):
     "Earnings report of top stakers"
     price = nx.token_price_data(ticker='nmr')['price']
-    df = download_earnings(round1, round2)
+    df = download_leaderboard(round1, round2)
     t1 = df['round'].min()
     t2 = df['round'].max()
     fmt = "Top stake earners (R{} - R{}) at {:.2f} usd/nmr"
@@ -294,7 +294,7 @@ def top_stakers(round1=61, round2=None, ntop=20):
 def top_earners(round1, round2=None, ntop=20):
     "Report on top earners"
     price = nx.token_price_data(ticker='nmr')['price']
-    df = download_earnings(round1, round2)
+    df = download_leaderboard(round1, round2)
     t1 = df['round'].min()
     t2 = df['round'].max()
     fmt = "Top earners (R{} - R{}) at {:.2f} usd/nmr"
@@ -316,8 +316,12 @@ def top_earners(round1, round2=None, ntop=20):
     print(df)
 
 
-def download_earnings(round1=None, round2=None):
-    "Download earnings for specified round range."
+# ---------------------------------------------------------------------------
+# leaderboard
+
+
+def download_leaderboard(round1=None, round2=None):
+    "Download leaderboard for specified round range."
     napi = NumerAPI(verbosity='warn')
     if round1 is None and round2 is None:
         r0 = napi.get_current_round()
@@ -332,8 +336,8 @@ def download_earnings(round1=None, round2=None):
         r0 = round1
         r1 = round2
     for num in range(r0, r1 + 1):
-        e = download_raw_earnings(round_number=num)
-        e = raw_earnings_to_df(e, num)
+        e = download_raw_leaderboard(round_number=num)
+        e = raw_leaderboard_to_df(e, num)
         if num == r0:
             df = e
         else:
@@ -341,8 +345,8 @@ def download_earnings(round1=None, round2=None):
     return df
 
 
-def download_raw_earnings(round_number=None):
-    "Download earnings for given round number"
+def download_raw_leaderboard(round_number=None):
+    "Download leaderboard for given round number"
     query = '''
             query($number: Int!) {
                 rounds(number: $number) {
@@ -370,35 +374,33 @@ def download_raw_earnings(round_number=None):
     if round_number is None:
         round_number = napi.get_current_round()
     arguments = {'number': round_number}
-    earnings = napi.raw_query(query, arguments)
-    earnings = earnings['data']['rounds'][0]['leaderboard']
-    return earnings
+    leaderboard = napi.raw_query(query, arguments)
+    leaderboard = leaderboard['data']['rounds'][0]['leaderboard']
+    return leaderboard
 
 
-def raw_earnings_to_df(raw_earnings, round_number):
-    "Keep non-zero earnings and convert to dataframe"
-    earnings = []
-    for user in raw_earnings:
+def raw_leaderboard_to_df(raw_leaderboard, round_number):
+    "Keep non-zero leaderboard and convert to dataframe"
+    leaderboard = []
+    for user in raw_leaderboard:
         main = user['paymentGeneral']
         stake = user['paymentStaking']
         burn = user['stakeResolution']
-        earned = main is not None or stake is not None
         burned = burn is not None and burn['destroyed']
-        if earned or burned:
-            x = [round_number, user['username'], 0.0, 0.0, 0.0, 0.0, 0.0]
-            if main is not None:
-                x[2] = float(main['usdAmount'])
-                if 'nmrAmount' in main:
-                    x[4] = float(main['nmrAmount'])
-            if stake is not None:
-                x[3] = float(stake['usdAmount'])
-                x[5] = float(stake['nmrAmount'])
-            if burned:
-                x[6] = float(user['stake']['value'])
-            earnings.append(x)
+        x = [round_number, user['username'], 0.0, 0.0, 0.0, 0.0, 0.0]
+        if main is not None:
+            x[2] = float(main['usdAmount'])
+            if 'nmrAmount' in main:
+                x[4] = float(main['nmrAmount'])
+        if stake is not None:
+            x[3] = float(stake['usdAmount'])
+            x[5] = float(stake['nmrAmount'])
+        if burned:
+            x[6] = float(user['stake']['value'])
+        leaderboard.append(x)
     columns = ['round', 'user', 'usd_main', 'usd_stake', 'nmr_main',
                'nmr_stake', 'nmr_burn']
-    df = pd.DataFrame(data=earnings, columns=columns)
+    df = pd.DataFrame(data=leaderboard, columns=columns)
     return df
 
 

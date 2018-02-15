@@ -5,8 +5,9 @@ Release Notes
 
 - v0.8.0 (not yet released)
 
-  * ``show_stakes``: refactor, reformat output add more options
-  * ``get_stakes``: refactor, reformat output add more options
+  * ``show_stakes``: refactor, reformat output, add more options
+  * ``get_stakes``: refactor, reformat output, add more options
+  * Rename ``download_earnings`` to ``download_leaderboard``
   * Add ``load_prediction_csv``
   * ``tournament_number`` input variable renamed ``round_number``
   * Can now handle nmr winnings in the staking tournament: ``ten99``,
