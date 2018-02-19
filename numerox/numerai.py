@@ -223,7 +223,7 @@ def get_stakes(round_number=None, sort_by='prize pool', mark_user=None,
         stakes['cumsum'] = stakes['cumsum'].astype(int)
 
     # mark user
-    if mark_user is not None:
+    if mark_user is not None and mark_user in stakes.index:
         stakes['mark'] = ''
         me = stakes.loc[mark_user]['days']
         idx = stakes.days < me
