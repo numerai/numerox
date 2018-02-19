@@ -3,7 +3,7 @@
 Release Notes
 =============
 
-- v0.8.0 (not yet released)
+- v0.8.0
 
   * ``show_stakes``: refactor, reformat output, add more options
   * ``get_stakes``: refactor, reformat output, add more options
