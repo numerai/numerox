@@ -5,6 +5,8 @@ Release Notes
 
 - v0.9.0 (not yet released)
 
+  * Add live logloss to ``download_leaderboard``
+
 - v0.8.0
 
   * ``show_stakes``: refactor, reformat output, add more options

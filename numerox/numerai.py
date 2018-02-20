@@ -3,6 +3,7 @@ import time
 import tempfile
 import datetime
 
+import numpy as np
 import pandas as pd
 from numerapi import NumerAPI
 from numerapi.utils import download_file
@@ -352,6 +353,7 @@ def download_raw_leaderboard(round_number=None):
                 rounds(number: $number) {
                     leaderboard {
                         username
+                        LiveLogloss
                         paymentGeneral {
                           nmrAmount
                           usdAmount
@@ -387,7 +389,7 @@ def raw_leaderboard_to_df(raw_leaderboard, round_number):
         stake = user['paymentStaking']
         burn = user['stakeResolution']
         burned = burn is not None and burn['destroyed']
-        x = [round_number, user['username'], 0.0, 0.0, 0.0, 0.0, 0.0]
+        x = [round_number, user['username'], 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
         if main is not None:
             x[2] = float(main['usdAmount'])
             if 'nmrAmount' in main:
@@ -397,9 +399,17 @@ def raw_leaderboard_to_df(raw_leaderboard, round_number):
             x[5] = float(stake['nmrAmount'])
         if burned:
             x[6] = float(user['stake']['value'])
+        live = user['LiveLogloss']
+        if live is None:
+            if round_number < 90:
+                x[7] = 1
+            else:
+                x[7] = np.nan
+        else:
+            x[7] = float(user['LiveLogloss'])
         leaderboard.append(x)
     columns = ['round', 'user', 'usd_main', 'usd_stake', 'nmr_main',
-               'nmr_stake', 'nmr_burn']
+               'nmr_stake', 'nmr_burn', 'live']
     df = pd.DataFrame(data=leaderboard, columns=columns)
     return df
 
