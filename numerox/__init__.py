@@ -40,6 +40,7 @@ from numerox.numerai import top_stakers
 from numerox.numerai import download_leaderboard
 from numerox.numerai import round_resolution_date
 from numerox.numerai import year_to_round_range
+from numerox.numerai import top_consistency
 from numerox.numerai import top_earners
 
 # tokens

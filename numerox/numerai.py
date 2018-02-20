@@ -235,6 +235,26 @@ def get_stakes(round_number=None, sort_by='prize pool', mark_user=None,
 
 
 # ---------------------------------------------------------------------------
+# logloss
+
+def top_consistency(round1=84, round2=None, min_participation_fraction=0.5):
+    "Report on top consistency users"
+    df = download_leaderboard(round1, round2)
+    df = df[['user', 'round', 'live']]
+    df = df[~df['live'].isna()]
+    df = df.drop_duplicates(['round', 'user'])
+    df = df.pivot(index='user', columns='round', values='live')
+    df = df[df.count(axis=1) >= min_participation_fraction * df.shape[1]]
+    nrounds = df.count(axis=1)
+    nwins = (df < np.log(2)).sum(axis=1)
+    consistency = pd.DataFrame()
+    consistency['rounds'] = nrounds
+    consistency['consistency'] = nwins / nrounds
+    consistency = consistency.sort_values('consistency', ascending=False)
+    return consistency
+
+
+# ---------------------------------------------------------------------------
 # earnings
 
 

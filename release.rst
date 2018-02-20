@@ -5,6 +5,7 @@ Release Notes
 
 - v0.9.0 (not yet released)
 
+  * Add ``top_consistency``
   * Add live logloss to ``download_leaderboard``
 
 - v0.8.0
