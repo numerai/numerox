@@ -2,6 +2,7 @@ import os
 import time
 import tempfile
 import datetime
+import decimal
 
 import numpy as np
 import pandas as pd
@@ -173,7 +174,7 @@ def get_stakes(round_number=None, sort_by='prize pool', mark_user=None,
             s2 = {}
             s2['user'] = user
             s2['s'] = float(s['value'])
-            s2['c'] = float(s['confidence'])
+            s2['c'] = decimal.Decimal(s['confidence'])
             s2['soc'] = float(s['soc'])
             t = now - strptime(s['insertedAt'], '%Y-%m-%dT%H:%M:%S.%fZ')
             d = t.days

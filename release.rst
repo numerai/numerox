@@ -7,6 +7,7 @@ Release Notes
 
   * Add ``top_consistency``
   * Add live logloss to ``download_leaderboard``
+  * Use Python's decimal.Decimal to avoid staking confidence rounding errors
 
 - v0.8.0
 
