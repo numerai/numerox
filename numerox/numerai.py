@@ -237,8 +237,10 @@ def get_stakes(round_number=None, sort_by='prize pool', mark_user=None,
 # ---------------------------------------------------------------------------
 # logloss
 
-def top_consistency(round1=84, round2=None, min_participation_fraction=0.5):
+def top_consistency(round1=31, round2=None, min_participation_fraction=0.8):
     "Report on top consistency users"
+    if round1 < 51 or round2 < 51:
+        raise ValueError("round must be greater than 50")
     df = download_leaderboard(round1, round2)
     df = df[['user', 'round', 'live']]
     df = df[~df['live'].isna()]
@@ -421,7 +423,9 @@ def raw_leaderboard_to_df(raw_leaderboard, round_number):
             x[6] = float(user['stake']['value'])
         live = user['LiveLogloss']
         if live is None:
-            if round_number < 90:
+            if round_number < 51:
+                x[7] = np.nan
+            elif round_number < 90:
                 x[7] = 1
             else:
                 x[7] = np.nan
