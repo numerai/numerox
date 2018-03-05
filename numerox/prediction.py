@@ -12,9 +12,9 @@ from numerox.metrics import ks_2samp
 from numerox.metrics import concordance
 
 if sys.version_info[0] == 2:
-    base_string = basestring
+    BASE_STRING = basestring
 else:
-    base_string = str  # pragma: no cover
+    BASE_STRING = str  # pragma: no cover
 
 HDF_PREDICTION_KEY = 'numerox_prediction'
 
@@ -54,7 +54,7 @@ class Prediction(object):
         """
         if self.df is None:
             raise ValueError("Cannot rename an empty prediction")
-        if isinstance(mapper, base_string):
+        if isinstance(mapper, BASE_STRING):
             if self.shape[1] != 1:
                 raise ValueError("prediction must contain a single name")
             mapper = {self.names[0]: mapper}
@@ -399,7 +399,7 @@ class Prediction(object):
 
     def __getitem__(self, name):
         "Prediction indexing is by model name(s)"
-        if isinstance(name, base_string):
+        if isinstance(name, BASE_STRING):
             p = Prediction(self.df[name].to_frame(name))
         else:
             p = Prediction(self.df[name])
