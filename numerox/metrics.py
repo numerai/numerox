@@ -121,6 +121,11 @@ def calc_metrics_arrays(y, yhat, columns):
                 m = log_loss(y, yhat)
             except ValueError:
                 m = np.nan
+        elif col == 'logloss_pass':
+            try:
+                m = log_loss(y, yhat) < np.log(2)
+            except ValueError:
+                m = np.nan
         elif col == 'auc':
             try:
                 m = roc_auc_score(y, yhat)
@@ -135,6 +140,8 @@ def calc_metrics_arrays(y, yhat, columns):
                 m = np.nan
         elif col == 'ystd':
             m = yhat.std()
+        elif col == 'length':
+            m = yhat.size
         else:
             raise ValueError("unknown metric ({})".format(col))
         metrics.append(m)
