@@ -5,12 +5,12 @@ Release Notes
 
 - v0.9.0 (not yet released)
 
+  * Change log loss benchmark to 0.693 from ln(2)
   * Add ``top_consistency``
   * Add live logloss to ``download_leaderboard``
   * Use Python's decimal.Decimal to avoid staking confidence rounding errors
   * Add 'logloss_pass' and 'length' to ``prediction.metrics_per_era``
-  * Add requirements.txt
-  * Thanks for improvements made by: dhj-io
+  * Add requirements.txt (thanks dhj-io)
 
 - v0.8.0
 

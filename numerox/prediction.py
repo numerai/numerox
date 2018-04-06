@@ -10,6 +10,7 @@ from numerox.metrics import metrics_per_name
 from numerox.metrics import pearsonr
 from numerox.metrics import ks_2samp
 from numerox.metrics import concordance
+from numerox.metrics import LOGLOSS_BENCHMARK
 
 if sys.version_info[0] == 2:
     BASE_STRING = basestring
@@ -20,7 +21,7 @@ HDF_PREDICTION_KEY = 'numerox_prediction'
 
 ORIGINALITY_CORR_LTE = 0.95
 ORIGINALITY_KS_GT = 0.03
-CONSISTENCY_GTE = 0.75
+CONSISTENCY_GTE = 7.0 / 12.0
 CONCORDANCE_LT = 0.12
 
 
@@ -170,8 +171,8 @@ class Prediction(object):
         region_str = ', '.join(regions)
         nera = metrics.shape[0]
         logloss = metrics['logloss']
-        consis = (logloss < np.log(2)).mean()
-        sharpe = (np.log(2) - logloss).mean() / logloss.std()
+        consis = (logloss < LOGLOSS_BENCHMARK).mean()
+        sharpe = (LOGLOSS_BENCHMARK - logloss).mean() / logloss.std()
 
         # summary of metrics
         m1 = metrics.mean(axis=0).tolist() + ['region', region_str]

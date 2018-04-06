@@ -7,6 +7,8 @@ from sklearn.metrics import log_loss, roc_auc_score, accuracy_score
 from numerox.data import ERA_INT_TO_STR
 from numerox.data import REGION_INT_TO_STR
 
+LOGLOSS_BENCHMARK = 0.693
+
 
 def metrics_per_era(data, prediction, join='data',
                     columns=['logloss', 'auc', 'acc', 'ystd'],
@@ -94,9 +96,9 @@ def metrics_per_name(data, prediction, join='data',
 
     for col in columns:
         if col == 'consis':
-            m = (pivot < np.log(2)).mean(axis=0)
+            m = (pivot < LOGLOSS_BENCHMARK).mean(axis=0)
         elif col == 'sharpe':
-            m = (np.log(2) - pivot).mean(axis=0) / pivot.std(axis=0)
+            m = (LOGLOSS_BENCHMARK - pivot).mean(axis=0) / pivot.std(axis=0)
         elif col == 'logloss':
             m = mm['logloss']
         elif col == 'auc':
@@ -123,7 +125,7 @@ def calc_metrics_arrays(y, yhat, columns):
                 m = np.nan
         elif col == 'logloss_pass':
             try:
-                m = log_loss(y, yhat) < np.log(2)
+                m = log_loss(y, yhat) < LOGLOSS_BENCHMARK
             except ValueError:
                 m = np.nan
         elif col == 'auc':

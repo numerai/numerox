@@ -10,6 +10,7 @@ from numerapi import NumerAPI
 from numerapi.utils import download_file
 
 import numerox as nx
+from numerox.metrics import LOGLOSS_BENCHMARK
 
 
 # ---------------------------------------------------------------------------
@@ -249,7 +250,8 @@ def top_consistency(round1=31, round2=None, min_participation_fraction=0.8):
     df = df.pivot(index='user', columns='round', values='live')
     df = df[df.count(axis=1) >= min_participation_fraction * df.shape[1]]
     nrounds = df.count(axis=1)
-    nwins = (df < np.log(2)).sum(axis=1)
+    # TODO use np.log(2) for rounds 101 and earlier
+    nwins = (df < LOGLOSS_BENCHMARK).sum(axis=1)
     consistency = pd.DataFrame()
     consistency['rounds'] = nrounds
     consistency['consistency'] = nwins / nrounds
