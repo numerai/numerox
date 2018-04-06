@@ -10,7 +10,7 @@ Release Notes
   * Use Python's decimal.Decimal to avoid staking confidence rounding errors
   * Add 'logloss_pass' and 'length' to ``prediction.metrics_per_era``
   * Add requirements.txt
-  * Thanks for improvements made by: @dhj-io
+  * Thanks for improvements made by: dhj-io
 
 - v0.8.0
 
