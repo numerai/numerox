@@ -1,0 +1,6 @@
+numpy
+pandas
+tables
+scikit-learn
+numerapi
+nose
