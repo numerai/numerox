@@ -3,6 +3,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.neural_network import MLPClassifier as MLPC
 from sklearn.ensemble import ExtraTreesClassifier as ETC
 from sklearn.ensemble import RandomForestClassifier as RFC
+from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.pipeline import Pipeline
 from sklearn.decomposition import PCA
 
@@ -126,6 +127,20 @@ class mlpc(Model):
                    max_iter=200)
         clf.fit(dfit.x, dfit.y)
         yhat = clf.predict_proba(dpre.x)[:, 1]
+        return dpre.ids, yhat
+
+
+# model used by numerai's example_predictions.csv
+class example_predictions(Model):
+
+    def __init__(self):
+        self.p = {}
+
+    def fit_predict(self, dfit, dpre):
+        model = GradientBoostingClassifier(n_estimators=25, max_depth=1,
+                                           random_state=1776)
+        model.fit(dfit.x, dfit.y)
+        yhat = model.predict_proba(dpre.x)[:, 1]
         return dpre.ids, yhat
 
 

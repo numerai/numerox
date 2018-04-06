@@ -6,6 +6,7 @@ Release Notes
 - v0.9.0 (not yet released)
 
   * Change log loss benchmark to 0.693 from ln(2)
+  * Add the model used by Numerai to generate example_predictions.csv
   * Add ``top_consistency``
   * Add live logloss to ``download_leaderboard``
   * Use Python's decimal.Decimal to avoid staking confidence rounding errors
