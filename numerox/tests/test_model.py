@@ -4,7 +4,7 @@ from numerox.model import fifty
 
 def get_models():
     models = [nx.logistic(), nx.extratrees(), nx.randomforest(),
-              nx.mlpc(), nx.logisticPCA(), fifty()]
+              nx.mlpc(), nx.logisticPCA(), nx.example_predictions(), fifty()]
     return models
 
 
