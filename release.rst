@@ -9,6 +9,7 @@ Release Notes
   * Add the model used by Numerai to generate example_predictions.csv
   * Add ``top_consistency``
   * Add live logloss to ``download_leaderboard``
+  * ``top_stakers`` now returns a dataframe
   * Use Python's decimal.Decimal to avoid staking confidence rounding errors
   * Add 'logloss_pass' and 'length' to ``prediction.metrics_per_era``
   * Add requirements.txt (thanks dhj-io)

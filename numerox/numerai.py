@@ -294,7 +294,7 @@ def ten99(user, year=2017):
     return df
 
 
-def top_stakers(round1=61, round2=None, ntop=20):
+def top_stakers(round1=61, round2=None, ntop=None):
     "Earnings report of top stakers"
     price = nx.token_price_data(ticker='nmr')['price']
     df = download_leaderboard(round1, round2)
@@ -307,14 +307,15 @@ def top_stakers(round1=61, round2=None, ntop=20):
     nmr = df['nmr_stake'] - df['nmr_burn']
     df['profit_usd'] = df['usd_stake'] + price * nmr
     df = df.sort_values('profit_usd', ascending=False)
-    if ntop < 0:
-        df = df[ntop:]
-    else:
-        df = df[:ntop]
+    if ntop is not None:
+        if ntop < 0:
+            df = df[ntop:]
+        else:
+            df = df[:ntop]
     df = df.round()
     cols = ['usd_stake', 'nmr_stake', 'nmr_burn', 'profit_usd']
     df[cols] = df[cols].astype(int)
-    print(df)
+    return df
 
 
 def top_earners(round1, round2=None, ntop=20):
