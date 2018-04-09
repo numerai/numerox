@@ -130,7 +130,7 @@ class mlpc(Model):
         return dpre.ids, yhat
 
 
-# model used by numerai's example_predictions.csv
+# model used by numerai to generate example_predictions.csv
 class example_predictions(Model):
 
     def __init__(self):

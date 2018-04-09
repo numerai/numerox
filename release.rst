@@ -3,7 +3,7 @@
 Release Notes
 =============
 
-- v0.9.0 (not yet released)
+- v0.9.0
 
   * Change log loss benchmark to 0.693 from ln(2)
   * Add the model used by Numerai to generate example_predictions.csv
