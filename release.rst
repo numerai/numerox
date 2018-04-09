@@ -3,6 +3,8 @@
 Release Notes
 =============
 
+- v1.0.0 (not yet released)
+
 - v0.9.0
 
   * Change log loss benchmark to 0.693 from ln(2)
