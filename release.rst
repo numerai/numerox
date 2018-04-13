@@ -3,7 +3,7 @@
 Release Notes
 =============
 
-- v1.0.0 (not yet released)
+- v1.0.0
 
   * Add support for tournament number; defaults to current tournament #1
   * NumerAPI 0.9.0 is required
