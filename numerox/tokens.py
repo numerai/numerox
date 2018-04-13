@@ -78,10 +78,10 @@ def historical_price(ticker, one_per_day=False):
     return prices
 
 
-def nmr_resolution_price():
+def nmr_resolution_price(tournament=1):
     "Price of NMR in USD and date versus round number as a dataframe."
     price = nx.historical_price('nmr', one_per_day=True)
-    dates = nx.round_resolution_date()
+    dates = nx.round_resolution_date(tournament=tournament)
     price = pd.merge(dates, price, how='inner', left_on='date',
                      right_index=True)
     return price

@@ -11,25 +11,26 @@ from numerapi.utils import download_file
 
 import numerox as nx
 from numerox.metrics import LOGLOSS_BENCHMARK
+from numerox.prediction import CONSISTENCY_GTE
 
 
 # ---------------------------------------------------------------------------
 # download dataset
 
-def download(filename, verbose=False):
+def download(filename, tournament=1, verbose=False):
     "Download the current Numerai dataset; overwrites if file exists"
     if verbose:
         print("Download dataset {}".format(filename))
     napi = NumerAPI()
-    url = napi.get_dataset_url()
+    url = napi.get_dataset_url(tournament=tournament)
     filename = os.path.expanduser(filename)  # expand ~/tmp to /home/...
     download_file(url, filename)
 
 
-def download_data_object(verbose=False):
+def download_data_object(tournament=1, verbose=False):
     "Used by numerox to avoid hard coding paths; probably not useful to users"
     with tempfile.NamedTemporaryFile() as temp:
-        download(temp.name, verbose=verbose)
+        download(temp.name, tournament=tournament, verbose=verbose)
         data = nx.load_zip(temp.name)
     return data
 
@@ -37,7 +38,7 @@ def download_data_object(verbose=False):
 # ---------------------------------------------------------------------------
 # upload submission
 
-def upload(filename, public_id, secret_key, block=True):
+def upload(filename, public_id, secret_key, tournament=1, block=True):
     """
     Upload tournament submission (csv file) to Numerai.
 
@@ -47,7 +48,7 @@ def upload(filename, public_id, secret_key, block=True):
     """
     napi = NumerAPI(public_id=public_id, secret_key=secret_key,
                     verbosity='warning')
-    upload_id = napi.upload_predictions(filename)
+    upload_id = napi.upload_predictions(filename, tournament=tournament)
     if block:
         status = status_block(upload_id, public_id, secret_key)
     else:
@@ -108,18 +109,18 @@ def is_controlling_capital(status):
     "Did you get controlling capital? Pending status returns False."
     if None in status.values():
         return False
-    iscc = status['consistency'] >= 75 and status['originality']
-    iscc = iscc and status['concordance']
+    iscc = status['consistency'] >= 100 * CONSISTENCY_GTE
+    iscc = iscc and status['originality'] and status['concordance']
     return iscc
 
 
 # ---------------------------------------------------------------------------
 # stakes
 
-def show_stakes(round_number=None, sort_by='prize pool', mark_user=None,
-                use_integers=True):
+def show_stakes(round_number=None, tournament=1, sort_by='prize pool',
+                mark_user=None, use_integers=True):
     "Display info on staking; cumsum is dollars above you"
-    df, c_zero_users = get_stakes(round_number, sort_by, mark_user,
+    df, c_zero_users = get_stakes(round_number, tournament, sort_by, mark_user,
                                   use_integers)
     with pd.option_context('display.colheader_justify', 'left'):
         print(df.to_string(index=True))
@@ -128,8 +129,8 @@ def show_stakes(round_number=None, sort_by='prize pool', mark_user=None,
         print('C=0: {}'.format(c_zero_users))
 
 
-def get_stakes(round_number=None, sort_by='prize pool', mark_user=None,
-               use_integers=True):
+def get_stakes(round_number=None, tournament=1, sort_by='prize pool',
+               mark_user=None, use_integers=True):
     """
     Download stakes, modify it to make it more useful, return as dataframe.
 
@@ -139,8 +140,10 @@ def get_stakes(round_number=None, sort_by='prize pool', mark_user=None,
     # get raw stakes
     napi = NumerAPI()
     query = '''
-        query stakes($number: Int!){
-          rounds(number: $number){
+        query stakes($number: Int!
+                     $tournament: Int!){
+          rounds(number: $number
+                 tournament: $tournament){
             leaderboard {
               username
               stake {
@@ -157,8 +160,7 @@ def get_stakes(round_number=None, sort_by='prize pool', mark_user=None,
         round_number = 0
     elif round_number < 61:
         raise ValueError('First staking was in round 61')
-    arguments = {'number': round_number}
-    # ~92% of time spent on the following line
+    arguments = {'number': round_number, 'tournament': tournament}
     stakes = napi.raw_query(query, arguments)
 
     # massage raw stakes
@@ -239,11 +241,12 @@ def get_stakes(round_number=None, sort_by='prize pool', mark_user=None,
 # ---------------------------------------------------------------------------
 # logloss
 
-def top_consistency(round1=31, round2=None, min_participation_fraction=0.8):
+def top_consistency(round1=31, round2=None, tournament=1,
+                    min_participation_fraction=0.8):
     "Report on top consistency users"
     if round1 < 51 or round2 < 51:
         raise ValueError("round must be greater than 50")
-    df = download_leaderboard(round1, round2)
+    df = download_leaderboard(round1, round2, tournament=tournament)
     df = df[['user', 'round', 'live']]
     df = df[~df['live'].isna()]
     df = df.drop_duplicates(['round', 'user'])
@@ -263,14 +266,14 @@ def top_consistency(round1=31, round2=None, min_participation_fraction=0.8):
 # earnings
 
 
-def ten99(user, year=2017):
+def ten99(user, year=2017, tournament=1):
     "Generate unoffical 1099-MISC report"
-    r0, r1 = year_to_round_range(year)
-    df = download_leaderboard(r0, r1)
+    r0, r1 = year_to_round_range(year, tournament=tournament)
+    df = download_leaderboard(r0, r1, tournament=tournament)
     df = df[df.user == user]
     df = df[['round', 'usd_main', 'usd_stake', 'nmr_main', 'nmr_stake']]
     df = df.set_index('round')
-    nmrprice = nx.nmr_resolution_price()
+    nmrprice = nx.nmr_resolution_price(tournament=tournament)
     price = []
     for n in df.index:
         if n < 58:
@@ -286,7 +289,7 @@ def ten99(user, year=2017):
     df['total'] = total
     earn = df['usd_main'] + df['nmr_main'] + df['nmr_stake'] + df['usd_stake']
     df = df[earn != 0]  # remove burn only rounds
-    date = round_resolution_date()
+    date = round_resolution_date(tournament=tournament)
     date = date.loc[df.index]
     df.insert(0, 'date', date)
     df['nmr_usd'] = df['nmr_usd'].round(2)
@@ -294,10 +297,10 @@ def ten99(user, year=2017):
     return df
 
 
-def top_stakers(round1=61, round2=None, ntop=None):
+def top_stakers(round1=61, round2=None, tournament=1, ntop=None):
     "Earnings report of top stakers"
     price = nx.token_price_data(ticker='nmr')['price']
-    df = download_leaderboard(round1, round2)
+    df = download_leaderboard(round1, round2, tournament=tournament)
     t1 = df['round'].min()
     t2 = df['round'].max()
     fmt = "Top stake earners (R{} - R{}) at {:.2f} usd/nmr"
@@ -318,10 +321,10 @@ def top_stakers(round1=61, round2=None, ntop=None):
     return df
 
 
-def top_earners(round1, round2=None, ntop=20):
+def top_earners(round1, round2=None, tournament=1, ntop=20):
     "Report on top earners"
     price = nx.token_price_data(ticker='nmr')['price']
-    df = download_leaderboard(round1, round2)
+    df = download_leaderboard(round1, round2, tournament=tournament)
     t1 = df['round'].min()
     t2 = df['round'].max()
     fmt = "Top earners (R{} - R{}) at {:.2f} usd/nmr"
@@ -347,23 +350,23 @@ def top_earners(round1, round2=None, ntop=20):
 # leaderboard
 
 
-def download_leaderboard(round1=None, round2=None):
+def download_leaderboard(round1=None, round2=None, tournament=1):
     "Download leaderboard for specified round range."
     napi = NumerAPI(verbosity='warn')
     if round1 is None and round2 is None:
-        r0 = napi.get_current_round()
+        r0 = napi.get_current_round(tournament=tournament)
         r1 = r0
     elif round1 is None:
-        r0 = napi.get_current_round()
+        r0 = napi.get_current_round(tournament=tournament)
         r1 = round2
     elif round2 is None:
         r0 = round1
-        r1 = napi.get_current_round()
+        r1 = napi.get_current_round(tournament=tournament)
     else:
         r0 = round1
         r1 = round2
     for num in range(r0, r1 + 1):
-        e = download_raw_leaderboard(round_number=num)
+        e = download_raw_leaderboard(round_number=num, tournament=tournament)
         e = raw_leaderboard_to_df(e, num)
         if num == r0:
             df = e
@@ -372,11 +375,13 @@ def download_leaderboard(round1=None, round2=None):
     return df
 
 
-def download_raw_leaderboard(round_number=None):
+def download_raw_leaderboard(round_number=None, tournament=1):
     "Download leaderboard for given round number"
     query = '''
-            query($number: Int!) {
-                rounds(number: $number) {
+            query($number: Int!
+                  $tournament: Int!) {
+                rounds(number: $number
+                       tournament: $tournament) {
                     leaderboard {
                         username
                         LiveLogloss
@@ -401,7 +406,7 @@ def download_raw_leaderboard(round_number=None):
     napi = NumerAPI(verbosity='warn')
     if round_number is None:
         round_number = napi.get_current_round()
-    arguments = {'number': round_number}
+    arguments = {'number': round_number, 'tournament': tournament}
     leaderboard = napi.raw_query(query, arguments)
     leaderboard = leaderboard['data']['rounds'][0]['leaderboard']
     return leaderboard
@@ -446,10 +451,10 @@ def raw_leaderboard_to_df(raw_leaderboard, round_number):
 # utilities
 
 
-def round_resolution_date():
+def round_resolution_date(tournament=1):
     "The date each round was resolved as a Dataframe."
     napi = NumerAPI(verbosity='warn')
-    dates = napi.get_competitions()
+    dates = napi.get_competitions(tournament=tournament)
     dates = pd.DataFrame(dates)[['number', 'resolveTime']]
     rename_map = {'number': 'round', 'resolveTime': 'date'}
     dates = dates.rename(rename_map, axis=1)
@@ -461,7 +466,7 @@ def round_resolution_date():
     return dates
 
 
-def year_to_round_range(year):
+def year_to_round_range(year, tournament=1):
     "First and last (or latest) round number resolved in given year."
     if year < 2016:
         raise ValueError("`year` must be at least 2016")
@@ -477,7 +482,7 @@ def year_to_round_range(year):
         round1 = 32
         round2 = 83
     else:
-        date = round_resolution_date()
+        date = round_resolution_date(tournament=tournament)
         dates = date['date'].tolist()
         years = [d.year for d in dates]
         date['year'] = years

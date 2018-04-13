@@ -5,6 +5,10 @@ Release Notes
 
 - v1.0.0 (not yet released)
 
+  * Add support for tournament number; defaults to current tournament #1
+  * NumerAPI 0.9.0 is required
+  * ``is_controlling_capital`` 58% consistency now required
+
 - v0.9.0
 
   * Change log loss benchmark to 0.693 from ln(2)

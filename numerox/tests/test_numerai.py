@@ -9,7 +9,7 @@ from numerox.numerai import raw_leaderboard_to_df
 def make_status():
     s = {}
     s['concordance'] = True
-    s['consistency'] = 75
+    s['consistency'] = 58
     s['originality'] = True
     s['validation_logloss'] = 0.693
     return s
@@ -33,7 +33,7 @@ def test_is_controlling_capital():
     ok_(not iscc(s), msg)
 
     s = make_status()
-    s['consistency'] = 74
+    s['consistency'] = 57
     ok_(not iscc(s), msg)
 
 
