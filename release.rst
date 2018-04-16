@@ -5,6 +5,8 @@ Release Notes
 
 - v1.1.0 (not yet released)
 
+  * Add ``load_example_predictions``
+
 - v1.0.0
 
   * Add support for tournament number; defaults to current tournament #1

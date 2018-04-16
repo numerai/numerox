@@ -14,10 +14,12 @@ from numerox.model import example_predictions
 from numerox.model import logisticPCA
 
 # load
-from numerox.data import load_data, load_zip
+from numerox.data import load_data
+from numerox.data import load_zip
 from numerox.testing import play_data
 from numerox.prediction import load_prediction
 from numerox.prediction import load_prediction_csv
+from numerox.prediction import load_example_predictions
 
 # splitters
 from numerox.splitter import TournamentSplitter

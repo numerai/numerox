@@ -1,5 +1,6 @@
 import sys
 import os
+import zipfile
 
 import pandas as pd
 import numpy as np
@@ -18,6 +19,7 @@ else:
     BASE_STRING = str  # pragma: no cover
 
 HDF_PREDICTION_KEY = 'numerox_prediction'
+EXAMPLE_PREDICTIONS = 'example_predictions.csv'
 
 ORIGINALITY_CORR_LTE = 0.95
 ORIGINALITY_KS_GT = 0.03
@@ -491,6 +493,15 @@ def load_prediction_csv(filename, name=None):
             name = name[:-4]
     df.columns = [name]
     return Prediction(df)
+
+
+def load_example_predictions(data_zip):
+    "Load example predictions from Numerai zip archive"
+    zf = zipfile.ZipFile(data_zip)
+    df = pd.read_csv(zf.open(EXAMPLE_PREDICTIONS), header=0, index_col=0)
+    df.columns = ['example_predictions']
+    p = nx.Prediction(df)
+    return p
 
 
 def merge_predictions(prediction_list):

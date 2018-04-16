@@ -1,3 +1,4 @@
+import os
 import tempfile
 
 import numpy as np
@@ -8,6 +9,9 @@ from nose.tools import assert_raises
 import numerox as nx
 from numerox import testing
 from numerox.testing import assert_data_equal as ade
+
+TINY_DATASET_CSV = os.path.join(os.path.dirname(__file__),
+                                'tiny_dataset_csv.zip')
 
 
 def test_empty_prediction():
@@ -72,6 +76,14 @@ def test_prediction_to_csv():
         p2 = nx.load_prediction_csv(temp.name, 'model1')
         ade(p2, p['model1'], "prediction corrupted during roundtrip")
     assert_raises(ValueError, p.to_csv, 'unused')
+
+
+def test_load_example_predictions():
+    "test nx.load_example_predictions"
+    p = nx.load_example_predictions(TINY_DATASET_CSV)
+    ok_(len(p) == 4, "wrong number of rows")
+    ok_(p.shape == (4, 1), 'data has wrong shape')
+    ok_(np.abs(p.df.iloc[2, 0] - 0.50123) < 1e-8, 'wrong feature value')
 
 
 def test_prediction_copies():
