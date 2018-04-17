@@ -568,13 +568,3 @@ def _merge_predictions(prediction1, prediction2):
                       left_index=True, right_index=True)
         df[name] = dfnew
     return Prediction(df)
-
-
-if __name__ == '__main__':
-    data = nx.load_data('/data/ni/raw.h5')
-    p = nx.load_prediction('/data/ni/prediction.h5')
-    p = p['green']
-    e = nx.load_example_predictions('/data/ni/numerai_dataset.zip')
-    p += e
-    df = p.check(data)
-    print(df)
