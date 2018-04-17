@@ -224,15 +224,6 @@ def test_prediction_originality():
     ok_(isinstance(df, pd.DataFrame), 'expecting a dataframe')
 
 
-def test_prediction_check():
-    "make sure prediction.check runs"
-    d = nx.play_data()
-    p = nx.production(nx.logistic(), d, verbosity=0)
-    p += nx.production(nx.logisticPCA(), d, verbosity=0)
-    df = p.check(['logistic'], d)
-    ok_(isinstance(df, pd.DataFrame), 'expecting a dataframe')
-
-
 def test_prediction_correlation():
     "make sure prediction.correlation runs"
     p = testing.micro_prediction()

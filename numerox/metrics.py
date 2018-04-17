@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+from scipy.stats import ks_2samp
 
 from sklearn.cluster import MiniBatchKMeans
 from sklearn.metrics import log_loss, roc_auc_score, accuracy_score
@@ -176,9 +177,9 @@ def concordance(data, prediction):
             yhat0 = yhats[0][:, i][clusters[0] == j]
             yhat1 = yhats[1][:, i][clusters[1] == j]
             yhat2 = yhats[2][:, i][clusters[2] == j]
-            d = [ks_2samp(yhat0, yhat1),
-                 ks_2samp(yhat0, yhat2),
-                 ks_2samp(yhat2, yhat1)]
+            d = [ks_2samp(yhat0, yhat1)[0],
+                 ks_2samp(yhat0, yhat2)[0],
+                 ks_2samp(yhat2, yhat1)[0]]
             ks.append(max(d))
         concord = np.mean(ks)
         concords.loc[name] = concord
@@ -186,106 +187,3 @@ def concordance(data, prediction):
     concords = concords.sort_values('concord')
 
     return concords
-
-
-# copied from scipy to avoid scipy dependency; modified for use in numerox
-def ks_2samp(y1, y2):
-    """
-    Compute the Kolmogorov-Smirnov statistic on 2 samples.
-
-    This is a two-sided test for the null hypothesis that 2 independent samples
-    are drawn from the same continuous distribution.
-
-    Parameters
-    ----------
-    y1, y2 : sequence of 1-D ndarrays
-        two arrays of sample observations assumed to be drawn from a continuous
-        distribution, sample sizes can be different
-
-    Returns
-    -------
-    statistic : float
-        KS statistic
-
-    Notes
-    -----
-    This tests whether 2 samples are drawn from the same distribution. Note
-    that, like in the case of the one-sample K-S test, the distribution is
-    assumed to be continuous.
-
-    This is the two-sided test, one-sided tests are not implemented.
-    The test uses the two-sided asymptotic Kolmogorov-Smirnov distribution.
-
-    If the K-S statistic is small or the p-value is high, then we cannot
-    reject the hypothesis that the distributions of the two samples
-    are the same.
-    """
-    y1 = np.sort(y1)
-    y2 = np.sort(y2)
-    n1 = y1.shape[0]
-    n2 = y2.shape[0]
-    data_all = np.concatenate([y1, y2])
-    cdf1 = np.searchsorted(y1, data_all, side='right') / (1.0*n1)
-    cdf2 = np.searchsorted(y2, data_all, side='right') / (1.0*n2)
-    d = np.max(np.absolute(cdf1 - cdf2))
-    return d
-
-
-# copied from scipy to avoid scipy dependency; modified for use in numerox
-def pearsonr(x, y):
-    """
-    Calculate a Pearson correlation coefficient.
-
-    The Pearson correlation coefficient measures the linear relationship
-    between two datasets. Strictly speaking, Pearson's correlation requires
-    that each dataset be normally distributed, and not necessarily zero-mean.
-    Like other correlation coefficients, this one varies between -1 and +1
-    with 0 implying no correlation. Correlations of -1 or +1 imply an exact
-    linear relationship. Positive correlations imply that as x increases, so
-    does y. Negative correlations imply that as x increases, y decreases.
-
-    Parameters
-    ----------
-    x : (N,) array_like
-        Input
-    y : (N,) array_like
-        Input
-
-    Returns
-    -------
-    r : float
-        Pearson's correlation coefficient
-
-    Notes
-    -----
-
-    The correlation coefficient is calculated as follows:
-
-    .. math::
-
-        r_{pb} = \frac{\sum (x - m_x) (y - m_y)
-                       }{\sqrt{\sum (x - m_x)^2 (y - m_y)^2}}
-
-    where :math:`m_x` is the mean of the vector :math:`x` and :math:`m_y` is
-    the mean of the vector :math:`y`.
-
-
-    References
-    ----------
-    http://www.statsoft.com/textbook/glosp.html#Pearson%20Correlation
-    """
-    # x and y should have same length.
-    x = np.asarray(x)
-    y = np.asarray(y)
-    mx = x.mean()
-    my = y.mean()
-    xm, ym = x - mx, y - my
-    r_num = np.add.reduce(xm * ym)
-    r_den = np.sqrt(np.sum(xm * xm) * np.sum(ym * ym))
-    r = r_num / r_den
-
-    # Presumably, if abs(r) > 1, then it is only some small artifact of
-    # floating point arithmetic.
-    r = max(min(r, 1.0), -1.0)
-
-    return r

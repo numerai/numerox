@@ -4,12 +4,13 @@ import zipfile
 
 import pandas as pd
 import numpy as np
+from scipy.stats import pearsonr
+from scipy.stats import spearmanr
+from scipy.stats import ks_2samp
 
 import numerox as nx
 from numerox.metrics import metrics_per_era
 from numerox.metrics import metrics_per_name
-from numerox.metrics import pearsonr
-from numerox.metrics import ks_2samp
 from numerox.metrics import concordance
 from numerox.metrics import LOGLOSS_BENCHMARK
 
@@ -301,12 +302,12 @@ class Prediction(object):
             ksTF = True
             y = self.df[name].values
             for i in range(ys.shape[1]):
-                c = np.abs(pearsonr(y, ys[:, i]))
+                c = np.abs(pearsonr(y, ys[:, i])[0])
                 if c > corr:
                     corr = c
                 if corrTF and c > ORIGINALITY_CORR_LTE:
                     corrTF = False
-                k = ks_2samp(y, ys[:, i])
+                k = ks_2samp(y, ys[:, i])[0]
                 if k < ks:
                     ks = k
                 if ksTF and k <= ORIGINALITY_KS_GT:
@@ -319,30 +320,53 @@ class Prediction(object):
 
         return df
 
-    def check(self, submitted_names, data):
-        "Run all Numerai checks against the already submitted names list"
+    def check(self, data):
+        "Run Numerai checks; must contain a model named 'example_predictions'"
 
-        # concordance only defined for tournament predictions
-        ids = data['tournament'].ids
-        pred = self.loc[ids]
+        if 'example_predictions' not in self:
+            msg = "must contain a model named 'example_predictions'"
+            raise ValueError(msg)
+        eidx = self.names.index('example_predictions')
+        yex = self.y[:, eidx]
 
-        # run reports
-        df1 = pred.originality(submitted_names)[['corr', 'ks']]
-        df2 = pred.concordance(data)
-        df3 = pred.performance(data['validation'], columns=['consis'])
+        names = list(self.names)
+        names.remove('example_predictions')
 
-        # concatenate reports
-        df = pd.concat([df1, df2, df3], axis=1)
-        df = df.drop(submitted_names)
+        df_dict = {}
+        columns = ['validation', 'test', 'live', 'all', 'pass']
+        data = data.loc[self.ids]
+        regions = data.region
+        for name in names:
+            print(name)
+            df = pd.DataFrame(columns=columns)
+            idx = self.names.index(name)
+            y = self.y[:, idx]
+            for region in ('validation', 'test', 'live', 'all'):
+                if region == 'all':
+                    yi = y
+                    yexi = yex
+                else:
+                    idx = regions == region
+                    yi = y[idx]
+                    yexi = yex[idx]
+                df.loc['corr', region] = pearsonr(yi, yexi)[0]
+                df.loc['rcorr', region] = spearmanr(yi, yexi)[0]
+                df.loc['min', region] = yi.min()
+                df.loc['max', region] = yi.max()
+                maz = np.abs((yi - yi.mean()) / yi.std()).max()
+                df.loc['maz', region] = maz
 
-        # add True/False columns (i.e. Pass/Fail)
-        df['corrTF'] = df['corr'] <= ORIGINALITY_CORR_LTE
-        df['ksTF'] = df['ks'] > ORIGINALITY_KS_GT
-        df['concordTF'] = df['concord'] < CONCORDANCE_LT
-        df['consisTF'] = df['consis'] >= CONSISTENCY_GTE
-        df['pass'] = df.all(axis=1)
+            df.loc['corr', 'pass'] = (df.loc['corr'][:-1] >= 0.2).all()
+            df.loc['rcorr', 'pass'] = (df.loc['rcorr'][:-1] >= 0.2).all()
+            df.loc['min', 'pass'] = (df.loc['min'][:-1] >= 0.3).all()
+            df.loc['max', 'pass'] = (df.loc['max'][:-1] <= 0.7).all()
+            df.loc['maz', 'pass'] = (df.loc['maz'][:-1] <= 15).all()
 
-        return df
+            print(df)
+
+            df_dict[name] = df
+
+        return df_dict
 
     def compare(self, data, prediction):
         "Compare performance of predictions with the same names"
@@ -544,3 +568,13 @@ def _merge_predictions(prediction1, prediction2):
                       left_index=True, right_index=True)
         df[name] = dfnew
     return Prediction(df)
+
+
+if __name__ == '__main__':
+    data = nx.load_data('/data/ni/raw.h5')
+    p = nx.load_prediction('/data/ni/prediction.h5')
+    p = p['green']
+    e = nx.load_example_predictions('/data/ni/numerai_dataset.zip')
+    p += e
+    df = p.check(data)
+    print(df)
