@@ -8,6 +8,7 @@ Release Notes
   * ``prediction.check`` now checks for correlation to example predictions,
     maximum absolution Z score, minimum and maximum values
   * Add ``load_example_predictions``
+  * ``example_predictions`` model now rounds to 5 decimal places
   * SciPy is now a primary dependency of numerox (not just through sklearn)
 
 - v1.0.0

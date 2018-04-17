@@ -141,6 +141,7 @@ class example_predictions(Model):
                                            random_state=1776)
         model.fit(dfit.x, dfit.y)
         yhat = model.predict_proba(dpre.x)[:, 1]
+        yhat = np.round(yhat, 5)
         return dpre.ids, yhat
 
 
