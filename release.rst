@@ -3,7 +3,7 @@
 Release Notes
 =============
 
-- v1.1.0 (not yet released)
+- v1.1.0
 
   * Add ``load_example_predictions``
   * Add ``prediction.hash``
