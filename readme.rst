@@ -74,8 +74,7 @@ failures)::
     >>> import numerox as nx
     >>> nx.test()
 
-Requirements: python, setuptools, numpy, pandas, pytables, sklearn, numerapi,
-requests, nose.
+Requirements: pandas, sklearn, pytables, setuptools, numerapi, requests, nose.
 
 Resources
 =========

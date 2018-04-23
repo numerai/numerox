@@ -557,7 +557,7 @@ def merge_predictions(prediction_list):
 def _merge_predictions(prediction1, prediction2):
     "Merge a possibly multi-name prediction1 with a single-name prediction2"
     if prediction2.shape[1] != 1:
-        raise ValueError("`prediction2` must contain a signle name")
+        raise ValueError("`prediction2` must contain a single name")
     name = prediction2.names[0]
     if prediction1.df is None:
         # empty prediction
