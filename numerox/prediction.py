@@ -424,6 +424,17 @@ class Prediction(object):
                           df.columns.copy())
         return Prediction(df)
 
+    def hash(self):
+        """
+        Hash of prediction object.
+
+        The hash is unlikely to be the same across different computers (OS,
+        Python version, etc). But should be constant on the same system.
+        """
+        b = self.df.values.tobytes(order='A')
+        h = hash(b)
+        return h
+
     def __getitem__(self, name):
         "Prediction indexing is by model name(s)"
         if isinstance(name, BASE_STRING):

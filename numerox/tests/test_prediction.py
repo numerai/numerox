@@ -303,6 +303,14 @@ def test_prediction_repr():
     p.__repr__()
 
 
+def test_data_hash():
+    "test prediction.hash"
+    p = testing.micro_prediction()
+    ok_(p.hash() == p.hash(), "prediction.hash not reproduceable")
+    p2 = nx.Prediction(p.df[::2])
+    ok_(p2.hash() == p2.hash(), "prediction.hash not reproduceable")
+
+
 def test_merge_predictions():
     "test merge_predictions"
 
