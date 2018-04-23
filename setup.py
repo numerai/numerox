@@ -40,6 +40,7 @@ CLASSIFIERS = [
 
 
 REQUIRES = ['numpy',
+            'scipy',
             'pandas',
             'tables',
             'scikit-learn',
