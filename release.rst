@@ -3,13 +3,13 @@
 Release Notes
 =============
 
-- v1.2.0 (not yet released)
+- v1.2.0
 
   * Add ``Report`` class
   * Add ``Leaderboard`` class
   * Remove ``top_consistency``, ``ten99``, ``top_stakers``, ``top_earners``;
-    Use ``Report`` instead
-  * Remove ``download_leaderboard``; Use ``Leaderboard`` instead
+    use ``Report`` instead
+  * Remove ``download_leaderboard``; use ``Leaderboard`` instead
   * Add ``get_current_round_number``
   * ``report.consistency`` now uses ln(2) as benchmark for rounds before R102;
     ties are now broken with number of rounds entered
