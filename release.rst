@@ -3,6 +3,8 @@
 Release Notes
 =============
 
+- v1.3.0 (not yet released)
+
 - v1.2.0
 
   * Add ``Report`` class
