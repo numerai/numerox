@@ -10,6 +10,7 @@ Release Notes
   * Remove ``top_consistency``, ``ten99``, ``top_stakers``, ``top_earners``;
     Use ``Report`` instead
   * Remove ``download_leaderboard``; Use ``Leaderboard`` instead
+  * Add ``get_current_round_number``
 
 - v1.1.0
 
