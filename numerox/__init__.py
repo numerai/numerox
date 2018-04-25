@@ -38,13 +38,15 @@ from numerox.run import run
 # numerai
 from numerox.numerai import download
 from numerox.numerai import upload
-from numerox.numerai import ten99
-from numerox.numerai import top_stakers
-from numerox.numerai import download_leaderboard
 from numerox.numerai import round_resolution_date
 from numerox.numerai import year_to_round_range
-from numerox.numerai import top_consistency
-from numerox.numerai import top_earners
+
+# report
+from numerox.report import Report
+
+# leaderboard
+from numerox.leaderboard import Leaderboard
+from numerox.leaderboard import get_current_round_number
 
 # tokens
 from numerox.tokens import nmr_at_addr

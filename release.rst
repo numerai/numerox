@@ -5,6 +5,12 @@ Release Notes
 
 - v1.2.0 (not yet released)
 
+  * Add ``Report`` class
+  * Add ``Leaderboard`` class
+  * Remove ``top_consistency``, ``ten99``, ``top_stakers``, ``top_earners``;
+    Use ``Report`` instead
+  * Remove ``download_leaderboard``; Use ``Leaderboard`` instead
+
 - v1.1.0
 
   * Add ``load_example_predictions``
