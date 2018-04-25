@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 
 import numerox as nx
@@ -44,12 +45,17 @@ def consistency(df, min_participation_fraction):
     df = df.pivot(index='user', columns='round', values='live')
     df = df[df.count(axis=1) >= min_participation_fraction * df.shape[1]]
     nrounds = df.count(axis=1)
-    # TODO use np.log(2) for rounds 101 and earlier
-    nwins = (df < LOGLOSS_BENCHMARK).sum(axis=1)
+    rounds = df.columns.tolist()
+    idx1 = [r for r in rounds if r < 102]
+    nwins1 = (df[idx1] < np.log(2)).sum(axis=1)
+    idx2 = [r for r in rounds if r >= 102]
+    nwins2 = (df[idx2] < LOGLOSS_BENCHMARK).sum(axis=1)
+    nwins = nwins1 + nwins2
     consistency = pd.DataFrame()
     consistency['rounds'] = nrounds
     consistency['consistency'] = nwins / nrounds
-    consistency = consistency.sort_values('consistency', ascending=False)
+    consistency = consistency.sort_values(['consistency', 'rounds'],
+                                          ascending=[False, False])
     return consistency
 
 

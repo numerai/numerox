@@ -11,6 +11,8 @@ Release Notes
     Use ``Report`` instead
   * Remove ``download_leaderboard``; Use ``Leaderboard`` instead
   * Add ``get_current_round_number``
+  * ``report.consistency`` now uses ln(2) as benchmark for rounds before R102;
+    ties are now broken with number of rounds entered
 
 - v1.1.0
 
