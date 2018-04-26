@@ -177,7 +177,8 @@ def participation(df, ntop):
     fmt = "Participation (R{} - R{})"
     print(fmt.format(t1, t2))
     df = df[['user', 'round']]
-    df_count = df.groupby('user').count()
+    # users appear twice in R44 so use nunique instead of count
+    df_count = df.groupby('user').nunique()
     df_count = df_count.rename({'round': 'count'}, axis='columns')
     df_first = df.groupby('user').min()
     df_first = df_first.rename({'round': 'first'}, axis='columns')
@@ -186,6 +187,7 @@ def participation(df, ntop):
     df = pd.concat([df_count, df_first, df_last], axis=1)
     df['skipped'] = df['last'] - df['first'] + 1 - df['count']
     df = df.sort_values(['count', 'skipped'], ascending=[False, True])
+    df = df.drop(['user'], axis=1)
     if ntop < 0:
         df = df[ntop:]
     else:
@@ -202,5 +204,6 @@ def user_participation(df, user):
     if idx.sum() == 0:
         return []
     df = df[idx]
-    r = df['round'].tolist()
+    # users appear twice in R44 so use unique
+    r = df['round'].unique().tolist()
     return r
