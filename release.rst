@@ -6,6 +6,7 @@ Release Notes
 - v1.3.0 (not yet released)
 
   * Add ``report.burn``
+  * Add ``report.user_participation``
   * Improve ``report.earn``
   * Add utility functions ``isint`` and ``isstring``
 

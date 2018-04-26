@@ -41,6 +41,11 @@ class Report(object):
         df = burn(self.lb[round1:round2], ntop)
         return df
 
+    def user_participation(self, user, round1=61, round2=None):
+        "List of rounds user participated in"
+        r = user_participation(self.lb[round1:round2], user)
+        return r
+
 
 def consistency(df, min_participation_fraction):
     "User consistency"
@@ -158,3 +163,14 @@ def burn(df, ntop):
     df = df.round()
     df = df.astype(int)
     return df
+
+
+def user_participation(df, user):
+    "List of rounds user participated in"
+    df = df[['user', 'round']]
+    idx = df['user'] == user
+    if idx.sum() == 0:
+        return []
+    df = df[idx]
+    r = df['round'].tolist()
+    return r
