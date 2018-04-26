@@ -36,6 +36,11 @@ class Report(object):
         df = earn(self.lb[round1:round2], ntop)
         return df
 
+    def burn(self, round1=61, round2=None, ntop=None):
+        "Burn report"
+        df = burn(self.lb[round1:round2], ntop)
+        return df
+
 
 def consistency(df, min_participation_fraction):
     "User consistency"
@@ -134,4 +139,22 @@ def earn(df, ntop):
     cols = ['usd_main', 'usd_stake', 'nmr_main', 'nmr_stake', 'nmr_burn',
             'profit_usd']
     df[cols] = df[cols].astype(int)
+    return df
+
+
+def burn(df, ntop):
+    "Report on top burners"
+    t1 = df['round'].min()
+    t2 = df['round'].max()
+    fmt = "Top burners (R{} - R{})"
+    print(fmt.format(t1, t2))
+    df = df[['user', 'nmr_burn']]
+    df = df.groupby('user').sum()
+    df = df.sort_values('nmr_burn', ascending=False)
+    if ntop < 0:
+        df = df[ntop:]
+    else:
+        df = df[:ntop]
+    df = df.round()
+    df = df.astype(int)
     return df
