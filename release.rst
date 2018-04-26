@@ -6,6 +6,7 @@ Release Notes
 - v1.3.0 (not yet released)
 
   * Improve ``report.earn``
+  * Add utility functions ``isint`` and ``isstring``
 
 - v1.2.0
 

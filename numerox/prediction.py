@@ -1,4 +1,3 @@
-import sys
 import os
 import zipfile
 
@@ -13,11 +12,7 @@ from numerox.metrics import metrics_per_era
 from numerox.metrics import metrics_per_name
 from numerox.metrics import concordance
 from numerox.metrics import LOGLOSS_BENCHMARK
-
-if sys.version_info[0] == 2:
-    BASE_STRING = basestring
-else:
-    BASE_STRING = str  # pragma: no cover
+from numerox.util import isstring
 
 HDF_PREDICTION_KEY = 'numerox_prediction'
 EXAMPLE_PREDICTIONS = 'example_predictions.csv'
@@ -58,7 +53,7 @@ class Prediction(object):
         """
         if self.df is None:
             raise ValueError("Cannot rename an empty prediction")
-        if isinstance(mapper, BASE_STRING):
+        if isstring(mapper):
             if self.shape[1] != 1:
                 raise ValueError("prediction must contain a single name")
             mapper = {self.names[0]: mapper}
@@ -437,7 +432,7 @@ class Prediction(object):
 
     def __getitem__(self, name):
         "Prediction indexing is by model name(s)"
-        if isinstance(name, BASE_STRING):
+        if isstring(name):
             p = Prediction(self.df[name].to_frame(name))
         else:
             p = Prediction(self.df[name])

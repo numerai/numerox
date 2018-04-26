@@ -2,6 +2,8 @@ import numpy as np
 import pandas as pd
 from numerapi import NumerAPI
 
+from numerox.util import isint
+
 DEFAULT_FIRST_ROUND = 51
 
 
@@ -195,51 +197,3 @@ def get_current_round_number(tournament):
     napi = NumerAPI(verbosity='warn')
     cr = napi.get_current_round(tournament=tournament)
     return cr
-
-
-def isint(x):
-    """
-    Returns True if input is an integer; False otherwise.
-
-    Parameters
-    ----------
-    x : any
-        Input can be of any type.
-
-    Returns
-    -------
-    y : bool
-        True is `x` is an integer, False otherwise.
-
-    Notes
-    -----
-    A table showing what isint returns for various types:
-
-    ========== =======
-       type     isint
-    ========== =======
-    int          True
-    np.int32     True
-    np.int64     True
-    float        False
-    np.float32   False
-    np.float64   False
-    complex      False
-    str          False
-    bool         False
-
-    Examples
-    --------
-    >>> isint(1)
-    True
-    >>> isint(1.1)
-    False
-    >>> isint(True)
-    False
-    >>> isint(1j)
-    False
-    >>> isint('a')
-    False
-
-    """
-    return np.issubdtype(type(x), np.signedinteger)
