@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from numerapi import NumerAPI
 
-from numerox.util import isint
+import numerox as nx
 
 DEFAULT_FIRST_ROUND = 51
 
@@ -27,7 +27,7 @@ class Leaderboard(object):
             idx2 = self.df['round'] <= r2
             idx = idx1 & idx2
             df = self.df[idx]
-        elif isint(index):
+        elif nx.isint(index):
             self.get_round(index)
             df = self.df[self.df['round'] == index]
         elif isinstance(index, list) or isinstance(index, tuple):

@@ -1,27 +1,27 @@
 from nose.tools import ok_
 
-from numerox.util import isint, isstring
+import numerox as nx
 
 
 def test_isint():
     "test isint"
-    ok_(isint(1))
-    ok_(isint(-1))
-    ok_(not isint(1.1))
-    ok_(not isint('a'))
-    ok_(not isint(True))
-    ok_(not isint(False))
-    ok_(not isint(None))
+    ok_(nx.isint(1))
+    ok_(nx.isint(-1))
+    ok_(not nx.isint(1.1))
+    ok_(not nx.isint('a'))
+    ok_(not nx.isint(True))
+    ok_(not nx.isint(False))
+    ok_(not nx.isint(None))
 
 
 def test_isstring():
-    "test isint"
-    ok_(isstring('1'))
-    ok_(isstring("1"))
-    ok_(isstring(u'1'))
-    ok_(not isstring(1))
-    ok_(not isstring(1))
-    ok_(not isstring(1.1))
-    ok_(not isstring(True))
-    ok_(not isstring(False))
-    ok_(not isstring(None))
+    "test isstring"
+    ok_(nx.isstring('1'))
+    ok_(nx.isstring("1"))
+    ok_(nx.isstring(u'1'))
+    ok_(not nx.isstring(1))
+    ok_(not nx.isstring(1))
+    ok_(not nx.isstring(1.1))
+    ok_(not nx.isstring(True))
+    ok_(not nx.isstring(False))
+    ok_(not nx.isstring(None))
