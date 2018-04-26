@@ -19,7 +19,6 @@ def test_isstring():
     ok_(isstring('1'))
     ok_(isstring("1"))
     ok_(isstring(u'1'))
-    ok_(isstring(b'1'))
     ok_(not isstring(1))
     ok_(not isstring(1))
     ok_(not isstring(1.1))
