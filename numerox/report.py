@@ -118,7 +118,8 @@ def earn(df, ntop):
     t2 = df['round'].max()
     fmt = "Top earners (R{} - R{}) at {:.2f} usd/nmr"
     print(fmt.format(t1, t2, price))
-    df = df.drop('round', axis=1)
+    df = df[['user', 'usd_main', 'usd_stake', 'nmr_main', 'nmr_stake',
+            'nmr_burn']]
     df = df.groupby('user').sum()
     profit = df['usd_main'] + df['usd_stake']
     nmr = df['nmr_main'] + df['nmr_stake'] - df['nmr_burn']
@@ -130,6 +131,7 @@ def earn(df, ntop):
     else:
         df = df[:ntop]
     df = df.round()
-    cols = ['usd_main', 'usd_stake', 'nmr_main', 'nmr_burn', 'profit_usd']
+    cols = ['usd_main', 'usd_stake', 'nmr_main', 'nmr_stake', 'nmr_burn',
+            'profit_usd']
     df[cols] = df[cols].astype(int)
     return df

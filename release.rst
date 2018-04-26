@@ -5,6 +5,8 @@ Release Notes
 
 - v1.3.0 (not yet released)
 
+  * Improve ``report.earn``
+
 - v1.2.0
 
   * Add ``Report`` class
