@@ -41,6 +41,11 @@ class Report(object):
         df = burn(self.lb[round1:round2], ntop)
         return df
 
+    def participation(self, round1=61, round2=None, ntop=None):
+        "Participation report"
+        df = participation(self.lb[round1:round2], ntop)
+        return df
+
     def user_participation(self, user, round1=61, round2=None):
         "List of rounds user participated in"
         r = user_participation(self.lb[round1:round2], user)
@@ -156,6 +161,31 @@ def burn(df, ntop):
     df = df[['user', 'nmr_burn']]
     df = df.groupby('user').sum()
     df = df.sort_values('nmr_burn', ascending=False)
+    if ntop < 0:
+        df = df[ntop:]
+    else:
+        df = df[:ntop]
+    df = df.round()
+    df = df.astype(int)
+    return df
+
+
+def participation(df, ntop):
+    "Report on participation"
+    t1 = df['round'].min()
+    t2 = df['round'].max()
+    fmt = "Participation (R{} - R{})"
+    print(fmt.format(t1, t2))
+    df = df[['user', 'round']]
+    df_count = df.groupby('user').count()
+    df_count = df_count.rename({'round': 'count'}, axis='columns')
+    df_first = df.groupby('user').min()
+    df_first = df_first.rename({'round': 'first'}, axis='columns')
+    df_last = df.groupby('user').max()
+    df_last = df_last.rename({'round': 'last'}, axis='columns')
+    df = pd.concat([df_count, df_first, df_last], axis=1)
+    df['skipped'] = df['last'] - df['first'] + 1 - df['count']
+    df = df.sort_values(['count', 'skipped'], ascending=[False, True])
     if ntop < 0:
         df = df[ntop:]
     else:
