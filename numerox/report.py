@@ -51,15 +51,38 @@ class Report(object):
         df = big_staker(self.lb[round1:round2], ntop)
         return df
 
-    def new_users(self, round1=61, round2=None):
+    def new_user(self, round1=61, round2=None):
         "Count of new users versus round number"
-        df = new_users(self.lb[round1:round2])
+        df = new_user(self.lb[round1:round2])
         return df
 
     def user_participation(self, user, round1=61, round2=None):
         "List of rounds user participated in"
         r = user_participation(self.lb[round1:round2], user)
         return r
+
+    def all(self, round1=61, round2=None):
+
+        print_title(self.consistency)
+        print(self.consistency(round1, round2))
+
+        print_title(self.stake)
+        print(self.stake(round1, round2))
+
+        print_title(self.earn)
+        print(self.earn(round1, round2))
+
+        print_title(self.burn)
+        print(self.burn(round1, round2))
+
+        print_title(self.participation)
+        print(self.participation(round1, round2))
+
+        print_title(self.big_staker)
+        print(self.big_staker(round1, round2))
+
+        print_title(self.new_user)
+        print(self.new_user(round1, round2))
 
 
 def consistency(df, min_participation_fraction):
@@ -222,7 +245,7 @@ def big_staker(df, ntop):
     return df
 
 
-def new_users(df):
+def new_user(df):
     "Count of new users versus round number"
     t1 = df['round'].min()
     t2 = df['round'].max()
@@ -250,3 +273,8 @@ def user_participation(df, user):
     # users appear twice in R44 so use unique
     r = df['round'].unique().tolist()
     return r
+
+
+def print_title(func):
+    print('-' * 70)
+    print('\n{}\n'.format(func.__name__.upper()))

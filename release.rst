@@ -8,8 +8,9 @@ Release Notes
   * Add ``report.burn``
   * Add ``report.participation``
   * Add ``report.big_staker``
-  * Add ``report.new_users``
+  * Add ``report.new_user``
   * Add ``report.user_participation``
+  * Add ``report.all``
   * Improve ``report.earn``
   * ``Leaderboard`` now includes stake amount ``s``
   * Add utility functions ``isint`` and ``isstring``
