@@ -7,6 +7,7 @@ Release Notes
 
   * Add ``report.burn``
   * Add ``report.participation``
+  * Add ``report.big_staker``
   * Add ``report.new_users``
   * Add ``report.user_participation``
   * Improve ``report.earn``

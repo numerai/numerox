@@ -46,6 +46,11 @@ class Report(object):
         df = participation(self.lb[round1:round2], ntop)
         return df
 
+    def big_staker(self, round1=61, round2=None, ntop=None):
+        "Stake amount (in nmr) report"
+        df = big_staker(self.lb[round1:round2], ntop)
+        return df
+
     def new_users(self, round1=61, round2=None):
         "Count of new users versus round number"
         df = new_users(self.lb[round1:round2])
@@ -193,6 +198,23 @@ def participation(df, ntop):
     df['skipped'] = df['last'] - df['first'] + 1 - df['count']
     df = df.sort_values(['count', 'skipped'], ascending=[False, True])
     df = df.drop(['user'], axis=1)
+    if ntop < 0:
+        df = df[ntop:]
+    else:
+        df = df[:ntop]
+    return df
+
+
+def big_staker(df, ntop):
+    "Report on big stakers"
+    t1 = df['round'].min()
+    t2 = df['round'].max()
+    fmt = "Big stakers (in units of NMR) (R{} - R{})"
+    print(fmt.format(t1, t2))
+    df = df[['user', 's']]
+    df = df.groupby('user').sum()
+    df = df.sort_values('s', ascending=False)
+    df = df.rename({'s': 'sum'}, axis=1)
     if ntop < 0:
         df = df[ntop:]
     else:
