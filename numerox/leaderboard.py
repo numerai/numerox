@@ -165,7 +165,7 @@ def raw_leaderboard_to_df(raw_leaderboard, round_number):
         stake = user['paymentStaking']
         burn = user['stakeResolution']
         burned = burn is not None and burn['destroyed']
-        x = [round_number, user['username'], 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        x = [round_number, user['username'], 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
         if main is not None:
             x[2] = float(main['usdAmount'])
             if 'nmrAmount' in main:
@@ -185,9 +185,11 @@ def raw_leaderboard_to_df(raw_leaderboard, round_number):
                 x[7] = np.nan
         else:
             x[7] = float(user['LiveLogloss'])
+        if user['stake']['value'] is not None:
+            x[8] = float(user['stake']['value'])
         leaderboard.append(x)
     columns = ['round', 'user', 'usd_main', 'usd_stake', 'nmr_main',
-               'nmr_stake', 'nmr_burn', 'live']
+               'nmr_stake', 'nmr_burn', 'live', 's']
     df = pd.DataFrame(data=leaderboard, columns=columns)
     return df
 

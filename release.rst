@@ -10,6 +10,7 @@ Release Notes
   * Add ``report.new_users``
   * Add ``report.user_participation``
   * Improve ``report.earn``
+  * ``Leaderboard`` now includes stake amount ``s``
   * Add utility functions ``isint`` and ``isstring``
 
 - v1.2.0
