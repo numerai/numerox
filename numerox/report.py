@@ -28,27 +28,32 @@ class Report(object):
 
     def stake(self, round1=61, round2=None, ntop=None):
         "Stake earnings report"
-        df = stake(self.lb[round1:round2], ntop)
+        df = stake(self.lb[round1:round2])
+        df = ntopify(df, ntop)
         return df
 
     def earn(self, round1=61, round2=None, ntop=None):
         "Earnings report"
-        df = earn(self.lb[round1:round2], ntop)
+        df = earn(self.lb[round1:round2])
+        df = ntopify(df, ntop)
         return df
 
     def burn(self, round1=61, round2=None, ntop=None):
         "Burn report"
-        df = burn(self.lb[round1:round2], ntop)
+        df = burn(self.lb[round1:round2])
+        df = ntopify(df, ntop)
         return df
 
     def participation(self, round1=61, round2=None, ntop=None):
         "Participation report"
-        df = participation(self.lb[round1:round2], ntop)
+        df = participation(self.lb[round1:round2])
+        df = ntopify(df, ntop)
         return df
 
     def big_staker(self, round1=61, round2=None, ntop=None):
         "Stake amount (in nmr) report"
-        df = big_staker(self.lb[round1:round2], ntop)
+        df = big_staker(self.lb[round1:round2])
+        df = ntopify(df, ntop)
         return df
 
     def new_user(self, round1=61, round2=None):
@@ -136,7 +141,7 @@ def ten99(df, user, year, tournament):
     return df
 
 
-def stake(df, ntop):
+def stake(df):
     "Earnings report of top stakers"
     price = nx.token_price_data(ticker='nmr')['price']
     t1 = df['round'].min()
@@ -148,18 +153,13 @@ def stake(df, ntop):
     nmr = df['nmr_stake'] - df['nmr_burn']
     df['profit_usd'] = df['usd_stake'] + price * nmr
     df = df.sort_values('profit_usd', ascending=False)
-    if ntop is not None:
-        if ntop < 0:
-            df = df[ntop:]
-        else:
-            df = df[:ntop]
     df = df.round()
     cols = ['usd_stake', 'nmr_stake', 'nmr_burn', 'profit_usd']
     df[cols] = df[cols].astype(int)
     return df
 
 
-def earn(df, ntop):
+def earn(df):
     "Report on top earners"
     price = nx.token_price_data(ticker='nmr')['price']
     t1 = df['round'].min()
@@ -174,10 +174,6 @@ def earn(df, ntop):
     profit += price * nmr
     df['profit_usd'] = profit
     df = df.sort_values('profit_usd', ascending=False)
-    if ntop < 0:
-        df = df[ntop:]
-    else:
-        df = df[:ntop]
     df = df.round()
     cols = ['usd_main', 'usd_stake', 'nmr_main', 'nmr_stake', 'nmr_burn',
             'profit_usd']
@@ -185,7 +181,7 @@ def earn(df, ntop):
     return df
 
 
-def burn(df, ntop):
+def burn(df):
     "Report on top burners"
     t1 = df['round'].min()
     t2 = df['round'].max()
@@ -194,16 +190,12 @@ def burn(df, ntop):
     df = df[['user', 'nmr_burn']]
     df = df.groupby('user').sum()
     df = df.sort_values('nmr_burn', ascending=False)
-    if ntop < 0:
-        df = df[ntop:]
-    else:
-        df = df[:ntop]
     df = df.round()
     df = df.astype(int)
     return df
 
 
-def participation(df, ntop):
+def participation(df):
     "Report on participation"
     t1 = df['round'].min()
     t2 = df['round'].max()
@@ -211,24 +203,21 @@ def participation(df, ntop):
     print(fmt.format(t1, t2))
     df = df[['user', 'round']]
     # users appear twice in R44 so use nunique instead of count
-    df_count = df.groupby('user').nunique()
+    gb = df.groupby('user')
+    df_count = gb.nunique()
     df_count = df_count.rename({'round': 'count'}, axis='columns')
-    df_first = df.groupby('user').min()
+    df_first = gb.min()
     df_first = df_first.rename({'round': 'first'}, axis='columns')
-    df_last = df.groupby('user').max()
+    df_last = gb.max()
     df_last = df_last.rename({'round': 'last'}, axis='columns')
     df = pd.concat([df_count, df_first, df_last], axis=1)
     df['skipped'] = df['last'] - df['first'] + 1 - df['count']
     df = df.sort_values(['count', 'skipped'], ascending=[False, True])
     df = df.drop(['user'], axis=1)
-    if ntop < 0:
-        df = df[ntop:]
-    else:
-        df = df[:ntop]
     return df
 
 
-def big_staker(df, ntop):
+def big_staker(df):
     "Report on big stakers"
     t1 = df['round'].min()
     t2 = df['round'].max()
@@ -249,10 +238,6 @@ def big_staker(df, ntop):
     df = pd.concat([df_sum['s'].rename('sum'), df_max, df_med, df_min], axis=1)
     df['aggressiveness'] = df_sum['pool'] / df_sum['s']
     df = df.sort_values(['sum', 'aggressiveness'], ascending=[False, False])
-    if ntop < 0:
-        df = df[ntop:]
-    else:
-        df = df[:ntop]
     return df
 
 
@@ -284,6 +269,19 @@ def user_participation(df, user):
     # users appear twice in R44 so use unique
     r = df['round'].unique().tolist()
     return r
+
+
+# ---------------------------------------------------------------------------
+# utility functions
+
+def ntopify(df, ntop):
+    "Select top N (ntop > 0) or bottom N (ntop < 0) or all (ntop = None)"
+    if ntop is not None:
+        if ntop < 0:
+            df = df[ntop:]
+        else:
+            df = df[:ntop]
+    return df
 
 
 def print_title(func):
