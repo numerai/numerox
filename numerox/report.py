@@ -234,9 +234,13 @@ def big_staker(df, ntop):
     t2 = df['round'].max()
     fmt = "Big stakers (in units of NMR) (R{} - R{})"
     print(fmt.format(t1, t2))
+    pool = df['usd_stake'].abs() + df['nmr_burn'].abs() != 0
     df = df[['user', 's']]
+    df.insert(2, 'pool', df['s'] * pool)
     df = df.groupby('user').sum()
-    df = df.sort_values('s', ascending=False)
+    df['above_cutoff'] = df['pool'] / df['s']
+    df = df.drop('pool', axis=1)
+    df = df.sort_values(['s', 'above_cutoff'], ascending=[False, False])
     df = df.rename({'s': 'sum'}, axis=1)
     if ntop < 0:
         df = df[ntop:]
