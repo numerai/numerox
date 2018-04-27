@@ -237,13 +237,16 @@ def big_staker(df, ntop):
     pool = df['usd_stake'].abs() + df['nmr_burn'].abs() != 0
     df = df[['user', 's']]
     df.insert(2, 'pool', df['s'] * pool)
+    df = df[df['s'] > 0]
     gb = df.groupby('user')
     df_sum = gb.sum()
+    df_min = gb['s'].min()
     df_max = gb['s'].max()
     df_med = gb['s'].median()
+    df_min = df_min.rename('min')
     df_max = df_max.rename('max')
     df_med = df_med.rename('median')
-    df = pd.concat([df_sum['s'].rename('sum'), df_max, df_med], axis=1)
+    df = pd.concat([df_sum['s'].rename('sum'), df_max, df_med, df_min], axis=1)
     df['aggressiveness'] = df_sum['pool'] / df_sum['s']
     df = df.sort_values(['sum', 'aggressiveness'], ascending=[False, False])
     if ntop < 0:
