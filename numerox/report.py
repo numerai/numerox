@@ -46,6 +46,11 @@ class Report(object):
         df = participation(self.lb[round1:round2], ntop)
         return df
 
+    def new_users(self, round1=61, round2=None):
+        "Count of new users versus round number"
+        df = new_users(self.lb[round1:round2])
+        return df
+
     def user_participation(self, user, round1=61, round2=None):
         "List of rounds user participated in"
         r = user_participation(self.lb[round1:round2], user)
@@ -192,8 +197,24 @@ def participation(df, ntop):
         df = df[ntop:]
     else:
         df = df[:ntop]
-    df = df.round()
-    df = df.astype(int)
+    return df
+
+
+def new_users(df):
+    "Count of new users versus round number"
+    t1 = df['round'].min()
+    t2 = df['round'].max()
+    fmt = "Count of new users (R{} - R{})"
+    print(fmt.format(t1, t2))
+    df = df[['user', 'round']]
+    df_first = df.groupby('user').min()
+    df_first = df_first.rename({'round': 'first'}, axis='columns')
+    data = []
+    for r in range(t1, t2 + 1):
+        n = (df_first['first'] == r).sum()
+        data.append((r, n))
+    df = pd.DataFrame(data=data, columns=['round', 'count'])
+    df = df.set_index('round')
     return df
 
 
