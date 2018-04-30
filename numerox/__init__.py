@@ -63,8 +63,11 @@ from numerox.numerai import get_stakes
 from numerox.numerai import is_controlling_capital
 from numerox.version import __version__
 from numerox.prediction import merge_predictions
+
+# util
 from numerox.util import isint
 from numerox.util import isstring
+from numerox.util import history
 
 try:
     from numpy.testing import Tester

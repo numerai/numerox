@@ -1,5 +1,6 @@
 import sys
 import numpy as np
+import pandas as pd
 
 if sys.version_info[0] == 2:
     BASE_STRING = basestring
@@ -58,3 +59,21 @@ def isint(x):
 def isstring(s):
     "Returns True if input is a string; False otherwise."
     return isinstance(s, BASE_STRING)
+
+
+def history():
+    d = [
+         [1, 51, 'first live logloss'],
+         [1, 61, 'first stake; $3000 prize pool'],
+         [1, 67, 'the big burn'],
+         [1, 78, 'stake prize pool increased to $6000'],
+         [1, 81, 'originality no longer a staking requirement'],
+         [1, 85, 'rounds resolve on Saturdays instead of Mondays'],
+         [1, 94, 'main tournament dropped; staking adds nmr prizes'],
+         [1, 100, 'correlation > 0.1 with example predictions to stake'],
+         [1, 101, 'additional staking corr check: ranked corr > 0.1'],
+         [1, 102, 'logloss benchmark lowered from ln(2) to 0.693 etc'],
+        ]
+    columns = ['tournament', 'round', 'comment']
+    df = pd.DataFrame(data=d, columns=columns)
+    return df
