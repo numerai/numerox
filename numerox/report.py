@@ -232,10 +232,13 @@ def big_staker(df):
     df_min = gb['s'].min()
     df_max = gb['s'].max()
     df_med = gb['s'].median()
+    df_num = gb['s'].count()
     df_min = df_min.rename('min')
     df_max = df_max.rename('max')
     df_med = df_med.rename('median')
-    df = pd.concat([df_sum['s'].rename('sum'), df_max, df_med, df_min], axis=1)
+    df_num = df_num.rename('nstake')
+    df = pd.concat([df_sum['s'].rename('sum'), df_max, df_med, df_min, df_num],
+                   axis=1)
     df['aggressiveness'] = df_sum['pool'] / df_sum['s']
     df = df.sort_values(['sum', 'aggressiveness'], ascending=[False, False])
     return df
