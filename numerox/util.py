@@ -62,7 +62,9 @@ def isstring(s):
 
 
 def history():
+    "History of changes made to the Numerai tournaments"
     d = [
+         [1, 1, 'December 1, 2015'],
          [1, 51, 'first live logloss'],
          [1, 61, 'first stake; $3000 prize pool'],
          [1, 67, 'the big burn'],
@@ -70,8 +72,8 @@ def history():
          [1, 81, 'originality no longer a staking requirement'],
          [1, 85, 'rounds resolve on Saturdays instead of Mondays'],
          [1, 94, 'main tournament dropped; staking adds nmr prizes'],
-         [1, 100, 'correlation > 0.1 with example predictions to stake'],
-         [1, 101, 'additional staking corr check: ranked corr > 0.1'],
+         [1, 100, 'corr > 0.1 with example predictions'],
+         [1, 101, 'rank corr > 0.1 with example predictions'],
          [1, 102, 'logloss benchmark lowered from ln(2) to 0.693 etc'],
         ]
     columns = ['tournament', 'round', 'comment']
