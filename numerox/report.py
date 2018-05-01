@@ -202,8 +202,8 @@ def participation(df):
     fmt = "Participation (R{} - R{})"
     print(fmt.format(t1, t2))
     df = df[['user', 'round']]
-    # users appear twice in R44 so use nunique instead of count
     gb = df.groupby('user')
+    # users appear twice in R44 so use nunique instead of count
     df_count = gb.nunique()
     df_count = df_count.rename({'round': 'count'}, axis='columns')
     df_first = gb.min()

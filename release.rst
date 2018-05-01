@@ -3,7 +3,7 @@
 Release Notes
 =============
 
-- v1.3.0 (not yet released)
+- v1.3.0
 
   * Add ``report.burn``
   * Add ``report.participation``
