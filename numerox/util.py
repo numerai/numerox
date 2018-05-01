@@ -74,7 +74,7 @@ def history():
          [1, 94, 'main tournament dropped; staking adds nmr prizes'],
          [1, 100, 'corr > 0.1 with example predictions'],
          [1, 101, 'rank corr > 0.1 with example predictions'],
-         [1, 102, 'logloss benchmark lowered from ln(2) to 0.693 etc'],
+         [1, 102, 'logloss benchmark 0.693; corr>0.2; [0.3, 0.7]'],
         ]
     columns = ['tournament', 'round', 'comment']
     df = pd.DataFrame(data=d, columns=columns)
