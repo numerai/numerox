@@ -72,8 +72,8 @@ def history():
          [1, 81, 'originality no longer a staking requirement'],
          [1, 85, 'rounds resolve on Saturdays instead of Mondays'],
          [1, 94, 'main tournament dropped; staking adds nmr prizes'],
-         [1, 100, 'corr > 0.1 with example predictions'],
-         [1, 101, 'rank corr > 0.1 with example predictions'],
+         [1, 100, 'rank corr > 0.1 with example predictions'],
+         [1, 101, 'corr > 0.1 with example predictions'],
          [1, 102, 'logloss benchmark 0.693; corr>0.2; [0.3, 0.7]'],
         ]
     columns = ['tournament', 'round', 'comment']
