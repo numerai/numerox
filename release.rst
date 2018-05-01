@@ -3,6 +3,8 @@
 Release Notes
 =============
 
+- v1.4.0 (not yet released)
+
 - v1.3.0
 
   * Add ``report.burn``
