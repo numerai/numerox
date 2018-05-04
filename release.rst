@@ -6,6 +6,7 @@ Release Notes
 - v1.4.0 (not yet released)
 
   * Add ``report.reputation``
+  * Add ``report.group_consistency``
 
 - v1.3.0
 

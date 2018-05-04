@@ -72,10 +72,18 @@ class Report(object):
         r = user_participation(self.lb[round1:round2], user)
         return r
 
+    def group_consistency(self, round1=61, round2=None):
+        "Consistency among various groups of users"
+        df = group_consistency(self.lb[round1:round2])
+        return df
+
     def all(self, round1=61, round2=None):
 
         print_title(self.consistency)
         print(self.consistency(round1, round2))
+
+        print_title(self.reputation)
+        print(self.reputation(round1, round2))
 
         print_title(self.stake)
         print(self.stake(round1, round2))
@@ -94,6 +102,9 @@ class Report(object):
 
         print_title(self.new_user)
         print(self.new_user(round1, round2))
+
+        print_title(self.group_consistency)
+        print(self.group_consistency(round1, round2))
 
 
 def consistency(df, min_participation_fraction):
@@ -156,6 +167,38 @@ def reputation(df):
     df['index'] = df.index
     df = df.sort_values(['points', 'index'], ascending=[False, True])
     df = df.drop('index', axis=1)
+
+    return df
+
+
+def group_consistency(df):
+    "Consistency among various groups of users"
+
+    # display round range
+    t1 = df['round'].min()
+    t2 = df['round'].max()
+    fmt = "Group consistency (R{} - R{})"
+    print(fmt.format(t1, t2))
+
+    # pass logloss benchmark?
+    df = df[['user', 'round', 'live', 's']]
+    df_pass1 = df['live']
+    df_pass1 = 1.0 * (df_pass1 < np.log(2))
+    df_pass1[df['round'] > 101] = 0
+    df_pass2 = df['live']
+    df_pass2 = 1.0 * (df_pass1 < LOGLOSS_BENCHMARK)
+    df_pass2[df['round'] < 102] = 0
+    df_pass = df_pass1 + df_pass2
+    df.insert(3, 'pass', df_pass)
+
+    # consistency
+    df_overall = df.groupby('round').mean()['pass']
+    df_nonstake = df[df['s'] == 0].groupby('round').mean()['pass']
+    df_stake = df[df['s'] > 0].groupby('round').mean()['pass']
+
+    # put it all together
+    df = pd.concat([df_overall, df_nonstake, df_stake], axis=1)
+    df.columns = ['overall', 'nonstake', 'stake']
 
     return df
 
