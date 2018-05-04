@@ -77,6 +77,11 @@ class Report(object):
         df = group_consistency(self.lb[round1:round2])
         return df
 
+    def group_burn(self, round1=61, round2=None):
+        "Total NMR burn per round"
+        df = group_burn(self.lb[round1:round2])
+        return df
+
     def all(self, round1=61, round2=None):
 
         print_title(self.consistency)
@@ -105,6 +110,9 @@ class Report(object):
 
         print_title(self.group_consistency)
         print(self.group_consistency(round1, round2))
+
+        print_title(self.group_burn)
+        print(self.group_burn(round1, round2))
 
 
 def consistency(df, min_participation_fraction):
@@ -192,6 +200,7 @@ def group_consistency(df):
     df.insert(3, 'pass', df_pass)
 
     # consistency
+    df = df.drop_duplicates(['round', 'user'])
     df_overall = df.groupby('round').mean()['pass']
     df_nonstake = df[df['s'] == 0].groupby('round').mean()['pass']
     df_stake = df[df['s'] > 0].groupby('round').mean()['pass']
@@ -199,6 +208,26 @@ def group_consistency(df):
     # put it all together
     df = pd.concat([df_overall, df_nonstake, df_stake], axis=1)
     df.columns = ['overall', 'nonstake', 'stake']
+
+    return df
+
+
+def group_burn(df):
+    "Total NMR burn per round"
+
+    # display round range
+    t1 = df['round'].min()
+    t2 = df['round'].max()
+    fmt = "NMR burned (R{} - R{})"
+    print(fmt.format(t1, t2))
+
+    # nmr burned
+    df = df.drop_duplicates(['round', 'user'])
+    df = df[['round', 'nmr_burn', 's']]
+    df = df.groupby('round').sum()
+    df = df[['nmr_burn', 's']]
+    df.columns = ['burn', 'staked']
+    df.insert(2, 'fraction', df['burn'] / df['staked'])
 
     return df
 

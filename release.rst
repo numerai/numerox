@@ -7,6 +7,7 @@ Release Notes
 
   * Add ``report.reputation``
   * Add ``report.group_consistency``
+  * Add ``report.group_burn``
 
 - v1.3.0
 
