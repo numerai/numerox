@@ -26,6 +26,12 @@ class Report(object):
         df = consistency(self.lb[round1:round2], min_participation_fraction)
         return df
 
+    def reputation(self, round1=51, round2=None, ntop=None):
+        "Reputation report"
+        df = reputation(self.lb[round1:round2])
+        df = ntopify(df, ntop)
+        return df
+
     def stake(self, round1=61, round2=None, ntop=None):
         "Stake earnings report"
         df = stake(self.lb[round1:round2])
@@ -110,6 +116,48 @@ def consistency(df, min_participation_fraction):
     consistency = consistency.sort_values(['consistency', 'rounds'],
                                           ascending=[False, False])
     return consistency
+
+
+def reputation(df):
+    "Reputation report"
+
+    # display round range
+    t1 = df['round'].min()
+    t2 = df['round'].max()
+    fmt = "Reputation (sorted by points, username) (R{} - R{})"
+    print(fmt.format(t1, t2))
+
+    # pass logloss benchmark?
+    df = df[['user', 'round', 'live']]
+    df_pass1 = df['live']
+    df_pass1 = 1.0 * (df_pass1 < np.log(2))
+    df_pass1[df['round'] > 101] = 0
+    df_pass2 = df['live']
+    df_pass2 = 1.0 * (df_pass1 < LOGLOSS_BENCHMARK)
+    df_pass2[df['round'] < 102] = 0
+    df_pass = df_pass1 + df_pass2
+    df.insert(3, 'pass', df_pass)
+
+    # how many points?
+    df_points = df.groupby('user').sum()['pass']
+
+    # how many precious nmr?
+    nmr1 = df[df['round'] < 100].groupby('user').sum()['pass']
+    nmr2 = df[df['round'] >= 100].groupby('user').sum()['pass']
+    nmr2 = 0.1 * nmr2
+    df_nmr = nmr1.add(nmr2, fill_value=0)
+
+    # how many rounds?
+    df_rounds = df.groupby('user').count()['live']
+
+    # put it all together
+    df = pd.concat([df_points, df_nmr, df_rounds], axis=1)
+    df.columns = ['points', 'nmr', 'rounds']
+    df['index'] = df.index
+    df = df.sort_values(['points', 'index'], ascending=[False, True])
+    df = df.drop('index', axis=1)
+
+    return df
 
 
 def ten99(df, user, year, tournament):
