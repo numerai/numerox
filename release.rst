@@ -5,6 +5,7 @@ Release Notes
 
 - v1.4.0 (not yet released)
 
+  # Add ``LoocvSplitter``
   * Add ``report.reputation``
   * Add ``report.group_consistency``
   * Add ``report.group_burn``

@@ -27,6 +27,7 @@ from numerox.splitter import ValidationSplitter
 from numerox.splitter import SplitSplitter
 from numerox.splitter import CheatSplitter
 from numerox.splitter import CVSplitter
+from numerox.splitter import LoocvSplitter
 from numerox.splitter import IgnoreEraCVSplitter
 from numerox.splitter import RollSplitter
 

@@ -12,6 +12,7 @@ def test_splitter_overlap():
                  nx.ValidationSplitter(d),
                  nx.CheatSplitter(d),
                  nx.CVSplitter(d),
+                 nx.LoocvSplitter(d),
                  nx.IgnoreEraCVSplitter(d),
                  nx.SplitSplitter(d, fit_fraction=0.5)]
     for splitter in splitters:
@@ -28,6 +29,7 @@ def test_splitter_reset():
                  nx.ValidationSplitter(d),
                  nx.CheatSplitter(d),
                  nx.CVSplitter(d),
+                 nx.LoocvSplitter(d),
                  nx.IgnoreEraCVSplitter(d),
                  nx.SplitSplitter(d, fit_fraction=0.5)]
     for splitter in splitters:
@@ -51,6 +53,23 @@ def test_cvsplitter_kfold():
         for dfit, dpredict in splitter:
             count += 1
         ok_(count == k, "CVSplitter iterated through wrong number of folds")
+
+
+def test_loocvsplitter():
+    "test loocvsplitter"
+    d = nx.play_data()['train']
+    splitter = nx.LoocvSplitter(d)
+    count = 0
+    for dfit, dpre in splitter:
+        count += 1
+        eras = dfit.unique_era().tolist()
+        era = dpre.unique_era().tolist()
+        ok_(isinstance(eras, list), "expecting a list")
+        ok_(isinstance(era, list), "expecting a list")
+        ok_(len(era) == 1, "expecting a single era")
+        ok_(era not in eras, "did not hold out era")
+    k = d.unique_era().size
+    ok_(count == k, "LoocvSplitter iterated through wrong number of folds")
 
 
 def test_rollsplitter():

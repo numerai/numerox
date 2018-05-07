@@ -128,6 +128,25 @@ class CVSplitter(Splitter):
         return dfit, dpre
 
 
+class LoocvSplitter(Splitter):
+    "Leave one (era) out cross validation fit-predict splits across train eras"
+
+    def __init__(self, data, train_only=True):
+        if train_only:
+            data = data['train']
+        self.p = {'data': data}
+        self.eras = data.unique_era()
+        self.max_count = self.eras.size - 1
+        self.reset()
+
+    def next_split(self):
+        data = self.p['data']
+        era = self.eras[self.count]
+        dfit = data.era_isnotin([era])
+        dpre = data.era_isin([era])
+        return dfit, dpre
+
+
 class IgnoreEraCVSplitter(Splitter):
     "K-fold cross validation fit-predict splits ignoring eras and balancing y"
 
