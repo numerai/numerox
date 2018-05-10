@@ -1,3 +1,5 @@
+import decimal
+
 import numpy as np
 import pandas as pd
 from numerapi import NumerAPI
@@ -92,7 +94,7 @@ class Leaderboard(object):
     def is_resolved(self, df_single_round):
         "Has the round been resolved? True or False. Pass in a single round"
         df = df_single_round
-        total = df.iloc[:, 2:-1].abs().sum().sum()
+        total = df.iloc[:, 2:-3].abs().sum().sum()
         if total == 0:
             return False
         return True
@@ -140,6 +142,8 @@ def download_raw_leaderboard(round_number=None, tournament=1):
                         }
                         stake {
                           value
+                          confidence
+                          soc
                         }
                         stakeResolution {
                           destroyed
@@ -165,7 +169,8 @@ def raw_leaderboard_to_df(raw_leaderboard, round_number):
         stake = user['paymentStaking']
         burn = user['stakeResolution']
         burned = burn is not None and burn['destroyed']
-        x = [round_number, user['username'], 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        x = [round_number, user['username'],
+             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, np.nan, np.nan]
         if main is not None:
             x[2] = float(main['usdAmount'])
             if 'nmrAmount' in main:
@@ -187,9 +192,11 @@ def raw_leaderboard_to_df(raw_leaderboard, round_number):
             x[7] = float(user['LiveLogloss'])
         if user['stake']['value'] is not None:
             x[8] = float(user['stake']['value'])
+            x[9] = decimal.Decimal(user['stake']['confidence'])
+            x[10] = float(user['stake']['soc'])
         leaderboard.append(x)
     columns = ['round', 'user', 'usd_main', 'usd_stake', 'nmr_main',
-               'nmr_stake', 'nmr_burn', 'live', 's']
+               'nmr_stake', 'nmr_burn', 'live', 's', 'c', 'soc']
     df = pd.DataFrame(data=leaderboard, columns=columns)
     return df
 

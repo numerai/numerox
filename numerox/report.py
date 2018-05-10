@@ -77,6 +77,11 @@ class Report(object):
         df = group_consistency(self.lb[round1:round2])
         return df
 
+    def group_confidence(self, round1=61, round2=None):
+        "Linearly interpolated confidence at prize-pool cutoff"
+        df = group_confidence(self.lb[round1:round2])
+        return df
+
     def group_burn(self, round1=61, round2=None):
         "Total NMR burn per round"
         df = group_burn(self.lb[round1:round2])
@@ -110,6 +115,9 @@ class Report(object):
 
         print_title(self.group_consistency)
         print(self.group_consistency(round1, round2))
+
+        print_title(self.group_confidence)
+        print(self.group_confidence(round1, round2))
 
         print_title(self.group_burn)
         print(self.group_burn(round1, round2))
@@ -194,7 +202,7 @@ def group_consistency(df):
     df_pass1 = 1.0 * (df_pass1 < np.log(2))
     df_pass1[df['round'] > 101] = 0
     df_pass2 = df['live']
-    df_pass2 = 1.0 * (df_pass1 < LOGLOSS_BENCHMARK)
+    df_pass2 = 1.0 * (df_pass2 < LOGLOSS_BENCHMARK)
     df_pass2[df['round'] < 102] = 0
     df_pass = df_pass1 + df_pass2
     df.insert(3, 'pass', df_pass)
@@ -208,6 +216,57 @@ def group_consistency(df):
     # put it all together
     df = pd.concat([df_overall, df_nonstake, df_stake], axis=1)
     df.columns = ['overall', 'nonstake', 'stake']
+
+    return df
+
+
+def group_confidence(df):
+    "Linearly interpolated confidence at prize-pool cutoff"
+
+    # display round range
+    t1 = df['round'].min()
+    if t1 < 61:
+        t1 = 61
+    t2 = df['round'].max()
+    if t1 < 61:
+        t1 = 61
+    fmt = "Linearly interpolated confidence at prize-pool cutoff (R{} - R{})"
+    print(fmt.format(t1, t2))
+
+    # only keep the data that we need
+    df = df[['round', 's', 'c', 'soc', 'nmr_burn']]
+    df = df[df.s != 0]
+
+    # loop through each round
+    data = []
+    for r in range(t1, t2 + 1):
+
+        if r < 78:
+            cutoff = 3000
+        else:
+            cutoff = 6000
+
+        c = [0, 0]
+        for i in range(2):
+            stakes = df[df['round'] == r]
+            if i == 1:
+                stakes = stakes[stakes.nmr_burn == 0]
+            stakes = stakes.sort_values(by='c', ascending=False)
+            cumsum = stakes.soc.cumsum(axis=0) - stakes.soc  # dollars above
+            stakes.insert(4, 'cumsum', cumsum)
+            x = stakes['c'].values.astype(np.float64)
+            y = stakes['cumsum'].values
+            idx = np.isfinite(x + y)
+            x = x[idx]
+            y = y[idx]
+            c[i] = np.interp(cutoff, y, x)
+
+        data.append([r, c[0], c[1]])
+
+    # jam into dataframe
+    df = pd.DataFrame(data=data,
+                      columns=['round', 'cutoff', 'resolved_cutoff'])
+    df = df.set_index('round')
 
     return df
 

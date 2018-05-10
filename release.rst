@@ -7,8 +7,10 @@ Release Notes
 
   # Add ``LoocvSplitter``
   * Add ``report.reputation``
+  * Add ``report.group_confidence``
   * Add ``report.group_consistency``
   * Add ``report.group_burn``
+  * Add confidence and s/c to ``Leaderboard``
 
 - v1.3.0
 
