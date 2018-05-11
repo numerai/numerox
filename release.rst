@@ -3,6 +3,8 @@
 Release Notes
 =============
 
+- v1.5.0 (in development; not yet released)
+
 - v1.4.0
 
   # Add ``LoocvSplitter``
