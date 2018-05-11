@@ -3,7 +3,7 @@
 Release Notes
 =============
 
-- v1.4.0 (not yet released)
+- v1.4.0
 
   # Add ``LoocvSplitter``
   * Add ``report.reputation``
