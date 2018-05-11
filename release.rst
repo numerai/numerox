@@ -11,6 +11,7 @@ Release Notes
   * Add ``report.group_consistency``
   * Add ``report.group_burn``
   * Add confidence and s/c to ``Leaderboard``
+  * Bugfix when sorting prediction.performance by consistency
 
 - v1.3.0
 

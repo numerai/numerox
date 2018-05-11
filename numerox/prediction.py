@@ -220,8 +220,12 @@ class Prediction(object):
             elif sort_by == 'sharpe':
                 df = df.sort_values(by='sharpe', ascending=False)
             elif sort_by == 'consis':
-                df = df.sort_values(by=['consis', 'logloss'],
-                                    ascending=[False, True])
+                by = ['consis']
+                ascending = [False]
+                if 'logloss' in df:
+                    by.append('logloss')
+                    ascending.append('True')
+                df = df.sort_values(by=by, ascending=ascending)
             else:
                 raise ValueError("`sort_by` name not recognized")
         return df
