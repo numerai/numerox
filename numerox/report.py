@@ -67,6 +67,13 @@ class Report(object):
         df = new_user(self.lb[round1:round2])
         return df
 
+    def user_summary(self, users, round1=61, round2=None):
+        "Summary report on user(s)"
+        if nx.isstring(users):
+            users = [users]
+        df = user_summary(self.lb[round1:round2], users)
+        return df
+
     def user_participation(self, user, round1=61, round2=None):
         "List of rounds user participated in"
         r = user_participation(self.lb[round1:round2], user)
@@ -145,14 +152,15 @@ def consistency(df, min_participation_fraction):
     return consistency
 
 
-def reputation(df):
+def reputation(df, verbose=True):
     "Reputation report"
 
     # display round range
-    t1 = df['round'].min()
-    t2 = df['round'].max()
-    fmt = "Reputation (sorted by points, username) (R{} - R{})"
-    print(fmt.format(t1, t2))
+    if verbose:
+        t1 = df['round'].min()
+        t2 = df['round'].max()
+        fmt = "Reputation (sorted by points, username) (R{} - R{})"
+        print(fmt.format(t1, t2))
 
     # pass logloss benchmark?
     df = df[['user', 'round', 'live']]
@@ -187,14 +195,15 @@ def reputation(df):
     return df
 
 
-def group_consistency(df):
+def group_consistency(df, verbose=True):
     "Consistency among various groups of users"
 
     # display round range
-    t1 = df['round'].min()
-    t2 = df['round'].max()
-    fmt = "Group consistency (R{} - R{})"
-    print(fmt.format(t1, t2))
+    if verbose:
+        t1 = df['round'].min()
+        t2 = df['round'].max()
+        fmt = "Group consistency (R{} - R{})"
+        print(fmt.format(t1, t2))
 
     # pass logloss benchmark?
     df = df[['user', 'round', 'live', 's']]
@@ -220,18 +229,20 @@ def group_consistency(df):
     return df
 
 
-def group_confidence(df):
+def group_confidence(df, verbose=True):
     "Linearly interpolated confidence at prize-pool cutoff"
 
     # display round range
-    t1 = df['round'].min()
-    if t1 < 61:
-        t1 = 61
-    t2 = df['round'].max()
-    if t1 < 61:
-        t1 = 61
-    fmt = "Linearly interpolated confidence at prize-pool cutoff (R{} - R{})"
-    print(fmt.format(t1, t2))
+    if verbose:
+        t1 = df['round'].min()
+        if t1 < 61:
+            t1 = 61
+        t2 = df['round'].max()
+        if t1 < 61:
+            t1 = 61
+        fmt = "Linearly interpolated confidence at prize-pool cutoff "
+        fmt += "(R{} - R{})"
+        print(fmt.format(t1, t2))
 
     # only keep the data that we need
     df = df[['round', 's', 'c', 'soc', 'nmr_burn']]
@@ -271,14 +282,15 @@ def group_confidence(df):
     return df
 
 
-def group_burn(df):
+def group_burn(df, verbose=True):
     "Total NMR burn per round"
 
     # display round range
-    t1 = df['round'].min()
-    t2 = df['round'].max()
-    fmt = "NMR burned (R{} - R{})"
-    print(fmt.format(t1, t2))
+    if verbose:
+        t1 = df['round'].min()
+        t2 = df['round'].max()
+        fmt = "NMR burned (R{} - R{})"
+        print(fmt.format(t1, t2))
 
     # nmr burned
     df = df.drop_duplicates(['round', 'user'])
@@ -320,13 +332,14 @@ def ten99(df, user, year, tournament):
     return df
 
 
-def stake(df):
+def stake(df, verbose=True):
     "Earnings report of top stakers"
     price = nx.token_price_data(ticker='nmr')['price']
-    t1 = df['round'].min()
-    t2 = df['round'].max()
-    fmt = "Top stake earners (R{} - R{}) at {:.2f} usd/nmr"
-    print(fmt.format(t1, t2, price))
+    if verbose:
+        t1 = df['round'].min()
+        t2 = df['round'].max()
+        fmt = "Top stake earners (R{} - R{}) at {:.2f} usd/nmr"
+        print(fmt.format(t1, t2, price))
     df = df[['user', 'usd_stake', 'nmr_stake', 'nmr_burn']]
     df = df.groupby('user').sum()
     nmr = df['nmr_stake'] - df['nmr_burn']
@@ -338,13 +351,14 @@ def stake(df):
     return df
 
 
-def earn(df):
+def earn(df, verbose=True):
     "Report on top earners"
     price = nx.token_price_data(ticker='nmr')['price']
-    t1 = df['round'].min()
-    t2 = df['round'].max()
-    fmt = "Top earners (R{} - R{}) at {:.2f} usd/nmr"
-    print(fmt.format(t1, t2, price))
+    if verbose:
+        t1 = df['round'].min()
+        t2 = df['round'].max()
+        fmt = "Top earners (R{} - R{}) at {:.2f} usd/nmr"
+        print(fmt.format(t1, t2, price))
     df = df[['user', 'usd_main', 'usd_stake', 'nmr_main', 'nmr_stake',
             'nmr_burn']]
     df = df.groupby('user').sum()
@@ -360,12 +374,13 @@ def earn(df):
     return df
 
 
-def burn(df):
+def burn(df, verbose=True):
     "Report on top burners"
-    t1 = df['round'].min()
-    t2 = df['round'].max()
-    fmt = "Top burners (R{} - R{})"
-    print(fmt.format(t1, t2))
+    if verbose:
+        t1 = df['round'].min()
+        t2 = df['round'].max()
+        fmt = "Top burners (R{} - R{})"
+        print(fmt.format(t1, t2))
     df = df[['user', 'nmr_burn']]
     df = df.groupby('user').sum()
     df = df.sort_values('nmr_burn', ascending=False)
@@ -374,12 +389,13 @@ def burn(df):
     return df
 
 
-def participation(df):
+def participation(df, verbose=True):
     "Report on participation"
-    t1 = df['round'].min()
-    t2 = df['round'].max()
-    fmt = "Participation (R{} - R{})"
-    print(fmt.format(t1, t2))
+    if verbose:
+        t1 = df['round'].min()
+        t2 = df['round'].max()
+        fmt = "Participation (R{} - R{})"
+        print(fmt.format(t1, t2))
     df = df[['user', 'round']]
     gb = df.groupby('user')
     # users appear twice in R44 so use nunique instead of count
@@ -396,12 +412,13 @@ def participation(df):
     return df
 
 
-def big_staker(df):
+def big_staker(df, verbose=True):
     "Report on big stakers"
-    t1 = df['round'].min()
-    t2 = df['round'].max()
-    fmt = "Big stakers (in units of NMR) (R{} - R{})"
-    print(fmt.format(t1, t2))
+    if verbose:
+        t1 = df['round'].min()
+        t2 = df['round'].max()
+        fmt = "Big stakers (in units of NMR) (R{} - R{})"
+        print(fmt.format(t1, t2))
     pool = df['usd_stake'].abs() + df['nmr_burn'].abs() != 0
     df = df[['user', 's']]
     df.insert(2, 'pool', df['s'] * pool)
@@ -423,12 +440,13 @@ def big_staker(df):
     return df
 
 
-def new_user(df):
+def new_user(df, verbose=True):
     "Count of new users versus round number"
     t1 = df['round'].min()
     t2 = df['round'].max()
-    fmt = "Count of new users (R{} - R{})"
-    print(fmt.format(t1, t2))
+    if verbose:
+        fmt = "Count of new users (R{} - R{})"
+        print(fmt.format(t1, t2))
     df = df[['user', 'round']]
     df_first = df.groupby('user').min()
     df_first = df_first.rename({'round': 'first'}, axis='columns')
@@ -439,6 +457,55 @@ def new_user(df):
     df = pd.DataFrame(data=data, columns=['round', 'count'])
     df = df.set_index('round')
     return df
+
+
+def user_summary(df, users, verbose=True):
+    "Summary report on user(s)"
+
+    if verbose:
+        t1 = df['round'].min()
+        t2 = df['round'].max()
+        fmt = "User(s) summary (R{} - R{})"
+        print(fmt.format(t1, t2))
+
+    idx = df.user.isin(users)
+    df = df[idx]
+
+    s = pd.DataFrame(columns=users)
+
+    c = consistency(df, 0)
+    s.loc['rounds'] = c['rounds']
+
+    r = reputation(df, verbose=False)
+    s.loc['rep_points'] = r['points']
+    s.loc['consistency'] = c['consistency']
+
+    e = earn(df, verbose=False)
+    s.loc['profit_usd'] = e['profit_usd']
+    s.loc['nmr_burn'] = e['nmr_burn']
+
+    bs = big_staker(df, verbose=False)
+    s.loc['nmr_staked'] = bs['sum']
+    s.loc['median_stake'] = bs['median']
+    s.loc['max_stake'] = bs['max']
+
+    st = stake(df, verbose=False)
+    s.loc['stake_profit_usd'] = st['profit_usd']
+
+    d = df[['user']]
+    nmr = df['nmr_main'] + df['nmr_stake']
+    d.insert(1, 'nmr', nmr)
+    nmr = d.groupby('user').sum()['nmr']
+    s.loc['nmr_earn'] = nmr
+
+    s = s.loc[['rep_points', 'rounds', 'consistency', 'profit_usd',
+               'nmr_staked', 'median_stake', 'max_stake', 'nmr_burn',
+               'nmr_earn']]
+
+    for row in ('nmr_staked', 'median_stake', 'max_stake'):
+        s.loc[row] = s.loc[row].fillna(0)
+
+    return s
 
 
 def user_participation(df, user):
