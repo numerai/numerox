@@ -498,12 +498,14 @@ def user_summary(df, users, verbose=True):
     nmr = d.groupby('user').sum()['nmr']
     s.loc['nmr_earn'] = nmr
 
-    s = s.loc[['rep_points', 'rounds', 'consistency', 'profit_usd',
+    columns = ['rep_points', 'rounds', 'consistency', 'profit_usd',
                'nmr_staked', 'median_stake', 'max_stake', 'nmr_burn',
-               'nmr_earn']]
+               'nmr_earn']
+    s = s.loc[columns]
 
-    for row in ('nmr_staked', 'median_stake', 'max_stake'):
-        s.loc[row] = s.loc[row].fillna(0)
+    for row in columns:
+        if row != 'consistency':
+            s.loc[row] = s.loc[row].fillna(0)
 
     return s
 
