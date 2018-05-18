@@ -522,7 +522,7 @@ def user_nmr(df, users, tournament, verbose=True):
     if verbose:
         t1 = df['round'].min()
         t2 = df['round'].max()
-        fmt = "User(s) earnings detail (R{} - R{})"
+        fmt = "User(s) nmr detail (R{} - R{})"
         print(fmt.format(t1, t2))
     idx = df.user.isin(users)
     df = df[idx]
