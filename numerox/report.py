@@ -74,6 +74,13 @@ class Report(object):
         df = user_summary(self.lb[round1:round2], users)
         return df
 
+    def user_nmr(self, users, round1=61, round2=None):
+        "User(s) nmr details"
+        if nx.isstring(users):
+            users = [users]
+        df = user_nmr(self.lb[round1:round2], users, self.tournament)
+        return df
+
     def user_participation(self, user, round1=61, round2=None):
         "List of rounds user participated in"
         r = user_participation(self.lb[round1:round2], user)
@@ -508,6 +515,27 @@ def user_summary(df, users, verbose=True):
             s.loc[row] = s.loc[row].fillna(0)
 
     return s
+
+
+def user_nmr(df, users, tournament, verbose=True):
+    "User(s) nmr details"
+    if verbose:
+        t1 = df['round'].min()
+        t2 = df['round'].max()
+        fmt = "User(s) earnings detail (R{} - R{})"
+        print(fmt.format(t1, t2))
+    idx = df.user.isin(users)
+    df = df[idx]
+    df = df[['round', 'user', 'nmr_main', 'nmr_stake', 'nmr_burn']]
+    idx = df['nmr_main'] + df['nmr_stake'] + df['nmr_burn'].abs() != 0
+    df = df[idx]
+    df = df.reset_index(drop=True)
+    net_nmr = df['nmr_main'] + df['nmr_stake'] - df['nmr_burn']
+    df.insert(5, 'net_nmr', net_nmr)
+    date = round_resolution_date(tournament=tournament)
+    date = date.loc[df['round']]
+    df.insert(0, 'date', date.values)
+    return df
 
 
 def user_participation(df, user):

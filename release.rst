@@ -6,6 +6,7 @@ Release Notes
 - v1.5.0 (in development; not yet released)
 
   * Add ``report.user_summary``
+  * Add ``report.user_nmr``
 
 - v1.4.0
 
