@@ -7,6 +7,7 @@ Release Notes
 
   * Add ``report.user_summary``
   * Add ``report.user_nmr``
+  * Add more information to ``report.new_users``
 
 - v1.4.0
 

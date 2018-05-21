@@ -454,14 +454,18 @@ def new_user(df, verbose=True):
     if verbose:
         fmt = "Count of new users (R{} - R{})"
         print(fmt.format(t1, t2))
-    df = df[['user', 'round']]
+    df = df[['user', 'round', 's']]
+    df2 = df[df.s != 0]
     df_first = df.groupby('user').min()
+    df2_first = df2.groupby('user').min()
     df_first = df_first.rename({'round': 'first'}, axis='columns')
+    df2_first = df2_first.rename({'round': 'first'}, axis='columns')
     data = []
     for r in range(t1, t2 + 1):
         n = (df_first['first'] == r).sum()
-        data.append((r, n))
-    df = pd.DataFrame(data=data, columns=['round', 'count'])
+        n2 = (df2_first['first'] == r).sum()
+        data.append((r, n2, n))
+    df = pd.DataFrame(data=data, columns=['round', 'stakers', 'total'])
     df = df.set_index('round')
     return df
 
