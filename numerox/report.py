@@ -67,6 +67,11 @@ class Report(object):
         df = new_user(self.lb[round1:round2])
         return df
 
+    def single_stake_payout(self, round1=61, round2=None):
+        "Largest stake payouts"
+        df = single_stake_payout(self.lb[round1:round2])
+        return df
+
     def user_summary(self, users, round1=61, round2=None):
         "Summary report on user(s)"
         if nx.isstring(users):
@@ -126,6 +131,9 @@ class Report(object):
 
         print_title(self.new_user)
         print(self.new_user(round1, round2))
+
+        print_title(self.single_stake_payout)
+        print(self.single_stake_payout(round1, round2))
 
         print_title(self.group_consistency)
         print(self.group_consistency(round1, round2))
@@ -467,6 +475,25 @@ def new_user(df, verbose=True):
         data.append((r, n2, n))
     df = pd.DataFrame(data=data, columns=['round', 'stakers', 'total'])
     df = df.set_index('round')
+    return df
+
+
+def single_stake_payout(df, verbose=True):
+    "Largest stake payouts"
+    price = nx.token_price_data(ticker='nmr')['price']
+    t1 = df['round'].min()
+    t2 = df['round'].max()
+    if verbose:
+        fmt = "Largest stake payouts (R{} - R{}) at {:.2f} usd/nmr"
+        print(fmt.format(t1, t2, price))
+    df = df[['round', 'user', 's', 'c', 'usd_stake', 'nmr_stake', 'nmr_burn']]
+    nmr = df['nmr_stake'] - df['nmr_burn']
+    profit_usd = df['usd_stake'] + price * nmr
+    df.insert(4, 'profit_usd', profit_usd)
+    df = df.drop(['usd_stake', 'nmr_stake', 'nmr_burn'], axis=1)
+    df = df.sort_values('profit_usd', ascending=False)
+    df = df.round()
+    df = df.reset_index(drop=True)
     return df
 
 
