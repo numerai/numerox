@@ -86,6 +86,22 @@ class Report(object):
         df = user_nmr(self.lb[round1:round2], users, self.tournament)
         return df
 
+    def user_nmr_tax(self, users, round1=61, round2=None,
+                     price_zero_burns=True):
+        """
+        User(s) nmr tax details.
+
+        Price of nmr (in usd) before round 58 (i.e before nmr was traded on
+        and exchange) is set to 0.
+
+        Price of nmr for burns is optionally set to zero by default.
+        """
+        if nx.isstring(users):
+            users = [users]
+        df = user_nmr_tax(self.lb[round1:round2], users, self.tournament,
+                          price_zero_burns)
+        return df
+
     def user_participation(self, user, round1=61, round2=None):
         "List of rounds user participated in"
         r = user_participation(self.lb[round1:round2], user)
@@ -566,6 +582,61 @@ def user_nmr(df, users, tournament, verbose=True):
     date = round_resolution_date(tournament=tournament)
     date = date.loc[df['round']]
     df.insert(0, 'date', date.values)
+    return df
+
+
+def user_nmr_tax(df, users, tournament, price_zero_burns, verbose=True):
+    "User(s) nmr tax details"
+    if verbose:
+        t1 = df['round'].min()
+        t2 = df['round'].max()
+        fmt = "User(s) nmr tax detail (R{} - R{})"
+        print(fmt.format(t1, t2))
+
+    df = user_nmr(df, users, tournament, verbose=False)
+    nmrprice = nx.nmr_resolution_price(tournament=tournament)
+    price = []
+    for n in df['round']:
+        if n < 58:
+            # nmr not yet traded on bittrex
+            p = 0
+        else:
+            p = nmrprice.loc[n]['usd']
+        price.append(p)
+    df['nmr_usd'] = price
+
+    data = []
+    for i in range(df.shape[0]):
+        row = df.iloc[i]
+        if row['nmr_main'] > 0:
+            data.append([row['date'],
+                         'nmr',
+                         row['nmr_main'],
+                         row['nmr_usd'] * row['nmr_main'],
+                         'main',
+                         row['user']])
+        if row['nmr_stake'] > 0:
+            data.append([row['date'],
+                         'nmr',
+                         row['nmr_stake'],
+                         row['nmr_usd'] * row['nmr_stake'],
+                         'stake',
+                         row['user']])
+        if row['nmr_burn'] > 0:
+            if price_zero_burns:
+                value = 0
+            else:
+                value = -row['nmr_usd'] * row['nmr_burn']
+            data.append([row['date'],
+                         'nmr',
+                         -row['nmr_burn'],
+                         value,
+                         'burn',
+                         row['user']])
+
+    columns = ['date', 'ticker', 'shares', 'usd', 'type', 'acct']
+    df = pd.DataFrame(data=data, columns=columns)
+
     return df
 
 

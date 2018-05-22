@@ -7,6 +7,7 @@ Release Notes
 
   * Add ``report.user_summary``
   * Add ``report.user_nmr``
+  * Add ``report.user_nmr_tax``
   * Add ``report.single_stake_payout``
   * Add more information to ``report.new_users``
 
