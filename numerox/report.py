@@ -478,11 +478,13 @@ def headcount(df, verbose=True):
     if verbose:
         fmt = "Count of users (R{} - R{})"
         print(fmt.format(t1, t2))
-    df = df[['user', 'round', 's']]
+    df = df[['user', 'round', 's', 'nmr_burn']]
     df2 = df[df.s != 0]
     df3 = df[df.s == 0]
+    df4 = df[df.nmr_burn > 0]
     df2_first = df2.groupby('user').min()
     df3_first = df3.groupby('user').min()
+    df4_first = df4.groupby('user').min()
     data = []
     for r in range(t1, t2 + 1):
         total = (df['round'] == r).sum()
@@ -490,8 +492,11 @@ def headcount(df, verbose=True):
         nonstake = (df3['round'] == r).sum()
         new_stake = (df2_first['round'] == r).sum()
         new_nonstake = (df3_first['round'] == r).sum()
-        data.append((r, total, stake, nonstake, new_stake, new_nonstake))
-    cols = ['round', 'total', 'stake', 'nonstake', 'new_stake', 'new_nonstake']
+        new_burn = (df4_first['round'] == r).sum()
+        data.append((r, total, stake, nonstake, new_stake, new_nonstake,
+                     new_burn))
+    cols = ['round', 'total', 'stake', 'nonstake', 'new_stake',
+            'new_nonstake', 'new_burn']
     df = pd.DataFrame(data=data, columns=cols)
     df = df.set_index('round')
     return df
