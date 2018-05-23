@@ -62,9 +62,9 @@ class Report(object):
         df = ntopify(df, ntop)
         return df
 
-    def new_user(self, round1=61, round2=None):
-        "Count of new users versus round number"
-        df = new_user(self.lb[round1:round2])
+    def headcount(self, round1=61, round2=None):
+        "Count of users versus round number"
+        df = headcount(self.lb[round1:round2])
         return df
 
     def single_stake_payout(self, round1=61, round2=None):
@@ -145,8 +145,8 @@ class Report(object):
         print_title(self.big_staker)
         print(self.big_staker(round1, round2))
 
-        print_title(self.new_user)
-        print(self.new_user(round1, round2))
+        print_title(self.headcount)
+        print(self.headcount(round1, round2))
 
         print_title(self.single_stake_payout)
         print(self.single_stake_payout(round1, round2))
@@ -471,25 +471,28 @@ def big_staker(df, verbose=True):
     return df
 
 
-def new_user(df, verbose=True):
-    "Count of new users versus round number"
+def headcount(df, verbose=True):
+    "Count of users versus round number"
     t1 = df['round'].min()
     t2 = df['round'].max()
     if verbose:
-        fmt = "Count of new users (R{} - R{})"
+        fmt = "Count of users (R{} - R{})"
         print(fmt.format(t1, t2))
     df = df[['user', 'round', 's']]
     df2 = df[df.s != 0]
-    df_first = df.groupby('user').min()
+    df3 = df[df.s == 0]
     df2_first = df2.groupby('user').min()
-    df_first = df_first.rename({'round': 'first'}, axis='columns')
-    df2_first = df2_first.rename({'round': 'first'}, axis='columns')
+    df3_first = df3.groupby('user').min()
     data = []
     for r in range(t1, t2 + 1):
-        n = (df_first['first'] == r).sum()
-        n2 = (df2_first['first'] == r).sum()
-        data.append((r, n2, n))
-    df = pd.DataFrame(data=data, columns=['round', 'stakers', 'total'])
+        total = (df['round'] == r).sum()
+        stake = (df2['round'] == r).sum()
+        nonstake = (df3['round'] == r).sum()
+        new_stake = (df2_first['round'] == r).sum()
+        new_nonstake = (df3_first['round'] == r).sum()
+        data.append((r, total, stake, nonstake, new_stake, new_nonstake))
+    cols = ['round', 'total', 'stake', 'nonstake', 'new_stake', 'new_nonstake']
+    df = pd.DataFrame(data=data, columns=cols)
     df = df.set_index('round')
     return df
 

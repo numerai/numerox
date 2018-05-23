@@ -9,6 +9,7 @@ Release Notes
   * Add ``report.user_nmr``
   * Add ``report.user_nmr_tax``
   * Add ``report.single_stake_payout``
+  * Rename ``report.new_users`` to ``report.headcount`` and add columns
   * Add more information to ``report.new_users``
 
 - v1.4.0
