@@ -3,6 +3,8 @@
 Release Notes
 =============
 
+- v1.6.0 (in development; not yet released)
+
 - v1.5.0
 
   * Add ``report.user_summary``
