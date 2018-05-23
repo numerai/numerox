@@ -15,7 +15,7 @@ Release Notes
 
 - v1.4.0
 
-  # Add ``LoocvSplitter``
+  * Add ``LoocvSplitter``
   * Add ``report.reputation``
   * Add ``report.group_confidence``
   * Add ``report.group_consistency``
