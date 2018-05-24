@@ -6,19 +6,20 @@ from numerox.numerai import year_to_round_range
 from numerox.numerai import round_resolution_date
 from numerox.metrics import LOGLOSS_BENCHMARK
 
-DEFAULT_FIRST_ROUND = 51
-
 
 class Report(object):
 
     def __init__(self, tournament=1):
         self.tournament = tournament
         self.lb = nx.Leaderboard(tournament)
+        self.resolution_date = None
 
     def ten99(self, user, year=2017):
         "Generate unoffical 1099-MISC report"
         r1, r2 = year_to_round_range(year, self.tournament)
-        df = ten99(self.lb[r1:r2], user, year, self.tournament)
+        nmr_price = nx.nmr_resolution_price(tournament=self.tournament)
+        resolution_dates = self.get_resolution_dates()
+        df = ten99(self.lb[r1:r2], user, nmr_price, resolution_dates)
         return df
 
     def consistency(self, round1, round2=None, min_participation_fraction=0.8):
@@ -34,13 +35,15 @@ class Report(object):
 
     def stake(self, round1=61, round2=None, ntop=None):
         "Stake earnings report"
-        df = stake(self.lb[round1:round2])
+        nmr_usd = nx.token_price_data(ticker='nmr')['price']
+        df = stake(self.lb[round1:round2], nmr_usd)
         df = ntopify(df, ntop)
         return df
 
     def earn(self, round1=61, round2=None, ntop=None):
         "Earnings report"
-        df = earn(self.lb[round1:round2])
+        nmr_usd = nx.token_price_data(ticker='nmr')['price']
+        df = earn(self.lb[round1:round2], nmr_usd)
         df = ntopify(df, ntop)
         return df
 
@@ -69,21 +72,24 @@ class Report(object):
 
     def single_stake_payout(self, round1=61, round2=None):
         "Largest stake payouts"
-        df = single_stake_payout(self.lb[round1:round2])
+        nmr_usd = nx.token_price_data(ticker='nmr')['price']
+        df = single_stake_payout(self.lb[round1:round2], nmr_usd)
         return df
 
     def user_summary(self, users, round1=61, round2=None):
         "Summary report on user(s)"
+        nmr_usd = nx.token_price_data(ticker='nmr')['price']
         if nx.isstring(users):
             users = [users]
-        df = user_summary(self.lb[round1:round2], users)
+        df = user_summary(self.lb[round1:round2], users, nmr_usd)
         return df
 
     def user_nmr(self, users, round1=61, round2=None):
         "User(s) nmr details"
         if nx.isstring(users):
             users = [users]
-        df = user_nmr(self.lb[round1:round2], users, self.tournament)
+        resolution_dates = self.get_resolution_dates()
+        df = user_nmr(self.lb[round1:round2], users, resolution_dates)
         return df
 
     def user_nmr_tax(self, users, round1=61, round2=None,
@@ -98,8 +104,10 @@ class Report(object):
         """
         if nx.isstring(users):
             users = [users]
-        df = user_nmr_tax(self.lb[round1:round2], users, self.tournament,
-                          price_zero_burns)
+        nmr_price = nx.nmr_resolution_price(tournament=self.tournament)
+        resolution_dates = self.get_resolution_dates()
+        df = user_nmr_tax(self.lb[round1:round2], users, nmr_price,
+                          resolution_dates, price_zero_burns)
         return df
 
     def user_participation(self, user, round1=61, round2=None):
@@ -159,6 +167,12 @@ class Report(object):
 
         print_title(self.group_burn)
         print(self.group_burn(round1, round2))
+
+    def get_resolution_dates(self):
+        if self.resolution_date is None:
+            dates = round_resolution_date(tournament=self.tournament)
+            self.resolution_date = dates
+        return self.resolution_date
 
 
 def consistency(df, min_participation_fraction):
@@ -264,13 +278,13 @@ def group_confidence(df, verbose=True):
     "Linearly interpolated confidence at prize-pool cutoff"
 
     # display round range
+    t1 = df['round'].min()
+    if t1 < 61:
+        t1 = 61
+    t2 = df['round'].max()
+    if t1 < 61:
+        t1 = 61
     if verbose:
-        t1 = df['round'].min()
-        if t1 < 61:
-            t1 = 61
-        t2 = df['round'].max()
-        if t1 < 61:
-            t1 = 61
         fmt = "Linearly interpolated confidence at prize-pool cutoff "
         fmt += "(R{} - R{})"
         print(fmt.format(t1, t2))
@@ -291,10 +305,14 @@ def group_confidence(df, verbose=True):
         c = [0, 0]
         for i in range(2):
             stakes = df[df['round'] == r]
+            if stakes.shape[0] < 2:
+                continue
             if i == 1:
                 stakes = stakes[stakes.nmr_burn == 0]
             stakes = stakes.sort_values(by='c', ascending=False)
             cumsum = stakes.soc.cumsum(axis=0) - stakes.soc  # dollars above
+            if cumsum.max() < cutoff:
+                continue
             stakes.insert(4, 'cumsum', cumsum)
             x = stakes['c'].values.astype(np.float64)
             y = stakes['cumsum'].values
@@ -334,19 +352,18 @@ def group_burn(df, verbose=True):
     return df
 
 
-def ten99(df, user, year, tournament):
+def ten99(df, user, nmr_price, resolution_dates):
     "Generate unoffical 1099-MISC report"
     df = df[df.user == user]
     df = df[['round', 'usd_main', 'usd_stake', 'nmr_main', 'nmr_stake']]
     df = df.set_index('round')
-    nmrprice = nx.nmr_resolution_price(tournament=tournament)
     price = []
     for n in df.index:
         if n < 58:
             # nmr not yet traded on bittrex
             p = 0
         else:
-            p = nmrprice.loc[n]['usd']
+            p = nmr_price.loc[n]['usd']
         price.append(p)
     df['nmr_usd'] = price
     total = df['usd_main'].values + df['usd_stake'].values
@@ -355,7 +372,7 @@ def ten99(df, user, year, tournament):
     df['total'] = total
     earn = df['usd_main'] + df['nmr_main'] + df['nmr_stake'] + df['usd_stake']
     df = df[earn != 0]  # remove burn only rounds
-    date = round_resolution_date(tournament=tournament)
+    date = resolution_dates
     date = date.loc[df.index]
     df.insert(0, 'date', date)
     df['nmr_usd'] = df['nmr_usd'].round(2)
@@ -363,9 +380,8 @@ def ten99(df, user, year, tournament):
     return df
 
 
-def stake(df, verbose=True):
+def stake(df, price, verbose=True):
     "Earnings report of top stakers"
-    price = nx.token_price_data(ticker='nmr')['price']
     if verbose:
         t1 = df['round'].min()
         t2 = df['round'].max()
@@ -382,9 +398,8 @@ def stake(df, verbose=True):
     return df
 
 
-def earn(df, verbose=True):
+def earn(df, price, verbose=True):
     "Report on top earners"
-    price = nx.token_price_data(ticker='nmr')['price']
     if verbose:
         t1 = df['round'].min()
         t2 = df['round'].max()
@@ -502,9 +517,8 @@ def headcount(df, verbose=True):
     return df
 
 
-def single_stake_payout(df, verbose=True):
+def single_stake_payout(df, price, verbose=True):
     "Largest stake payouts"
-    price = nx.token_price_data(ticker='nmr')['price']
     t1 = df['round'].min()
     t2 = df['round'].max()
     if verbose:
@@ -521,7 +535,7 @@ def single_stake_payout(df, verbose=True):
     return df
 
 
-def user_summary(df, users, verbose=True):
+def user_summary(df, users, price, verbose=True):
     "Summary report on user(s)"
 
     if verbose:
@@ -542,7 +556,7 @@ def user_summary(df, users, verbose=True):
     s.loc['rep_points'] = r['points']
     s.loc['consistency'] = c['consistency']
 
-    e = earn(df, verbose=False)
+    e = earn(df, price, verbose=False)
     s.loc['profit_usd'] = e['profit_usd']
     s.loc['nmr_burn'] = e['nmr_burn']
 
@@ -551,7 +565,7 @@ def user_summary(df, users, verbose=True):
     s.loc['median_stake'] = bs['median']
     s.loc['max_stake'] = bs['max']
 
-    st = stake(df, verbose=False)
+    st = stake(df, price, verbose=False)
     s.loc['stake_profit_usd'] = st['profit_usd']
 
     d = df[['user']]
@@ -572,7 +586,7 @@ def user_summary(df, users, verbose=True):
     return s
 
 
-def user_nmr(df, users, tournament, verbose=True):
+def user_nmr(df, users, resolution_dates, verbose=True):
     "User(s) nmr details"
     if verbose:
         t1 = df['round'].min()
@@ -587,13 +601,15 @@ def user_nmr(df, users, tournament, verbose=True):
     df = df.reset_index(drop=True)
     net_nmr = df['nmr_main'] + df['nmr_stake'] - df['nmr_burn']
     df.insert(5, 'net_nmr', net_nmr)
-    date = round_resolution_date(tournament=tournament)
+    date = resolution_dates
     date = date.loc[df['round']]
-    df.insert(0, 'date', date.values)
+    if df.shape[0] > 0:
+        df.insert(0, 'date', date.values)
     return df
 
 
-def user_nmr_tax(df, users, tournament, price_zero_burns, verbose=True):
+def user_nmr_tax(df, users, nmr_price, resolution_dates, price_zero_burns,
+                 verbose=True):
     "User(s) nmr tax details"
     if verbose:
         t1 = df['round'].min()
@@ -601,15 +617,14 @@ def user_nmr_tax(df, users, tournament, price_zero_burns, verbose=True):
         fmt = "User(s) nmr tax detail (R{} - R{})"
         print(fmt.format(t1, t2))
 
-    df = user_nmr(df, users, tournament, verbose=False)
-    nmrprice = nx.nmr_resolution_price(tournament=tournament)
+    df = user_nmr(df, users, resolution_dates, verbose=False)
     price = []
     for n in df['round']:
         if n < 58:
             # nmr not yet traded on bittrex
             p = 0
         else:
-            p = nmrprice.loc[n]['usd']
+            p = nmr_price.loc[n]['usd']
         price.append(p)
     df['nmr_usd'] = price
 

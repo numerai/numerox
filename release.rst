@@ -5,6 +5,10 @@ Release Notes
 
 - v1.6.0 (in development; not yet released)
 
+  * Add simple unit testing of functions used by the Report class
+  * Bugfix ``report.user_nmr`` corner cases such when no nmr awarded
+  * Bugfix ``report.group_confidence`` corner cases such as when cumsum < $6000
+
 - v1.5.0
 
   * Add ``report.user_summary``
