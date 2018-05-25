@@ -16,10 +16,11 @@ dataset and then load it::
     >>> nx.download('numerai_dataset.zip')
     >>> data = nx.load_zip('numerai_dataset.zip')
     >>> data
-    rows      637184
+    region    train, validation, test, live
+    rows      636906
     era       133, [era1, eraX]
     x         50, min 0.0000, mean 0.5025, max 1.0000
-    y         mean 0.499924, fraction missing 0.3095
+    y         mean 0.499924, fraction missing 0.3092
 
 Let's use the logistic regression model in numerox to run 5-fold cross
 validation on the training data::
@@ -27,11 +28,11 @@ validation on the training data::
     >>> model = nx.logistic()
     >>> prediction = nx.backtest(model, data, verbosity=1)
     logistic(inverse_l2=0.0001)
-          logloss   auc     acc     ystd   stats
+           logloss     auc     acc    ystd   stats
     mean  0.692885  0.5165  0.5116  0.0056  region     train
     std   0.000536  0.0281  0.0215  0.0003    eras       120
-    min   0.691360  0.4478  0.4540  0.0050  sharpe  0.488866
-    max   0.694202  0.5944  0.5636  0.0061  consis  0.691667
+    min   0.691360  0.4478  0.4540  0.0050  sharpe  0.214323
+    max   0.694202  0.5944  0.5636  0.0061  consis     0.625
 
 OK, results are good enough for a demo so let's make a submission file for the
 tournament. We will fit the model on the train data and make our predictions
@@ -39,11 +40,11 @@ for the tournament data::
 
     >>> prediction = nx.production(model, data, verbosity=1)
     logistic(inverse_l2=0.0001)
-          logloss   auc     acc     ystd   stats
+           logloss     auc     acc    ystd   stats
     mean  0.692808  0.5194  0.5142  0.0063  region  validation
     std   0.000375  0.0168  0.0137  0.0001    eras          12
-    min   0.691961  0.4903  0.4925  0.0062  sharpe    0.903277
-    max   0.693460  0.5553  0.5342  0.0064  consis    0.916667
+    min   0.691961  0.4903  0.4925  0.0062  sharpe    0.510818
+    max   0.693460  0.5553  0.5342  0.0064  consis        0.75
 
 Let's upload our predictions to enter the tournament::
 
