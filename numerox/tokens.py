@@ -17,6 +17,34 @@ def nmr_at_addr(addr_str):
     return nmr
 
 
+def nmr_transactions(addr_str):
+    "NMR transactions (dataframe) to/from given address."
+    url = 'http://api.etherscan.io/api?module=account&action=tokentx&'
+    url += 'address=%s'
+    r = requests.get(url % addr_str)
+    data = r.json()
+    if data['status'] != '1':
+        raise IOError('Could not get nmr transactions')
+    txs = data['result']
+    d = []
+    for tx in txs:
+        if tx['tokenName'] != 'Numeraire':
+            raise ValueError('Unknown token; expecting NMR')
+        date = datetime.datetime.fromtimestamp(int(tx['timeStamp']))
+        to = tx['to']
+        if to == addr_str:
+            mult = 1
+            addr = tx['from']
+        else:
+            mult = -1
+            addr = tx['to']
+        nmr = mult * int(tx['value']) / 1e18
+        d.append([date, nmr, addr])
+    df = pd.DataFrame(data=d, columns=['date', 'nmr', 'address'])
+    df = df.set_index('date')
+    return df
+
+
 def token_price_data(ticker='nmr'):
     "Most recent price (and return) data for given ticker; returns dictionary."
     tickers = {'nmr': 'numeraire',

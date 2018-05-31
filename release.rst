@@ -5,6 +5,7 @@ Release Notes
 
 - v1.6.0 (in development; not yet released)
 
+  * Add ``nmr_transactions``
   * Replace ``is_controlling_capital`` with ``is_stakeable``
   * ``upload`` now reports if submission is stakeable
   * Add simple unit testing of functions used by the Report class

@@ -51,6 +51,7 @@ from numerox.leaderboard import get_current_round_number
 
 # tokens
 from numerox.tokens import nmr_at_addr
+from numerox.tokens import nmr_transactions
 from numerox.tokens import token_price_data
 from numerox.tokens import historical_price
 from numerox.tokens import nmr_resolution_price
