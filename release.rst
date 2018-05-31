@@ -5,6 +5,8 @@ Release Notes
 
 - v1.6.0 (in development; not yet released)
 
+  * Replace ``is_controlling_capital`` with ``is_stakeable``
+  * ``upload`` now reports if submission is stakeable
   * Add simple unit testing of functions used by the Report class
   * Bugfix ``report.user_nmr`` corner cases such when no nmr awarded
   * Bugfix ``report.group_confidence`` corner cases such as when cumsum < $6000

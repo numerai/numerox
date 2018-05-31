@@ -98,18 +98,18 @@ def status_block(upload_id, public_id, secret_key, verbose=True):
     if verbose:
         t = time.time()
         minutes = (t - t0) / 60
-        iscc = is_controlling_capital(status)
-        print(fmt_b.format('controlling capital', str(iscc), minutes))
+        iss = is_stakeable(status)
+        print(fmt_b.format('stakeable', str(iss), minutes))
     return status
 
 
-def is_controlling_capital(status):
-    "Did you get controlling capital? Pending status returns False."
+def is_stakeable(status):
+    "Is sumission stakeable? Pending status returns False."
     if None in status.values():
         return False
-    iscc = status['consistency'] >= 100 * CONSISTENCY_GTE
-    iscc = iscc and status['originality'] and status['concordance']
-    return iscc
+    iss = status['consistency'] >= 100 * CONSISTENCY_GTE
+    iss = iss and status['concordance']
+    return iss
 
 
 # ---------------------------------------------------------------------------

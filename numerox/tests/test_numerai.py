@@ -12,23 +12,27 @@ def make_status():
     return s
 
 
-def test_is_controlling_capital():
-    "test is_controlling_capital"
+def test_is_stakeable():
+    "test is_stakeable"
 
-    iscc = nx.is_controlling_capital
+    iss = nx.is_stakeable
     msg = 'is_controlling_capital failed'
 
     s = make_status()
-    ok_(iscc(s), msg)
+    ok_(iss(s), msg)
 
     s = make_status()
     s['concordance'] = None
-    ok_(not iscc(s), msg)
+    ok_(not iss(s), msg)
 
     s = make_status()
     s['concordance'] = False
-    ok_(not iscc(s), msg)
+    ok_(not iss(s), msg)
 
     s = make_status()
     s['consistency'] = 57
-    ok_(not iscc(s), msg)
+    ok_(not iss(s), msg)
+
+    s = make_status()
+    s['originality'] = False
+    ok_(iss(s), msg)
