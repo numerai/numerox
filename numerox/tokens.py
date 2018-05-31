@@ -36,7 +36,8 @@ def nmr_transactions(addr_str):
     r = requests.get(url % addr_str)
     data = r.json()
     if data['status'] != '1':
-        raise IOError('Could not get nmr transactions')
+        if data['message'] != 'No transactions found':
+            raise IOError('Could not get nmr transactions')
     txs = data['result']
     d = []
     for tx in txs:
