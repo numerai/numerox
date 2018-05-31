@@ -18,7 +18,19 @@ def nmr_at_addr(addr_str):
 
 
 def nmr_transactions(addr_str):
-    "NMR transactions (dataframe) to/from given address."
+    """
+    NMR transactions (dataframe) to/from given address.
+
+    The sign of the 'nmr' column gives the direction of the transaction. Plus
+    (minus) means the balance of NMR increased (decreased).
+
+    The 'address' column is the from address for incoming transactions and
+    the to address for outgoing transactions.
+
+    The sum of the 'nmr' column is not necessarily the NMR balance at the
+    address because burns are not included. To find the balance use
+    the function 'nmr_at_addr'.
+    """
     url = 'http://api.etherscan.io/api?module=account&action=tokentx&'
     url += 'address=%s'
     r = requests.get(url % addr_str)
