@@ -17,7 +17,7 @@ def nmr_at_addr(addr_str):
     return nmr
 
 
-def nmr_transactions(addr_str):
+def nmr_transactions(addr_str, map_known_exchanges=False):
     """
     NMR transactions (dataframe) to/from given address.
 
@@ -30,6 +30,14 @@ def nmr_transactions(addr_str):
     The sum of the 'nmr' column is not necessarily the NMR balance at the
     address because burns are not included. To find the balance use
     the function 'nmr_at_addr'.
+
+    If there are more than 1000 transactions then only the first 1000 are
+    returned.
+
+    Non-Numeraire tokens are skipped.
+
+    When `map_known_exchanges` is True an attempt will be made to map the
+    addresses to known exchange names.
     """
     url = 'http://api.etherscan.io/api?module=account&action=tokentx&'
     url += 'address=%s'
@@ -42,7 +50,7 @@ def nmr_transactions(addr_str):
     d = []
     for tx in txs:
         if tx['tokenName'] != 'Numeraire':
-            raise ValueError('Unknown token; expecting NMR')
+            continue
         date = datetime.datetime.fromtimestamp(int(tx['timeStamp']))
         to = tx['to']
         if to == addr_str:
@@ -55,6 +63,16 @@ def nmr_transactions(addr_str):
         d.append([date, nmr, addr])
     df = pd.DataFrame(data=d, columns=['date', 'nmr', 'address'])
     df = df.set_index('date')
+    if map_known_exchanges:
+        exmap = {'0xfbb1b73c4f0bda4f67dca266ce6ef42f520fbb98': 'bittrex',
+                 '0x7e5f1d2f3176b0fbcf551efa59367419e2c31812': 'bittrex',
+                 '0xe94b04a0fed112f3664e45adb2b8915693dd5ff3': 'bittrex_2',
+                 '0x8d12a197cb00d4747a1fe03395095ce2a5cc6819': 'etherdelta',
+                 '0xb68704549cab20de1fadad34d27a86ffabb04a6e': 'shapeshift',
+                 '0x0e1e175a0c57ebec5c17a72517dd3236efbe282e': 'changelly',
+                 '0x32a263fcd370ea00e92d694e10080f97d7ef52a2': 'yobit',
+                 '0xe269e891a2ec8585a378882ffa531141205e92e9': '0x'}
+        df = df.replace({'address': exmap})
     return df
 
 
