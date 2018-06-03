@@ -55,7 +55,7 @@ Let's upload our predictions to enter the tournament::
     consistency           91.6667   0.0898
     originality             False   0.1783
     validation_logloss     0.6928   0.1783
-    controlling capital     False   0.1783
+    stakeable                True   0.1783
 
 Examples
 ========
