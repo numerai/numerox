@@ -3,6 +3,8 @@
 Release Notes
 =============
 
+- v1.7.0 (in development; not yet released)
+
 - v1.6.0
 
   * Add ``nmr_transactions``
