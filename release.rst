@@ -3,7 +3,7 @@
 Release Notes
 =============
 
-- v1.6.0 (in development; not yet released)
+- v1.6.0
 
   * Add ``nmr_transactions``
   * Replace ``is_controlling_capital`` with ``is_stakeable``
