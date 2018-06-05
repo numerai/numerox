@@ -5,6 +5,8 @@ Release Notes
 
 - v1.7.0 (in development; not yet released)
 
+  * Bugfix ``report.reputation``
+
 - v1.6.0
 
   * Add ``nmr_transactions``

@@ -209,11 +209,12 @@ def reputation(df, verbose=True):
 
     # pass logloss benchmark?
     df = df[['user', 'round', 'live']]
+    df = df.drop_duplicates(['round', 'user'])
     df_pass1 = df['live']
     df_pass1 = 1.0 * (df_pass1 < np.log(2))
     df_pass1[df['round'] > 101] = 0
     df_pass2 = df['live']
-    df_pass2 = 1.0 * (df_pass1 < LOGLOSS_BENCHMARK)
+    df_pass2 = 1.0 * (df_pass2 < LOGLOSS_BENCHMARK)
     df_pass2[df['round'] < 102] = 0
     df_pass = df_pass1 + df_pass2
     df.insert(3, 'pass', df_pass)
