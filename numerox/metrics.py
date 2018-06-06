@@ -28,7 +28,7 @@ def metrics_per_era(data, prediction, tournament, join='data',
     else:
         raise ValueError("`join` method not recognized")
     yhats_df = df.dropna()
-    yn = 'y' + str(tournament + 1)
+    yn = 'y' + str(tournament)
     data_df = data.df[['era', 'region', yn]]
     df = pd.merge(data_df, yhats_df, left_index=True, right_index=True,
                   how=how)
@@ -59,7 +59,7 @@ def metrics_per_era(data, prediction, tournament, join='data',
     return metrics, regions
 
 
-def metrics_per_name(data, prediction, join='data',
+def metrics_per_name(data, prediction, tournament, join='data',
                      columns=['logloss', 'auc', 'acc', 'ystd'],
                      era_as_str=True, region_as_str=True):
 
@@ -69,7 +69,8 @@ def metrics_per_name(data, prediction, join='data',
     if 'sharpe' in columns or 'consis' in columns:
         if 'logloss' not in cols:
             cols.append('logloss')
-    mpe, regions = metrics_per_era(data, prediction, join=join, columns=cols)
+    mpe, regions = metrics_per_era(data, prediction, tournament, join=join,
+                                   columns=cols)
 
     # gather some info
     info = {}

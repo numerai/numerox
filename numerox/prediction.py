@@ -191,20 +191,24 @@ class Prediction(object):
 
         return df
 
-    def metrics_per_era(self, data, metrics=['logloss', 'auc', 'acc', 'ystd'],
+    def metrics_per_era(self, data, tournament,
+                        metrics=['logloss', 'auc', 'acc', 'ystd'],
                         era_as_str=True):
         "DataFrame containing given metrics versus era (as index)"
-        metrics, regions = metrics_per_era(data, self, columns=metrics,
+        metrics, regions = metrics_per_era(data, self, tournament,
+                                           columns=metrics,
                                            era_as_str=era_as_str)
         metrics.index = metrics['era']
         metrics = metrics.drop(['era'], axis=1)
         return metrics
 
-    def performance(self, data, era_as_str=True, region_as_str=True,
+    def performance(self, data, tournament, era_as_str=True,
+                    region_as_str=True,
                     columns=['logloss', 'auc', 'acc', 'ystd', 'sharpe',
                              'consis'], sort_by='logloss'):
         df, info = metrics_per_name(data,
                                     self,
+                                    tournament,
                                     columns=columns,
                                     era_as_str=era_as_str,
                                     region_as_str=region_as_str)
@@ -230,10 +234,10 @@ class Prediction(object):
                 raise ValueError("`sort_by` name not recognized")
         return df
 
-    def dominance(self, data, sort_by='logloss'):
+    def dominance(self, data, tournament, sort_by='logloss'):
         "Mean (across eras) of fraction of models bested per era"
         columns = ['logloss', 'auc', 'acc']
-        mpe, regions = metrics_per_era(data, self, columns=columns)
+        mpe, regions = metrics_per_era(data, self, tournament, columns=columns)
         dfs = []
         for i, col in enumerate(columns):
             pivot = mpe.pivot(index='era', columns='name', values=col)
@@ -280,6 +284,7 @@ class Prediction(object):
                 if name != zname:
                     print("   {:.4f} {}".format(corr[ix], zname))
 
+    # TODO: remove method
     def originality(self, submitted_names):
         "Which models are original given the models already submitted?"
 
@@ -366,7 +371,7 @@ class Prediction(object):
 
         return df_dict
 
-    def compare(self, data, prediction):
+    def compare(self, data, prediction, tournament):
         "Compare performance of predictions with the same names"
         cols = ['logloss1', 'logloss2', 'win1',
                 'corr', 'maxdiff', 'ystd1', 'ystd2']
@@ -382,9 +387,11 @@ class Prediction(object):
         df2 = prediction.loc[ids]
         p1 = self[names]
         p2 = prediction[names]
-        m1 = p1.metrics_per_era(data, metrics=['logloss', 'auc', 'ystd'],
+        m1 = p1.metrics_per_era(data, tournament,
+                                metrics=['logloss', 'auc', 'ystd'],
                                 era_as_str=False)
-        m2 = p2.metrics_per_era(data, metrics=['logloss', 'auc', 'ystd'],
+        m2 = p2.metrics_per_era(data, tournament,
+                                metrics=['logloss', 'auc', 'ystd'],
                                 era_as_str=False)
         for name in names:
 
