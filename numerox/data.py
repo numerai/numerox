@@ -243,6 +243,11 @@ class Data(object):
         "View of targets for tournament 5 as a 1d numpy float array"
         return self.df.iloc[:, -1].values
 
+    def y_correlation(self):
+        "Correlation matrix of y's as dataframe"
+        df = self.df.iloc[:, -5:]
+        return df.corr()
+
     def y_to_nan(self):
         "Copy of data with y values set to NaN"
         data = self.copy()
