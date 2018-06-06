@@ -12,7 +12,7 @@ HDF_DATA_KEY = 'numerox_data'
 ERA_INT_TO_STR = {}
 ERA_STR_TO_INT = {}
 ERA_STR_TO_FLOAT = {}
-for i in range(150):
+for i in range(180):
     name = 'era' + str(i)
     ERA_INT_TO_STR[i] = name
     ERA_STR_TO_INT[name] = i
@@ -26,7 +26,11 @@ REGION_INT_TO_STR = {0: 'train', 1: 'validation', 2: 'test', 3: 'live'}
 REGION_STR_TO_INT = {'train': 0, 'validation': 1, 'test': 2, 'live': 3}
 REGION_STR_TO_FLOAT = {'train': 0., 'validation': 1., 'test': 2., 'live': 3.}
 
-TOURNAMENT_NAMES = ['alpha', 'bravo', 'charlie', 'delta', 'echo']
+TOURNAMENT_NAMES = ['target_bernie',
+                    'target_charles',
+                    'target_elizabeth',
+                    'target_jordan',
+                    'target_ken']
 
 
 class Data(object):
@@ -525,7 +529,7 @@ def load_zip(file_path, verbose=False):
     for i in range(1, 51):
         rename_map['feature' + str(i)] = 'x' + str(i)
     for i, name in enumerate(TOURNAMENT_NAMES):
-        rename_map['target_' + name] = 'y' + str(i + 1)
+        rename_map[name] = 'y' + str(i + 1)
     df.rename(columns=rename_map, inplace=True)
 
     # convert era, region, and labels to np.float64
