@@ -26,11 +26,7 @@ REGION_INT_TO_STR = {0: 'train', 1: 'validation', 2: 'test', 3: 'live'}
 REGION_STR_TO_INT = {'train': 0, 'validation': 1, 'test': 2, 'live': 3}
 REGION_STR_TO_FLOAT = {'train': 0., 'validation': 1., 'test': 2., 'live': 3.}
 
-TOURNAMENT_NAMES = ['target_bernie',
-                    'target_charles',
-                    'target_elizabeth',
-                    'target_jordan',
-                    'target_ken']
+TOURNAMENT_NAMES = ['bernie', 'charles', 'elizabeth', 'jordan', 'ken']
 
 
 class Data(object):
@@ -529,13 +525,17 @@ def load_zip(file_path, verbose=False):
     for i in range(1, 51):
         rename_map['feature' + str(i)] = 'x' + str(i)
     for i, name in enumerate(TOURNAMENT_NAMES):
-        rename_map[name] = 'y' + str(i + 1)
+        rename_map['target_' + name] = 'y' + str(i + 1)
     df.rename(columns=rename_map, inplace=True)
 
     # convert era, region, and labels to np.float64
     df['era'] = df['era'].map(ERA_STR_TO_FLOAT)
     df['region'] = df['region'].map(REGION_STR_TO_FLOAT)
     df.iloc[:, -5:] = df.iloc[:, -5:].astype('float64')
+
+    # no way we did something wrong, right?
+    if df.shape[1] != 57:
+        raise IOError("expecting 57 columns; found {}".format(df.shape[1]))
 
     # make sure memory is contiguous so that, e.g., data.x is a view
     df = df.copy()
