@@ -154,14 +154,15 @@ class Prediction(object):
         if verbose:
             print("Save {}".format(path_or_buf))
 
-    def summary(self, data, round_output=True):
+    def summary(self, data, tournament, round_output=True):
         "Performance summary of prediction object that contains a single name"
 
         if self.shape[1] != 1:
             raise ValueError("prediction must contain a single name")
 
         # metrics
-        metrics, regions = metrics_per_era(data, self, region_as_str=True)
+        metrics, regions = metrics_per_era(data, self, tournament,
+                                           region_as_str=True)
         metrics = metrics.drop(['era', 'name'], axis=1)
 
         # additional metrics
@@ -169,12 +170,11 @@ class Prediction(object):
         nera = metrics.shape[0]
         logloss = metrics['logloss']
         consis = (logloss < LOGLOSS_BENCHMARK).mean()
-        sharpe = (LOGLOSS_BENCHMARK - logloss).mean() / logloss.std()
 
         # summary of metrics
-        m1 = metrics.mean(axis=0).tolist() + ['region', region_str]
-        m2 = metrics.std(axis=0).tolist() + ['eras', nera]
-        m3 = metrics.min(axis=0).tolist() + ['sharpe', sharpe]
+        m1 = metrics.mean(axis=0).tolist() + ['tourn', str(tournament)]
+        m2 = metrics.std(axis=0).tolist() + ['region', region_str]
+        m3 = metrics.min(axis=0).tolist() + ['eras', nera]
         m4 = metrics.max(axis=0).tolist() + ['consis', consis]
         data = [m1, m2, m3, m4]
 

@@ -11,7 +11,7 @@ from numerox.data import REGION_INT_TO_STR
 LOGLOSS_BENCHMARK = 0.693
 
 
-def metrics_per_era(data, prediction, join='data',
+def metrics_per_era(data, prediction, tournament, join='data',
                     columns=['logloss', 'auc', 'acc', 'ystd'],
                     era_as_str=False, region_as_str=False):
     "Dataframe with columns era, model, and specified metrics. And region list"
@@ -28,7 +28,8 @@ def metrics_per_era(data, prediction, join='data',
     else:
         raise ValueError("`join` method not recognized")
     yhats_df = df.dropna()
-    data_df = data.df[['era', 'region', 'y']]
+    yn = 'y' + str(tournament + 1)
+    data_df = data.df[['era', 'region', yn]]
     df = pd.merge(data_df, yhats_df, left_index=True, right_index=True,
                   how=how)
 
@@ -43,7 +44,7 @@ def metrics_per_era(data, prediction, join='data',
     for era in unique_eras:
         idx = df.era.isin([era])
         df_era = df[idx]
-        y = df_era['y'].values
+        y = df_era[yn].values
         if era_as_str:
             era = ERA_INT_TO_STR[era]
         for name in names:
