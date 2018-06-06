@@ -69,13 +69,15 @@ def test_prediction_save():
 def test_prediction_to_csv():
     "make sure prediction.to_csv runs"
     p = testing.micro_prediction()
+    tournament = 1
     with tempfile.NamedTemporaryFile() as temp:
-        p['model1'].to_csv(temp.name)
+        p['model1'].to_csv(temp.name, tournament=tournament)
         with testing.HiddenPrints():
-            p['model1'].to_csv(temp.name, verbose=True)
+            p['model1'].to_csv(temp.name, tournament=tournament, verbose=True)
         p2 = nx.load_prediction_csv(temp.name, 'model1')
         ade(p2, p['model1'], "prediction corrupted during roundtrip")
-    assert_raises(ValueError, p.to_csv, 'unused')
+    assert_raises(ValueError, p.to_csv, 'unused', tournament)
+    assert_raises(ValueError, p.to_csv, 'model1', 99)
 
 
 def test_load_example_predictions():
@@ -183,7 +185,7 @@ def test_prediction_summary():
     "make sure prediction.summary runs"
     d = testing.micro_data()
     p = testing.micro_prediction()
-    df = p['model1'].summary(d)
+    df = p['model1'].summary(d, 3)
     ok_(isinstance(df, pd.DataFrame), 'expecting a dataframe')
 
 
@@ -191,13 +193,13 @@ def test_prediction_performance():
     "make sure prediction.performance runs"
     d = testing.micro_data()
     p = testing.micro_prediction()
-    df = p.performance(d)
+    df = p.performance(d, 1)
     ok_(isinstance(df, pd.DataFrame), 'expecting a dataframe')
-    p.performance(d, sort_by='auc')
-    p.performance(d, sort_by='acc')
-    p.performance(d, sort_by='ystd')
-    p.performance(d, sort_by='sharpe')
-    p.performance(d, sort_by='consis')
+    p.performance(d, 2, sort_by='auc')
+    p.performance(d, 3, sort_by='acc')
+    p.performance(d, 4, sort_by='ystd')
+    p.performance(d, 5, sort_by='sharpe')
+    p.performance(d, 1, sort_by='consis')
 
 
 def test_prediction_dominance():
@@ -211,7 +213,7 @@ def test_prediction_dominance():
     p = p.merge_arrays(d.ids, d.y, 'model2')
     p = p.merge_arrays(d.ids, d.y, 'model3')
 
-    df = p.dominance(d)
+    df = p.dominance(d, 3)
 
     ok_(isinstance(df, pd.DataFrame), 'expecting a dataframe')
     assert_raises(ValueError, p['model1'].dominance, d)
@@ -234,7 +236,7 @@ def test_prediction_correlation():
 def test_prediction_check():
     "make sure prediction.check runs"
     d = nx.play_data()
-    p1 = nx.production(nx.logistic(), d, verbosity=0)
+    p1 = nx.production(nx.logistic(), d, 3, verbosity=0)
     p2 = p1.copy()
     p2 = p2.rename('example_predictions')
     p = p1 + p2
@@ -247,7 +249,7 @@ def test_prediction_check():
 def test_prediction_concordance():
     "make sure prediction.concordance runs"
     d = testing.play_data()
-    p = nx.production(nx.logistic(), d, 'model1', verbosity=0)
+    p = nx.production(nx.logistic(), d, 3, 'model1', verbosity=0)
     df = p.concordance(d)
     ok_(isinstance(df, pd.DataFrame), 'expecting a dataframe')
 
@@ -256,7 +258,7 @@ def test_prediction_compare():
     "make sure prediction.compare runs"
     d = testing.micro_data()
     p = testing.micro_prediction()
-    df = p.compare(d, p)
+    df = p.compare(d, p, tournament=2)
     ok_(isinstance(df, pd.DataFrame), 'expecting a dataframe')
 
 
@@ -264,10 +266,10 @@ def test_prediction_setitem():
     "compare prediction._setitem__ with merge"
 
     data = nx.play_data()
-    p1 = nx.production(nx.logistic(), data, 'model1', verbosity=0)
-    p2 = nx.production(nx.logistic(1e-5), data, 'model2',  verbosity=0)
-    p3 = nx.production(nx.logistic(1e-6), data, 'model3',  verbosity=0)
-    p4 = nx.backtest(nx.logistic(), data, 'model1',  verbosity=0)
+    p1 = nx.production(nx.logistic(), data, 1, 'model1', verbosity=0)
+    p2 = nx.production(nx.logistic(1e-5), data, 2, 'model2',  verbosity=0)
+    p3 = nx.production(nx.logistic(1e-6), data, 3, 'model3',  verbosity=0)
+    p4 = nx.backtest(nx.logistic(), data, 4, 'model1',  verbosity=0)
 
     p = nx.Prediction()
     p['model1'] = p1
