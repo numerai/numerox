@@ -202,6 +202,45 @@ class Data(object):
         "View of targets, y, as a numpy float array"
         return self.df.iloc[:, -5:].values
 
+    def y_for_tournament(self, tournament):
+        "View of targets for give tournament as a 1d numpy float array"
+        if tournament == 1:
+            return self.y1
+        elif tournament == 2:
+            return self.y2
+        elif tournament == 3:
+            return self.y3
+        elif tournament == 4:
+            return self.y4
+        elif tournament == 5:
+            return self.y5
+        raise ValueError('unknown `tournament`')
+
+    @property
+    def y1(self):
+        "View of targets for tournament 1 as a 1d numpy float array"
+        return self.df.iloc[:, -5].values
+
+    @property
+    def y2(self):
+        "View of targets for tournament 2 as a 1d numpy float array"
+        return self.df.iloc[:, -4].values
+
+    @property
+    def y3(self):
+        "View of targets for tournament 3 as a 1d numpy float array"
+        return self.df.iloc[:, -3].values
+
+    @property
+    def y4(self):
+        "View of targets for tournament 4 as a 1d numpy float array"
+        return self.df.iloc[:, -2].values
+
+    @property
+    def y5(self):
+        "View of targets for tournament 5 as a 1d numpy float array"
+        return self.df.iloc[:, -1].values
+
     def y_to_nan(self):
         "Copy of data with y values set to NaN"
         data = self.copy()
