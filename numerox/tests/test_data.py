@@ -55,7 +55,7 @@ def test_data_indexing():
     ade(d['live'], micro_data([9]), msg)
 
     msg = 'error indexing data by array'
-    ade(d[d.y == 0], micro_data([0, 2, 4, 6, 8]), msg)
+    ade(d[d.y1 == 0], micro_data([0, 2, 4, 6, 8, 9]), msg)
     ade(d[d.era == 'era4'], micro_data([6]), msg)
 
     assert_raises(IndexError, d.__getitem__, 'era')
@@ -174,8 +174,8 @@ def test_data_methods():
     "test data methods"
     d = micro_data()
     ok_(len(d) == 10, "wrong length")
-    ok_(d.size == 60, "wrong size")
-    ok_(d.shape == (10, 6), "wrong shape")
+    ok_(d.size == 100, "wrong size")
+    ok_(d.shape == (10, 10), "wrong shape")
     ok_(d == d, "not equal")
 
 
@@ -208,8 +208,9 @@ def test_data_properties():
     ok_((d.era_float == d.df.era).all(), "era is corrupted")
     ok_((d.region_float == d.df.region).all(), "region is corrupted")
 
-    idx = ~np.isnan(d.df.y)
-    ok_((d.y[idx] == d.df.y[idx]).all(), "y is corrupted")
+    idx = ~np.isnan(d.y)
+    y = d.df[['y1', 'y2', 'y3', 'y4', 'y5']].values
+    ok_((d.y[idx] == y[idx]).all(), "y is corrupted")
 
     x = d.x
     for i, name in enumerate(d.column_list(x_only=True)):

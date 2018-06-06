@@ -175,7 +175,7 @@ class Data(object):
         if x_array.shape[0] != len(self):
             msg = "`x_array` must have the same number of rows as data"
             raise ValueError(msg)
-        shape = (x_array.shape[0], x_array.shape[1] + 3)
+        shape = (x_array.shape[0], x_array.shape[1] + 7)
         cols = ['x'+str(i) for i in range(x_array.shape[1])]
         cols = ['era', 'region'] + cols
         cols = cols + ['y'+str(i + 1) for i in range(5)]
@@ -184,7 +184,7 @@ class Data(object):
                           columns=cols)
         df['era'] = self.df['era'].values.copy()
         df['region'] = self.df['region'].values.copy()
-        df.values[:, 2:-1] = x_array
+        df.values[:, 2:-5] = x_array
         for i in range(1, 6):
             col = 'y' + str(i)
             df[col] = self.df[col].values.copy()
