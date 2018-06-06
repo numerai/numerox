@@ -63,7 +63,8 @@ class logistic(Model):
 
     def fit_predict(self, dfit, dpre, tournament):
         model = LogisticRegression(C=self.p['inverse_l2'])
-        model.fit(dfit.x, dfit.y_for_tournament(tournament))
+        yfit = dfit.y_for_tournament(tournament)
+        model.fit(dfit.x, yfit)
         yhat = model.predict_proba(dpre.x)[:, 1]
         return dpre.ids, yhat
 
@@ -76,14 +77,15 @@ class extratrees(Model):
                   'nfeatures': nfeatures,
                   'seed': seed}
 
-    def fit_predict(self, dfit, dpre):
+    def fit_predict(self, dfit, dpre, tournament):
         clf = ETC(criterion='gini',
                   max_features=self.p['nfeatures'],
                   max_depth=self.p['depth'],
                   n_estimators=self.p['ntrees'],
                   random_state=self.p['seed'],
                   n_jobs=-1)
-        clf.fit(dfit.x, dfit.y)
+        yfit = dfit.y_for_tournament(tournament)
+        clf.fit(dfit.x, yfit)
         yhat = clf.predict_proba(dpre.x)[:, 1]
         return dpre.ids, yhat
 
@@ -96,14 +98,15 @@ class randomforest(Model):
                   'max_features': max_features,
                   'seed': seed}
 
-    def fit_predict(self, dfit, dpre):
+    def fit_predict(self, dfit, dpre, tournament):
         clf = RFC(criterion='gini',
                   max_features=self.p['max_features'],
                   max_depth=self.p['depth'],
                   n_estimators=self.p['ntrees'],
                   random_state=self.p['seed'],
                   n_jobs=-1)
-        clf.fit(dfit.x, dfit.y)
+        yfit = dfit.y_for_tournament(tournament)
+        clf.fit(dfit.x, yfit)
         yhat = clf.predict_proba(dpre.x)[:, 1]
         return dpre.ids, yhat
 
@@ -118,14 +121,15 @@ class mlpc(Model):
                   'learn': learn,
                   'seed': seed}
 
-    def fit_predict(self, dfit, dpre):
+    def fit_predict(self, dfit, dpre, tournament):
         clf = MLPC(hidden_layer_sizes=self.p['layers'],
                    alpha=self.p['alpha'],
                    activation=self.p['activation'],
                    learning_rate_init=self.p['learn'],
                    random_state=self.p['seed'],
                    max_iter=200)
-        clf.fit(dfit.x, dfit.y)
+        yfit = dfit.y_for_tournament(tournament)
+        clf.fit(dfit.x, yfit)
         yhat = clf.predict_proba(dpre.x)[:, 1]
         return dpre.ids, yhat
 
@@ -136,10 +140,11 @@ class example_predictions(Model):
     def __init__(self):
         self.p = {}
 
-    def fit_predict(self, dfit, dpre):
+    def fit_predict(self, dfit, dpre, tournament):
         model = GradientBoostingClassifier(n_estimators=25, max_depth=1,
                                            random_state=1776)
-        model.fit(dfit.x, dfit.y)
+        yfit = dfit.y_for_tournament(tournament)
+        model.fit(dfit.x, yfit)
         yhat = model.predict_proba(dpre.x)[:, 1]
         yhat = np.round(yhat, 5)
         return dpre.ids, yhat
@@ -152,10 +157,11 @@ class logisticPCA(Model):
         self.p = {'inverse_l2': inverse_l2,
                   'nfeatures': nfeatures}
 
-    def fit_predict(self, dfit, dpre):
+    def fit_predict(self, dfit, dpre, tournament):
         pipe = Pipeline([('pca', PCA(n_components=self.p['nfeatures'])),
                          ("lr", LogisticRegression(C=self.p['inverse_l2']))])
-        pipe.fit(dfit.x, dfit.y)
+        yfit = dfit.y_for_tournament(tournament)
+        pipe.fit(dfit.x, yfit)
         yhat = pipe.predict_proba(dpre.x)[:, 1]
         return dpre.ids, yhat
 
@@ -166,6 +172,6 @@ class fifty(Model):
     def __init__(self):
         self.p = {}
 
-    def fit_predict(self, dfit, dpre):
+    def fit_predict(self, dfit, dpre, tournament):
         yhat = 0.5 * np.ones(len(dpre))
         return dpre.ids, yhat
