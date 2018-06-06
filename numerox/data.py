@@ -166,7 +166,7 @@ class Data(object):
     @property
     def x(self):
         "View of features, x, as a numpy float array"
-        return self.df.iloc[:, 2:-1].values
+        return self.df.iloc[:, 2:-5].values
 
     def xnew(self, x_array):
         "Copy of data but with data.x=`x_array`; must have same number of rows"
@@ -175,14 +175,17 @@ class Data(object):
             raise ValueError(msg)
         shape = (x_array.shape[0], x_array.shape[1] + 3)
         cols = ['x'+str(i) for i in range(x_array.shape[1])]
-        cols = ['era', 'region'] + cols + ['y']
+        cols = ['era', 'region'] + cols
+        cols = cols + ['y'+str(i + 1) for i in range(5)]
         df = pd.DataFrame(data=np.empty(shape, dtype=np.float64),
                           index=self.df.index.copy(deep=True),
                           columns=cols)
         df['era'] = self.df['era'].values.copy()
         df['region'] = self.df['region'].values.copy()
         df.values[:, 2:-1] = x_array
-        df['y'] = self.df['y'].values.copy()
+        for i in range(1, 6):
+            col = 'y' + str(i)
+            df[col] = self.df[col].values.copy()
         return Data(df)
 
     @property
@@ -196,13 +199,17 @@ class Data(object):
 
     @property
     def y(self):
-        "View of y as a 1d numpy float array"
-        return self.df['y'].values
+        "View of targets, y, as a numpy float array"
+        return self.df.iloc[:, -5:].values
 
     def y_to_nan(self):
         "Copy of data with y values set to NaN"
         data = self.copy()
-        data.df = data.df.assign(y=np.nan)
+        data.df = data.df.assign(y1=np.nan)
+        data.df = data.df.assign(y2=np.nan)
+        data.df = data.df.assign(y3=np.nan)
+        data.df = data.df.assign(y4=np.nan)
+        data.df = data.df.assign(y5=np.nan)
         return data
 
     # transforms ----------------------------------------------------------
@@ -444,9 +451,9 @@ class Data(object):
         t.append(fmt.format('x', stats))
 
         # y
-        y = self.df.y
+        y = self.y
         stats = 'mean {:.6f}, fraction missing {:.4f}'
-        stats = stats.format(y.mean(), y.isnull().mean())
+        stats = stats.format(np.nanmean(y), (~np.isfinite(y)).mean())
         t.append(fmt.format('y', stats))
 
         return '\n'.join(t)
@@ -468,14 +475,17 @@ def load_zip(file_path, verbose=False):
 
     # turn into single dataframe and rename columns
     df = pd.concat([train, tourn], axis=0)
-    rename_map = {'data_type': 'region', 'target': 'y'}
+    rename_map = {'data_type': 'region'}
     for i in range(1, 51):
         rename_map['feature' + str(i)] = 'x' + str(i)
+    for i, name in enumerate(('alpha', 'bravo', 'charlie', 'delta', 'echo')):
+        rename_map['target_' + name] = 'y' + str(i + 1)
     df.rename(columns=rename_map, inplace=True)
 
-    # convert era and region strings to np.float64
+    # convert era, region, and labels to np.float64
     df['era'] = df['era'].map(ERA_STR_TO_FLOAT)
     df['region'] = df['region'].map(REGION_STR_TO_FLOAT)
+    df.iloc[:, -5:] = df.iloc[:, -5:].astype('float64')
 
     # make sure memory is contiguous so that, e.g., data.x is a view
     df = df.copy()
