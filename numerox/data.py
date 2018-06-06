@@ -26,6 +26,8 @@ REGION_INT_TO_STR = {0: 'train', 1: 'validation', 2: 'test', 3: 'live'}
 REGION_STR_TO_INT = {'train': 0, 'validation': 1, 'test': 2, 'live': 3}
 REGION_STR_TO_FLOAT = {'train': 0., 'validation': 1., 'test': 2., 'live': 3.}
 
+TOURNAMENT_NAMES = ['alpha', 'bravo', 'charlie', 'delta', 'echo']
+
 
 class Data(object):
 
@@ -517,7 +519,7 @@ def load_zip(file_path, verbose=False):
     rename_map = {'data_type': 'region'}
     for i in range(1, 51):
         rename_map['feature' + str(i)] = 'x' + str(i)
-    for i, name in enumerate(('alpha', 'bravo', 'charlie', 'delta', 'echo')):
+    for i, name in enumerate(TOURNAMENT_NAMES):
         rename_map['target_' + name] = 'y' + str(i + 1)
     df.rename(columns=rename_map, inplace=True)
 

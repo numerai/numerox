@@ -12,6 +12,7 @@ from numerox.metrics import metrics_per_era
 from numerox.metrics import metrics_per_name
 from numerox.metrics import concordance
 from numerox.metrics import LOGLOSS_BENCHMARK
+from numerox.data import TOURNAMENT_NAMES
 
 HDF_PREDICTION_KEY = 'numerox_prediction'
 EXAMPLE_PREDICTIONS = 'example_predictions.csv'
@@ -143,11 +144,12 @@ class Prediction(object):
         else:
             self.df.to_hdf(path_or_buf, HDF_PREDICTION_KEY)
 
-    def to_csv(self, path_or_buf=None, decimals=6, verbose=False):
+    def to_csv(self, path_or_buf, tournament, decimals=6, verbose=False):
         "Save a csv file of predictions; predictin must contain only one name"
         if self.shape[1] != 1:
             raise ValueError("prediction must contain a single name")
-        df = self.df.iloc[:, 0].to_frame('probability')
+        name = TOURNAMENT_NAMES[tournament - 1]
+        df = self.df.iloc[:, 0].to_frame('probability_' + name)
         df.index.rename('id', inplace=True)
         float_format = "%.{}f".format(decimals)
         df.to_csv(path_or_buf, float_format=float_format)
