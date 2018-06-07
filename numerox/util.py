@@ -7,6 +7,8 @@ if sys.version_info[0] == 2:
 else:
     BASE_STRING = str  # pragma: no cover
 
+TOURNAMENT_NAMES = ['bernie', 'elizabeth', 'jordan', 'ken', 'charles']
+
 
 def isint(x):
     """
@@ -79,3 +81,25 @@ def history():
     columns = ['tournament', 'round', 'comment']
     df = pd.DataFrame(data=d, columns=columns)
     return df
+
+
+def tournament_int2str(tournament_int):
+    "Convert tournament integer to string name"
+    if tournament_int < 1:
+        raise ValueError("`tournament_int` must be greater than 0")
+    if tournament_int > 5:
+        raise ValueError("`tournament_int` must be less than 6")
+    return TOURNAMENT_NAMES[tournament_int - 1]
+
+
+def tournament_str2int(tournament_str):
+    "Convert tournament name (as str) to tournament integer"
+    if tournament_str not in TOURNAMENT_NAMES:
+        raise ValueError('`tournament_str` name not recognized')
+    return TOURNAMENT_NAMES.index(tournament_str) + 1
+
+
+def tournament_iter():
+    "Iterate, in order, through tournaments yielding tuple of (int, str)"
+    for t in range(1, 6):
+        yield t, tournament_int2str(t)

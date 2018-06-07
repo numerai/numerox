@@ -5,6 +5,8 @@ import pandas as pd
 from sklearn.decomposition import PCA
 from sklearn.neighbors import NearestNeighbors
 
+import numerox as nx
+
 TRAIN_FILE = 'numerai_training_data.csv'
 TOURNAMENT_FILE = 'numerai_tournament_data.csv'
 HDF_DATA_KEY = 'numerox_data'
@@ -25,8 +27,6 @@ TOURNAMENT_REGIONS = ['validation', 'test', 'live']
 REGION_INT_TO_STR = {0: 'train', 1: 'validation', 2: 'test', 3: 'live'}
 REGION_STR_TO_INT = {'train': 0, 'validation': 1, 'test': 2, 'live': 3}
 REGION_STR_TO_FLOAT = {'train': 0., 'validation': 1., 'test': 2., 'live': 3.}
-
-TOURNAMENT_NAMES = ['bernie', 'elizabeth', 'jordan', 'ken', 'charles']
 
 
 class Data(object):
@@ -521,8 +521,8 @@ def load_zip(file_path, verbose=False):
     rename_map = {'data_type': 'region'}
     for i in range(1, 51):
         rename_map['feature' + str(i)] = 'x' + str(i)
-    for i, name in enumerate(TOURNAMENT_NAMES):
-        rename_map['target_' + name] = 'y' + str(i + 1)
+    for t, name in nx.tournament_iter():
+        rename_map['target_' + name] = 'y' + str(t)
     df.rename(columns=rename_map, inplace=True)
 
     # convert era, region, and labels to np.float64

@@ -70,6 +70,9 @@ from numerox.prediction import merge_predictions
 from numerox.util import isint
 from numerox.util import isstring
 from numerox.util import history
+from numerox.util import tournament_int2str
+from numerox.util import tournament_str2int
+from numerox.util import tournament_iter
 
 try:
     from numpy.testing import Tester

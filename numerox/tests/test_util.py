@@ -33,3 +33,10 @@ def test_history():
     "make sure history runs"
     df = nx.history()
     ok_(isinstance(df, pd.DataFrame), 'expecting a dataframe')
+
+
+def test_tournament():
+    "Roundtrip of tournament_int2str and tournament_str2int"
+    for i in range(1, 6):
+        t = nx.tournament_str2int(nx.tournament_int2str(i))
+        ok_(t == i, 'tournament corrupted during round trip')
