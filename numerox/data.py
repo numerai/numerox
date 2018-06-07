@@ -377,7 +377,7 @@ class Data(object):
             index.append(idx)
         index = np.concatenate(index)
         df = self.df.take(index)
-        data = Data(df)
+        data = Data(df.copy())
         return data
 
     # misc ------------------------------------------------------------------
