@@ -150,8 +150,9 @@ class LoocvSplitter(Splitter):
 class IgnoreEraCVSplitter(Splitter):
     "K-fold cross validation fit-predict splits ignoring eras and balancing y"
 
-    def __init__(self, data, kfold=5, seed=0, train_only=True):
+    def __init__(self, data, tournament, kfold=5, seed=0, train_only=True):
         self.p = {'data': data,
+                  'tournament': tournament,
                   'kfold': kfold,
                   'seed': seed,
                   'train_only': train_only}
@@ -167,7 +168,8 @@ class IgnoreEraCVSplitter(Splitter):
             cv = StratifiedKFold(n_splits=self.p['kfold'],
                                  random_state=self.p['seed'],
                                  shuffle=True)
-            self.cv = cv.split(data.x, data.y)
+            y = data.y_for_tournament(self.p['tournament'])
+            self.cv = cv.split(data.x, y)
         if sys.version_info[0] == 2:
             fit_index, pre_index = self.cv.next()
         else:
