@@ -5,7 +5,6 @@ import pandas as pd
 import numpy as np
 from scipy.stats import pearsonr
 from scipy.stats import spearmanr
-from scipy.stats import ks_2samp
 
 import numerox as nx
 from numerox.metrics import metrics_per_era
@@ -285,45 +284,6 @@ class Prediction(object):
                 zname = znames[ix]
                 if name != zname:
                     print("   {:.4f} {}".format(corr[ix], zname))
-
-    # TODO: remove method
-    def originality(self, submitted_names):
-        "Which models are original given the models already submitted?"
-
-        # predictions of models already submitted
-        ys = self.df[submitted_names].values
-
-        # models that have not been submitted; we will report on these
-        names = self.names
-        names = [m for m in names if m not in submitted_names]
-
-        # originality
-        columns = ['corr', 'corrTF', 'ks', 'ksTF', 'original']
-        df = pd.DataFrame(index=names, columns=columns)
-        for name in names:
-            corr = -np.inf
-            ks = np.inf
-            corrTF = True
-            ksTF = True
-            y = self.df[name].values
-            for i in range(ys.shape[1]):
-                c = np.abs(pearsonr(y, ys[:, i])[0])
-                if c > corr:
-                    corr = c
-                if corrTF and c > ORIGINALITY_CORR_LTE:
-                    corrTF = False
-                k = ks_2samp(y, ys[:, i])[0]
-                if k < ks:
-                    ks = k
-                if ksTF and k <= ORIGINALITY_KS_GT:
-                    ksTF = False
-            df.loc[name, 'corr'] = corr
-            df.loc[name, 'ks'] = ks
-            df.loc[name, 'corrTF'] = corrTF
-            df.loc[name, 'ksTF'] = ksTF
-            df.loc[name, 'original'] = corrTF and ksTF
-
-        return df
 
     def check(self, data):
         "Run Numerai checks; must contain a model named 'example_predictions'"

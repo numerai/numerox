@@ -219,13 +219,6 @@ def test_prediction_dominance():
     assert_raises(ValueError, p['model1'].dominance, d)
 
 
-def test_prediction_originality():
-    "make sure prediction.originality runs"
-    p = testing.micro_prediction()
-    df = p.originality(['model1'])
-    ok_(isinstance(df, pd.DataFrame), 'expecting a dataframe')
-
-
 def test_prediction_correlation():
     "make sure prediction.correlation runs"
     p = testing.micro_prediction()

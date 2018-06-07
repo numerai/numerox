@@ -31,10 +31,6 @@ def compare_models(data):
     df = prediction[['logistic', 'logisticPCA']].dominance(data['validation'])
     print(df)
 
-    # originality given that logistic model has already been submitted
-    print('\nModel originality (versus logistic):\n')
-    print(prediction.originality(['logistic']))
-
     # concordance
     print('\nConcordance:\n')
     print(prediction.concordance(data))

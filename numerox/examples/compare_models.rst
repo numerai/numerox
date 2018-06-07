@@ -91,17 +91,6 @@ Let's compare dominance of two models::
     logisticPCA  0.6667   0.75  0.5000
     logistic     0.3333   0.25  0.4167
 
-Let's say you have already submitted the predictions of the logistic model.
-Which of your other models will that submission prevent from passing
-originality::
-
-    >>> print(prediction.originality(['logistic']))
-                   corr     ks  original
-    extratrees     True   True      True
-    randomforest   True   True      True
-    mlpc          False   True     False
-    logisticPCA   False  False     False
-
 A concordance if less than 0.12 is needed to pass Numerai's test::
 
     >>> print(prediction.concordance(data))
