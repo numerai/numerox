@@ -116,7 +116,7 @@ def update_play_data(data=None, fraction=0.01):
     "Create and save data used by play_data function"
     if data is None:
         data = nx.numerai.download_data_object()
-    play = data.subsample(fraction=fraction, balance=False, seed=0)
+    play = data.subsample(fraction=fraction, seed=0)
     play.save(TEST_DATA)
 
 
