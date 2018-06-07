@@ -104,38 +104,37 @@ def test_data_pca():
 def test_data_balance():
     "test data.balance"
 
+    tournament = 1
     d = micro_data()
 
     # check balance
-    b = d.balance(train_only=False)
+    b = d.balance(tournament, train_only=False)
     for era in b.unique_era():
         if era != 'eraX':
-            y = b[era].y
+            y = b[era].y_for_tournament(tournament)
             n0 = (y == 0).sum()
             n1 = (y == 1).sum()
             ok_(n0 == n1, "y is not balanced")
 
     # check balance
-    b = d.balance(train_only=True)
+    b = d.balance(tournament, train_only=True)
     eras = np.unique(b.era[b.region == 'train'])
     for era in eras:
-        y = b[era].y
+        y = b[era].y_for_tournament(tournament)
         n0 = (y == 0).sum()
         n1 = (y == 1).sum()
         ok_(n0 == n1, "y is not balanced")
 
     # balance already balanced data (regression test)
-    d.balance().balance()
+    d.balance(tournament).balance(tournament)
 
 
 def test_data_subsample():
     "test data.subsample"
     d = nx.play_data()
-    d2 = d.subsample(0.5, balance=True)
-    for era, idx in d2.era_iter():
-        m = d2.y[idx].mean()
-        if np.isfinite(m):
-            ok_(d2.y[idx].mean() == 0.5, 'data is not balanced')
+    d2 = d.subsample(0.5)
+    ok_(isinstance(d2, nx.Data), 'expecting a Data object')
+    ok_(d2.shape[0] < 0.51 * d.shape[0], 'expecting smaller subsample')
 
 
 def test_data_hash():
@@ -285,9 +284,9 @@ def test_load_zip():
         else:
             with testing.HiddenPrints():
                 d = nx.load_zip(TINY_DATASET_CSV, verbose=True)
-        ok_(len(d) == 11, "wrong number of rows")
-        ok_(d.shape == (11, 53), 'data has wrong shape')
-        ok_(d.x.shape == (11, 50), 'x has wrong shape')
+        ok_(len(d) == 13, "wrong number of rows")
+        ok_(d.shape == (13, 57), 'data has wrong shape')
+        ok_(d.x.shape == (13, 50), 'x has wrong shape')
         ok_(d.df.iloc[2, 3] == 0.34143, 'wrong feature value')
 
 

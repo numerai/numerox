@@ -26,7 +26,7 @@ REGION_INT_TO_STR = {0: 'train', 1: 'validation', 2: 'test', 3: 'live'}
 REGION_STR_TO_INT = {'train': 0, 'validation': 1, 'test': 2, 'live': 3}
 REGION_STR_TO_FLOAT = {'train': 0., 'validation': 1., 'test': 2., 'live': 3.}
 
-TOURNAMENT_NAMES = ['bernie', 'charles', 'elizabeth', 'jordan', 'ken']
+TOURNAMENT_NAMES = ['bernie', 'elizabeth', 'jordan', 'ken', 'charles']
 
 
 class Data(object):
@@ -291,12 +291,14 @@ class Data(object):
         data = self.xnew(x)
         return data
 
-    def balance(self, train_only=True, seed=0):
+    def balance(self, tournament, train_only=True, seed=0):
         """
         Copy of data where specified eras have mean y of 0.5.
 
         Parameters
         ----------
+        tournament : int
+            Which tournament's targets to balance.
         train_only : {True, False}, optional
             By default (True) only train eras are y balanced. No matter what
             the setting of `train_only` any era that contains a y that is NaN
@@ -308,7 +310,8 @@ class Data(object):
         Returns
         -------
         data : Data
-            A copy of data where specified eras have mean y of 0.5.
+            A copy of data where specified eras have mean y (for the
+            given `tournament`) of 0.5.
         """
         # This function is not written in a straightforward manner.
         # A few speed optimizations have been made.
@@ -319,7 +322,7 @@ class Data(object):
         else:
             eras = data.unique_era(as_str=False).tolist()
         era = data.era_float
-        y = data.y
+        y = data.y_for_tournament(tournament)
         index = np.arange(y.size)
         remove = []
         rs = np.random.RandomState(seed)
@@ -358,13 +361,9 @@ class Data(object):
             data = Data(df)
         return data
 
-    def subsample(self, fraction, balance=True, seed=0):
+    def subsample(self, fraction, seed=0):
         """
         Randomly sample `fraction` of each era's rows.
-
-        data.y is optionally balanced. The default is to balance y. Balancing
-        is achieved by removing rows so the number of rows will likely be
-        less than expected using `fraction` if `balance` is True.
         """
         rs = np.random.RandomState(seed)
         data_index = np.arange(len(self))
@@ -379,8 +378,6 @@ class Data(object):
         index = np.concatenate(index)
         df = self.df.take(index)
         data = Data(df)
-        if balance:
-            data = data.balance(train_only=False, seed=seed)
         return data
 
     # misc ------------------------------------------------------------------

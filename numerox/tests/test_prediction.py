@@ -82,10 +82,10 @@ def test_prediction_to_csv():
 
 def test_load_example_predictions():
     "test nx.load_example_predictions"
-    p = nx.load_example_predictions(TINY_DATASET_CSV)
-    ok_(len(p) == 4, "wrong number of rows")
-    ok_(p.shape == (4, 1), 'data has wrong shape')
-    ok_(np.abs(p.df.iloc[2, 0] - 0.50123) < 1e-8, 'wrong feature value')
+    p = nx.load_example_predictions(TINY_DATASET_CSV, tournament=1)
+    ok_(len(p) == 6, "wrong number of rows")
+    ok_(p.shape == (6, 1), 'data has wrong shape')
+    ok_(np.abs(p.df.iloc[2, 0] - 0.50397) < 1e-8, 'wrong feature value')
 
 
 def test_prediction_copies():

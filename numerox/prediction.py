@@ -14,7 +14,7 @@ from numerox.metrics import LOGLOSS_BENCHMARK
 from numerox.data import TOURNAMENT_NAMES
 
 HDF_PREDICTION_KEY = 'numerox_prediction'
-EXAMPLE_PREDICTIONS = 'example_predictions.csv'
+EXAMPLE_PREDICTIONS = 'example_predictions_target_{}.csv'
 
 ORIGINALITY_CORR_LTE = 0.95
 ORIGINALITY_KS_GT = 0.03
@@ -497,11 +497,13 @@ def load_prediction_csv(filename, name=None):
     return Prediction(df)
 
 
-def load_example_predictions(data_zip):
+def load_example_predictions(data_zip, tournament):
     "Load example predictions from Numerai zip archive"
     zf = zipfile.ZipFile(data_zip)
-    df = pd.read_csv(zf.open(EXAMPLE_PREDICTIONS), header=0, index_col=0)
-    df.columns = ['example_predictions']
+    tourn_name = TOURNAMENT_NAMES[tournament - 1]
+    filename = EXAMPLE_PREDICTIONS.format(tourn_name)
+    df = pd.read_csv(zf.open(filename), header=0, index_col=0)
+    df.columns = ['example_predictions_{}'.format(tourn_name)]
     p = nx.Prediction(df)
     return p
 
