@@ -102,13 +102,13 @@ def test_data_properties():
 
     d = testing.micro_data()
     p = nx.Prediction()
-    p = p.merge_arrays(d.ids, d.y, 'model1')
-    p = p.merge_arrays(d.ids, d.y, 'model2')
+    p = p.merge_arrays(d.ids, d.y1, 'model1')
+    p = p.merge_arrays(d.ids, d.y2, 'model2')
 
     ok_((p.ids == p.df.index).all(), "ids is corrupted")
     ok_((p.ids == d.df.index).all(), "ids is corrupted")
-    ok_((p.y[:, 0] == d.df.y).all(), "y is corrupted")
-    ok_((p.y[:, 1] == d.df.y).all(), "y is corrupted")
+    ok_((p.y[:, 0] == d.df.y1).all(), "y is corrupted")
+    ok_((p.y[:, 1] == d.df.y2).all(), "y is corrupted")
 
 
 def test_prediction_rename():
@@ -209,14 +209,14 @@ def test_prediction_dominance():
     d = d['validation']
 
     p = nx.Prediction()
-    p = p.merge_arrays(d.ids, d.y, 'model1')
-    p = p.merge_arrays(d.ids, d.y, 'model2')
-    p = p.merge_arrays(d.ids, d.y, 'model3')
+    p = p.merge_arrays(d.ids, d.y1, 'model1')
+    p = p.merge_arrays(d.ids, d.y2, 'model2')
+    p = p.merge_arrays(d.ids, d.y3, 'model3')
 
     df = p.dominance(d, 3)
 
     ok_(isinstance(df, pd.DataFrame), 'expecting a dataframe')
-    assert_raises(ValueError, p['model1'].dominance, d)
+    assert_raises(ValueError, p['model1'].dominance, d, 1)
 
 
 def test_prediction_correlation():
