@@ -2,7 +2,7 @@ import pandas as pd
 import numerox as nx
 
 
-def cv_warning(data, nsamples=100):
+def cv_warning(data, tournament=1, nsamples=100):
     "Hold out a sample of eras not rows when doing cross validation."
 
     data = data['train']
@@ -14,14 +14,14 @@ def cv_warning(data, nsamples=100):
 
         # cv across eras
         cve = nx.CVSplitter(data, seed=i)
-        prediction = nx.run(model, cve, verbosity=0)
-        df = prediction.performance(data)
+        prediction = nx.run(model, cve, tournament, verbosity=0)
+        df = prediction.performance(data, tournament)
         results_cve = results_cve.append(df, ignore_index=True)
 
         # cv ignoring eras but y balanced
-        cv = nx.IgnoreEraCVSplitter(data, seed=i)
-        prediction = nx.run(model, cv, verbosity=0)
-        df = prediction.performance(data)
+        cv = nx.IgnoreEraCVSplitter(data, tournament=tournament, seed=i)
+        prediction = nx.run(model, cv, tournament, verbosity=0)
+        df = prediction.performance(data, tournament)
         results_cv = results_cv.append(df, ignore_index=True)
 
         # display results

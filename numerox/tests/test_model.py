@@ -28,4 +28,4 @@ def test_model_run():
     d_fit = d['train']
     d_predict = d['tournament']
     for model in get_models():
-        model.fit_predict(d_fit, d_predict)
+        model.fit_predict(d_fit, d_predict, tournament=5)
