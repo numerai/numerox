@@ -7,6 +7,7 @@ from numerox.prediction import Prediction
 # models
 from numerox.model import Model
 from numerox.model import logistic
+from numerox.model import ridge_mean
 from numerox.model import extratrees
 from numerox.model import randomforest
 from numerox.model import mlpc

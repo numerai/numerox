@@ -1,5 +1,6 @@
 import numpy as np
 from sklearn.linear_model import LogisticRegression
+from sklearn.linear_model import Ridge
 from sklearn.neural_network import MLPClassifier as MLPC
 from sklearn.ensemble import ExtraTreesClassifier as ETC
 from sklearn.ensemble import RandomForestClassifier as RFC
@@ -66,6 +67,19 @@ class logistic(Model):
         yfit = dfit.y_for_tournament(tournament)
         model.fit(dfit.x, yfit)
         yhat = model.predict_proba(dpre.x)[:, 1]
+        return dpre.ids, yhat
+
+
+class ridge_mean(Model):
+
+    def __init__(self, alpha=6):
+        self.p = {'alpha': alpha}
+
+    def fit_predict(self, dfit, dpre, tournament):
+        model = Ridge(alpha=self.p['alpha'], normalize=True)
+        yfit = dfit.y.mean(axis=1)
+        model.fit(dfit.x, yfit)
+        yhat = model.predict(dpre.x)
         return dpre.ids, yhat
 
 

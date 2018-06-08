@@ -3,8 +3,9 @@ from numerox.model import fifty
 
 
 def get_models():
-    models = [nx.logistic(), nx.extratrees(), nx.randomforest(),
-              nx.mlpc(), nx.logisticPCA(), nx.example_predictions(), fifty()]
+    models = [nx.logistic(), nx.ridge_mean(), nx.extratrees(),
+              nx.randomforest(), nx.mlpc(), nx.logisticPCA(),
+              nx.example_predictions(), fifty()]
     return models
 
 
