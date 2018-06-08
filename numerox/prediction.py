@@ -202,6 +202,19 @@ class Prediction(object):
         metrics = metrics.drop(['era'], axis=1)
         return metrics
 
+    def metric_per_tournament(self, data, metric='logloss'):
+        "DataFrame containing given metric versus tournament"
+        dfs = []
+        for t_int, t_name in nx.tournament_iter():
+                df, info = metrics_per_name(data, self, t_int,
+                                            columns=[metric])
+                df.columns = [t_name]
+                dfs.append(df)
+        df = pd.concat(dfs, axis=1)
+        df.insert(df.shape[1], 'mean', df.mean(axis=1))
+        df = df.sort_values('mean')
+        return df
+
     def performance(self, data, tournament, era_as_str=True,
                     region_as_str=True,
                     columns=['logloss', 'auc', 'acc', 'ystd', 'sharpe',

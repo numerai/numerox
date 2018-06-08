@@ -81,11 +81,12 @@ def metrics_per_name(data, prediction, tournament, join='data',
     if region_as_str:
         info['region'] = [REGION_INT_TO_STR[r] for r in info['region']]
 
-    # pivot is a dataframe with:
-    #     era for rows
-    #     name for columns
-    #     logloss for cell values
-    pivot = mpe.pivot(index='era', columns='name', values='logloss')
+    if 'logloss' in cols:
+        # pivot is a dataframe with:
+        #     era for rows
+        #     name for columns
+        #     logloss for cell values
+        pivot = mpe.pivot(index='era', columns='name', values='logloss')
 
     # mm is a dataframe with:
     #    name as rows
@@ -95,7 +96,7 @@ def metrics_per_name(data, prediction, tournament, join='data',
     # metrics is the output with:
     #    name as rows
     #    `columns` as columns
-    metrics = pd.DataFrame(index=pivot.columns, columns=columns)
+    metrics = pd.DataFrame(index=mm.index, columns=columns)
 
     for col in columns:
         if col == 'consis':
