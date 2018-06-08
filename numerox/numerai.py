@@ -15,20 +15,20 @@ from numerox.prediction import CONSISTENCY_GTE
 # ---------------------------------------------------------------------------
 # download dataset
 
-def download(filename, tournament=1, verbose=False):
+def download(filename, verbose=False):
     "Download the current Numerai dataset; overwrites if file exists"
     if verbose:
         print("Download dataset {}".format(filename))
     napi = NumerAPI()
-    url = napi.get_dataset_url(tournament=tournament)
+    url = napi.get_dataset_url(tournament=1)
     filename = os.path.expanduser(filename)  # expand ~/tmp to /home/...
     download_file(url, filename)
 
 
-def download_data_object(tournament=1, verbose=False):
+def download_data_object(verbose=False):
     "Used by numerox to avoid hard coding paths; probably not useful to users"
     with tempfile.NamedTemporaryFile() as temp:
-        download(temp.name, tournament=tournament, verbose=verbose)
+        download(temp.name, verbose=verbose)
         data = nx.load_zip(temp.name)
     return data
 
@@ -36,7 +36,7 @@ def download_data_object(tournament=1, verbose=False):
 # ---------------------------------------------------------------------------
 # upload submission
 
-def upload(filename, public_id, secret_key, tournament=1, block=True):
+def upload(filename, tournament, public_id, secret_key, block=True):
     """
     Upload tournament submission (csv file) to Numerai.
 
