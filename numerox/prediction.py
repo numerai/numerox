@@ -154,6 +154,10 @@ class Prediction(object):
         if verbose:
             print("Save {}".format(path_or_buf))
 
+    def y_correlation(self):
+        "Correlation matrix of y's (predictions) as dataframe"
+        return self.df.corr()
+
     def summary(self, data, tournament, round_output=True):
         "Performance summary of prediction object that contains a single name"
 

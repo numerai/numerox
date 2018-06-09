@@ -181,6 +181,13 @@ def test_prediction_loc():
     ade(p.loc[['index4', 'index0', 'index2']], mp([4, 0, 2]), msg)
 
 
+def test_prediction_y_correlation():
+    "test prediction.y_correlation"
+    p = testing.micro_prediction()
+    df = p.y_correlation()
+    ok_(isinstance(df, pd.DataFrame), 'expecting a dataframe')
+
+
 def test_prediction_summary():
     "make sure prediction.summary runs"
     d = testing.micro_data()
