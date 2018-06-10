@@ -38,7 +38,7 @@ OK, results are good enough for a demo so let's make a submission file for the
 tournament. We will fit the model on the train data and make our predictions
 for the tournament data::
 
-    >>> prediction = nx.production(model, data, verbosity=1)
+    >>> prediction = nx.production(model, data, 'bernie', verbosity=1)
     logistic(inverse_l2=0.0001)
            logloss     auc     acc    ystd   stats
     mean  0.692808  0.5194  0.5142  0.0063   tourn      bernie
