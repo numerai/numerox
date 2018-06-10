@@ -1,4 +1,5 @@
 from nose.tools import ok_
+from nose.tools import assert_raises
 
 import pandas as pd
 
@@ -40,3 +41,25 @@ def test_tournament():
     for i in range(1, 6):
         t = nx.tournament_str2int(nx.tournament_int2str(i))
         ok_(t == i, 'tournament corrupted during round trip')
+
+
+def test_tournament_int():
+    "test tournament_int"
+    for t_int, t_str in nx.tournament_iter():
+        t_int2 = nx.tournament_int(t_int)
+        ok_(t_int2 == t_int, "torunament int do not agree")
+        t_int2 = nx.tournament_int(t_str)
+        ok_(t_int2 == t_int, "torunament int do not agree")
+    assert_raises(ValueError, nx.tournament_int, 0)
+    assert_raises(ValueError, nx.tournament_int, 'burn')
+
+
+def test_tournament_str():
+    "test tournament_str"
+    for t_int, t_str in nx.tournament_iter():
+        t_str2 = nx.tournament_str(t_int)
+        ok_(t_str2 == t_str, "torunament str do not agree")
+        t_str2 = nx.tournament_str(t_str)
+        ok_(t_str2 == t_str, "torunament str do not agree")
+    assert_raises(ValueError, nx.tournament_str, 0)
+    assert_raises(ValueError, nx.tournament_str, 'burn')

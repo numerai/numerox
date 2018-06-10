@@ -103,3 +103,25 @@ def tournament_iter():
     "Iterate, in order, through tournaments yielding tuple of (int, str)"
     for t in range(1, 6):
         yield t, tournament_int2str(t)
+
+
+def tournament_int(tournament_int_or_str):
+    "Convert tournament int or str to int"
+    if isstring(tournament_int_or_str):
+        return tournament_str2int(tournament_int_or_str)
+    elif isint(tournament_int_or_str):
+        if tournament_int_or_str not in (1, 2, 3, 4, 5):
+            raise ValueError('tournament int must be between 1 and 5')
+        return tournament_int_or_str
+    raise ValueError('input must be a str or int')
+
+
+def tournament_str(tournament_int_or_str):
+    "Convert tournament int or str to str"
+    if isstring(tournament_int_or_str):
+        if tournament_int_or_str not in TOURNAMENT_NAMES:
+            raise ValueError('tournament name is unknown')
+        return tournament_int_or_str
+    elif isint(tournament_int_or_str):
+        return tournament_int2str(tournament_int_or_str)
+    raise ValueError('input must be a str or int')

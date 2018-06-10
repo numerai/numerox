@@ -74,6 +74,8 @@ from numerox.util import history
 from numerox.util import tournament_int2str
 from numerox.util import tournament_str2int
 from numerox.util import tournament_iter
+from numerox.util import tournament_int
+from numerox.util import tournament_str
 
 try:
     from numpy.testing import Tester
