@@ -12,7 +12,7 @@ DEFAULT_FIRST_ROUND = 51
 class Leaderboard(object):
 
     def __init__(self, tournament=1, verbose=False):
-        self.tournament = tournament
+        self.tournament = nx.torunament_int(tournament)
         self.verbose = verbose
         self.df = None
         self.unresolved_rounds = []
@@ -112,6 +112,7 @@ def download_leaderboard(round_number=None, tournament=1):
 
     Default is to download current round.
     """
+    tournament = nx.tournament_int(tournament)
     if round_number is None:
         napi = NumerAPI(verbosity='warn')
         num = napi.get_current_round(tournament=tournament)
@@ -124,6 +125,7 @@ def download_leaderboard(round_number=None, tournament=1):
 
 def download_raw_leaderboard(round_number=None, tournament=1):
     "Download leaderboard for given round number"
+    tournament = nx.tournament_int(tournament)
     query = '''
             query($number: Int!
                   $tournament: Int!) {
@@ -203,6 +205,7 @@ def raw_leaderboard_to_df(raw_leaderboard, round_number):
 
 def get_current_round_number(tournament):
     "Current round number as an integer."
+    tournament = nx.tournament_int(tournament)
     napi = NumerAPI(verbosity='warn')
     cr = napi.get_current_round(tournament=tournament)
     return cr

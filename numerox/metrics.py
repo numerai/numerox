@@ -5,6 +5,7 @@ from scipy.stats import ks_2samp
 from sklearn.cluster import MiniBatchKMeans
 from sklearn.metrics import log_loss, roc_auc_score, accuracy_score
 
+import numerox as nx
 from numerox.data import ERA_INT_TO_STR
 from numerox.data import REGION_INT_TO_STR
 
@@ -28,7 +29,7 @@ def metrics_per_era(data, prediction, tournament, join='data',
     else:
         raise ValueError("`join` method not recognized")
     yhats_df = df.dropna()
-    yn = 'y' + str(tournament)
+    yn = 'y' + str(nx.tournament_int(tournament))
     data_df = data.df[['era', 'region', yn]]
     df = pd.merge(data_df, yhats_df, left_index=True, right_index=True,
                   how=how)

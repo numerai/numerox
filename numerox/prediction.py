@@ -146,7 +146,7 @@ class Prediction(object):
         "Save a csv file of predictions; predictin must contain only one name"
         if self.shape[1] != 1:
             raise ValueError("prediction must contain a single name")
-        name = nx.tournament_int2str(tournament)
+        name = nx.tournament_str(tournament)
         df = self.df.iloc[:, 0].to_frame('probability_' + name)
         df.index.rename('id', inplace=True)
         float_format = "%.{}f".format(decimals)
@@ -176,7 +176,8 @@ class Prediction(object):
         consis = (logloss < LOGLOSS_BENCHMARK).mean()
 
         # summary of metrics
-        m1 = metrics.mean(axis=0).tolist() + ['tourn', str(tournament)]
+        t_str = nx.tournament_str(tournament)
+        m1 = metrics.mean(axis=0).tolist() + ['tourn', t_str]
         m2 = metrics.std(axis=0).tolist() + ['region', region_str]
         m3 = metrics.min(axis=0).tolist() + ['eras', nera]
         m4 = metrics.max(axis=0).tolist() + ['consis', consis]
@@ -516,7 +517,7 @@ def load_prediction_csv(filename, name=None):
 def load_example_predictions(data_zip, tournament):
     "Load example predictions from Numerai zip archive"
     zf = zipfile.ZipFile(data_zip)
-    tourn_name = nx.tournament_int2str(tournament)
+    tourn_name = nx.tournament_str(tournament)
     filename = EXAMPLE_PREDICTIONS.format(tourn_name)
     df = pd.read_csv(zf.open(filename), header=0, index_col=0)
     df.columns = ['example_predictions_{}'.format(tourn_name)]

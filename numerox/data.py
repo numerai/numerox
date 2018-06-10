@@ -206,6 +206,7 @@ class Data(object):
 
     def y_for_tournament(self, tournament):
         "View of targets for give tournament as a 1d numpy float array"
+        tournament = nx.tournament_int(tournament)
         if tournament == 1:
             return self.y1
         elif tournament == 2:
@@ -326,7 +327,7 @@ class Data(object):
 
         Parameters
         ----------
-        tournament : int
+        tournament : int or str
             Which tournament's targets to balance.
         train_only : {True, False}, optional
             By default (True) only train eras are y balanced. No matter what
