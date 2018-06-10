@@ -69,19 +69,19 @@ def test_prediction_save():
 def test_prediction_to_csv():
     "make sure prediction.to_csv runs"
     p = testing.micro_prediction()
-    tournament = 1
     with tempfile.NamedTemporaryFile() as temp:
-        p['model1'].to_csv(temp.name, tournament=tournament)
+        p['model1'].to_csv(temp.name, tournament=1)
         with testing.HiddenPrints():
-            p['model1'].to_csv(temp.name, tournament=tournament, verbose=True)
+            p['model1'].to_csv(temp.name, tournament='bernie', verbose=True)
         p2 = nx.load_prediction_csv(temp.name, 'model1')
         ade(p2, p['model1'], "prediction corrupted during roundtrip")
-    assert_raises(ValueError, p.to_csv, 'unused', tournament)
+    assert_raises(ValueError, p.to_csv, 'unused', 2)
     assert_raises(ValueError, p.to_csv, 'model1', 99)
 
 
 def test_load_example_predictions():
     "test nx.load_example_predictions"
+    p = nx.load_example_predictions(TINY_DATASET_CSV, tournament='elizabeth')
     p = nx.load_example_predictions(TINY_DATASET_CSV, tournament=1)
     ok_(len(p) == 6, "wrong number of rows")
     ok_(p.shape == (6, 1), 'data has wrong shape')
@@ -97,7 +97,7 @@ def test_prediction_copies():
     ok_(not testing.shares_memory(p, p.copy()), "should be a copy")
 
 
-def test_data_properties():
+def test_prediction_properties():
     "prediction properties should not be corrupted"
 
     d = testing.micro_data()
@@ -203,6 +203,7 @@ def test_prediction_performance():
     df = p.performance(d, 1)
     ok_(isinstance(df, pd.DataFrame), 'expecting a dataframe')
     p.performance(d, 2, sort_by='auc')
+    p.performance(d, 'elizabeth', sort_by='auc')
     p.performance(d, 3, sort_by='acc')
     p.performance(d, 4, sort_by='ystd')
     p.performance(d, 5, sort_by='sharpe')
@@ -221,6 +222,7 @@ def test_prediction_dominance():
     p = p.merge_arrays(d.ids, d.y3, 'model3')
 
     df = p.dominance(d, 3)
+    df = p.dominance(d, 'jordan')
 
     ok_(isinstance(df, pd.DataFrame), 'expecting a dataframe')
     assert_raises(ValueError, p['model1'].dominance, d, 1)
@@ -266,7 +268,7 @@ def test_prediction_setitem():
     "compare prediction._setitem__ with merge"
 
     data = nx.play_data()
-    p1 = nx.production(nx.logistic(), data, 1, 'model1', verbosity=0)
+    p1 = nx.production(nx.logistic(), data, 'bernie', 'model1', verbosity=0)
     p2 = nx.production(nx.logistic(1e-5), data, 2, 'model2',  verbosity=0)
     p3 = nx.production(nx.logistic(1e-6), data, 3, 'model3',  verbosity=0)
     p4 = nx.backtest(nx.logistic(), data, 4, 'model1',  verbosity=0)

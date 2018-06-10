@@ -44,6 +44,7 @@ def upload(filename, tournament, public_id, secret_key, block=True):
     upload_submission and read_submission_info. If block is False then only
     upload_submission is needed.
     """
+    tournament = nx.tournament_int(tournament)
     napi = NumerAPI(public_id=public_id, secret_key=secret_key,
                     verbosity='warning')
     upload_id = napi.upload_predictions(filename, tournament=tournament)
@@ -134,6 +135,8 @@ def get_stakes(round_number=None, tournament=1, sort_by='prize pool',
 
     cumsum is dollars ABOVE you.
     """
+
+    tournament = nx.tournament_int(tournament)
 
     # get raw stakes
     napi = NumerAPI()
@@ -242,6 +245,7 @@ def get_stakes(round_number=None, tournament=1, sort_by='prize pool',
 
 def round_resolution_date(tournament=1):
     "The date each round was resolved as a Dataframe."
+    tournament = nx.tournament_int(tournament)
     napi = NumerAPI(verbosity='warn')
     dates = napi.get_competitions(tournament=tournament)
     dates = pd.DataFrame(dates)[['number', 'resolveTime']]
