@@ -248,6 +248,17 @@ class Data(object):
         df = self.df.iloc[:, -5:]
         return df.corr()
 
+    def y_sum_hist(self):
+        "Histogram data of sum of y targets across tournaments as dataframe"
+        s = self.y.sum(axis=1)
+        s = s[np.isfinite(s)]
+        data = []
+        for si in range(6):
+            data.append((si, (s == si).mean()))
+        df = pd.DataFrame(data=data, columns=['ysum', 'fraction'])
+        df = df.set_index('ysum')
+        return df
+
     def y_similarity(self):
         "Similarity (fraction of y's equal) matrix as dataframe"
         y = self.y
