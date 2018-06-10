@@ -248,6 +248,24 @@ class Data(object):
         df = self.df.iloc[:, -5:]
         return df.corr()
 
+    def y_similarity(self):
+        "Similarity (fraction of y's equal) matrix as dataframe"
+        y = self.y
+        s = np.ones((5, 5))
+        for i in range(5):
+            for j in range(i+1, 5):
+                yi = y[:, i]
+                yj = y[:, j]
+                idx = np.isfinite(yi + yj)
+                yi = yi[idx]
+                yj = yj[idx]
+                sij = (yi == yj).mean()
+                s[i,  j] = sij
+                s[j,  i] = sij
+        cols = ['y1', 'y2', 'y3', 'y4', 'y5']
+        df = pd.DataFrame(data=s, columns=cols, index=cols)
+        return df
+
     def y_to_nan(self):
         "Copy of data with y values set to NaN"
         data = self.copy()

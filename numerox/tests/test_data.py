@@ -101,6 +101,20 @@ def test_data_pca():
         ok_(corr < 1e-5, "features are not orthogonal")
 
 
+def test_data_y_correlation():
+    "test data.y_correlation"
+    d = micro_data()
+    df = d.y_correlation()
+    ok_(isinstance(df, pd.DataFrame), 'expecting a dataframe')
+
+
+def test_data_y_similarity():
+    "test data.y_similarity"
+    d = micro_data()
+    df = d.y_similarity()
+    ok_(isinstance(df, pd.DataFrame), 'expecting a dataframe')
+
+
 def test_data_balance():
     "test data.balance"
 
