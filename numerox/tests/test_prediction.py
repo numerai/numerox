@@ -238,14 +238,14 @@ def test_prediction_correlation():
 def test_prediction_check():
     "make sure prediction.check runs"
     d = nx.play_data()
-    p1 = nx.production(nx.logistic(), d, 3, verbosity=0)
+    p1 = nx.production(nx.logistic(), d, 'ken', verbosity=0)
     p2 = p1.copy()
     p2 = p2.rename('example_predictions')
     p = p1 + p2
     with testing.HiddenPrints():
-        df = p.check(d)
+        df = p.check(d, example_predictions='ken')
     ok_(isinstance(df, dict), 'expecting a dictionary')
-    assert_raises(ValueError, p1.check, d)
+    assert_raises(ValueError, p1.check, d, None)
 
 
 def test_prediction_concordance():

@@ -302,17 +302,42 @@ class Prediction(object):
                 if name != zname:
                     print("   {:.4f} {}".format(corr[ix], zname))
 
-    def check(self, data):
-        "Run Numerai checks; must contain a model named 'example_predictions'"
+    def check(self, data, example_predictions, verbose=True):
+        """
+        Run Numerai upload checks.
 
-        if 'example_predictions' not in self:
-            msg = "must contain a model named 'example_predictions'"
-            raise ValueError(msg)
-        eidx = self.names.index('example_predictions')
-        yex = self.y[:, eidx]
+        Parameters
+        ----------
+        data : nx.Data
+            Data object of Numerai dataset.
+        example_predictions : int, str, or nx.Prediction
+            The examples predictions. If an integer, e.g. 1, or string
+            ('bernie') is given then numerox will calculate the example
+            predictions for tournament 1. Or you can pass in a Prediction
+            object that contain the example predictions.
+        verbose : bool
+            By default, True, output is printed to stdout.
 
+        Returns
+        -------
+        check : dict
+            A dictionary where the keys are the model names and the values
+            are Pandas DataFrames that contain the results of the checks.
+        """
+
+        if not isinstance(example_predictions, nx.Prediction):
+            t_int = nx.tournament_int(example_predictions)
+            example_predictions = nx.production(nx.example_predictions(),
+                                                data,
+                                                tournament=t_int,
+                                                verbosity=0)
+        else:
+            if example_predictions.shape[1] != 1:
+                raise ValueError('Expecting only one example prediction')
+
+        example_predictions = example_predictions.loc[self.ids]
+        yex = example_predictions.y[:, 0]
         names = list(self.names)
-        names.remove('example_predictions')
 
         df_dict = {}
         columns = ['validation', 'test', 'live', 'all', 'pass']
