@@ -3,7 +3,7 @@
 Release Notes
 =============
 
-- v2.0.0 (in development; not yet released)
+- v2.0.0
 
   * Redesign of numerox to support Numerai's new 5-tournament format
 
