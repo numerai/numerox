@@ -5,7 +5,7 @@ If your tournament submission does not pass Numerai's upload checks then
 Numerai will reject the submission immediately. You can use Numerox to make
 sure the checks will pass before you upload.
 
-First load the datset::
+First load the dataset::
 
     >>> data = nx.load_zip('numerai_dataset.zip')
 
@@ -16,7 +16,7 @@ Next make a prediction::
 
 Or, alternatively, if you do not use Numerox to run your model then you can
 create the prediction from 1-dimensional numpy arrays of the Numerai row ids,
-`ids`, and the prediction values, `yhat`::
+``ids``, and the prediction values, ``yhat``::
 
     >>> prediction = nx.Prediction()
     >>> prediction = prediction.merge_arrays(ids, yhat, 'my_model_name')
@@ -34,7 +34,7 @@ Let's run the checks::
 
 All checks passed!
 
-If you pass the tournament number or tournament name to the `check` method
+If you pass the tournament number or tournament name to the ``check`` method
 then numerox will calculate the example prediction. Alternatively, to run
 fast if you wish to check more than one model, you can pass in the example
 predictions as a prediction object, which you can generate in one of two ways::
