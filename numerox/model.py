@@ -18,16 +18,17 @@ model is just a thin wrapper around sklearn's LogisticRegression. The wrapper
 allows LogisticRegression to receive data from numerox and for numerox to keep
 track of its predictions.
 
-Your model MUST have a fit_predict method that takes two data objects as
-input. The first is training data (dfit), the second is prediction data (dpre).
+Your model MUST have a fit_predict method that takes three inputs: The first
+is training data (dfit), the second is prediction data (dpre), and the third
+is the tournament (integer, 1, or string, 'bernie').
 
 The fit_predict method MUST return two numpy arrays. The first contains the
 ids, the second the predictions. Make sure that these two arrays stay aligned!
 
 The models below inherit from The Model class. That is optional. But if you do
-inherit from Model and if you place your parameters in self.p as is done in
-the models below then you will get a nice printout (model name and parameters)
-when you run your model.
+inherit from Model and if you place your parameters in a self.p dictionary as
+is done in the models below then you will get a nice printout (model name and
+parameters) when you run your model.
 
 None of the models below will be competitive in the Numerai tournament. You'll
 have to make your own model. If you already have a model then you can make a
