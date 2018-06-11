@@ -26,8 +26,9 @@ tasks that numerox automates.
 Performance
 -----------
 
-Is your model any good?
+Is your model any good? Does it pass the Numerai upload checks?
 
+- Numerai `upload checks`_
 - `Compare model`_ performances
 - Compare performance of a `single change`_ across several models
 
@@ -57,6 +58,7 @@ You can run all the examples [1]_::
 .. _backtest: https://github.com/kwgoodman/numerox/blob/master/numerox/examples/backtest_example.py
 .. _run and splitter: https://github.com/kwgoodman/numerox/blob/master/numerox/examples/run.rst
 
+.. _upload checks: https://github.com/kwgoodman/numerox/blob/master/numerox/examples/upload_checks.rst
 .. _compare model: https://github.com/kwgoodman/numerox/blob/master/numerox/examples/compare_models.rst
 .. _single change: https://github.com/kwgoodman/numerox/blob/master/numerox/examples/compare_change.py
 
