@@ -53,7 +53,7 @@ Let's upload our predictions to enter the tournament::
                                       public_id, secret_key)
     metric                  value   minutes
     concordance              True   0.0898
-    consistency              0.75    0.0898
+    consistency              0.75   0.0898
     originality             False   0.1783
     validation_logloss     0.6928   0.1783
     stakeable                True   0.1783
