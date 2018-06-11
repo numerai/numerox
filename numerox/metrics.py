@@ -5,13 +5,14 @@ from scipy.stats import ks_2samp
 from sklearn.cluster import MiniBatchKMeans
 from sklearn.metrics import log_loss, roc_auc_score, accuracy_score
 
+import numerox as nx
 from numerox.data import ERA_INT_TO_STR
 from numerox.data import REGION_INT_TO_STR
 
 LOGLOSS_BENCHMARK = 0.693
 
 
-def metrics_per_era(data, prediction, join='data',
+def metrics_per_era(data, prediction, tournament, join='data',
                     columns=['logloss', 'auc', 'acc', 'ystd'],
                     era_as_str=False, region_as_str=False):
     "Dataframe with columns era, model, and specified metrics. And region list"
@@ -28,7 +29,8 @@ def metrics_per_era(data, prediction, join='data',
     else:
         raise ValueError("`join` method not recognized")
     yhats_df = df.dropna()
-    data_df = data.df[['era', 'region', 'y']]
+    yn = 'y' + str(nx.tournament_int(tournament))
+    data_df = data.df[['era', 'region', yn]]
     df = pd.merge(data_df, yhats_df, left_index=True, right_index=True,
                   how=how)
 
@@ -43,7 +45,7 @@ def metrics_per_era(data, prediction, join='data',
     for era in unique_eras:
         idx = df.era.isin([era])
         df_era = df[idx]
-        y = df_era['y'].values
+        y = df_era[yn].values
         if era_as_str:
             era = ERA_INT_TO_STR[era]
         for name in names:
@@ -58,7 +60,7 @@ def metrics_per_era(data, prediction, join='data',
     return metrics, regions
 
 
-def metrics_per_name(data, prediction, join='data',
+def metrics_per_name(data, prediction, tournament, join='data',
                      columns=['logloss', 'auc', 'acc', 'ystd'],
                      era_as_str=True, region_as_str=True):
 
@@ -68,7 +70,8 @@ def metrics_per_name(data, prediction, join='data',
     if 'sharpe' in columns or 'consis' in columns:
         if 'logloss' not in cols:
             cols.append('logloss')
-    mpe, regions = metrics_per_era(data, prediction, join=join, columns=cols)
+    mpe, regions = metrics_per_era(data, prediction, tournament, join=join,
+                                   columns=cols)
 
     # gather some info
     info = {}
@@ -79,11 +82,12 @@ def metrics_per_name(data, prediction, join='data',
     if region_as_str:
         info['region'] = [REGION_INT_TO_STR[r] for r in info['region']]
 
-    # pivot is a dataframe with:
-    #     era for rows
-    #     name for columns
-    #     logloss for cell values
-    pivot = mpe.pivot(index='era', columns='name', values='logloss')
+    if 'logloss' in cols:
+        # pivot is a dataframe with:
+        #     era for rows
+        #     name for columns
+        #     logloss for cell values
+        pivot = mpe.pivot(index='era', columns='name', values='logloss')
 
     # mm is a dataframe with:
     #    name as rows
@@ -93,7 +97,7 @@ def metrics_per_name(data, prediction, join='data',
     # metrics is the output with:
     #    name as rows
     #    `columns` as columns
-    metrics = pd.DataFrame(index=pivot.columns, columns=columns)
+    metrics = pd.DataFrame(index=mm.index, columns=columns)
 
     for col in columns:
         if col == 'consis':

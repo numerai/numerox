@@ -3,9 +3,9 @@
 Release Notes
 =============
 
-- v1.7.0 (in development; not yet released)
+- v2.0.0 (in development; not yet released)
 
-  * Bugfix ``report.reputation``
+  * Redesign of numerox to support Numerai's new 5-tournament format
 
 - v1.6.0
 

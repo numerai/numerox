@@ -4,47 +4,49 @@ Staking information
 Numerox provides information about the staking tournament::
 
     >>> import numerox as nx
-    >>> nx.show_stakes(mark_user='bps')
-                          days    s    soc   cumsum  c     mark
+    >>> nx.show_stakes(tournament='bernie', mark_user='steppenwolf')
+                          days    s   soc   cumsum c      mark
     user
-    gopovo                2.2766    3     5      0   0.730
-    npc                   2.2807    1     3      5   0.300
-    shimco                3.1578    1     3      8   0.260
-    hb_scout              2.9623    2     7     12   0.256
-    hb_exp                2.9640    2     7     20   0.255
-    timboy                3.1049   25   131     27   0.190
-    costello              2.2760    1     7    159   0.136
-    hb                    2.9630    2    14    166   0.134
-    yty                   2.2812   50   381    181   0.131
-    zuz                   2.2781   50   381    563   0.131
-    no_formal_training    2.9833   13   100    945   0.130
-    themicon              2.3197    5    40   1045   0.125
-    themiconman           2.3193    5    40   1085   0.124
-    themiconmanweb        2.3187    5    40   1125   0.123
-    chrissly31415         3.0337   10    95   1166   0.105
-    wsw                   2.2748   50   490   1261   0.102
-    justaddmorelayers     2.2766  100   990   1751   0.101
-    witnessai             4.1025    2    20   2741   0.100
-    dnum1_2               3.4168    1    10   2761   0.100
-    kreator               3.1093   20   200   2771   0.100
-    ragnar                3.1028   20   200   2971   0.100
-    abriosi               2.6279    9    90   3171   0.100
-    tyler3                3.9674    2    22   3261   0.090
-    niccholas             2.3035   18   210   3283   0.088
-    anna2                 2.3053    2    22   3493   0.087
-    anna1                 2.3052    2    22   3516   0.087
-    quantverse            2.2745  100  1149   3539   0.087   new
-    data_science_machine  2.2746   50   581   4689   0.086   new
-    theafh                2.3296   10   117   5270   0.085
-    karl_marx             2.3280   10   117   5388   0.085
-    joseph_schumpeter     2.3268   10   117   5505   0.085
-    milgram               2.2822    3    46   5623   0.085
-    narf                  2.2744  101  1202   5670   0.084   new
-    bps                   2.2748  100  1204   6872   0.083  <<<<
-    steppenwolf           2.2748   50   602   8077   0.083
-    alisa                 2.2745   50   602   8680   0.083   new
-    euageney              2.2753   23   282   9282   0.082
-    zbieram_na_piwo       2.2745    1    12   9565   0.082   new
+    jvk                   1.5177   0     0      0   0.700
+    prosperity            0.5283   0     0      0   0.450
+    unmarkedlearner       1.9310   0     0      0   0.400
+    dustoff               1.9655   5    14      1   0.350
+    cosmo                 0.2776   0     2     15   0.150
+    onesimplenight        0.6861   1     9     17   0.110
+    numbergamesai2        0.6383   0     1     27   0.110
+    slyfox                1.9588   0     1     28   0.100
+    andrei113             1.1434   0     1     29   0.100
+    milanai               0.8345   0     1     30   0.100
+    crysis                0.7821   1    10     31   0.100
+    deltron               0.6383   0     5     41   0.100
+    jackolantern          0.3637   0     2     46   0.100
+    noone                 0.1450   5    50     48   0.100   new
+    sjn                   0.6988   0     2     98   0.085
+    dg                    0.6946   1    14    101   0.071
+    hoi                   0.5262   1    22    115   0.050
+    kreator               1.9097   2    48    137   0.041
+    fearindex             0.7387   5   121    186   0.041
+    parmenas              1.5905   1    40    308   0.040
+    warg_1                0.2605   1    25    348   0.040
+    lothlorien            0.2576   1    25    373   0.040
+    wacax                 1.5634   0     6    398   0.035
+    anna2                 0.7797   1    31    404   0.032
+    anna1                 0.6673   2    62    435   0.032
+    theorist13            0.3629   3    96    498   0.031
+    smirmik3              0.1412   2    95    594   0.021   new
+    mlt                   0.8278   0    25    690   0.020
+    accountnumber3        0.1452   0    10    715   0.020   new
+    mmfine                0.1447   2   105    725   0.020   new
+    mmfine1               0.1444   2   105    830   0.020   new
+    washington            0.1443   2   105    935   0.020   new
+    glasperlenspiel       0.1536  14   736   1040   0.019   new
+    smirmik2              0.1431   2   105   1776   0.019   new
+    steppenwolf           0.1547   6   333   1882   0.018  <<<<
+    data_science_machine  0.1665  14   823   2215   0.017
+    smirmik               0.1556   2   117   3039   0.017
+    monai                 0.1601   2   125   3156   0.016
+    innmrwetrust          1.3307   3   200   3281   0.015
+    themicon              0.1767   1    66   3481   0.015
     <snip>
 
 You can optionally specify the round number, the column by which to sort,

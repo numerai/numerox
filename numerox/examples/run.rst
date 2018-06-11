@@ -4,7 +4,7 @@ numerox run
 Both the ``production`` and ``backtest`` functions are just very thin wrappers
 around the ``run`` function::
 
-    >>> prediction = nx.run(model, splitter, verbosity=2)
+    >>> prediction = nx.run(model, splitter, tournament, verbosity=2)
 
 where ``splitter`` iterates through fit, predict splits of the data. Numerox
 comes with eight splitters:
@@ -21,9 +21,9 @@ comes with eight splitters:
 For example, here's how you would reproduce the ``backtest`` function::
 
     >>> splitter = nx.CVSplitter(data, kfold=5, seed=0)
-    >>> prediction = nx.run(model, splitter)
+    >>> prediction = nx.run(model, splitter, tournament)
 
 and the ``production`` function::
 
     >>> splitter = nx.TournamentSplitter(data)
-    >>> prediction = nx.run(model, splitter)
+    >>> prediction = nx.run(model, splitter, tournament)

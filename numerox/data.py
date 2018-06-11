@@ -5,6 +5,8 @@ import pandas as pd
 from sklearn.decomposition import PCA
 from sklearn.neighbors import NearestNeighbors
 
+import numerox as nx
+
 TRAIN_FILE = 'numerai_training_data.csv'
 TOURNAMENT_FILE = 'numerai_tournament_data.csv'
 HDF_DATA_KEY = 'numerox_data'
@@ -12,7 +14,7 @@ HDF_DATA_KEY = 'numerox_data'
 ERA_INT_TO_STR = {}
 ERA_STR_TO_INT = {}
 ERA_STR_TO_FLOAT = {}
-for i in range(150):
+for i in range(180):
     name = 'era' + str(i)
     ERA_INT_TO_STR[i] = name
     ERA_STR_TO_INT[name] = i
@@ -166,23 +168,26 @@ class Data(object):
     @property
     def x(self):
         "View of features, x, as a numpy float array"
-        return self.df.iloc[:, 2:-1].values
+        return self.df.iloc[:, 2:-5].values
 
     def xnew(self, x_array):
         "Copy of data but with data.x=`x_array`; must have same number of rows"
         if x_array.shape[0] != len(self):
             msg = "`x_array` must have the same number of rows as data"
             raise ValueError(msg)
-        shape = (x_array.shape[0], x_array.shape[1] + 3)
+        shape = (x_array.shape[0], x_array.shape[1] + 7)
         cols = ['x'+str(i) for i in range(x_array.shape[1])]
-        cols = ['era', 'region'] + cols + ['y']
+        cols = ['era', 'region'] + cols
+        cols = cols + ['y'+str(i + 1) for i in range(5)]
         df = pd.DataFrame(data=np.empty(shape, dtype=np.float64),
                           index=self.df.index.copy(deep=True),
                           columns=cols)
         df['era'] = self.df['era'].values.copy()
         df['region'] = self.df['region'].values.copy()
-        df.values[:, 2:-1] = x_array
-        df['y'] = self.df['y'].values.copy()
+        df.values[:, 2:-5] = x_array
+        for i in range(1, 6):
+            col = 'y' + str(i)
+            df[col] = self.df[col].values.copy()
         return Data(df)
 
     @property
@@ -196,13 +201,91 @@ class Data(object):
 
     @property
     def y(self):
-        "View of y as a 1d numpy float array"
-        return self.df['y'].values
+        "View of targets, y, as a numpy float array"
+        return self.df.iloc[:, -5:].values
+
+    def y_for_tournament(self, tournament):
+        "View of targets for give tournament as a 1d numpy float array"
+        tournament = nx.tournament_int(tournament)
+        if tournament == 1:
+            return self.y1
+        elif tournament == 2:
+            return self.y2
+        elif tournament == 3:
+            return self.y3
+        elif tournament == 4:
+            return self.y4
+        elif tournament == 5:
+            return self.y5
+        raise ValueError('unknown `tournament`')
+
+    @property
+    def y1(self):
+        "View of targets for tournament 1 as a 1d numpy float array"
+        return self.df.iloc[:, -5].values
+
+    @property
+    def y2(self):
+        "View of targets for tournament 2 as a 1d numpy float array"
+        return self.df.iloc[:, -4].values
+
+    @property
+    def y3(self):
+        "View of targets for tournament 3 as a 1d numpy float array"
+        return self.df.iloc[:, -3].values
+
+    @property
+    def y4(self):
+        "View of targets for tournament 4 as a 1d numpy float array"
+        return self.df.iloc[:, -2].values
+
+    @property
+    def y5(self):
+        "View of targets for tournament 5 as a 1d numpy float array"
+        return self.df.iloc[:, -1].values
+
+    def y_correlation(self):
+        "Correlation matrix of y's as dataframe"
+        df = self.df.iloc[:, -5:]
+        return df.corr()
+
+    def y_sum_hist(self):
+        "Histogram data of sum of y targets across tournaments as dataframe"
+        s = self.y.sum(axis=1)
+        s = s[np.isfinite(s)]
+        data = []
+        for si in range(6):
+            data.append((si, (s == si).mean()))
+        df = pd.DataFrame(data=data, columns=['ysum', 'fraction'])
+        df = df.set_index('ysum')
+        return df
+
+    def y_similarity(self):
+        "Similarity (fraction of y's equal) matrix as dataframe"
+        y = self.y
+        s = np.ones((5, 5))
+        for i in range(5):
+            for j in range(i+1, 5):
+                yi = y[:, i]
+                yj = y[:, j]
+                idx = np.isfinite(yi + yj)
+                yi = yi[idx]
+                yj = yj[idx]
+                sij = (yi == yj).mean()
+                s[i,  j] = sij
+                s[j,  i] = sij
+        cols = ['y1', 'y2', 'y3', 'y4', 'y5']
+        df = pd.DataFrame(data=s, columns=cols, index=cols)
+        return df
 
     def y_to_nan(self):
         "Copy of data with y values set to NaN"
         data = self.copy()
-        data.df = data.df.assign(y=np.nan)
+        data.df = data.df.assign(y1=np.nan)
+        data.df = data.df.assign(y2=np.nan)
+        data.df = data.df.assign(y3=np.nan)
+        data.df = data.df.assign(y4=np.nan)
+        data.df = data.df.assign(y5=np.nan)
         return data
 
     # transforms ----------------------------------------------------------
@@ -238,12 +321,14 @@ class Data(object):
         data = self.xnew(x)
         return data
 
-    def balance(self, train_only=True, seed=0):
+    def balance(self, tournament, train_only=True, seed=0):
         """
         Copy of data where specified eras have mean y of 0.5.
 
         Parameters
         ----------
+        tournament : int or str
+            Which tournament's targets to balance.
         train_only : {True, False}, optional
             By default (True) only train eras are y balanced. No matter what
             the setting of `train_only` any era that contains a y that is NaN
@@ -255,7 +340,8 @@ class Data(object):
         Returns
         -------
         data : Data
-            A copy of data where specified eras have mean y of 0.5.
+            A copy of data where specified eras have mean y (for the
+            given `tournament`) of 0.5.
         """
         # This function is not written in a straightforward manner.
         # A few speed optimizations have been made.
@@ -266,7 +352,7 @@ class Data(object):
         else:
             eras = data.unique_era(as_str=False).tolist()
         era = data.era_float
-        y = data.y
+        y = data.y_for_tournament(tournament)
         index = np.arange(y.size)
         remove = []
         rs = np.random.RandomState(seed)
@@ -305,13 +391,9 @@ class Data(object):
             data = Data(df)
         return data
 
-    def subsample(self, fraction, balance=True, seed=0):
+    def subsample(self, fraction, seed=0):
         """
         Randomly sample `fraction` of each era's rows.
-
-        data.y is optionally balanced. The default is to balance y. Balancing
-        is achieved by removing rows so the number of rows will likely be
-        less than expected using `fraction` if `balance` is True.
         """
         rs = np.random.RandomState(seed)
         data_index = np.arange(len(self))
@@ -325,9 +407,7 @@ class Data(object):
             index.append(idx)
         index = np.concatenate(index)
         df = self.df.take(index)
-        data = Data(df)
-        if balance:
-            data = data.balance(train_only=False, seed=seed)
+        data = Data(df.copy())
         return data
 
     # misc ------------------------------------------------------------------
@@ -444,9 +524,9 @@ class Data(object):
         t.append(fmt.format('x', stats))
 
         # y
-        y = self.df.y
+        y = self.y
         stats = 'mean {:.6f}, fraction missing {:.4f}'
-        stats = stats.format(y.mean(), y.isnull().mean())
+        stats = stats.format(np.nanmean(y), (~np.isfinite(y)).mean())
         t.append(fmt.format('y', stats))
 
         return '\n'.join(t)
@@ -468,14 +548,21 @@ def load_zip(file_path, verbose=False):
 
     # turn into single dataframe and rename columns
     df = pd.concat([train, tourn], axis=0)
-    rename_map = {'data_type': 'region', 'target': 'y'}
+    rename_map = {'data_type': 'region'}
     for i in range(1, 51):
         rename_map['feature' + str(i)] = 'x' + str(i)
+    for t, name in nx.tournament_iter():
+        rename_map['target_' + name] = 'y' + str(t)
     df.rename(columns=rename_map, inplace=True)
 
-    # convert era and region strings to np.float64
+    # convert era, region, and labels to np.float64
     df['era'] = df['era'].map(ERA_STR_TO_FLOAT)
     df['region'] = df['region'].map(REGION_STR_TO_FLOAT)
+    df.iloc[:, -5:] = df.iloc[:, -5:].astype('float64')
+
+    # no way we did something wrong, right?
+    if df.shape[1] != 57:
+        raise IOError("expecting 57 columns; found {}".format(df.shape[1]))
 
     # make sure memory is contiguous so that, e.g., data.x is a view
     df = df.copy()

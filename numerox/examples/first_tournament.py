@@ -18,11 +18,11 @@ def first_tournament():
     model = nx.logistic()
 
     # fit model with train data and make predictions for tournament data
-    prediction = nx.production(model, data)
+    prediction = nx.production(model, data, tournament='bernie')
 
     # save predictions to csv file
-    prediction.to_csv('logistic.csv', verbose=True)
+    prediction.to_csv('logistic.csv', tournament='bernie', verbose=True)
 
     # upload predictions to Numerai to enter the tournament
     # you create the public_id and secret_key on the Numerai website
-    # nx.upload('logistic.csv', public_id, secret_key)
+    # nx.upload('logistic.csv', tournament='bernie', public_id, secret_key)

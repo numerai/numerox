@@ -55,7 +55,7 @@ def test_data_indexing():
     ade(d['live'], micro_data([9]), msg)
 
     msg = 'error indexing data by array'
-    ade(d[d.y == 0], micro_data([0, 2, 4, 6, 8]), msg)
+    ade(d[d.y1 == 0], micro_data([0, 2, 4, 6, 8, 9]), msg)
     ade(d[d.era == 'era4'], micro_data([6]), msg)
 
     assert_raises(IndexError, d.__getitem__, 'era')
@@ -101,41 +101,54 @@ def test_data_pca():
         ok_(corr < 1e-5, "features are not orthogonal")
 
 
+def test_data_y_correlation():
+    "test data.y_correlation"
+    d = micro_data()
+    df = d.y_correlation()
+    ok_(isinstance(df, pd.DataFrame), 'expecting a dataframe')
+
+
+def test_data_y_similarity():
+    "test data.y_similarity"
+    d = micro_data()
+    df = d.y_similarity()
+    ok_(isinstance(df, pd.DataFrame), 'expecting a dataframe')
+
+
 def test_data_balance():
     "test data.balance"
 
+    tournament = 1
     d = micro_data()
 
     # check balance
-    b = d.balance(train_only=False)
+    b = d.balance(tournament, train_only=False)
     for era in b.unique_era():
         if era != 'eraX':
-            y = b[era].y
+            y = b[era].y_for_tournament(tournament)
             n0 = (y == 0).sum()
             n1 = (y == 1).sum()
             ok_(n0 == n1, "y is not balanced")
 
     # check balance
-    b = d.balance(train_only=True)
+    b = d.balance(tournament, train_only=True)
     eras = np.unique(b.era[b.region == 'train'])
     for era in eras:
-        y = b[era].y
+        y = b[era].y_for_tournament(tournament)
         n0 = (y == 0).sum()
         n1 = (y == 1).sum()
         ok_(n0 == n1, "y is not balanced")
 
     # balance already balanced data (regression test)
-    d.balance().balance()
+    d.balance(tournament).balance(tournament)
 
 
 def test_data_subsample():
     "test data.subsample"
     d = nx.play_data()
-    d2 = d.subsample(0.5, balance=True)
-    for era, idx in d2.era_iter():
-        m = d2.y[idx].mean()
-        if np.isfinite(m):
-            ok_(d2.y[idx].mean() == 0.5, 'data is not balanced')
+    d2 = d.subsample(0.5)
+    ok_(isinstance(d2, nx.Data), 'expecting a Data object')
+    ok_(d2.shape[0] < 0.51 * d.shape[0], 'expecting smaller subsample')
 
 
 def test_data_hash():
@@ -174,8 +187,8 @@ def test_data_methods():
     "test data methods"
     d = micro_data()
     ok_(len(d) == 10, "wrong length")
-    ok_(d.size == 60, "wrong size")
-    ok_(d.shape == (10, 6), "wrong shape")
+    ok_(d.size == 100, "wrong size")
+    ok_(d.shape == (10, 10), "wrong shape")
     ok_(d == d, "not equal")
 
 
@@ -208,8 +221,9 @@ def test_data_properties():
     ok_((d.era_float == d.df.era).all(), "era is corrupted")
     ok_((d.region_float == d.df.region).all(), "region is corrupted")
 
-    idx = ~np.isnan(d.df.y)
-    ok_((d.y[idx] == d.df.y[idx]).all(), "y is corrupted")
+    idx = ~np.isnan(d.y)
+    y = d.df[['y1', 'y2', 'y3', 'y4', 'y5']].values
+    ok_((d.y[idx] == y[idx]).all(), "y is corrupted")
 
     x = d.x
     for i, name in enumerate(d.column_list(x_only=True)):
@@ -284,9 +298,9 @@ def test_load_zip():
         else:
             with testing.HiddenPrints():
                 d = nx.load_zip(TINY_DATASET_CSV, verbose=True)
-        ok_(len(d) == 11, "wrong number of rows")
-        ok_(d.shape == (11, 53), 'data has wrong shape')
-        ok_(d.x.shape == (11, 50), 'x has wrong shape')
+        ok_(len(d) == 13, "wrong number of rows")
+        ok_(d.shape == (13, 57), 'data has wrong shape')
+        ok_(d.x.shape == (13, 50), 'x has wrong shape')
         ok_(d.df.iloc[2, 3] == 0.34143, 'wrong feature value')
 
 

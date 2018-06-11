@@ -5,7 +5,6 @@ import pandas as pd
 import numpy as np
 from scipy.stats import pearsonr
 from scipy.stats import spearmanr
-from scipy.stats import ks_2samp
 
 import numerox as nx
 from numerox.metrics import metrics_per_era
@@ -14,7 +13,7 @@ from numerox.metrics import concordance
 from numerox.metrics import LOGLOSS_BENCHMARK
 
 HDF_PREDICTION_KEY = 'numerox_prediction'
-EXAMPLE_PREDICTIONS = 'example_predictions.csv'
+EXAMPLE_PREDICTIONS = 'example_predictions_target_{}.csv'
 
 ORIGINALITY_CORR_LTE = 0.95
 ORIGINALITY_KS_GT = 0.03
@@ -143,25 +142,31 @@ class Prediction(object):
         else:
             self.df.to_hdf(path_or_buf, HDF_PREDICTION_KEY)
 
-    def to_csv(self, path_or_buf=None, decimals=6, verbose=False):
+    def to_csv(self, path_or_buf, tournament, decimals=6, verbose=False):
         "Save a csv file of predictions; predictin must contain only one name"
         if self.shape[1] != 1:
             raise ValueError("prediction must contain a single name")
-        df = self.df.iloc[:, 0].to_frame('probability')
+        name = nx.tournament_str(tournament)
+        df = self.df.iloc[:, 0].to_frame('probability_' + name)
         df.index.rename('id', inplace=True)
         float_format = "%.{}f".format(decimals)
         df.to_csv(path_or_buf, float_format=float_format)
         if verbose:
             print("Save {}".format(path_or_buf))
 
-    def summary(self, data, round_output=True):
+    def y_correlation(self):
+        "Correlation matrix of y's (predictions) as dataframe"
+        return self.df.corr()
+
+    def summary(self, data, tournament, round_output=True):
         "Performance summary of prediction object that contains a single name"
 
         if self.shape[1] != 1:
             raise ValueError("prediction must contain a single name")
 
         # metrics
-        metrics, regions = metrics_per_era(data, self, region_as_str=True)
+        metrics, regions = metrics_per_era(data, self, tournament,
+                                           region_as_str=True)
         metrics = metrics.drop(['era', 'name'], axis=1)
 
         # additional metrics
@@ -169,12 +174,12 @@ class Prediction(object):
         nera = metrics.shape[0]
         logloss = metrics['logloss']
         consis = (logloss < LOGLOSS_BENCHMARK).mean()
-        sharpe = (LOGLOSS_BENCHMARK - logloss).mean() / logloss.std()
 
         # summary of metrics
-        m1 = metrics.mean(axis=0).tolist() + ['region', region_str]
-        m2 = metrics.std(axis=0).tolist() + ['eras', nera]
-        m3 = metrics.min(axis=0).tolist() + ['sharpe', sharpe]
+        t_str = nx.tournament_str(tournament)
+        m1 = metrics.mean(axis=0).tolist() + ['tourn', t_str]
+        m2 = metrics.std(axis=0).tolist() + ['region', region_str]
+        m3 = metrics.min(axis=0).tolist() + ['eras', nera]
         m4 = metrics.max(axis=0).tolist() + ['consis', consis]
         data = [m1, m2, m3, m4]
 
@@ -191,20 +196,37 @@ class Prediction(object):
 
         return df
 
-    def metrics_per_era(self, data, metrics=['logloss', 'auc', 'acc', 'ystd'],
+    def metrics_per_era(self, data, tournament,
+                        metrics=['logloss', 'auc', 'acc', 'ystd'],
                         era_as_str=True):
         "DataFrame containing given metrics versus era (as index)"
-        metrics, regions = metrics_per_era(data, self, columns=metrics,
+        metrics, regions = metrics_per_era(data, self, tournament,
+                                           columns=metrics,
                                            era_as_str=era_as_str)
         metrics.index = metrics['era']
         metrics = metrics.drop(['era'], axis=1)
         return metrics
 
-    def performance(self, data, era_as_str=True, region_as_str=True,
+    def metric_per_tournament(self, data, metric='logloss'):
+        "DataFrame containing given metric versus tournament"
+        dfs = []
+        for t_int, t_name in nx.tournament_iter():
+                df, info = metrics_per_name(data, self, t_int,
+                                            columns=[metric])
+                df.columns = [t_name]
+                dfs.append(df)
+        df = pd.concat(dfs, axis=1)
+        df.insert(df.shape[1], 'mean', df.mean(axis=1))
+        df = df.sort_values('mean')
+        return df
+
+    def performance(self, data, tournament, era_as_str=True,
+                    region_as_str=True,
                     columns=['logloss', 'auc', 'acc', 'ystd', 'sharpe',
                              'consis'], sort_by='logloss'):
         df, info = metrics_per_name(data,
                                     self,
+                                    tournament,
                                     columns=columns,
                                     era_as_str=era_as_str,
                                     region_as_str=region_as_str)
@@ -230,10 +252,10 @@ class Prediction(object):
                 raise ValueError("`sort_by` name not recognized")
         return df
 
-    def dominance(self, data, sort_by='logloss'):
+    def dominance(self, data, tournament, sort_by='logloss'):
         "Mean (across eras) of fraction of models bested per era"
         columns = ['logloss', 'auc', 'acc']
-        mpe, regions = metrics_per_era(data, self, columns=columns)
+        mpe, regions = metrics_per_era(data, self, tournament, columns=columns)
         dfs = []
         for i, col in enumerate(columns):
             pivot = mpe.pivot(index='era', columns='name', values=col)
@@ -279,44 +301,6 @@ class Prediction(object):
                 zname = znames[ix]
                 if name != zname:
                     print("   {:.4f} {}".format(corr[ix], zname))
-
-    def originality(self, submitted_names):
-        "Which models are original given the models already submitted?"
-
-        # predictions of models already submitted
-        ys = self.df[submitted_names].values
-
-        # models that have not been submitted; we will report on these
-        names = self.names
-        names = [m for m in names if m not in submitted_names]
-
-        # originality
-        columns = ['corr', 'corrTF', 'ks', 'ksTF', 'original']
-        df = pd.DataFrame(index=names, columns=columns)
-        for name in names:
-            corr = -np.inf
-            ks = np.inf
-            corrTF = True
-            ksTF = True
-            y = self.df[name].values
-            for i in range(ys.shape[1]):
-                c = np.abs(pearsonr(y, ys[:, i])[0])
-                if c > corr:
-                    corr = c
-                if corrTF and c > ORIGINALITY_CORR_LTE:
-                    corrTF = False
-                k = ks_2samp(y, ys[:, i])[0]
-                if k < ks:
-                    ks = k
-                if ksTF and k <= ORIGINALITY_KS_GT:
-                    ksTF = False
-            df.loc[name, 'corr'] = corr
-            df.loc[name, 'ks'] = ks
-            df.loc[name, 'corrTF'] = corrTF
-            df.loc[name, 'ksTF'] = ksTF
-            df.loc[name, 'original'] = corrTF and ksTF
-
-        return df
 
     def check(self, data):
         "Run Numerai checks; must contain a model named 'example_predictions'"
@@ -366,7 +350,7 @@ class Prediction(object):
 
         return df_dict
 
-    def compare(self, data, prediction):
+    def compare(self, data, prediction, tournament):
         "Compare performance of predictions with the same names"
         cols = ['logloss1', 'logloss2', 'win1',
                 'corr', 'maxdiff', 'ystd1', 'ystd2']
@@ -382,9 +366,11 @@ class Prediction(object):
         df2 = prediction.loc[ids]
         p1 = self[names]
         p2 = prediction[names]
-        m1 = p1.metrics_per_era(data, metrics=['logloss', 'auc', 'ystd'],
+        m1 = p1.metrics_per_era(data, tournament,
+                                metrics=['logloss', 'auc', 'ystd'],
                                 era_as_str=False)
-        m2 = p2.metrics_per_era(data, metrics=['logloss', 'auc', 'ystd'],
+        m2 = p2.metrics_per_era(data, tournament,
+                                metrics=['logloss', 'auc', 'ystd'],
                                 era_as_str=False)
         for name in names:
 
@@ -528,11 +514,13 @@ def load_prediction_csv(filename, name=None):
     return Prediction(df)
 
 
-def load_example_predictions(data_zip):
+def load_example_predictions(data_zip, tournament):
     "Load example predictions from Numerai zip archive"
     zf = zipfile.ZipFile(data_zip)
-    df = pd.read_csv(zf.open(EXAMPLE_PREDICTIONS), header=0, index_col=0)
-    df.columns = ['example_predictions']
+    tourn_name = nx.tournament_str(tournament)
+    filename = EXAMPLE_PREDICTIONS.format(tourn_name)
+    df = pd.read_csv(zf.open(filename), header=0, index_col=0)
+    df.columns = ['example_predictions_{}'.format(tourn_name)]
     p = nx.Prediction(df)
     return p
 

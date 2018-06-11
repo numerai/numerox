@@ -13,7 +13,7 @@ def test_splitter_overlap():
                  nx.CheatSplitter(d),
                  nx.CVSplitter(d),
                  nx.LoocvSplitter(d),
-                 nx.IgnoreEraCVSplitter(d),
+                 nx.IgnoreEraCVSplitter(d, tournament=1),
                  nx.SplitSplitter(d, fit_fraction=0.5)]
     for splitter in splitters:
         predict_ids = []
@@ -30,7 +30,7 @@ def test_splitter_reset():
                  nx.CheatSplitter(d),
                  nx.CVSplitter(d),
                  nx.LoocvSplitter(d),
-                 nx.IgnoreEraCVSplitter(d),
+                 nx.IgnoreEraCVSplitter(d, tournament=2),
                  nx.SplitSplitter(d, fit_fraction=0.5)]
     for splitter in splitters:
         ftups = [[], []]

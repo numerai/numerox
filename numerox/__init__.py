@@ -7,6 +7,7 @@ from numerox.prediction import Prediction
 # models
 from numerox.model import Model
 from numerox.model import logistic
+from numerox.model import ridge_mean
 from numerox.model import extratrees
 from numerox.model import randomforest
 from numerox.model import mlpc
@@ -70,6 +71,11 @@ from numerox.prediction import merge_predictions
 from numerox.util import isint
 from numerox.util import isstring
 from numerox.util import history
+from numerox.util import tournament_int2str
+from numerox.util import tournament_str2int
+from numerox.util import tournament_iter
+from numerox.util import tournament_int
+from numerox.util import tournament_str
 
 try:
     from numpy.testing import Tester

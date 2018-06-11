@@ -3,8 +3,9 @@ from numerox.model import fifty
 
 
 def get_models():
-    models = [nx.logistic(), nx.extratrees(), nx.randomforest(),
-              nx.mlpc(), nx.logisticPCA(), nx.example_predictions(), fifty()]
+    models = [nx.logistic(), nx.ridge_mean(), nx.extratrees(),
+              nx.randomforest(), nx.mlpc(), nx.logisticPCA(),
+              nx.example_predictions(), fifty()]
     return models
 
 
@@ -28,4 +29,4 @@ def test_model_run():
     d_fit = d['train']
     d_predict = d['tournament']
     for model in get_models():
-        model.fit_predict(d_fit, d_predict)
+        model.fit_predict(d_fit, d_predict, tournament=5)
