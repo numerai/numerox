@@ -1,6 +1,7 @@
 import time
 import pprint
 
+import numerox as nx
 from numerox import Prediction, TournamentSplitter, CVSplitter
 
 
@@ -22,7 +23,11 @@ def run(model, splitter, tournament, name=None, verbosity=2):
     "Run a single model through a data splitter"
     t0 = time.time()
     if name is None:
-        name = model.__class__.__name__ + "_t" + str(tournament)
+        if nx.isint(tournament):
+            postfix = '_t' + str(tournament)
+        else:
+            postfix = '_' + tournament
+        name = model.__class__.__name__ + postfix
     else:
         if verbosity > 2:
             print(name)
