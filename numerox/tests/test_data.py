@@ -101,6 +101,20 @@ def test_data_pca():
         ok_(corr < 1e-5, "features are not orthogonal")
 
 
+def test_data_y_for_tournment():
+    "test data.y_for_tournmanent"
+    d = nx.load_zip(TINY_DATASET_CSV)
+    for i in range(1, 6):
+        y = np.zeros(14)
+        y[i-1] = 1
+        y[i-1+5] = 1
+        y[10:] = np.nan
+        yt = d.y_for_tournament(i)
+        assert_array_equal(yt, y, "y{} targets corrupted".format(i))
+        yt = getattr(d, 'y{}'.format(i))
+        assert_array_equal(yt, y, "y{} targets corrupted".format(i))
+
+
 def test_data_y_correlation():
     "test data.y_correlation"
     d = micro_data()
@@ -298,9 +312,9 @@ def test_load_zip():
         else:
             with testing.HiddenPrints():
                 d = nx.load_zip(TINY_DATASET_CSV, verbose=True)
-        ok_(len(d) == 13, "wrong number of rows")
-        ok_(d.shape == (13, 57), 'data has wrong shape')
-        ok_(d.x.shape == (13, 50), 'x has wrong shape')
+        ok_(len(d) == 14, "wrong number of rows")
+        ok_(d.shape == (14, 57), 'data has wrong shape')
+        ok_(d.x.shape == (14, 50), 'x has wrong shape')
         ok_(d.df.iloc[2, 3] == 0.34143, 'wrong feature value')
 
 

@@ -222,27 +222,32 @@ class Data(object):
     @property
     def y1(self):
         "View of targets for tournament 1 as a 1d numpy float array"
-        return self.df.iloc[:, -5].values
+        idx = self.df.columns.get_loc('y1')
+        return self.df.iloc[:, idx].values
 
     @property
     def y2(self):
         "View of targets for tournament 2 as a 1d numpy float array"
-        return self.df.iloc[:, -4].values
+        idx = self.df.columns.get_loc('y2')
+        return self.df.iloc[:, idx].values
 
     @property
     def y3(self):
         "View of targets for tournament 3 as a 1d numpy float array"
-        return self.df.iloc[:, -3].values
+        idx = self.df.columns.get_loc('y3')
+        return self.df.iloc[:, idx].values
 
     @property
     def y4(self):
         "View of targets for tournament 4 as a 1d numpy float array"
-        return self.df.iloc[:, -2].values
+        idx = self.df.columns.get_loc('y4')
+        return self.df.iloc[:, idx].values
 
     @property
     def y5(self):
         "View of targets for tournament 5 as a 1d numpy float array"
-        return self.df.iloc[:, -1].values
+        idx = self.df.columns.get_loc('y5')
+        return self.df.iloc[:, idx].values
 
     def y_correlation(self):
         "Correlation matrix of y's as dataframe"
