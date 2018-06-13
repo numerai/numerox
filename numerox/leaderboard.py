@@ -12,7 +12,7 @@ DEFAULT_FIRST_ROUND = 51
 class Leaderboard(object):
 
     def __init__(self, tournament=1, verbose=False):
-        self.tournament = nx.torunament_int(tournament)
+        self.tournament = nx.tournament_int(tournament)
         self.verbose = verbose
         self.df = None
         self.unresolved_rounds = []

@@ -15,7 +15,7 @@ Running a model returns a prediction::
 
     >>> prediction = nx.production(nx.logistic(), data, tournament='bernie')
 
-By default the name of the prediction is the model name plus the torunament::
+By default the name of the prediction is the model name plus the tournament::
 
     >>> prediction.names
     >>> ['logistic_bernie']

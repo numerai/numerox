@@ -5,6 +5,8 @@ Release Notes
 
 - v2.1.0 (in development; not yet released)
 
+  * Bugfix: typo in Report class code
+
 - v2.0.0
 
   * Redesign of numerox to support Numerai's new 5-tournament format
