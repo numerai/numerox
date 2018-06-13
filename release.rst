@@ -3,7 +3,7 @@
 Release Notes
 =============
 
-- v2.0.1 (in development; not yet released)
+- v2.0.1
 
   * Critical bugfix in data.y_for_tournament and data.y1, data.y2, etc
   * Bugfix: typo in Report class code
