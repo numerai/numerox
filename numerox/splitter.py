@@ -67,7 +67,7 @@ class CheatSplitter(Splitter):
 
     def next_split(self):
         dfit = self.data.region_isin(['train', 'validation'])
-        dpre = self.data['validation']
+        dpre = self.data['tournament']
         return dfit, dpre
 
 
