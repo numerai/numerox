@@ -5,6 +5,8 @@ Release Notes
 
 - v2.1.0 (in development; not yet released)
 
+  * Bugfix: ``splitter.CheatSplitter``
+
 - v2.0.1
 
   * Critical bugfix in data.y_for_tournament and data.y1, data.y2, etc
