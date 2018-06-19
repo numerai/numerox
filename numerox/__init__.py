@@ -13,6 +13,7 @@ from numerox.model import randomforest
 from numerox.model import mlpc
 from numerox.model import example_predictions
 from numerox.model import logisticPCA
+from numerox.model import pipelinePCAPolyLR
 
 # load
 from numerox.data import load_data

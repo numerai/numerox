@@ -6,6 +6,7 @@ from sklearn.ensemble import ExtraTreesClassifier as ETC
 from sklearn.ensemble import RandomForestClassifier as RFC
 from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import PolynomialFeatures
 from sklearn.decomposition import PCA
 
 """
@@ -56,7 +57,6 @@ class Model(object):
         else:
             msg += model + "()"
         return msg
-
 
 class logistic(Model):
 
@@ -189,4 +189,20 @@ class fifty(Model):
 
     def fit_predict(self, dfit, dpre, tournament):
         yhat = 0.5 * np.ones(len(dpre))
+        return dpre.ids, yhat
+
+class pipelinePCAPolyLR(Model):
+
+    def __init__(self, nfeatures=10, inverse_l2=1e-4):
+        self.p = {'inverse_l2': inverse_l2,
+                  'nfeatures': nfeatures}
+
+    def fit_predict(self, dfit, dpre, tournament):
+        pipe = Pipeline([
+                        ('poly', PolynomialFeatures(degree=2)),
+                        ('pca', PCA(n_components=self.p['nfeatures'])),
+                        ("lr", LogisticRegression(C=self.p['inverse_l2']))])
+        yfit = dfit.y_for_tournament(tournament)
+        pipe.fit(dfit.x, yfit)
+        yhat = pipe.predict_proba(dpre.x)[:, 1]
         return dpre.ids, yhat
