@@ -181,7 +181,8 @@ def get_stakes(round_number=None, tournament=1, sort_by='prize pool',
     elif sort_by == 'user':
         stakes = stakes.sort_values(['user'], ascending=[True])
     elif sort_by == 'max_nmr':
-        stakes = stakes.sort_values(['max_nmr'], ascending=[False])
+        stakes = stakes.sort_values(['max_nmr', 's', 'c'],
+                                    ascending=[False, False, False])
     else:
         raise ValueError("`sort_by` key not recognized")
 
