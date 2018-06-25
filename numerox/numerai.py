@@ -144,7 +144,10 @@ def get_stakes(round_number=None, tournament=1, sort_by='prize pool',
     Use this function for `round_number` greater than 112.
     """
 
+    # download stakes
     stakes = get_stakes_minimal(round_number, tournament, mark_user)
+
+    # soc column is not needed for new stake (r > 112) rules
     stakes = stakes.drop('soc', axis=1)
 
     # max nmr payout per user if prize pool were infinite
@@ -152,24 +155,25 @@ def get_stakes(round_number=None, tournament=1, sort_by='prize pool',
     c = stakes.c.astype('float')
     maxnmr = cumsum * (1.0 - c) / c
 
-    # pool is not infinite so find fraction for each user
-    # fraction=1 means full participation in pool
-    # one user can have fraction less than 1 but greater than 0 (partial fill)
-    fraction = 1.0 * (maxnmr < NMR_PRIZE_POOL)
-    user_partial = fraction.ne(0).idxmin()
-    idx_partial = fraction.index.get_loc(user_partial)
-    partial = NMR_PRIZE_POOL - maxnmr.iloc[idx_partial - 1]
-    fraction.iloc[idx_partial] = partial / maxnmr.iloc[idx_partial]
+    # pool is not infinite so find effective stake amount s for each user
+    non_partial = 1.0 * (maxnmr < NMR_PRIZE_POOL)
+    user_partial = non_partial.ne(0).idxmin()
+    p = c.loc[user_partial]
+    s = non_partial * stakes.s
+    s_partial = NMR_PRIZE_POOL - s.sum() * (1.0 - p) / p
+    s_partial *= p / (1.0 - p)
+    if s_partial > 0:
+        s.loc[user_partial] = s_partial
 
     # p_final
-    s_sum = (fraction * stakes.s).sum()
+    s_sum = s.sum()
     p_final = s_sum / (NMR_PRIZE_POOL + s_sum)
 
-    # non-burn nmr payout for each user
-    payout = fraction * stakes.s * (1.0 - p_final) / p_final
+    # non-burn nmr payout potential for each user
+    payout = s * (1.0 - p_final) / p_final
     stakes.insert(3, 'max_nmr', payout)
 
-    # other sorting
+    # sort
     if sort_by == 'prize pool':
         pass
     elif sort_by == 'c':
