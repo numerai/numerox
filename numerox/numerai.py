@@ -11,6 +11,8 @@ from numerapi.utils import download_file
 import numerox as nx
 from numerox.prediction import CONSISTENCY_GTE
 
+NMR_PRIZE_POOL = 900
+
 
 # ---------------------------------------------------------------------------
 # download dataset
@@ -117,24 +119,116 @@ def is_stakeable(status):
 # stakes
 
 def show_stakes(round_number=None, tournament=1, sort_by='prize pool',
-                mark_user=None, use_integers=True):
+                mark_user=None):
     "Display info on staking; cumsum is dollars above you"
-    df, c_zero_users = get_stakes(round_number, tournament, sort_by, mark_user,
-                                  use_integers)
-    with pd.option_context('display.colheader_justify', 'left'):
-        print(df.to_string(index=True))
-    if len(c_zero_users) > 0:
-        c_zero_users = ','.join(c_zero_users)
-        print('C=0: {}'.format(c_zero_users))
+    if round_number is None or round_number > 112:
+        df = get_stakes(round_number, tournament, sort_by, mark_user)
+        with pd.option_context('display.colheader_justify', 'left'):
+            print(df.to_string(index=True))
+    else:
+        df, c_zero_users = get_stakes_old(round_number, tournament, sort_by,
+                                          mark_user)
+        with pd.option_context('display.colheader_justify', 'left'):
+            print(df.to_string(index=True))
+        if len(c_zero_users) > 0:
+            c_zero_users = ','.join(c_zero_users)
+            print('C=0: {}'.format(c_zero_users))
 
 
 def get_stakes(round_number=None, tournament=1, sort_by='prize pool',
-               mark_user=None, use_integers=True):
+               mark_user=None):
+    """
+    Download stakes, modify it to make it more useful, return as dataframe.
+
+    Use this function for `round_number` greater than 112.
+    """
+
+    stakes = get_stakes_minimal(round_number, tournament, mark_user)
+
+    # max nmr payout per user if prize pool were infinite
+    cumsum = stakes.s.cumsum(axis=0)
+    c = stakes.c.astype('float')
+    maxnmr = cumsum * (1.0 - c) / c
+
+    # pool is not infinite so find fraction for each user
+    # fraction=1 means full participation in pool
+    # one user can have fraction less than 1 but greater than 0 (partial fill)
+    fraction = 1.0 * (maxnmr < NMR_PRIZE_POOL)
+    user_partial = fraction.ne(0).idxmin()
+    idx_partial = fraction.index.get_loc(user_partial)
+    partial = NMR_PRIZE_POOL - maxnmr.iloc[idx_partial - 1]
+    fraction.iloc[idx_partial] = partial / maxnmr.iloc[idx_partial]
+
+    # p_final
+    s_sum = (fraction * stakes.s).sum()
+    p_final = s_sum / (NMR_PRIZE_POOL + s_sum)
+
+    # non-burn nmr payout for each user
+    payout = fraction * stakes.s * (1.0 - p_final) / p_final
+    stakes.insert(3, 'max_nmr', payout)
+
+    # other sorting
+    if sort_by == 'prize pool':
+        pass
+    elif sort_by == 'c':
+        stakes = stakes.sort_values(['c'], ascending=[False])
+    elif sort_by == 's':
+        stakes = stakes.sort_values(['s'], ascending=[False])
+    elif sort_by == 'soc':
+        stakes = stakes.sort_values(['soc'], ascending=[False])
+    elif sort_by == 'days':
+        stakes = stakes.sort_values(['days'], ascending=[True])
+    elif sort_by == 'user':
+        stakes = stakes.sort_values(['user'], ascending=[True])
+    elif sort_by == 'max_nmr':
+        stakes = stakes.sort_values(['max_nmr'], ascending=[False])
+    else:
+        raise ValueError("`sort_by` key not recognized")
+
+    return stakes
+
+
+def get_stakes_old(round_number=None, tournament=1, sort_by='prize pool',
+                   mark_user=None):
     """
     Download stakes, modify it to make it more useful, return as dataframe.
 
     cumsum is dollars ABOVE you.
+
+    Use this function for `round_number` less than 113.
     """
+
+    stakes = get_stakes_minimal(round_number, tournament, mark_user)
+
+    # remove C=0 stakers
+    c_zero_users = stakes.index[stakes.c == 0].tolist()
+    stakes = stakes[stakes.c != 0]
+
+    # add s/c cumsum
+    cumsum = stakes.soc.cumsum(axis=0) - stakes.soc  # dollars above you
+    stakes.insert(3, 'cumsum', cumsum)
+
+    # other sorting
+    if sort_by == 'prize pool':
+        pass
+    elif sort_by == 'c':
+        stakes = stakes.sort_values(['c'], ascending=[False])
+    elif sort_by == 's':
+        stakes = stakes.sort_values(['s'], ascending=[False])
+    elif sort_by == 'soc':
+        stakes = stakes.sort_values(['soc'], ascending=[False])
+    elif sort_by == 'days':
+        stakes = stakes.sort_values(['days'], ascending=[True])
+    elif sort_by == 'user':
+        stakes = stakes.sort_values(['user'], ascending=[True])
+    else:
+        raise ValueError("`sort_by` key not recognized")
+
+    return stakes, c_zero_users
+
+
+def get_stakes_minimal(round_number=None, tournament=1, mark_user=None):
+    "Download stakes, modify it to make it more useful, return as dataframe."
 
     tournament = nx.tournament_int(tournament)
 
@@ -192,41 +286,12 @@ def get_stakes(round_number=None, tournament=1, sort_by='prize pool',
     stakes = pd.DataFrame(stakes)
     stakes = stakes[['days', 's', 'soc', 'c', 'user']]
 
-    # remove C=0 stakers
-    c_zero_users = stakes.user[stakes.c == 0].tolist()
-    stakes = stakes[stakes.c != 0]
-
     # index by user
     stakes = stakes.set_index('user')
 
-    # sort in prize pool order; add s/c cumsum
+    # sort in prize pool order
     stakes = stakes.sort_values(['c', 'days'], axis=0,
                                 ascending=[False, False])
-    cumsum = stakes.soc.cumsum(axis=0) - stakes.soc  # dollars above you
-    stakes.insert(3, 'cumsum', cumsum)
-
-    # other sorting
-    if sort_by == 'prize pool':
-        pass
-    elif sort_by == 'c':
-        stakes = stakes.sort_values(['c'], ascending=[False])
-    elif sort_by == 's':
-        stakes = stakes.sort_values(['s'], ascending=[False])
-    elif sort_by == 'soc':
-        stakes = stakes.sort_values(['soc'], ascending=[False])
-    elif sort_by == 'days':
-        stakes = stakes.sort_values(['days'], ascending=[True])
-    elif sort_by == 'user':
-        stakes = stakes.sort_values(['user'], ascending=[True])
-    else:
-        raise ValueError("`sort_by` key not recognized")
-
-    # round stakes
-    if use_integers:
-        stakes['days'] = stakes['days'].round(4)
-        stakes['s'] = stakes['s'].astype(int)
-        stakes['soc'] = stakes['soc'].astype(int)
-        stakes['cumsum'] = stakes['cumsum'].astype(int)
 
     # mark user
     if mark_user is not None and mark_user in stakes.index:
@@ -236,7 +301,7 @@ def get_stakes(round_number=None, tournament=1, sort_by='prize pool',
         stakes.loc[idx, 'mark'] = 'new'
         stakes.loc[mark_user, 'mark'] = '<<<<'
 
-    return stakes, c_zero_users
+    return stakes
 
 
 # ---------------------------------------------------------------------------

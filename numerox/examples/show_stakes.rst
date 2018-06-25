@@ -4,57 +4,107 @@ Staking information
 Numerox provides information about the staking tournament::
 
     >>> import numerox as nx
-    >>> nx.show_stakes(tournament='bernie', mark_user='steppenwolf')
-                          days    s   soc   cumsum c      mark
+    >>> nx.show_stakes(tournament='bernie', mark_user='data_science_machine')
+                      days      s      soc    max_nmr    c      mark
     user
-    jvk                   1.5177   0     0      0   0.700
-    prosperity            0.5283   0     0      0   0.450
-    unmarkedlearner       1.9310   0     0      0   0.400
-    dustoff               1.9655   5    14      1   0.350
-    cosmo                 0.2776   0     2     15   0.150
-    onesimplenight        0.6861   1     9     17   0.110
-    numbergamesai2        0.6383   0     1     27   0.110
-    slyfox                1.9588   0     1     28   0.100
-    andrei113             1.1434   0     1     29   0.100
-    milanai               0.8345   0     1     30   0.100
-    crysis                0.7821   1    10     31   0.100
-    deltron               0.6383   0     5     41   0.100
-    jackolantern          0.3637   0     2     46   0.100
-    noone                 0.1450   5    50     48   0.100   new
-    sjn                   0.6988   0     2     98   0.085
-    dg                    0.6946   1    14    101   0.071
-    hoi                   0.5262   1    22    115   0.050
-    kreator               1.9097   2    48    137   0.041
-    fearindex             0.7387   5   121    186   0.041
-    parmenas              1.5905   1    40    308   0.040
-    warg_1                0.2605   1    25    348   0.040
-    lothlorien            0.2576   1    25    373   0.040
-    wacax                 1.5634   0     6    398   0.035
-    anna2                 0.7797   1    31    404   0.032
-    anna1                 0.6673   2    62    435   0.032
-    theorist13            0.3629   3    96    498   0.031
-    smirmik3              0.1412   2    95    594   0.021   new
-    mlt                   0.8278   0    25    690   0.020
-    accountnumber3        0.1452   0    10    715   0.020   new
-    mmfine                0.1447   2   105    725   0.020   new
-    mmfine1               0.1444   2   105    830   0.020   new
-    washington            0.1443   2   105    935   0.020   new
-    glasperlenspiel       0.1536  14   736   1040   0.019   new
-    smirmik2              0.1431   2   105   1776   0.019   new
-    steppenwolf           0.1547   6   333   1882   0.018  <<<<
-    data_science_machine  0.1665  14   823   2215   0.017
-    smirmik               0.1556   2   117   3039   0.017
-    monai                 0.1601   2   125   3156   0.016
-    innmrwetrust          1.3307   3   200   3281   0.015
-    themicon              0.1767   1    66   3481   0.015
+    w_boson               0.868755   3.00   3.00   17.116374  0.999
+    rafacost              0.597713   0.10   0.10    0.570546  0.999
+    noone                 0.404909   2.00   2.00   11.410916  0.999
+    it's_guff!            1.986216   0.42   0.42    2.396292  0.990
+    stmharry              0.873577   0.10   0.10    0.570546  0.990
+    sorios                0.414134   2.00   2.02   11.410916  0.990
+    m00nlight             1.425012   0.10   0.11    0.570546  0.950
+    xiaopi                1.377733   0.10   0.11    0.570546  0.950
+    sepheroni             0.544229   0.10   0.11    0.570546  0.901
+    lumix3000             0.902960   0.40   0.44    2.282183  0.900
+    dg                    1.984245   2.00   2.50   11.410916  0.800
+    luz                   1.156512   0.20   0.25    1.141092  0.800
+    luz2                  1.148589   0.20   0.25    1.141092  0.800
+    kreator               1.143397   0.75   0.94    4.279093  0.800
+    mel                   1.141855   0.20   0.25    1.141092  0.800
+    timboy                1.135808   0.10   0.13    0.570546  0.800
+    cla1                  1.131466   0.20   0.25    1.141092  0.800
+    nosaai3               0.915102   0.20   0.25    1.141092  0.800
+    nosaai2               0.910795   0.20   0.27    1.141092  0.750
+    eratostens            1.908797   0.20   0.29    1.141092  0.701
+    ti994a                1.764790   0.50   0.71    2.852729  0.700
+    mdo                   1.505385   1.00   1.43    5.705458  0.700
+    jf0979                0.915076   0.50   0.71    2.852729  0.700
+    nosaai                0.900954   0.20   0.29    1.141092  0.700
+    nmro                  0.463697   1.00   1.43    5.705458  0.700
+    oerlikon              0.257799   1.00   1.61    5.705458  0.622
+    othosbro              1.244067   0.20   0.33    1.141092  0.600
+    ragnar                1.129230   0.75   1.25    4.279093  0.600
+    bor1                  0.437401   3.00   5.43   17.116374  0.552
+    bor2                  0.427573   3.00   5.61   17.116374  0.535
+    talos                 2.049262   0.10   0.20    0.570546  0.500
+    traveler              1.775365   0.20   0.40    1.141092  0.500
+    cluna7                1.283002   0.16   0.32    0.912873  0.500
+    capt_cave_man         1.100530   0.20   0.40    1.141092  0.500
+    accountnumber3        0.237626   0.25   0.50    1.426364  0.500   new
+    wander                1.780772   0.20   0.44    1.141092  0.450
+    bor3                  0.474320   3.00   6.85   17.116374  0.438
+    transit               1.801580   0.20   0.50    1.141092  0.400
+    fearindex             0.257635   1.00   2.50    5.705458  0.400
+    quantverse            0.230935   3.00   8.11   17.116374  0.370   new
+    glasperlenspiel       0.243484  20.00  56.98  114.109159  0.351
+    alisa                 0.363536   3.00   8.57   17.116374  0.350
+    beatriz               0.359714   3.00   8.57   17.116374  0.350
+    z_core                0.473961   0.10   0.33    0.570546  0.300
+    drvby21               0.280841   2.00   6.67   11.410916  0.300
+    rue                   0.391500   0.20   0.80    1.141092  0.251
+    data_science_machine  0.239504  15.00  59.76   85.581869  0.251  <<<<
+    objectscience         1.753202   0.10   0.40    0.570546  0.250
+    objectscience_2       0.985249   0.20   0.80    1.141092  0.250
+    objectscience_3       0.846236   0.10   0.40    0.570546  0.250
+    smirmik2              0.443038   1.00   4.00    5.705458  0.250
+    drvby47               0.289633   1.00   4.35    5.705458  0.230
+    dustoff               0.237792   3.10  13.48   17.686920  0.230   new
+    orthogonal            0.292262  20.00  90.91  114.109159  0.220
+    oblique               0.281733  20.00  90.91  114.109159  0.220
+    avis                  0.551851   0.50   2.36    2.852729  0.212
+    srupal                0.554504   0.50   2.43    2.852729  0.206
+    ratnan                0.565319   0.50   2.44    2.852729  0.205
+    steppenwolf           0.240687  10.00  49.75   57.054579  0.201
+    chiragjn              1.507074   0.10   0.50    0.570546  0.200
+    hb                    1.117608   0.20   1.00    1.141092  0.200
+    hb_scout              1.117559   0.20   1.00    1.141092  0.200
+    hb_exp                1.117516   0.20   1.00    1.141092  0.200
+    javibear              1.059067   0.20   1.00    1.141092  0.200
+    hoi                   0.876771   2.00  10.00   11.410916  0.200
+    innmrwetrust          0.323374   1.00   5.00    5.705458  0.200
+    expdes                0.261210   2.00  10.00   11.410916  0.200
+    narf                  0.252272   0.10   0.50    0.570546  0.200
+    pinky_and_the_brain   0.251278   0.10   0.50    0.570546  0.200
+    daenris2              0.240429  10.00  50.00   57.054579  0.200
+    labrat                0.238371   0.10   0.50    0.570546  0.200   new
+    milgram               0.263456   0.50   2.62    2.852729  0.191
+    bookofillusions       1.990044   3.00  15.79   17.116374  0.190
+    dnet                  1.779368   0.10   0.54    0.570546  0.186
+    boxy                  0.514509   0.40   2.44    2.282183  0.164
+    mmfine                0.248352   1.10   7.24    6.276004  0.152
+    mmfine1               0.248151   1.10   7.24    6.276004  0.152
+    washington            0.247908   1.10   7.24    6.276004  0.152
+    no_formal_training    1.897204   1.50  10.00    8.558187  0.150
+    no_formal_agreement   1.826184   0.15   1.00    0.855819  0.150
+    wacax                 1.703101   0.15   1.00    0.855819  0.150
+    rabaman               1.248161   0.10   0.67    0.570546  0.150
+    moonrise              0.267671   2.00  13.33    0.078120  0.150
+    sybr                  1.779178   0.10   0.71    0.000000  0.140
+    anna1                 0.485584   1.00   7.69    0.000000  0.130
+    anna2                 0.484902   0.30   2.31    0.000000  0.130
+    wsw                   0.339028   2.00  15.38    0.000000  0.130
     <snip>
 
 You can optionally specify the round number, the column by which to sort,
-whether to use integers for some columns, and whether to mark a user and flag
-any stakes made after that of the marked user.
+and whether to mark a user and flag any stakes made after that of the marked
+user.
 
 You can add your own custom columns by grabbing the dataframe and inserting
 whatever columns you like::
 
     >>> df = nx.get_stakes()
     >>> df['mycolumn'] = ...
+
+Note: for rounds before 113 ``show_stakes`` has a cumsum column instead of
+max_nmr.

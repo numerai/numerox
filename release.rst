@@ -5,6 +5,9 @@ Release Notes
 
 - v2.1.0 (in development; not yet released)
 
+  * ``show_stakes`` works with both new (round > 112) staking rules and old
+  * ``get_stakes`` now works with new (round > 112) staking rules
+  * Add ``get_stakes_old`` to work with old (round < 113) staking rules 
   * Bugfix: ``splitter.CheatSplitter``
 
 - v2.0.1
