@@ -145,6 +145,7 @@ def get_stakes(round_number=None, tournament=1, sort_by='prize pool',
     """
 
     stakes = get_stakes_minimal(round_number, tournament, mark_user)
+    stakes = stakes.drop('soc', axis=1)
 
     # max nmr payout per user if prize pool were infinite
     cumsum = stakes.s.cumsum(axis=0)
@@ -175,8 +176,6 @@ def get_stakes(round_number=None, tournament=1, sort_by='prize pool',
         stakes = stakes.sort_values(['c'], ascending=[False])
     elif sort_by == 's':
         stakes = stakes.sort_values(['s'], ascending=[False])
-    elif sort_by == 'soc':
-        stakes = stakes.sort_values(['soc'], ascending=[False])
     elif sort_by == 'days':
         stakes = stakes.sort_values(['days'], ascending=[True])
     elif sort_by == 'user':
