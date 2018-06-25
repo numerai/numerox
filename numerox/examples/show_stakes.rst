@@ -95,6 +95,7 @@ Numerox provides information about the staking tournament::
     anna2                 0.484902   0.30   2.31    0.000000  0.130
     wsw                   0.339028   2.00  15.38    0.000000  0.130
     <snip>
+    PAYOUT P = 0.149132
 
 You can optionally specify the round number, the column by which to sort,
 and whether to mark a user and flag any stakes made after that of the marked

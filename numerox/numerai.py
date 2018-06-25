@@ -122,9 +122,10 @@ def show_stakes(round_number=None, tournament=1, sort_by='prize pool',
                 mark_user=None):
     "Display info on staking; cumsum is dollars above you"
     if round_number is None or round_number > 112:
-        df = get_stakes(round_number, tournament, sort_by, mark_user)
+        df, p_final = get_stakes(round_number, tournament, sort_by, mark_user)
         with pd.option_context('display.colheader_justify', 'left'):
             print(df.to_string(index=True))
+        print('PAYOUT P = {:f}'.format(p_final))
     else:
         df, c_zero_users = get_stakes_old(round_number, tournament, sort_by,
                                           mark_user)
@@ -185,7 +186,7 @@ def get_stakes(round_number=None, tournament=1, sort_by='prize pool',
     else:
         raise ValueError("`sort_by` key not recognized")
 
-    return stakes
+    return stakes, p_final
 
 
 def get_stakes_old(round_number=None, tournament=1, sort_by='prize pool',
