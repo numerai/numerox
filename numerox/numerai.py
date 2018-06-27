@@ -136,6 +136,38 @@ def show_stakes(round_number=None, tournament=1, sort_by='prize pool',
             print('C=0: {}'.format(c_zero_users))
 
 
+def get_stakes_users(users, round_number=None):
+    """
+    Stakes for given users for all tournaments.
+
+    Use this function for `round_number` greater than 112.
+    """
+    stakes = []
+    for number, name in nx.tournament_iter():
+        s, p = get_stakes(round_number, tournament=number)
+        idx = s.index.isin(users)
+        s = s[idx]
+        s.insert(0, 'tourney', name)
+        stakes.append(s)
+    stakes = pd.concat(stakes, axis=0)
+    return stakes
+
+
+def get_stakes_cutoff(round_number=None):
+    """
+    Staking confidence cutoff for all tournaments in given round.
+
+    Use this function for `round_number` greater than 112.
+    """
+    data = []
+    for number, name in nx.tournament_iter():
+        s, c = get_stakes(round_number, tournament=number)
+        data.append([name, c])
+    df = pd.DataFrame(data=data, columns=['tourney', 'cutoff'])
+    df = df.set_index('tourney')
+    return df
+
+
 def get_stakes(round_number=None, tournament=1, sort_by='prize pool',
                mark_user=None):
     """
