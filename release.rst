@@ -5,6 +5,8 @@ Release Notes
 
 - v2.2.0 (in development; not yet released)
 
+  * ``data.__repr__`` no longer warns when all y's are missing
+
 - v2.1.0
 
   * ``show_stakes`` works with both new (round > 112) staking rules and old

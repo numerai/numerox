@@ -531,7 +531,13 @@ class Data(object):
         # y
         y = self.y
         stats = 'mean {:.6f}, fraction missing {:.4f}'
-        stats = stats.format(np.nanmean(y), (~np.isfinite(y)).mean())
+        idx = np.isnan(y)
+        if idx.all():
+            # avoid numpy empty slice warning
+            mean = np.nan
+        else:
+            mean = np.nanmean(y)
+        stats = stats.format(mean, idx.mean())
         t.append(fmt.format('y', stats))
 
         return '\n'.join(t)
