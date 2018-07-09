@@ -66,20 +66,23 @@ def isstring(s):
 def history():
     "History of changes made to the Numerai tournaments"
     d = [
-         [1, 1, 'December 1, 2015'],
-         [1, 51, 'first live logloss'],
-         [1, 61, 'first stake; $3000 prize pool'],
-         [1, 67, 'the big burn'],
-         [1, 78, 'stake prize pool increased to $6000'],
-         [1, 81, 'originality no longer a staking requirement'],
-         [1, 85, 'rounds resolve on Saturdays instead of Mondays'],
-         [1, 94, 'main tournament dropped; staking adds nmr prizes'],
-         [1, 100, 'rank corr > 0.1 with example predictions'],
-         [1, 101, 'corr > 0.1 with example predictions'],
-         [1, 102, 'logloss benchmark 0.693; corr>0.2; [0.3, 0.7]'],
+         [1, 'December 1, 2015'],
+         [51, 'first live logloss'],
+         [61, 'first stake; $3000 prize pool'],
+         [67, 'the big burn'],
+         [78, 'stake prize pool increased to $6000'],
+         [81, 'originality no longer a staking requirement'],
+         [85, 'rounds resolve on Saturdays instead of Mondays'],
+         [94, 'main tournament dropped; staking adds nmr prizes'],
+         [100, 'rank corr > 0.1 with example predictions'],
+         [101, 'corr > 0.1 with example predictions'],
+         [102, 'logloss benchmark 0.693; corr>0.2; [0.3, 0.7]'],
+         [111, '5 tournament format'],
+         [113, 'conditional staking removed'],
         ]
-    columns = ['tournament', 'round', 'comment']
+    columns = ['round', 'comment']
     df = pd.DataFrame(data=d, columns=columns)
+    df = df.set_index('round')
     return df
 
 
