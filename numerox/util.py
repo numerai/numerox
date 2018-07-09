@@ -78,7 +78,7 @@ def history():
          [101, 'corr > 0.1 with example predictions'],
          [102, 'logloss benchmark 0.693; corr>0.2; [0.3, 0.7]'],
          [111, '5 tournament format'],
-         [113, 'conditional staking removed'],
+         [113, 'conditional staking removed; min confidence 0.1'],
         ]
     columns = ['round', 'comment']
     df = pd.DataFrame(data=d, columns=columns)
