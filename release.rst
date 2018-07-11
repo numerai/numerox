@@ -6,6 +6,7 @@ Release Notes
 - v2.2.0 (in development; not yet released)
 
   * Update ``nx.history``
+  * ``report.stake`` now removes accounts from report that did not stake
   * ``data.__repr__`` no longer warns when all y's are missing
 
 - v2.1.0

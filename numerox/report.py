@@ -388,6 +388,7 @@ def stake(df, price, verbose=True):
         t2 = df['round'].max()
         fmt = "Top stake earners (R{} - R{}) at {:.2f} usd/nmr"
         print(fmt.format(t1, t2, price))
+    df = df[df.s > 0]
     df = df[['user', 'usd_stake', 'nmr_stake', 'nmr_burn']]
     df = df.groupby('user').sum()
     nmr = df['nmr_stake'] - df['nmr_burn']
