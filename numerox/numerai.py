@@ -189,13 +189,14 @@ def get_stakes(round_number=None, tournament=1, sort_by='prize pool',
 
     # pool is not infinite so find effective stake amount s for each user
     non_partial = 1.0 * (maxnmr < NMR_PRIZE_POOL)
-    user_partial = non_partial.ne(0).idxmin()
-    p = c.loc[user_partial]
     s = non_partial * stakes.s
-    s_partial = NMR_PRIZE_POOL - s.sum() * (1.0 - p) / p
-    s_partial *= p / (1.0 - p)
-    if s_partial > 0:
-        s.loc[user_partial] = s_partial
+    if not non_partial.all():
+        user_partial = non_partial.ne(0).idxmin()
+        p = c.loc[user_partial]
+        s_partial = NMR_PRIZE_POOL - s.sum() * (1.0 - p) / p
+        s_partial *= p / (1.0 - p)
+        if s_partial > 0:
+            s.loc[user_partial] = s_partial
 
     # p_final
     s_sum = s.sum()
