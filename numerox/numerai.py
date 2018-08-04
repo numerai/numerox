@@ -386,3 +386,19 @@ def year_to_round_range(year, tournament=1):
         round1 = date.index.min()
         round2 = date.index.max()
     return round1, round2
+
+
+def get_user_names():
+    "A list containing all Numerai users, past and present."
+    q = '''
+        query {
+            rankings(limit:100000, offset:0)
+                {
+                    username
+                }
+        }
+    '''
+    napi = NumerAPI()
+    users = napi.raw_query(q)
+    users = [x['username'] for x in users['data']['rankings']]
+    return users

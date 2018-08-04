@@ -5,6 +5,7 @@ Release Notes
 
 - v2.2.0 (in development; not yet released)
 
+  * Add ``get_user_names``
   * Bugfix: ``get_stakes`` cutoff confidence when it is lower than 0.1
   * Update ``nx.history``
   * ``report.stake`` now removes accounts from report that did not stake
