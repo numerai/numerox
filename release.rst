@@ -8,6 +8,7 @@ Release Notes
   * Add ``get_user_names``
   * Bugfix: ``get_stakes`` cutoff confidence when it is lower than 0.1
   * Update ``nx.history``
+  * ``report.earn`` optionally do not round to nearest integer
   * ``report.stake`` now removes accounts from report that did not stake
   * ``data.__repr__`` no longer warns when all y's are missing
 

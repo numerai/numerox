@@ -40,11 +40,16 @@ class Report(object):
         df = ntopify(df, ntop)
         return df
 
-    def earn(self, round1=61, round2=None, ntop=None):
+    def earn(self, round1=61, round2=None, ntop=None, use_ints=True):
         "Earnings report"
         nmr_usd = nx.token_price_data(ticker='nmr')['price']
         df = earn(self.lb[round1:round2], nmr_usd)
         df = ntopify(df, ntop)
+        if use_ints:
+            df = df.round()
+            cols = ['usd_main', 'usd_stake', 'nmr_main', 'nmr_stake',
+                    'nmr_burn', 'profit_usd']
+            df[cols] = df[cols].astype(int)
         return df
 
     def burn(self, round1=61, round2=None, ntop=None):
@@ -415,10 +420,6 @@ def earn(df, price, verbose=True):
     profit += price * nmr
     df['profit_usd'] = profit
     df = df.sort_values('profit_usd', ascending=False)
-    df = df.round()
-    cols = ['usd_main', 'usd_stake', 'nmr_main', 'nmr_stake', 'nmr_burn',
-            'profit_usd']
-    df[cols] = df[cols].astype(int)
     return df
 
 
