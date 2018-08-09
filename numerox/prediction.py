@@ -391,11 +391,9 @@ class Prediction(object):
         df2 = prediction.loc[ids]
         p1 = self[names]
         p2 = prediction[names]
-        m1 = p1.metrics_per_era(data, tournament,
-                                metrics=['logloss', 'auc', 'ystd'],
+        m1 = p1.metrics_per_era(data, tournament, metrics=['logloss'],
                                 era_as_str=False)
-        m2 = p2.metrics_per_era(data, tournament,
-                                metrics=['logloss', 'auc', 'ystd'],
+        m2 = p2.metrics_per_era(data, tournament, metrics=['logloss'],
                                 era_as_str=False)
         for name in names:
 

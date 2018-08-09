@@ -11,6 +11,7 @@ Release Notes
   * ``report.earn`` optionally do not round to nearest integer
   * ``report.stake`` now removes accounts from report that did not stake
   * ``data.__repr__`` no longer warns when all y's are missing
+  * ``prediction.compare`` runs faster
 
 - v2.1.0
 
