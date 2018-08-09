@@ -204,6 +204,17 @@ class Data(object):
         "View of targets, y, as a numpy float array"
         return self.df.iloc[:, -5:].values
 
+    def y_df(self):
+        "Copy of targets, y, as a dataframe"
+        columns = []
+        data = []
+        for tint, tstr in nx.tournament_iter():
+            columns.append(tstr)
+            data.append(self.y_for_tournament(tint).reshape(-1, 1))
+        data = np.hstack(data)
+        df = pd.DataFrame(data=data, columns=columns, index=self.ids)
+        return df
+
     def y_for_tournament(self, tournament):
         "View of targets for give tournament as a 1d numpy float array"
         tournament = nx.tournament_int(tournament)
@@ -248,11 +259,6 @@ class Data(object):
         "View of targets for tournament 5 as a 1d numpy float array"
         idx = self.df.columns.get_loc('y5')
         return self.df.iloc[:, idx].values
-
-    def y_correlation(self):
-        "Correlation matrix of y's as dataframe"
-        df = self.df.iloc[:, -5:]
-        return df.corr()
 
     def y_sum_hist(self):
         "Histogram data of sum of y targets across tournaments as dataframe"

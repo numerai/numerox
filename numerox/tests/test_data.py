@@ -115,10 +115,10 @@ def test_data_y_for_tournment():
         assert_array_equal(yt, y, "y{} targets corrupted".format(i))
 
 
-def test_data_y_correlation():
-    "test data.y_correlation"
+def test_data_y_df():
+    "test data.y_df"
     d = micro_data()
-    df = d.y_correlation()
+    df = d.y_df()
     ok_(isinstance(df, pd.DataFrame), 'expecting a dataframe')
 
 
