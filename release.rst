@@ -3,6 +3,8 @@
 Release Notes
 =============
 
+- v2.3.0 (in development; not yet released)
+
 - v2.2.0
 
   * Add ``get_user_names``
