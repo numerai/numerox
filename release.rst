@@ -3,7 +3,7 @@
 Release Notes
 =============
 
-- v2.2.0 (in development; not yet released)
+- v2.2.0
 
   * Add ``get_user_names``
   * Bugfix: ``get_stakes`` cutoff confidence when it is lower than 0.1
@@ -19,7 +19,7 @@ Release Notes
 
   * ``show_stakes`` works with both new (round > 112) staking rules and old
   * ``get_stakes`` now works with new (round > 112) staking rules
-  * Add ``get_stakes_old`` to work with old (round < 113) staking rules 
+  * Add ``get_stakes_old`` to work with old (round < 113) staking rules
   * Add ``get_stakes_users``
   * Add ``get_stakes_cutoff``
   * Bugfix: ``splitter.CheatSplitter``
