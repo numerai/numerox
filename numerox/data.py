@@ -273,19 +273,19 @@ class Data(object):
 
     def y_similarity(self):
         "Similarity (fraction of y's equal) matrix as dataframe"
-        y = self.y
+        cols = []
         s = np.ones((5, 5))
-        for i in range(5):
-            for j in range(i+1, 5):
-                yi = y[:, i]
-                yj = y[:, j]
+        for i in range(1, 6):
+            cols.append(nx.tournament_str(i))
+            for j in range(i+1, 6):
+                yi = self.y_for_tournament(i)
+                yj = self.y_for_tournament(j)
                 idx = np.isfinite(yi + yj)
                 yi = yi[idx]
                 yj = yj[idx]
                 sij = (yi == yj).mean()
-                s[i,  j] = sij
-                s[j,  i] = sij
-        cols = ['y1', 'y2', 'y3', 'y4', 'y5']
+                s[i-1, j-1] = sij
+                s[j-1, i-1] = sij
         df = pd.DataFrame(data=s, columns=cols, index=cols)
         return df
 

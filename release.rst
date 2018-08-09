@@ -7,6 +7,8 @@ Release Notes
 
   * Add ``get_user_names``
   * Bugfix: ``get_stakes`` cutoff confidence when it is lower than 0.1
+  * Bugfix and improvements: ``data.y_similarity``
+  * Replace ``data.y_correlation`` with ``data.y_df``
   * Update ``nx.history``
   * ``report.earn`` optionally do not round to nearest integer
   * ``report.stake`` now removes accounts from report that did not stake
