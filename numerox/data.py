@@ -178,16 +178,15 @@ class Data(object):
         shape = (x_array.shape[0], x_array.shape[1] + 7)
         cols = ['x'+str(i) for i in range(x_array.shape[1])]
         cols = ['era', 'region'] + cols
-        cols = cols + ['y'+str(i + 1) for i in range(5)]
+        cols = cols + [name for number, name in nx.tournament_iter()]
         df = pd.DataFrame(data=np.empty(shape, dtype=np.float64),
                           index=self.df.index.copy(deep=True),
                           columns=cols)
         df['era'] = self.df['era'].values.copy()
         df['region'] = self.df['region'].values.copy()
         df.values[:, 2:-5] = x_array
-        for i in range(1, 6):
-            col = 'y' + str(i)
-            df[col] = self.df[col].values.copy()
+        for number, name in nx.tournament_iter():
+            df[name] = self.df[name].values.copy()
         return Data(df)
 
     @property
@@ -208,9 +207,9 @@ class Data(object):
         "Copy of targets, y, as a dataframe"
         columns = []
         data = []
-        for tint, tstr in nx.tournament_iter():
-            columns.append(tstr)
-            data.append(self.y_for_tournament(tint).reshape(-1, 1))
+        for number, name in nx.tournament_iter():
+            columns.append(name)
+            data.append(self.y_for_tournament(number).reshape(-1, 1))
         data = np.hstack(data)
         df = pd.DataFrame(data=data, columns=columns, index=self.ids)
         return df
@@ -219,46 +218,41 @@ class Data(object):
         "View of targets for give tournament as a 1d numpy float array"
         tournament = nx.tournament_int(tournament)
         if tournament == 1:
-            return self.y1
+            return self.bernie
         elif tournament == 2:
-            return self.y2
+            return self.elizabeth
         elif tournament == 3:
-            return self.y3
+            return self.jordan
         elif tournament == 4:
-            return self.y4
+            return self.ken
         elif tournament == 5:
-            return self.y5
+            return self.charles
         raise ValueError('unknown `tournament`')
 
     @property
-    def y1(self):
+    def bernie(self):
         "View of targets for tournament 1 as a 1d numpy float array"
-        idx = self.df.columns.get_loc('y1')
-        return self.df.iloc[:, idx].values
+        return self.df['bernie'].values
 
     @property
-    def y2(self):
+    def elizabeth(self):
         "View of targets for tournament 2 as a 1d numpy float array"
-        idx = self.df.columns.get_loc('y2')
-        return self.df.iloc[:, idx].values
+        return self.df['elizabeth'].values
 
     @property
-    def y3(self):
+    def jordan(self):
         "View of targets for tournament 3 as a 1d numpy float array"
-        idx = self.df.columns.get_loc('y3')
-        return self.df.iloc[:, idx].values
+        return self.df['jordan'].values
 
     @property
-    def y4(self):
+    def ken(self):
         "View of targets for tournament 4 as a 1d numpy float array"
-        idx = self.df.columns.get_loc('y4')
-        return self.df.iloc[:, idx].values
+        return self.df['ken'].values
 
     @property
-    def y5(self):
+    def charles(self):
         "View of targets for tournament 5 as a 1d numpy float array"
-        idx = self.df.columns.get_loc('y5')
-        return self.df.iloc[:, idx].values
+        return self.df['charles'].values
 
     def y_sum_hist(self):
         "Histogram data of sum of y targets across tournaments as dataframe"
@@ -292,11 +286,11 @@ class Data(object):
     def y_to_nan(self):
         "Copy of data with y values set to NaN"
         data = self.copy()
-        data.df = data.df.assign(y1=np.nan)
-        data.df = data.df.assign(y2=np.nan)
-        data.df = data.df.assign(y3=np.nan)
-        data.df = data.df.assign(y4=np.nan)
-        data.df = data.df.assign(y5=np.nan)
+        data.df = data.df.assign(bernie=np.nan)
+        data.df = data.df.assign(elizabeth=np.nan)
+        data.df = data.df.assign(jordan=np.nan)
+        data.df = data.df.assign(ken=np.nan)
+        data.df = data.df.assign(charles=np.nan)
         return data
 
     # transforms ----------------------------------------------------------
@@ -568,8 +562,8 @@ def load_zip(file_path, verbose=False):
     rename_map = {'data_type': 'region'}
     for i in range(1, 51):
         rename_map['feature' + str(i)] = 'x' + str(i)
-    for t, name in nx.tournament_iter():
-        rename_map['target_' + name] = 'y' + str(t)
+    for number, name in nx.tournament_iter():
+        rename_map['target_' + name] = name
     df.rename(columns=rename_map, inplace=True)
 
     # convert era, region, and labels to np.float64

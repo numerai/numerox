@@ -29,8 +29,8 @@ def metrics_per_era(data, prediction, tournament, join='data',
     else:
         raise ValueError("`join` method not recognized")
     yhats_df = df.dropna()
-    yn = 'y' + str(nx.tournament_int(tournament))
-    data_df = data.df[['era', 'region', yn]]
+    y_name = nx.tournament_str(tournament)
+    data_df = data.df[['era', 'region', y_name]]
     df = pd.merge(data_df, yhats_df, left_index=True, right_index=True,
                   how=how)
 
@@ -45,7 +45,7 @@ def metrics_per_era(data, prediction, tournament, join='data',
     for era in unique_eras:
         idx = df.era.isin([era])
         df_era = df[idx]
-        y = df_era[yn].values
+        y = df_era[y_name].values
         if era_as_str:
             era = ERA_INT_TO_STR[era]
         for name in names:

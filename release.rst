@@ -5,6 +5,8 @@ Release Notes
 
 - v2.3.0 (in development; not yet released)
 
+  * Data object stores targets as strings ('bernie') instead of integers (1)
+  * Replace ``data.y1`` with ``data.bernie`` etc.
   * Update data documentation
 
 - v2.2.0

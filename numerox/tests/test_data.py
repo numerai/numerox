@@ -55,7 +55,7 @@ def test_data_indexing():
     ade(d['live'], micro_data([9]), msg)
 
     msg = 'error indexing data by array'
-    ade(d[d.y1 == 0], micro_data([0, 2, 4, 6, 8, 9]), msg)
+    ade(d[d.bernie == 0], micro_data([0, 2, 4, 6, 8, 9]), msg)
     ade(d[d.era == 'era4'], micro_data([6]), msg)
 
     assert_raises(IndexError, d.__getitem__, 'era')
@@ -111,7 +111,7 @@ def test_data_y_for_tournment():
         y[10:] = np.nan
         yt = d.y_for_tournament(i)
         assert_array_equal(yt, y, "y{} targets corrupted".format(i))
-        yt = getattr(d, 'y{}'.format(i))
+        yt = getattr(d, nx.tournament_str(i))
         assert_array_equal(yt, y, "y{} targets corrupted".format(i))
 
 
@@ -236,7 +236,7 @@ def test_data_properties():
     ok_((d.region_float == d.df.region).all(), "region is corrupted")
 
     idx = ~np.isnan(d.y)
-    y = d.df[['y1', 'y2', 'y3', 'y4', 'y5']].values
+    y = d.df[['bernie', 'elizabeth', 'jordan', 'ken', 'charles']].values
     ok_((d.y[idx] == y[idx]).all(), "y is corrupted")
 
     x = d.x

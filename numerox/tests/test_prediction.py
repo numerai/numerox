@@ -102,13 +102,13 @@ def test_prediction_properties():
 
     d = testing.micro_data()
     p = nx.Prediction()
-    p = p.merge_arrays(d.ids, d.y1, 'model1')
-    p = p.merge_arrays(d.ids, d.y2, 'model2')
+    p = p.merge_arrays(d.ids, d.bernie, 'model1')
+    p = p.merge_arrays(d.ids, d.elizabeth, 'model2')
 
     ok_((p.ids == p.df.index).all(), "ids is corrupted")
     ok_((p.ids == d.df.index).all(), "ids is corrupted")
-    ok_((p.y[:, 0] == d.df.y1).all(), "y is corrupted")
-    ok_((p.y[:, 1] == d.df.y2).all(), "y is corrupted")
+    ok_((p.y[:, 0] == d.df.bernie).all(), "y is corrupted")
+    ok_((p.y[:, 1] == d.df.elizabeth).all(), "y is corrupted")
 
 
 def test_prediction_rename():
@@ -217,9 +217,9 @@ def test_prediction_dominance():
     d = d['validation']
 
     p = nx.Prediction()
-    p = p.merge_arrays(d.ids, d.y1, 'model1')
-    p = p.merge_arrays(d.ids, d.y2, 'model2')
-    p = p.merge_arrays(d.ids, d.y3, 'model3')
+    p = p.merge_arrays(d.ids, d.bernie, 'model1')
+    p = p.merge_arrays(d.ids, d.elizabeth, 'model2')
+    p = p.merge_arrays(d.ids, d.jordan, 'model3')
 
     df = p.dominance(d, 3)
     df = p.dominance(d, 'jordan')
