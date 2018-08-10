@@ -10,6 +10,8 @@ Release Notes
   * ``data.y[:]`` is equivalent to ``data.y`` from previous releases 
   * Remove ``data.y1``, ``data.y2``, etc
   * Call using ``data.y_df`` instead of ``data.y_df()``
+  * HDF Data archives created with previous releases cannot be read;
+    must recreate HDF archive from Numerai zip archive
   * Update data documentation
 
 - v2.2.0
