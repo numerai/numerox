@@ -199,11 +199,6 @@ class Data(object):
     # y ---------------------------------------------------------------------
 
     @property
-    def y_array(self):
-        "View of targets, y, as a numpy float array"
-        return self.df.iloc[:, -5:].values
-
-    @property
     def y_df(self):
         "Copy of targets, y, as a dataframe"
         columns = []
@@ -495,7 +490,7 @@ class Data(object):
         t.append(fmt.format('x', stats))
 
         # y
-        y = self.y_array
+        y = self.y[:]
         stats = 'mean {:.6f}, fraction missing {:.4f}'
         idx = np.isnan(y)
         if idx.all():
@@ -596,8 +591,8 @@ def compare_data(data1, data2, regions=None, n_jobs=1):
         nn.fit(d1.x)
         dist, idx = nn.kneighbors(d2.x, n_neighbors=1, return_distance=True)
         idx = idx.reshape(-1)
-        y1 = d1.y_array[idx]
-        y2 = d2.y_array
+        y1 = d1.y[:][idx]
+        y2 = d2.y[:]
         if np.isnan(y1).any() or np.isnan(y2).any():
             y_acc = np.nan
         else:
@@ -637,5 +632,12 @@ class Y(object):
             if index < 1 or index > 5:
                 raise IndexError('tournament number must be between 1 and 5')
             return self2.df[nx.tournament_str(index)].values
+        elif isinstance(index, slice):
+            if (index.start is None and index.stop is None and
+               index.step is None):
+                # slicing below means a view is returned instead of a copy
+                return self2.df.iloc[:, -5:].values
+            else:
+                raise IndexError('Start, stop, and step of slice must be None')
         else:
             raise IndexError('indexing type not recognized')

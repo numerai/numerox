@@ -77,7 +77,7 @@ class ridge_mean(Model):
 
     def fit_predict(self, dfit, dpre, tournament):
         model = Ridge(alpha=self.p['alpha'], normalize=True)
-        yfit = dfit.y_array.mean(axis=1)
+        yfit = dfit.y[:].mean(axis=1)
         model.fit(dfit.x, yfit)
         yhat = model.predict(dpre.x)
         return dpre.ids, yhat

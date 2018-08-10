@@ -30,7 +30,7 @@ Where's the data?
 -----------------
 
 To get views (not copies) of the data as numpy arrays use ``data.x`` and
-``data.y_array``. To get copies (not views) of ids, era, and region as numpy
+``data.y[:]``. To get copies (not views) of ids, era, and region as numpy
 string arrays use ``data.ids``, ``data.era``, ``data.region``.
 
 Internally era and region are stored as floats. To get views of era and region
