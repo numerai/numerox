@@ -3,7 +3,7 @@
 Release Notes
 =============
 
-- v2.3.0 (in development; not yet released)
+- v2.3.0
 
   * ``data.y[tournament]`` replaces ``data.y_for_tournament(tournament)``
   * ``data.y[:]`` is equivalent to ``data.y`` from previous releases 
