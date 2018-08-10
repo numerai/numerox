@@ -178,16 +178,15 @@ class Data(object):
         shape = (x_array.shape[0], x_array.shape[1] + 7)
         cols = ['x'+str(i) for i in range(x_array.shape[1])]
         cols = ['era', 'region'] + cols
-        cols = cols + ['y'+str(i + 1) for i in range(5)]
+        cols = cols + [name for number, name in nx.tournament_iter()]
         df = pd.DataFrame(data=np.empty(shape, dtype=np.float64),
                           index=self.df.index.copy(deep=True),
                           columns=cols)
         df['era'] = self.df['era'].values.copy()
         df['region'] = self.df['region'].values.copy()
         df.values[:, 2:-5] = x_array
-        for i in range(1, 6):
-            col = 'y' + str(i)
-            df[col] = self.df[col].values.copy()
+        for number, name in nx.tournament_iter():
+            df[name] = self.df[name].values.copy()
         return Data(df)
 
     @property
@@ -200,65 +199,21 @@ class Data(object):
     # y ---------------------------------------------------------------------
 
     @property
-    def y(self):
-        "View of targets, y, as a numpy float array"
-        return self.df.iloc[:, -5:].values
-
     def y_df(self):
         "Copy of targets, y, as a dataframe"
         columns = []
         data = []
-        for tint, tstr in nx.tournament_iter():
-            columns.append(tstr)
-            data.append(self.y_for_tournament(tint).reshape(-1, 1))
+        for number, name in nx.tournament_iter():
+            columns.append(name)
+            data.append(self.y[number].reshape(-1, 1))
         data = np.hstack(data)
         df = pd.DataFrame(data=data, columns=columns, index=self.ids)
         return df
 
-    def y_for_tournament(self, tournament):
-        "View of targets for give tournament as a 1d numpy float array"
-        tournament = nx.tournament_int(tournament)
-        if tournament == 1:
-            return self.y1
-        elif tournament == 2:
-            return self.y2
-        elif tournament == 3:
-            return self.y3
-        elif tournament == 4:
-            return self.y4
-        elif tournament == 5:
-            return self.y5
-        raise ValueError('unknown `tournament`')
-
     @property
-    def y1(self):
-        "View of targets for tournament 1 as a 1d numpy float array"
-        idx = self.df.columns.get_loc('y1')
-        return self.df.iloc[:, idx].values
-
-    @property
-    def y2(self):
-        "View of targets for tournament 2 as a 1d numpy float array"
-        idx = self.df.columns.get_loc('y2')
-        return self.df.iloc[:, idx].values
-
-    @property
-    def y3(self):
-        "View of targets for tournament 3 as a 1d numpy float array"
-        idx = self.df.columns.get_loc('y3')
-        return self.df.iloc[:, idx].values
-
-    @property
-    def y4(self):
-        "View of targets for tournament 4 as a 1d numpy float array"
-        idx = self.df.columns.get_loc('y4')
-        return self.df.iloc[:, idx].values
-
-    @property
-    def y5(self):
-        "View of targets for tournament 5 as a 1d numpy float array"
-        idx = self.df.columns.get_loc('y5')
-        return self.df.iloc[:, idx].values
+    def y(self):
+        "indexing targets, y, by tournament name or number"
+        return Y(self)
 
     def y_sum_hist(self):
         "Histogram data of sum of y targets across tournaments as dataframe"
@@ -278,8 +233,8 @@ class Data(object):
         for i in range(1, 6):
             cols.append(nx.tournament_str(i))
             for j in range(i+1, 6):
-                yi = self.y_for_tournament(i)
-                yj = self.y_for_tournament(j)
+                yi = self.y[i]
+                yj = self.y[j]
                 idx = np.isfinite(yi + yj)
                 yi = yi[idx]
                 yj = yj[idx]
@@ -292,11 +247,11 @@ class Data(object):
     def y_to_nan(self):
         "Copy of data with y values set to NaN"
         data = self.copy()
-        data.df = data.df.assign(y1=np.nan)
-        data.df = data.df.assign(y2=np.nan)
-        data.df = data.df.assign(y3=np.nan)
-        data.df = data.df.assign(y4=np.nan)
-        data.df = data.df.assign(y5=np.nan)
+        data.df = data.df.assign(bernie=np.nan)
+        data.df = data.df.assign(elizabeth=np.nan)
+        data.df = data.df.assign(jordan=np.nan)
+        data.df = data.df.assign(ken=np.nan)
+        data.df = data.df.assign(charles=np.nan)
         return data
 
     # transforms ----------------------------------------------------------
@@ -363,7 +318,7 @@ class Data(object):
         else:
             eras = data.unique_era(as_str=False).tolist()
         era = data.era_float
-        y = data.y_for_tournament(tournament)
+        y = data.y[tournament]
         index = np.arange(y.size)
         remove = []
         rs = np.random.RandomState(seed)
@@ -535,7 +490,7 @@ class Data(object):
         t.append(fmt.format('x', stats))
 
         # y
-        y = self.y
+        y = self.y[:]
         stats = 'mean {:.6f}, fraction missing {:.4f}'
         idx = np.isnan(y)
         if idx.all():
@@ -568,8 +523,8 @@ def load_zip(file_path, verbose=False):
     rename_map = {'data_type': 'region'}
     for i in range(1, 51):
         rename_map['feature' + str(i)] = 'x' + str(i)
-    for t, name in nx.tournament_iter():
-        rename_map['target_' + name] = 'y' + str(t)
+    for number, name in nx.tournament_iter():
+        rename_map['target_' + name] = name
     df.rename(columns=rename_map, inplace=True)
 
     # convert era, region, and labels to np.float64
@@ -636,8 +591,8 @@ def compare_data(data1, data2, regions=None, n_jobs=1):
         nn.fit(d1.x)
         dist, idx = nn.kneighbors(d2.x, n_neighbors=1, return_distance=True)
         idx = idx.reshape(-1)
-        y1 = d1.y[idx]
-        y2 = d2.y
+        y1 = d1.y[:][idx]
+        y2 = d2.y[:]
         if np.isnan(y1).any() or np.isnan(y2).any():
             y_acc = np.nan
         else:
@@ -659,3 +614,30 @@ class Loc(object):
 
     def __getitem__(self, index):
         return Data(self.data.df.loc[index])
+
+
+class Y(object):
+    "Utility class for y access."
+
+    def __init__(self2, self):
+        self2.df = self.df
+
+    def __getitem__(self2, index):
+        if isinstance(index, str):
+            if index in ('bernie', 'elizabeth', 'jordan', 'ken', 'charles'):
+                return self2.df[index].values
+            else:
+                raise IndexError('string index not recognized')
+        elif nx.isint(index):
+            if index < 1 or index > 5:
+                raise IndexError('tournament number must be between 1 and 5')
+            return self2.df[nx.tournament_str(index)].values
+        elif isinstance(index, slice):
+            if (index.start is None and index.stop is None and
+               index.step is None):
+                # slicing below means a view is returned instead of a copy
+                return self2.df.iloc[:, -5:].values
+            else:
+                raise IndexError('Start, stop, and step of slice must be None')
+        else:
+            raise IndexError('indexing type not recognized')

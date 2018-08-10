@@ -5,6 +5,13 @@ Release Notes
 
 - v2.3.0 (in development; not yet released)
 
+  * ``data.y[tournament]`` replaces ``data.y_for_tournament(tournament)``
+  * ``data.y[:]`` is equivalent to ``data.y`` from previous releases 
+  * Remove ``data.y1``, ``data.y2``, etc
+  * Call using ``data.y_df`` instead of ``data.y_df()``
+  * Internally Data object columns renamed, e.g., 'bernie' instead of y1
+  * HDF Data archives created with previous releases cannot be read;
+    must recreate HDF archive from Numerai zip archive
   * Update data documentation
 
 - v2.2.0
