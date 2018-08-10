@@ -168,7 +168,7 @@ class IgnoreEraCVSplitter(Splitter):
             cv = StratifiedKFold(n_splits=self.p['kfold'],
                                  random_state=self.p['seed'],
                                  shuffle=True)
-            y = data.y_for_tournament(self.p['tournament'])
+            y = data.y[self.p['tournament']]
             self.cv = cv.split(data.x, y)
         if sys.version_info[0] == 2:
             fit_index, pre_index = self.cv.next()

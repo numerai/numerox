@@ -30,17 +30,24 @@ Where's the data?
 -----------------
 
 To get views (not copies) of the data as numpy arrays use ``data.x`` and
-``data.y``. To get copies (not views) of ids, era, and region as numpy
+``data.y_array``. To get copies (not views) of ids, era, and region as numpy
 string arrays use ``data.ids``, ``data.era``, ``data.region``.
 
 Internally era and region are stored as floats. To get views of era and region
 as numpy float arrays use ``data.era_float``, ``data.region_float``.
 
-Here are some ways to look the targets of the 'elizabeth' tournament::
+You can also request the targets, y, as a Pandas DataFrame::
 
-    data.y2
-    data.y_for_tournament('elizabeth')
-    data.y_for_tournament(2)
+    >>> data.y_df
+                      bernie  elizabeth  jordan  ken  charles
+    n2b2e3dd163cb422     1.0        1.0     1.0  1.0      1.0
+    n177021a571c94c8     0.0        0.0     0.0  0.0      0.0
+    <snip>
+
+Here's how to get the targets of the 'elizabeth' tournament as NumPy arrays::
+
+    data.y['elizabeth']
+    data.y[2]
 
 Indexing
 --------
@@ -50,7 +57,7 @@ don't worry. You do not need to know them to get started.
 
 Data indexing is done by rows, not columns::
 
-    >>> data[data.y1 == 0]
+    >>> data[data.y['bernie'] == 0]
     region    train, validation
     rows      220021
     era       132, [era1, era132]
@@ -101,7 +108,7 @@ Or you can remove regions (or eras)::
     y         mean 0.499546, fraction missing 0.0000
 
 You can concatenate data objects (as long as the ids don't overlap) by
-adding them together. Let's add validation era92 to the training data::
+adding them together. Let's add validation era121 to the training data::
 
     >>> data['train'] + data['era121']
     region    train, validation
@@ -134,7 +141,7 @@ Why so many y's?
 
 Correlation between the tournament targets::
 
-    >>> data.y_df().corr()
+    >>> data.y_df.corr()
                  bernie  elizabeth    jordan       ken   charles
     bernie     1.000000   0.806894  0.829468  0.933892  0.919436
     elizabeth  0.806894   1.000000  0.734084  0.795488  0.789388

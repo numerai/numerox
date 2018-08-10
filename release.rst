@@ -6,7 +6,10 @@ Release Notes
 - v2.3.0 (in development; not yet released)
 
   * Data object stores targets as strings ('bernie') instead of integers (1)
-  * Replace ``data.y1`` with ``data.bernie`` etc.
+  * ``data.y[tournament]`` replaces ``data.y_for_tournament(tournament)``
+  * ``data.y_array`` replaces ``data.y``
+  * Remove ``data.y1``, ``data.y2``, etc
+  * Call using ``data.y_df`` instead of ``data.y_df()``
   * Update data documentation
 
 - v2.2.0

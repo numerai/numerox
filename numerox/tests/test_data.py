@@ -55,12 +55,44 @@ def test_data_indexing():
     ade(d['live'], micro_data([9]), msg)
 
     msg = 'error indexing data by array'
-    ade(d[d.bernie == 0], micro_data([0, 2, 4, 6, 8, 9]), msg)
+    ade(d[d.y['bernie'] == 0], micro_data([0, 2, 4, 6, 8, 9]), msg)
     ade(d[d.era == 'era4'], micro_data([6]), msg)
 
     assert_raises(IndexError, d.__getitem__, 'era')
     assert_raises(IndexError, d.__getitem__, 'wtf')
     assert_raises(IndexError, d.__getitem__, None)
+
+
+def test_data_y_indexing():
+    "test data y indexing"
+
+    d = micro_data()
+
+    msg = 'y arrays not equal'
+    y = [0, 1, 0, 1, 0, 1, 0, 1, 0, 0]
+    assert_array_equal(d.y[1], y, msg)
+    assert_array_equal(d.y['bernie'], y, msg)
+
+    y = [0, 1, 1, 1, 0, 1, 1, 1, 0, 1]
+    assert_array_equal(d.y[2], y, msg)
+    assert_array_equal(d.y['elizabeth'], y, msg)
+
+    y = [1, 1, 1, 0, 0, 1, 0, 1, 0, 0]
+    assert_array_equal(d.y[3], y, msg)
+    assert_array_equal(d.y['jordan'], y, msg)
+
+    y = [1, 1, 1, 1, 1, 1, 1, 1, 0, 0]
+    assert_array_equal(d.y[4], y, msg)
+    assert_array_equal(d.y['ken'], y, msg)
+
+    y = [0, 0, 1, 0, 0, 0, 1, 1, 0, 1]
+    assert_array_equal(d.y[5], y, msg)
+    assert_array_equal(d.y['charles'], y, msg)
+
+    assert_raises(IndexError, d.y.__getitem__, 0)
+    assert_raises(IndexError, d.y.__getitem__, 'era')
+    assert_raises(IndexError, d.y.__getitem__, 'wtf')
+    assert_raises(IndexError, d.y.__getitem__, None)
 
 
 def test_data_loc():
@@ -109,16 +141,16 @@ def test_data_y_for_tournment():
         y[i-1] = 1
         y[i-1+5] = 1
         y[10:] = np.nan
-        yt = d.y_for_tournament(i)
-        assert_array_equal(yt, y, "y{} targets corrupted".format(i))
-        yt = getattr(d, nx.tournament_str(i))
+        yt = d.y[i]
+        yt2 = d.y[nx.tournament_str(i)]
+        assert_array_equal(yt, yt2, "y{} indexing corrupted".format(i))
         assert_array_equal(yt, y, "y{} targets corrupted".format(i))
 
 
 def test_data_y_df():
     "test data.y_df"
     d = micro_data()
-    df = d.y_df()
+    df = d.y_df
     ok_(isinstance(df, pd.DataFrame), 'expecting a dataframe')
 
 
@@ -139,7 +171,7 @@ def test_data_balance():
     b = d.balance(tournament, train_only=False)
     for era in b.unique_era():
         if era != 'eraX':
-            y = b[era].y_for_tournament(tournament)
+            y = b[era].y[tournament]
             n0 = (y == 0).sum()
             n1 = (y == 1).sum()
             ok_(n0 == n1, "y is not balanced")
@@ -148,7 +180,7 @@ def test_data_balance():
     b = d.balance(tournament, train_only=True)
     eras = np.unique(b.era[b.region == 'train'])
     for era in eras:
-        y = b[era].y_for_tournament(tournament)
+        y = b[era].y[tournament]
         n0 = (y == 0).sum()
         n1 = (y == 1).sum()
         ok_(n0 == n1, "y is not balanced")
@@ -186,7 +218,7 @@ def test_empty_data():
     ok_(d0.era.size == 0, "empty data should have d.era.size == 0")
     ok_(d0.region.size == 0, "empty data should have d.region.size == 0")
     ok_(d0.x.size == 0, "empty data should have d.x.size == 0")
-    ok_(d0.y.size == 0, "empty data should have d.y.size == 0")
+    ok_(d0.y_array.size == 0, "empty data should have d.y.size == 0")
     d2 = d['era0'] + d[idx]
     ok_(len(d2) == 0, "empty data should have length 0")
 
@@ -194,7 +226,7 @@ def test_empty_data():
 def test_data_y_to_nan():
     "test data_y_to_nan"
     d = micro_data()
-    ok_(not np.isfinite(d.y_to_nan().y).any(), "not all y's are nan")
+    ok_(not np.isfinite(d.y_to_nan().y_array).any(), "not all y's are nan")
 
 
 def test_data_methods():
@@ -223,7 +255,7 @@ def test_data_copies():
     ok_(shares_memory(d, d.era_float), "d.era_float should be a view")
     ok_(shares_memory(d, d.region_float), "d.region_float should be a view")
     ok_(shares_memory(d, d.x), "d.x should be a view")
-    ok_(shares_memory(d, d.y), "d.y should be a view")
+    ok_(shares_memory(d, d.y_array), "d.y_array should be a view")
 
 
 def test_data_properties():
@@ -235,9 +267,9 @@ def test_data_properties():
     ok_((d.era_float == d.df.era).all(), "era is corrupted")
     ok_((d.region_float == d.df.region).all(), "region is corrupted")
 
-    idx = ~np.isnan(d.y)
+    idx = ~np.isnan(d.y_array)
     y = d.df[['bernie', 'elizabeth', 'jordan', 'ken', 'charles']].values
-    ok_((d.y[idx] == y[idx]).all(), "y is corrupted")
+    ok_((d.y_array[idx] == y[idx]).all(), "y is corrupted")
 
     x = d.x
     for i, name in enumerate(d.column_list(x_only=True)):

@@ -199,60 +199,26 @@ class Data(object):
     # y ---------------------------------------------------------------------
 
     @property
-    def y(self):
+    def y_array(self):
         "View of targets, y, as a numpy float array"
         return self.df.iloc[:, -5:].values
 
+    @property
     def y_df(self):
         "Copy of targets, y, as a dataframe"
         columns = []
         data = []
         for number, name in nx.tournament_iter():
             columns.append(name)
-            data.append(self.y_for_tournament(number).reshape(-1, 1))
+            data.append(self.y[number].reshape(-1, 1))
         data = np.hstack(data)
         df = pd.DataFrame(data=data, columns=columns, index=self.ids)
         return df
 
-    def y_for_tournament(self, tournament):
-        "View of targets for give tournament as a 1d numpy float array"
-        tournament = nx.tournament_int(tournament)
-        if tournament == 1:
-            return self.bernie
-        elif tournament == 2:
-            return self.elizabeth
-        elif tournament == 3:
-            return self.jordan
-        elif tournament == 4:
-            return self.ken
-        elif tournament == 5:
-            return self.charles
-        raise ValueError('unknown `tournament`')
-
     @property
-    def bernie(self):
-        "View of targets for tournament 1 as a 1d numpy float array"
-        return self.df['bernie'].values
-
-    @property
-    def elizabeth(self):
-        "View of targets for tournament 2 as a 1d numpy float array"
-        return self.df['elizabeth'].values
-
-    @property
-    def jordan(self):
-        "View of targets for tournament 3 as a 1d numpy float array"
-        return self.df['jordan'].values
-
-    @property
-    def ken(self):
-        "View of targets for tournament 4 as a 1d numpy float array"
-        return self.df['ken'].values
-
-    @property
-    def charles(self):
-        "View of targets for tournament 5 as a 1d numpy float array"
-        return self.df['charles'].values
+    def y(self):
+        "indexing targets, y, by tournament name or number"
+        return Y(self)
 
     def y_sum_hist(self):
         "Histogram data of sum of y targets across tournaments as dataframe"
@@ -272,8 +238,8 @@ class Data(object):
         for i in range(1, 6):
             cols.append(nx.tournament_str(i))
             for j in range(i+1, 6):
-                yi = self.y_for_tournament(i)
-                yj = self.y_for_tournament(j)
+                yi = self.y[i]
+                yj = self.y[j]
                 idx = np.isfinite(yi + yj)
                 yi = yi[idx]
                 yj = yj[idx]
@@ -357,7 +323,7 @@ class Data(object):
         else:
             eras = data.unique_era(as_str=False).tolist()
         era = data.era_float
-        y = data.y_for_tournament(tournament)
+        y = data.y[tournament]
         index = np.arange(y.size)
         remove = []
         rs = np.random.RandomState(seed)
@@ -529,7 +495,7 @@ class Data(object):
         t.append(fmt.format('x', stats))
 
         # y
-        y = self.y
+        y = self.y_array
         stats = 'mean {:.6f}, fraction missing {:.4f}'
         idx = np.isnan(y)
         if idx.all():
@@ -630,8 +596,8 @@ def compare_data(data1, data2, regions=None, n_jobs=1):
         nn.fit(d1.x)
         dist, idx = nn.kneighbors(d2.x, n_neighbors=1, return_distance=True)
         idx = idx.reshape(-1)
-        y1 = d1.y[idx]
-        y2 = d2.y
+        y1 = d1.y_array[idx]
+        y2 = d2.y_array
         if np.isnan(y1).any() or np.isnan(y2).any():
             y_acc = np.nan
         else:
@@ -653,3 +619,23 @@ class Loc(object):
 
     def __getitem__(self, index):
         return Data(self.data.df.loc[index])
+
+
+class Y(object):
+    "Utility class for y access."
+
+    def __init__(self2, self):
+        self2.df = self.df
+
+    def __getitem__(self2, index):
+        if isinstance(index, str):
+            if index in ('bernie', 'elizabeth', 'jordan', 'ken', 'charles'):
+                return self2.df[index].values
+            else:
+                raise IndexError('string index not recognized')
+        elif nx.isint(index):
+            if index < 1 or index > 5:
+                raise IndexError('tournament number must be between 1 and 5')
+            return self2.df[nx.tournament_str(index)].values
+        else:
+            raise IndexError('indexing type not recognized')

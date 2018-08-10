@@ -102,8 +102,8 @@ def test_prediction_properties():
 
     d = testing.micro_data()
     p = nx.Prediction()
-    p = p.merge_arrays(d.ids, d.bernie, 'model1')
-    p = p.merge_arrays(d.ids, d.elizabeth, 'model2')
+    p = p.merge_arrays(d.ids, d.y['bernie'], 'model1')
+    p = p.merge_arrays(d.ids, d.y['elizabeth'], 'model2')
 
     ok_((p.ids == p.df.index).all(), "ids is corrupted")
     ok_((p.ids == d.df.index).all(), "ids is corrupted")
@@ -217,9 +217,9 @@ def test_prediction_dominance():
     d = d['validation']
 
     p = nx.Prediction()
-    p = p.merge_arrays(d.ids, d.bernie, 'model1')
-    p = p.merge_arrays(d.ids, d.elizabeth, 'model2')
-    p = p.merge_arrays(d.ids, d.jordan, 'model3')
+    p = p.merge_arrays(d.ids, d.y['bernie'], 'model1')
+    p = p.merge_arrays(d.ids, d.y['elizabeth'], 'model2')
+    p = p.merge_arrays(d.ids, d.y['jordan'], 'model3')
 
     df = p.dominance(d, 3)
     df = p.dominance(d, 'jordan')

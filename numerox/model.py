@@ -65,8 +65,7 @@ class logistic(Model):
 
     def fit_predict(self, dfit, dpre, tournament):
         model = LogisticRegression(C=self.p['inverse_l2'])
-        yfit = dfit.y_for_tournament(tournament)
-        model.fit(dfit.x, yfit)
+        model.fit(dfit.x, dfit.y[tournament])
         yhat = model.predict_proba(dpre.x)[:, 1]
         return dpre.ids, yhat
 
@@ -78,7 +77,7 @@ class ridge_mean(Model):
 
     def fit_predict(self, dfit, dpre, tournament):
         model = Ridge(alpha=self.p['alpha'], normalize=True)
-        yfit = dfit.y.mean(axis=1)
+        yfit = dfit.y_array.mean(axis=1)
         model.fit(dfit.x, yfit)
         yhat = model.predict(dpre.x)
         return dpre.ids, yhat
@@ -99,8 +98,7 @@ class extratrees(Model):
                   n_estimators=self.p['ntrees'],
                   random_state=self.p['seed'],
                   n_jobs=-1)
-        yfit = dfit.y_for_tournament(tournament)
-        clf.fit(dfit.x, yfit)
+        clf.fit(dfit.x, dfit.y[tournament])
         yhat = clf.predict_proba(dpre.x)[:, 1]
         return dpre.ids, yhat
 
@@ -120,8 +118,7 @@ class randomforest(Model):
                   n_estimators=self.p['ntrees'],
                   random_state=self.p['seed'],
                   n_jobs=-1)
-        yfit = dfit.y_for_tournament(tournament)
-        clf.fit(dfit.x, yfit)
+        clf.fit(dfit.x, dfit.y[tournament])
         yhat = clf.predict_proba(dpre.x)[:, 1]
         return dpre.ids, yhat
 
@@ -143,8 +140,7 @@ class mlpc(Model):
                    learning_rate_init=self.p['learn'],
                    random_state=self.p['seed'],
                    max_iter=200)
-        yfit = dfit.y_for_tournament(tournament)
-        clf.fit(dfit.x, yfit)
+        clf.fit(dfit.x, dfit.y[tournament])
         yhat = clf.predict_proba(dpre.x)[:, 1]
         return dpre.ids, yhat
 
@@ -158,8 +154,7 @@ class example_predictions(Model):
     def fit_predict(self, dfit, dpre, tournament):
         model = GradientBoostingClassifier(n_estimators=25, max_depth=1,
                                            random_state=1776)
-        yfit = dfit.y_for_tournament(tournament)
-        model.fit(dfit.x, yfit)
+        model.fit(dfit.x, dfit.y[tournament])
         yhat = model.predict_proba(dpre.x)[:, 1]
         yhat = np.round(yhat, 5)
         return dpre.ids, yhat
@@ -175,8 +170,7 @@ class logisticPCA(Model):
     def fit_predict(self, dfit, dpre, tournament):
         pipe = Pipeline([('pca', PCA(n_components=self.p['nfeatures'])),
                          ("lr", LogisticRegression(C=self.p['inverse_l2']))])
-        yfit = dfit.y_for_tournament(tournament)
-        pipe.fit(dfit.x, yfit)
+        pipe.fit(dfit.x, dfit.y[tournament])
         yhat = pipe.predict_proba(dpre.x)[:, 1]
         return dpre.ids, yhat
 
