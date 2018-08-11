@@ -18,21 +18,21 @@ First take a look at the logistic regression model below:
             yhat = model.predict_proba(dpre.x)[:, 1]
             return dpre.ids, yhat
 
-The model is just a thin wrapper around sklearn's LogisticRegression. The
-wrapper allows LogisticRegression to receive data from numerox and for numerox
-to keep track of its predictions.
+The model is just a thin wrapper around sklearn's ``LogisticRegression``. The
+wrapper allows ``LogisticRegression`` to receive data from numerox and for
+numerox to keep track of its predictions.
 
-Your model **must** have a `fit_predict` method that takes three inputs: The
-first is training data (`dfit`), the second is prediction data (`dpre`), and
-the third is the `tournament` (integer, 1, or string, 'bernie').
+Your model **must** have a ``fit_predict`` method that takes three inputs: The
+first is training data (``dfit``), the second is prediction data (``dpre``),
+and the third is the `tournament` (integer, 1, or string, 'bernie').
 
-The `fit_predict method` **must** return two numpy arrays. The first contains
+The ``fit_predict method`` **must** return two numpy arrays. The first contains
 the ids, the second the predictions. Make sure that these two arrays stay
 aligned!
 
 The models above inherits from The Model class. That is optional. But if you do
-inherit from Model and if you place your parameters in a `self.p` dictionary as
-is done in the model above then you will get a nice printout (model name and
+inherit from Model and if you place your parameters in a ``self.p`` dictionary
+as is done in the model above then you will get a nice printout (model name and
 parameters) when you run your model.
 
 None of the models in numerox will likely be competitive in the Numerai
