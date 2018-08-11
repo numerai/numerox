@@ -5,6 +5,8 @@ Release Notes
 
 - v2.4.0 (in development; not yet released)
 
+  * Add ``model.rst``
+
 - v2.3.0
 
   * ``data.y[tournament]`` replaces ``data.y_for_tournament(tournament)``

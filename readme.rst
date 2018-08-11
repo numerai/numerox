@@ -7,7 +7,7 @@ numerox
 
 Numerox is a Numerai tournament toolbox written in Python.
 
-All you have to do is create a model. Take a look at `model.py`_ for examples.
+All you have to do is create a model. Take a look at `model`_ for examples.
 
 Once you have a model numerox will do the rest. First download the Numerai
 dataset and then load it::
@@ -100,7 +100,7 @@ Where indicated by code comments parts of NumPy are included in numerox. The
 NumPy license appears in the licenses directory.
 
 
-.. _model.py: https://github.com/kwgoodman/numerox/blob/master/numerox/model.py
+.. _model: https://github.com/kwgoodman/numerox/blob/master/numerox/examples/model.rst
 .. _examples: https://github.com/kwgoodman/numerox/blob/master/numerox/examples/readme.rst
 .. _chat: https://community.numer.ai/channel/numerox
 .. _bugs: https://github.com/kwgoodman/numerox/issues

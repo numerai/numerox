@@ -51,7 +51,7 @@ You can run all the examples [1]_::
 .. [1] The first_tournament example is skipped because it writes to disk.
 
 .. _data: https://github.com/kwgoodman/numerox/blob/master/numerox/examples/data.rst
-.. _model: https://github.com/kwgoodman/numerox/blob/master/numerox/model.py
+.. _model: https://github.com/kwgoodman/numerox/blob/master/numerox/examples/model.rst
 .. _prediction: https://github.com/kwgoodman/numerox/blob/master/numerox/examples/prediction.rst
 
 .. _first tournament: https://github.com/kwgoodman/numerox/blob/master/numerox/examples/first_tournament.py
