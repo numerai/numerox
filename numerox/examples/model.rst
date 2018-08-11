@@ -4,7 +4,6 @@ Make your own model
 First take a look at the logistic regression model below:
 
 .. code:: python
-    :linenos:
 
     from sklearn.linear_model import LogisticRegression
 
