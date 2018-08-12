@@ -7,6 +7,7 @@ Release Notes
 
   * Add ``get_user_activities``
   * Add ``model.rst``
+  * Update ``history``
 
 - v2.3.0
 
