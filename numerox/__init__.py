@@ -67,6 +67,7 @@ from numerox.numerai import get_stakes
 from numerox.numerai import get_stakes_old
 from numerox.numerai import get_stakes_users
 from numerox.numerai import get_stakes_cutoff
+from numerox.numerai import get_user_activities
 from numerox.numerai import is_stakeable
 from numerox.version import __version__
 from numerox.prediction import merge_predictions

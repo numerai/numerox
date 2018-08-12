@@ -5,6 +5,7 @@ Release Notes
 
 - v2.4.0 (in development; not yet released)
 
+  * Add ``get_user_activities``
   * Add ``model.rst``
 
 - v2.3.0

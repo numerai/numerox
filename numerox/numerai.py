@@ -3,6 +3,7 @@ import time
 import tempfile
 import datetime
 import decimal
+import collections
 
 import pandas as pd
 from numerapi import NumerAPI
@@ -402,3 +403,28 @@ def get_user_names():
     users = napi.raw_query(q)
     users = [x['username'] for x in users['data']['rankings']]
     return users
+
+
+def get_user_activities(user):
+    "Activity of `user` across all rounds and tournaments as dataframe"
+    napi = NumerAPI()
+    data = []
+    for number, name in nx.tournament_iter():
+        data += napi.get_user_activities(user, number)
+    flat = [flatten(d) for d in data]
+    df = pd.DataFrame.from_dict(flat)
+    return df
+
+
+# taken and modified from
+# https://stackoverflow.com/questions/6027558/
+# flatten-nested-python-dictionaries-compressing-keys
+def flatten(d):
+    "flatten nested dictionaries"
+    items = []
+    for k, v in d.items():
+        if isinstance(v, collections.MutableMapping):
+            items.extend(flatten(v).items())
+        else:
+            items.append((k, v))
+    return dict(items)
