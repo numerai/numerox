@@ -3,13 +3,13 @@ import time
 import tempfile
 import datetime
 import decimal
-import collections
 
 import pandas as pd
 from numerapi import NumerAPI
 from numerapi.utils import download_file
 
 import numerox as nx
+from numerox.util import flatten_dict
 from numerox.prediction import CONSISTENCY_GTE
 
 NMR_PRIZE_POOL = 900
@@ -411,20 +411,6 @@ def get_user_activities(user):
     data = []
     for number, name in nx.tournament_iter():
         data += napi.get_user_activities(user, number)
-    flat = [flatten(d) for d in data]
+    flat = [flatten_dict(d) for d in data]
     df = pd.DataFrame.from_dict(flat)
     return df
-
-
-# taken and modified from
-# https://stackoverflow.com/questions/6027558/
-# flatten-nested-python-dictionaries-compressing-keys
-def flatten(d):
-    "flatten nested dictionaries"
-    items = []
-    for k, v in d.items():
-        if isinstance(v, collections.MutableMapping):
-            items.extend(flatten(v).items())
-        else:
-            items.append((k, v))
-    return dict(items)

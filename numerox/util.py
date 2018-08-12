@@ -87,6 +87,17 @@ def history():
     return df
 
 
+def flatten_dict(dictionary):
+    "flatten nested dictionaries"
+    items = []
+    for key, value in dictionary.items():
+        if isinstance(value, dict):
+            items.extend(flatten_dict(value).items())
+        else:
+            items.append((key, value))
+    return dict(items)
+
+
 def tournament_int2str(tournament_int):
     "Convert tournament integer to string name"
     if tournament_int < 1:
