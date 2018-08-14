@@ -79,6 +79,11 @@ class Prediction(object):
             raise ValueError("prediction is empty")
         return self.df.values
 
+    @property
+    def y_df(self):
+        "Copy of predictions, y, as a dataframe"
+        return self.df.copy()
+
     def ynew(self, y_array):
         "Copy of prediction but with prediction.y=`y_array`"
         if self.df is None:

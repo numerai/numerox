@@ -95,6 +95,7 @@ def test_prediction_copies():
     ok_(testing.shares_memory(p, p.ids), "p.ids should be a view")
     ok_(testing.shares_memory(p, p.y), "p.y should be a view")
     ok_(not testing.shares_memory(p, p.copy()), "should be a copy")
+    ok_(not testing.shares_memory(p, p.y_df), "should be a copy")
 
 
 def test_prediction_properties():
@@ -301,6 +302,15 @@ def test_prediction_ynew():
     assert_raises(ValueError, p.ynew, y2[:3])
     assert_raises(ValueError, p.ynew, y2[:, :2])
     assert_raises(ValueError, p.ynew, y2.reshape(-1))
+
+
+def test_prediction_y_df():
+    "test prediction.y_df"
+    p = testing.micro_prediction()
+    y = p.y.copy()
+    df = p.y_df
+    ok_(isinstance(df, pd.DataFrame), 'expecting a dataframe')
+    np.testing.assert_array_equal(df.values, y, 'prediction.ynew failed')
 
 
 def test_prediction_iter():

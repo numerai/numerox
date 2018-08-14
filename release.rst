@@ -5,6 +5,7 @@ Release Notes
 
 - v2.4.0 (in development; not yet released)
 
+  * Add ``prediction.y_df``
   * Add ``get_user_activities``
   * Add ``calc_cutoff``
   * Add ``model.rst``
