@@ -7,6 +7,7 @@ Release Notes
 
   * Add ``prediction.y_df``
   * Add ``get_user_activities``
+  * Add ``cutoff_impact``
   * Add ``calc_cutoff``
   * Add ``model.rst``
   * Update ``history``
