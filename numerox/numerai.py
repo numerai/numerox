@@ -123,10 +123,10 @@ def show_stakes(round_number=None, tournament=1, sort_by='prize pool',
                 mark_user=None):
     "Display info on staking; cumsum is dollars above you"
     if round_number is None or round_number > 112:
-        df, p_final = get_stakes(round_number, tournament, sort_by, mark_user)
+        df, cutoff = get_stakes(round_number, tournament, sort_by, mark_user)
         with pd.option_context('display.colheader_justify', 'left'):
             print(df.to_string(index=True))
-        print('PAYOUT P = {:f}'.format(p_final))
+        print('PAYOUT P = {:f}'.format(cutoff))
     else:
         df, c_zero_users = get_stakes_old(round_number, tournament, sort_by,
                                           mark_user)
@@ -169,62 +169,42 @@ def get_stakes_cutoff(round_number=None):
     return df
 
 
-def get_stakes(round_number=None, tournament=1, sort_by='prize pool',
-               mark_user=None):
+def cutoff_impact(round_number=None, nmrs=[5, 10, 100, 200],
+                  is_cutoff=True, is_relative=False):
     """
-    Download stakes, modify it to make it more useful, return as dataframe.
+    Impact of adding stakes of various sizes (nmr) above the cutoff.
 
-    Use this function for `round_number` greater than 112.
+    If `is_cutoff` is True (default) then the cutoff is returned; otherwise
+    the payout ratio is returned.
+
+    If `is_relative` is False (default) then the absolute cutoff or payout
+    ration is given; otherwise a relative value (compared to adding no
+    additional stake) is given.
     """
-
-    # download stakes
-    stakes = get_stakes_minimal(round_number, tournament, mark_user)
-
-    # soc column is not needed for new stake (r > 112) rules
-    stakes = stakes.drop('soc', axis=1)
-
-    # max nmr payout per user if prize pool were infinite
-    cumsum = stakes.s.cumsum(axis=0)
-    c = stakes.c.astype('float')
-    maxnmr = cumsum * (1.0 - c) / c
-
-    # pool is not infinite so find effective stake amount s for each user
-    non_partial = 1.0 * (maxnmr < NMR_PRIZE_POOL)
-    s = non_partial * stakes.s
-    if not non_partial.all():
-        user_partial = non_partial.ne(0).idxmin()
-        p = c.loc[user_partial]
-        s_partial = NMR_PRIZE_POOL - s.sum() * (1.0 - p) / p
-        s_partial *= p / (1.0 - p)
-        if s_partial > 0:
-            s.loc[user_partial] = s_partial
-
-    # p_final
-    s_sum = s.sum()
-    p_final = s_sum / (NMR_PRIZE_POOL + s_sum)
-
-    # non-burn nmr payout potential for each user
-    payout = s * (1.0 - p_final) / p_final
-    stakes.insert(3, 'max_nmr', payout)
-
-    # sort
-    if sort_by == 'prize pool':
-        pass
-    elif sort_by == 'c':
-        stakes = stakes.sort_values(['c'], ascending=[False])
-    elif sort_by == 's':
-        stakes = stakes.sort_values(['s'], ascending=[False])
-    elif sort_by == 'days':
-        stakes = stakes.sort_values(['days'], ascending=[True])
-    elif sort_by == 'user':
-        stakes = stakes.sort_values(['user'], ascending=[True])
-    elif sort_by == 'max_nmr':
-        stakes = stakes.sort_values(['max_nmr', 's', 'c'],
-                                    ascending=[False, False, False])
-    else:
-        raise ValueError("`sort_by` key not recognized")
-
-    return stakes, p_final
+    data = []
+    for number, name in nx.tournament_iter():
+        s, cutoff = get_stakes(round_number, tournament=number)
+        if is_cutoff:
+            name = 'cutoff'
+            x0 = cutoff
+        else:
+            name = 'payout'
+            x0 = (1 - cutoff) / cutoff
+        d = [name, x0]
+        for nmr in nmrs:
+            c, ignore = calc_cutoff(s, impact_probe_nmr=nmr)
+            if is_cutoff:
+                x = c
+            else:
+                x = (1 - c) / c
+            if is_relative:
+                x = x - x0
+            d.append(x)
+        data.append(d)
+    columns = ['tourney', name] + nmrs
+    df = pd.DataFrame(data=data, columns=columns)
+    df = df.set_index('tourney')
+    return df
 
 
 def get_stakes_old(round_number=None, tournament=1, sort_by='prize pool',
@@ -264,6 +244,74 @@ def get_stakes_old(round_number=None, tournament=1, sort_by='prize pool',
         raise ValueError("`sort_by` key not recognized")
 
     return stakes, c_zero_users
+
+
+def get_stakes(round_number=None, tournament=1, sort_by='prize pool',
+               mark_user=None):
+    """
+    Download stakes, modify it to make it more useful, return as dataframe.
+    Use this function for `round_number` greater than 112.
+    """
+
+    # download stakes
+    stakes = get_stakes_minimal(round_number, tournament, mark_user)
+
+    # soc column is not needed for new stake (r > 112) rules
+    stakes = stakes.drop('soc', axis=1)
+
+    # calc cutoff
+    cutoff, payout = calc_cutoff(stakes)
+    stakes.insert(3, 'max_nmr', payout)
+
+    # sort
+    if sort_by == 'prize pool':
+        pass
+    elif sort_by == 'c':
+        stakes = stakes.sort_values(['c'], ascending=[False])
+    elif sort_by == 's':
+        stakes = stakes.sort_values(['s'], ascending=[False])
+    elif sort_by == 'days':
+        stakes = stakes.sort_values(['days'], ascending=[True])
+    elif sort_by == 'user':
+        stakes = stakes.sort_values(['user'], ascending=[True])
+    elif sort_by == 'max_nmr':
+        stakes = stakes.sort_values(['max_nmr', 's', 'c'],
+                                    ascending=[False, False, False])
+    else:
+        raise ValueError("`sort_by` key not recognized")
+
+    return stakes, cutoff
+
+
+def calc_cutoff(stakes, impact_probe_nmr=0):
+    """
+    Confidence cutoff (scalar) and max user payouts (dataframe).
+    """
+
+    # max nmr payout per user if prize pool were infinite
+    cumsum = stakes.s.cumsum(axis=0) + impact_probe_nmr
+    c = stakes.c.astype('float')
+    maxnmr = cumsum * (1.0 - c) / c
+
+    # pool is not infinite so find effective stake amount s for each user
+    non_partial = 1.0 * (maxnmr < NMR_PRIZE_POOL)
+    s = non_partial * stakes.s
+    if not non_partial.all():
+        user_partial = non_partial.ne(0).idxmin()
+        p = c.loc[user_partial]
+        s_partial = NMR_PRIZE_POOL - s.sum() * (1.0 - p) / p
+        s_partial *= p / (1.0 - p)
+        if s_partial > 0:
+            s.loc[user_partial] = s_partial
+
+    # cutoff
+    s_sum = s.sum()
+    cutoff = s_sum / (NMR_PRIZE_POOL + s_sum)
+
+    # non-burn nmr payout potential for each user
+    payout = s * (1.0 - cutoff) / cutoff
+
+    return cutoff, payout
 
 
 def get_stakes_minimal(round_number=None, tournament=1, mark_user=None):
@@ -341,7 +389,6 @@ def get_stakes_minimal(round_number=None, tournament=1, mark_user=None):
         stakes.loc[mark_user, 'mark'] = '<<<<'
 
     return stakes
-
 
 # ---------------------------------------------------------------------------
 # utilities
