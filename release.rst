@@ -10,6 +10,7 @@ Release Notes
   * Add ``calc_cutoff``
   * Add ``model.rst``
   * Update ``history``
+  * Bugfix: update ``data.y_sum_hist`` for changes introduced in nx 2.3.0
 
 - v2.3.0
 

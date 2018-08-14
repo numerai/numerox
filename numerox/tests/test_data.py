@@ -157,10 +157,10 @@ def test_data_y_df():
     ok_(isinstance(df, pd.DataFrame), 'expecting a dataframe')
 
 
-def test_data_y_similarity():
-    "test data.y_similarity"
+def test_data_y_sum_hist():
+    "test data.y_sum_hist"
     d = micro_data()
-    df = d.y_similarity()
+    df = d.y_sum_hist()
     ok_(isinstance(df, pd.DataFrame), 'expecting a dataframe')
 
 

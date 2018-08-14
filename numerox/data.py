@@ -217,7 +217,7 @@ class Data(object):
 
     def y_sum_hist(self):
         "Histogram data of sum of y targets across tournaments as dataframe"
-        s = self.y.sum(axis=1)
+        s = self.y[:].sum(axis=1)
         s = s[np.isfinite(s)]
         data = []
         for si in range(6):
