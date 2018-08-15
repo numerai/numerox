@@ -3,7 +3,7 @@
 Release Notes
 =============
 
-- v2.4.0 (in development; not yet released)
+- v2.4.0
 
   * Add ``prediction.y_df``
   * Add ``get_user_activities``
