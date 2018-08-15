@@ -1,7 +1,9 @@
+#!/usr/bin/env python
+
 import numerox as nx
 
 
-def first_tournament():
+def numerox_example():
     """
     Example of how to prepare a submission for the Numerai tournament.
     It uses Numerox which you can install with: pip install numerox
@@ -24,5 +26,10 @@ def first_tournament():
     prediction.to_csv('logistic.csv', tournament='bernie', verbose=True)
 
     # upload predictions to Numerai to enter the tournament
+    #
     # you create the public_id and secret_key on the Numerai website
     # nx.upload('logistic.csv', tournament='bernie', public_id, secret_key)
+
+
+if __name__ == '__main__':
+    numerox_example()
