@@ -145,6 +145,12 @@ def calc_metrics_arrays(y, yhat, columns):
                 m = accuracy_score(y, yh)
             except ValueError:
                 m = np.nan
+        elif col == 'ymin':
+            m = yhat.min()
+        elif col == 'ymax':
+            m = yhat.max()
+        elif col == 'ymean':
+            m = yhat.mean()
         elif col == 'ystd':
             m = yhat.std()
         elif col == 'length':

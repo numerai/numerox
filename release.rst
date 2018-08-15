@@ -10,6 +10,7 @@ Release Notes
   * Add ``cutoff_impact``
   * Add ``calc_cutoff``
   * Add ``model.rst``
+  * Add 'ymin', 'ymean', 'ymax' options to ``prediction.metrics_per_era``
   * Update ``history``
   * Bugfix: update ``data.y_sum_hist`` for changes introduced in nx 2.3.0
 
