@@ -15,11 +15,9 @@ Next make a prediction::
     >>> prediction = nx.production(model, data, tournament='bernie')
 
 Or, alternatively, if you do not use Numerox to run your model then you can
-create the prediction from 1-dimensional numpy arrays of the Numerai row ids,
-``ids``, and the prediction values, ``yhat``::
+load your predictions from a Numerai-style csv file::
 
-    >>> prediction = nx.Prediction()
-    >>> prediction = prediction.merge_arrays(ids, yhat, 'my_model_name')
+    >>> prediction = nx.load_prediction_csv('my_model.csv')
 
 Let's run the checks::
 
