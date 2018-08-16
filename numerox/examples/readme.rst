@@ -27,7 +27,7 @@ look at these:
 - `concordance.py`_
 - `improve_model.py`_
 
-Here's some miscelleneous stuff:
+Here's some miscellaneous stuff:
 
 - Numerai's `CV warning`_  to hold out eras not rows
 - `Stake information`_
