@@ -3,45 +3,34 @@ Numerox examples
 
 Numerox is a Numerai tournament toolbox written in Python.
 
-Main classes
-------------
-
-**Data** holds the Numerai dataset parts of which are passed to a **Model**
-which makes a **Prediction** that is stored and analyzed.
+Numerox contains three main classes. **Data** holds the Numerai dataset, parts
+of which are passed to a **Model** which makes a **Prediction** that is stored
+and analyzed.
 
 - `Data`_
 - `Model`_
 - `Prediction`_
 
-Run model
----------
-
 Running your model involves passing data to it and collecting its predictions,
 tasks that numerox automates.
 
-- Your `first tournament`_
-- `Backtest`_ example
-- The `run and splitter`_ functions
+- `Run model`_
 
-Performance
------------
+If you don't have time to `port your model`_ to numerox you can `import
+predictions`_ from a Numerai-style csv file and do all kinds of analysis on it.
 
-Is your model any good? Does it pass the Numerai upload checks?
+If you're the kind of person who prefers to browse example code then have a
+look at these:
 
-- Numerai `upload checks`_
-- `Compare model`_ performances
-- Compare performance of a `single change`_ across several models
+- `production.py`_
+- `backtest.py`_
+- `concordance.py`_
+- `improve_model.py`_
 
-Miscellaneous
---------------
+Here's some miscelleneous stuff:
 
-- `Transform features`_
-- Calculate `concordance`_
 - Numerai's `CV warning`_  to hold out eras not rows
 - `Stake information`_
-
-Run examples
-------------
 
 You can run all the examples [1]_::
 
@@ -54,15 +43,15 @@ You can run all the examples [1]_::
 .. _model: https://github.com/kwgoodman/numerox/blob/master/numerox/examples/model.rst
 .. _prediction: https://github.com/kwgoodman/numerox/blob/master/numerox/examples/prediction.rst
 
-.. _first tournament: https://github.com/kwgoodman/numerox/blob/master/numerox/examples/first_tournament.py
-.. _backtest: https://github.com/kwgoodman/numerox/blob/master/numerox/examples/backtest_example.py
-.. _run and splitter: https://github.com/kwgoodman/numerox/blob/master/numerox/examples/run.rst
+.. _run model: https://github.com/kwgoodman/numerox/blob/master/numerox/examples/run.rst
 
-.. _upload checks: https://github.com/kwgoodman/numerox/blob/master/numerox/examples/upload_checks.rst
-.. _compare model: https://github.com/kwgoodman/numerox/blob/master/numerox/examples/compare_models.rst
-.. _single change: https://github.com/kwgoodman/numerox/blob/master/numerox/examples/compare_change.py
+.. _port your model: https://github.com/kwgoodman/numerox/blob/master/numerox/examples/model.rst
+.. _import predictions: https://github.com/kwgoodman/numerox/blob/master/numerox/examples/prediction.rst
 
-.. _Transform features: https://github.com/kwgoodman/numerox/blob/master/numerox/examples/transform.rst
-.. _concordance: https://github.com/kwgoodman/numerox/blob/master/numerox/examples/concordance_example.py
+.. _production.py: https://github.com/kwgoodman/numerox/blob/master/numerox/examples/production.py
+.. _backtest.py: https://github.com/kwgoodman/numerox/blob/master/numerox/examples/backtest.py
+.. _concordance: https://github.com/kwgoodman/numerox/blob/master/numerox/examples/concordance.py
+.. _improve_model: https://github.com/kwgoodman/numerox/blob/master/numerox/examples/improve_model.py
+
 .. _cv warning: https://github.com/kwgoodman/numerox/blob/master/numerox/examples/cv_warning.rst
 .. _stake information: https://github.com/kwgoodman/numerox/blob/master/numerox/examples/show_stakes.rst

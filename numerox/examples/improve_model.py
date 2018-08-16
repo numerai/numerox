@@ -2,7 +2,7 @@ import numpy as np
 import numerox as nx
 
 
-def compare_change(data, tournament=1):
+def improve_model(data, tournament=1):
     """
     Run multiple models: fit on training data, predict for tournament data.
     Then change the data, rerun and compare performance with and without the

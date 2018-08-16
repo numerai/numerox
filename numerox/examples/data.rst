@@ -1,14 +1,21 @@
 Data class
 ==========
 
-The Data class is the most important object in numerox.
+The Data class is one of three main object in numerox.
 
-Load data quickly
------------------
+Download data
+-------------
+
+Let's download the current Numerai dataset::
+
+    >>> import numerox as nx
+    >>> nx.download('numerai_dataset.zip')
+
+Load data
+---------
 
 You can create a data object from the zip archive provided by Numerai::
 
-    >>> import numerox as nx
     >>> data = nx.load_zip('numerai_dataset.zip')
     >>> data
     region    train, validation, test, live
@@ -170,6 +177,52 @@ Historgram of sum of targets across tournaments::
     3     0.027390
     4     0.062367
     5     0.409573
+
+Feature engineering
+-------------------
+
+Numerox offers several ways to transform features (``data.x``).
+
+You can use principal component analysis (PCA) to make the features
+orthogonal::
+
+    >>> data2 = data.pca()
+
+You can keep only the number of orthogonal features that explain at least,
+say, 90% of the variance::
+
+    >>> data2 = data.pca(nfactor=0.9)
+
+which for the dataset I am using leaves me with 16 features (I'd get the
+same result if I had used ``nfactor=16``):::
+
+    >>> data2.xshape
+    (636835, 16)
+
+You can fit the PCA on, say, the train data and then use that fit to transform
+all the data::
+
+    >>> data2 = data.pca(nfactor=0.9, data_fit=data['train'])
+
+Besides using PCA you can make your own (secret) transformations of the
+features. Let's multiply all features by 2::
+
+    >>> x = 2 * data.x
+    >>> data2 = data.xnew(x)
+
+Let's only keep the first 20 features::
+
+    >>> x = data.x[:, :20]
+    >>> data2 = data.xnew(x)
+
+Let's double the number of features::
+
+    >>> x = data.x
+    >>> x = np.hstack((x, x * x))
+    >>> data2 = data.xnew(x)
+
+OK, you get the idea.
+
 
 Try it
 ------

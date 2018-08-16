@@ -1,7 +1,7 @@
 import numerox as nx
 
 
-def concordance_example(data, tournament=1):
+def concordance(data, tournament=1):
     """
     Example showing how to calculate concordance.
     Concordance must be less than 0.12 to pass numerai's check.

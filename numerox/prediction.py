@@ -201,6 +201,17 @@ class Prediction(object):
 
         return df
 
+    def summaries(self, data, tournament, round_output=True, display=True):
+        "Dictionary of performance summaries of predictions"
+        df_dict = {}
+        for name in self.names:
+            df_dict[name] = self[name].summary(data, tournament,
+                                               round_output=round_output)
+            if display:
+                print(name)
+                print(df_dict[name])
+        return df_dict
+
     def metrics_per_era(self, data, tournament,
                         metrics=['logloss', 'auc', 'acc', 'ystd'],
                         era_as_str=True):
