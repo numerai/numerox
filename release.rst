@@ -6,6 +6,7 @@ Release Notes
 - v2.5.0 (in development; not yet released)
 
   * Overhaul numerox's Sphinx documentation
+  * Add ``prediction.summaries``
 
 - v2.4.0
 
