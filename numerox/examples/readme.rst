@@ -50,8 +50,8 @@ You can run all the examples [1]_::
 
 .. _production.py: https://github.com/kwgoodman/numerox/blob/master/numerox/examples/production.py
 .. _backtest.py: https://github.com/kwgoodman/numerox/blob/master/numerox/examples/backtest.py
-.. _concordance: https://github.com/kwgoodman/numerox/blob/master/numerox/examples/concordance.py
-.. _improve_model: https://github.com/kwgoodman/numerox/blob/master/numerox/examples/improve_model.py
+.. _concordance.py: https://github.com/kwgoodman/numerox/blob/master/numerox/examples/concordance.py
+.. _improve_model.py: https://github.com/kwgoodman/numerox/blob/master/numerox/examples/improve_model.py
 
 .. _cv warning: https://github.com/kwgoodman/numerox/blob/master/numerox/examples/cv_warning.rst
 .. _stake information: https://github.com/kwgoodman/numerox/blob/master/numerox/examples/show_stakes.rst

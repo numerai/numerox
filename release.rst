@@ -5,6 +5,8 @@ Release Notes
 
 - v2.5.0 (in development; not yet released)
 
+  * Overhaul numerox's Sphinx documentation
+
 - v2.4.0
 
   * Add ``prediction.y_df``
