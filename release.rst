@@ -7,8 +7,9 @@ Release Notes
 
   * Overhaul numerox's Sphinx documentation
   * Add ``prediction.summaries``
+  * Reran and expanded experiments on Numerai's cross validation warning
   * You can now specify model to use when running Numerai's ``cv_warning``
-  * Small improvement in unit test coverage
+  * Tiny improvement in unit test coverage
 
 - v2.4.0
 

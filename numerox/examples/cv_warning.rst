@@ -12,7 +12,7 @@ logistic regression, that is less prone to overfitting. And one is a complex
 model, a too deep random forest, that is prone to overfitting. The code for
 this example is `here`_.
 
-We will do 100 five-fold cross validations that uses eras as Numerai recommends
+We will do 100 five-fold cross validations that use eras as Numerai recommends
 (cve) and 100 with a traditional cross validation that ignores eras (cv). When
 we do CV that ignores eras we do it in a stratfied way that balances the
 targets.
@@ -38,14 +38,14 @@ better at overfitting::
 
     >>> model = nx.randomforest(ntree=200, depth=7, max_features=10)
     >>> nx.examples.cv_warning(model, data, 'bernie')
-    89 runs
+    100 runs
                   cve        cv
-    logloss  0.692761  0.692448
-    auc      0.516010  0.521837
-    acc      0.510956  0.515070
-    ystd     0.014978  0.014598
-    sharpe   0.169746  0.428923
-    consis   0.575375  0.677996
+    logloss  0.692767  0.692449
+    auc      0.515888  0.521824
+    acc      0.510866  0.515052
+    ystd     0.014987  0.014601
+    sharpe   0.164951  0.428333
+    consis   0.574417  0.676917
 
 The more complex your model, the bigger the stakes are in heeding Numerai's
 warning.
