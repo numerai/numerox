@@ -1,7 +1,7 @@
 Data class
 ==========
 
-The Data class is one of three main object in numerox.
+The Data class is one of three main objects in numerox.
 
 Download data
 -------------

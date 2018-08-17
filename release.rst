@@ -7,6 +7,7 @@ Release Notes
 
   * Overhaul numerox's Sphinx documentation
   * Add ``prediction.summaries``
+  * You can now specify model to use when running Numerai's ``cv_warning``
 
 - v2.4.0
 
