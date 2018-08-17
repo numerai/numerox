@@ -52,6 +52,7 @@ def test_tournament_int():
         ok_(t_int2 == t_int, "tournament int do not agree")
     assert_raises(ValueError, nx.tournament_int, 0)
     assert_raises(ValueError, nx.tournament_int, 'burn')
+    assert_raises(ValueError, nx.tournament_int, None)
 
 
 def test_tournament_str():
@@ -63,3 +64,13 @@ def test_tournament_str():
         ok_(t_str2 == t_str, "tournament str do not agree")
     assert_raises(ValueError, nx.tournament_str, 0)
     assert_raises(ValueError, nx.tournament_str, 'burn')
+    assert_raises(ValueError, nx.tournament_int, None)
+
+
+def test_flatten_dict():
+    "test flatten_dict"
+    d = {'a': 1, 'z': {'b': 2, 'c': 3}}
+    f = nx.util.flatten_dict(d)
+    f0 = {'a': 1, 'b': 2, 'c': 3}
+    ok_(isinstance(f, dict), 'expecting a dict')
+    ok_(f == f0, 'wrong dict returned')

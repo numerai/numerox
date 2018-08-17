@@ -544,7 +544,7 @@ def load_prediction_csv(filename, name=None):
     "Load prediction object from a Numerai csv (text) tournament file"
     df = pd.read_csv(filename, index_col='id')
     if df.shape[1] != 1:
-        raise ValueError("csv file must contain on column of predictions")
+        raise ValueError("csv file must contain one column of predictions")
     if name is None:
         name = os.path.split(filename)[-1]
         if name.endswith('.csv'):

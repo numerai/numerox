@@ -302,6 +302,8 @@ def test_prediction_ynew():
     assert_raises(ValueError, p.ynew, y2[:3])
     assert_raises(ValueError, p.ynew, y2[:, :2])
     assert_raises(ValueError, p.ynew, y2.reshape(-1))
+    p = nx.Prediction()
+    assert_raises(ValueError, p.ynew, y2)
 
 
 def test_prediction_y_df():

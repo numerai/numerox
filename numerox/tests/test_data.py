@@ -96,6 +96,7 @@ def test_data_y_indexing():
     assert_raises(IndexError, d.y.__getitem__, 'era')
     assert_raises(IndexError, d.y.__getitem__, 'wtf')
     assert_raises(IndexError, d.y.__getitem__, None)
+    assert_raises(IndexError, d.y.__getitem__, slice(1))
 
 
 def test_data_loc():
