@@ -2,19 +2,18 @@ import time
 import pprint
 
 import numerox as nx
-from numerox import Prediction, TournamentSplitter, CVSplitter
 
 
 def production(model, data, tournament, name=None, verbosity=2):
     "Fit a model with train data; make prediction on tournament data"
-    splitter = TournamentSplitter(data)
+    splitter = nx.TournamentSplitter(data)
     prediction = run(model, splitter, tournament, name, verbosity=verbosity)
     return prediction
 
 
 def backtest(model, data, tournament, name=None, kfold=5, seed=0, verbosity=2):
     "K-fold cross validation of model through train data"
-    splitter = CVSplitter(data, kfold=kfold, seed=seed, train_only=True)
+    splitter = nx.CVSplitter(data, kfold=kfold, seed=seed, train_only=True)
     prediction = run(model, splitter, tournament, name, verbosity)
     return prediction
 
@@ -36,7 +35,7 @@ def run(model, splitter, tournament, name=None, verbosity=2):
     if verbosity > 0:
         pprint.pprint(model)
     data = None
-    prediction = Prediction()
+    prediction = nx.Prediction()
     for data_fit, data_predict in splitter:
         if verbosity > 0:
             if data is None:
