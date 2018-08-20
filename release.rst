@@ -3,6 +3,8 @@
 Release Notes
 =============
 
+- v2.6.0 (in development; not yet released)
+
 - v2.5.0
 
   * Reorganize, edit, expand numerox's Sphinx documentation
