@@ -6,8 +6,9 @@ First take a look at the logistic regression model below:
 .. code:: python
 
     from sklearn.linear_model import LogisticRegression
+    import numerox as nx
 
-    class logistic(Model):
+    class logistic(nx.Model):
 
         def __init__(self, inverse_l2=0.0001):
             self.p = {'inverse_l2': inverse_l2}
