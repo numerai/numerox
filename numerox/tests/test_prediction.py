@@ -1,5 +1,4 @@
 import os
-import tempfile
 
 import numpy as np
 import pandas as pd
@@ -43,15 +42,19 @@ def test_prediction_methods():
 def test_prediction_roundtrip():
     "save/load roundtrip shouldn't change prediction"
     p = testing.micro_prediction()
-    with tempfile.NamedTemporaryFile() as temp:
+    path = None
+    try:
+        path = testing.create_tempfile('numerox.h5')
 
-        p.save(temp.name)
-        p2 = nx.load_prediction(temp.name)
+        p.save(path)
+        p2 = nx.load_prediction(path)
         ade(p, p2, "prediction corrupted during roundtrip")
 
-        p.save(temp.name, compress=False)
-        p2 = nx.load_prediction(temp.name)
-        ade(p, p2, "prediction corrupted during roundtrip")
+        p.save(path, compress=False)
+        p2 = nx.load_prediction(path)
+    finally:
+        testing.delete_tempfile(path)
+    ade(p, p2, "prediction corrupted during roundtrip")
 
 
 def test_prediction_save():
@@ -59,22 +62,30 @@ def test_prediction_save():
     p = testing.micro_prediction()
     p1 = p['model0']
     p2 = p[['model1', 'model2']]
-    with tempfile.NamedTemporaryFile() as temp:
-        p1.save(temp.name)
-        p2.save(temp.name, mode='a')
-        p12 = nx.load_prediction(temp.name)
-        ade(p, p12, "prediction corrupted during roundtrip")
+    path = None
+    try:
+        path = testing.create_tempfile('numerox.h5')
+        p1.save(path)
+        p2.save(path, mode='a')
+        p12 = nx.load_prediction(path)
+    finally:
+        testing.delete_tempfile(path)
+    ade(p, p12, "prediction corrupted during roundtrip")
 
 
 def test_prediction_to_csv():
     "make sure prediction.to_csv runs"
     p = testing.micro_prediction()
-    with tempfile.NamedTemporaryFile() as temp:
-        p['model1'].to_csv(temp.name, tournament=1)
+    path = None
+    try:
+        path = testing.create_tempfile('numerox.h5')
+        p['model1'].to_csv(path, tournament=1)
         with testing.HiddenPrints():
-            p['model1'].to_csv(temp.name, tournament='bernie', verbose=True)
-        p2 = nx.load_prediction_csv(temp.name, 'model1')
-        ade(p2, p['model1'], "prediction corrupted during roundtrip")
+            p['model1'].to_csv(path, tournament='bernie', verbose=True)
+        p2 = nx.load_prediction_csv(path, 'model1')
+    finally:
+        testing.delete_tempfile(path)
+    ade(p2, p['model1'], "prediction corrupted during roundtrip")
     assert_raises(ValueError, p.to_csv, 'unused', 2)
     assert_raises(ValueError, p.to_csv, 'model1', 99)
 

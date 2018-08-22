@@ -1,5 +1,6 @@
 import os
 import sys
+import tempfile
 
 import pandas as pd
 import numpy as np
@@ -119,6 +120,19 @@ def update_play_data(data=None, fraction=0.01):
         data = nx.numerai.download_data_object()
     play = data.subsample(fraction=fraction, seed=0)
     play.save(TEST_DATA)
+
+
+def create_tempfile(path):
+    "Create temporary file"
+    return os.path.join(tempfile.gettempdir(), path)
+
+
+def delete_tempfile(path):
+    "Remove file"
+    try:
+        os.remove(path)
+    except:  # noqa
+        pass
 
 
 # taken from https://stackoverflow.com/a/45669280

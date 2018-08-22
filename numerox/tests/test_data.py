@@ -1,5 +1,4 @@
 import os
-import tempfile
 
 import numpy as np
 from numpy.testing import assert_array_equal
@@ -19,21 +18,30 @@ TINY_DATASET_CSV = os.path.join(os.path.dirname(__file__),
 
 def test_data_roundtrip():
     "save/load roundtrip shouldn't change data"
-    d = micro_data()
-    with tempfile.NamedTemporaryFile() as temp:
 
-        d.save(temp.name)
-        d2 = nx.load_data(temp.name)
+    d = micro_data()
+    path = None
+
+    try:
+
+        path = testing.create_tempfile('numerox.h5')
+
+        d.save(path)
+        d2 = nx.load_data(path)
         ade(d, d2, "data corrupted during roundtrip")
 
-        d.save(temp.name, compress=True)
-        d2 = nx.load_data(temp.name)
+        d.save(path, compress=True)
+        d2 = nx.load_data(path)
         ade(d, d2, "data corrupted during roundtrip")
 
         d = d['live']
-        d.save(temp.name)
-        d2 = nx.load_data(temp.name)
+        d.save(path)
+        d2 = nx.load_data(path)
         ade(d, d2, "data corrupted during roundtrip")
+
+    finally:
+
+        testing.delete_tempfile(path)
 
 
 def test_data_indexing():

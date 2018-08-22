@@ -5,6 +5,7 @@ Release Notes
 
 - v2.6.0 (in development; not yet released)
   
+  * Unit tests now run on Windows
   * Add ``ConsecutiveCVSplitter``
 
 - v2.5.0
