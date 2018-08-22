@@ -36,7 +36,7 @@ Every measure does better (that's the over fit) by ignoring eras (cv).
 Let's repeat the experiment using a more complex model, random forest, that is
 better at overfitting::
 
-    >>> model = nx.randomforest(ntree=200, depth=7, max_features=10)
+    >>> model = nx.randomforest(ntrees=200, depth=7, max_features=10)
     >>> nx.examples.cv_warning(model, data, 'bernie')
     100 runs
                   cve        cv

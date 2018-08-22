@@ -4,6 +4,8 @@ Release Notes
 =============
 
 - v2.6.0 (in development; not yet released)
+  
+  * Add ``ConsecutiveCVSplitter``
 
 - v2.5.0
 

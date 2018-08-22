@@ -222,3 +222,46 @@ class RollSplitter(Splitter):
         dfit = data.era_isin(era_fit)
         dpre = data.era_isin(era_pre)
         return dfit, dpre
+
+
+class ConsecutiveCVSplitter(Splitter):
+    "K-fold CV where folds contain mostly consecutive eras"
+
+    def __init__(self, data, kfold=5, seed=0, train_only=True):
+        self.p = {'data': data,
+                  'kfold': kfold,
+                  'seed': seed,
+                  'train_only': train_only}
+        self.eras = None
+        self.cv = None
+        self.max_count = kfold - 1
+        self.reset()
+
+    def next_split(self):
+        if not nx.isint(self.p['seed']):
+            raise ValueError("`seed` must be an integer")
+        data = self.p['data']
+        if self.count == 0:
+            if self.p['train_only']:
+                data = data['train']
+            eras = data.unique_era()
+            n = int(eras.size / self.p['kfold'])
+            idx = self.p['seed'] % n
+            if idx == 0:
+                era0 = eras[idx:n]
+                eras = eras[n:]
+            else:
+                era0 = np.concatenate((eras[idx:n], eras[-idx:]))
+                eras = np.concatenate((eras[:idx], eras[n:-idx]))
+            eras = np.array_split(eras, self.p['kfold'] - 1)
+            eras.append(era0)
+            self.eras = eras
+        fit_eras = []
+        for i, e in enumerate(self.eras):
+            if i != self.count:
+                fit_eras.append(e)
+        fit_eras = np.concatenate(fit_eras)
+        dfit = data.era_isin(fit_eras)
+        pre_eras = self.eras[self.count]
+        dpre = data.era_isin(pre_eras)
+        return dfit, dpre
