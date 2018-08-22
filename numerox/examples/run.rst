@@ -33,7 +33,7 @@ around the ``run`` function::
     >>> prediction = nx.run(model, splitter, tournament, verbosity=2)
 
 where ``splitter`` iterates through fit, predict splits of the data. Numerox
-comes with eight splitters:
+comes with nine splitters:
 
 - ``TournamentSplitter`` fit: train; predict: tournament (production)
 - ``ValidationSplitter`` fit: train; predict validation
@@ -43,6 +43,7 @@ comes with eight splitters:
 - ``SplitSplitter`` single fit-predict split (across eras) of data
 - ``IgnoreEraCVSplitter`` traditional k-fold cross validation ignoring eras
 - ``RollSplitter`` roll forward making fit-predict splits from consecutive eras
+- ``ConsecutiveCVSplitter`` CV with folds that have mostly consecutive eras
 
 For example, here's how you would reproduce the ``backtest`` function::
 
