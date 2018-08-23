@@ -3,7 +3,7 @@
 Release Notes
 =============
 
-- v2.6.0 (in development; not yet released)
+- v2.6.0
   
   * Unit tests now run on Windows
   * Add continuous integration testing on Windows with Appveyor
