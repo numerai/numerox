@@ -3,6 +3,8 @@
 Release Notes
 =============
 
+- v2.7.0 (in development; not yet released)
+
 - v2.6.0
   
   * Unit tests now run on Windows
