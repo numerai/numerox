@@ -439,6 +439,25 @@ class Data(object):
                     return self.region_isin(TOURNAMENT_REGIONS)
                 else:
                     raise IndexError('string index not recognized')
+        elif isinstance(index, slice):
+            if index.step is not None:
+                raise IndexError("slice step size must be 1")
+            era1 = index.start
+            if not nx.isstring(era1) or not era1.startswith('era'):
+                raise IndexError("slice elements must be strings like 'era23'")
+            era2 = index.stop
+            if not nx.isstring(era2) or not era1.startswith('era'):
+                raise IndexError("slice elements must be strings like 'era23'")
+            era1 = int(era1[3:])
+            era2 = int(era2[3:])
+            if era1 > era2:
+                raise IndexError("slice cannot go from large to small era")
+            eras = []
+            era = era1
+            while era <= era2:
+                eras.append('era' + str(era))
+                era += 1
+            return self.era_isin(eras)
         elif typidx is pd.Series or typidx is np.ndarray:
             idx = index
             return Data(self.df[idx])

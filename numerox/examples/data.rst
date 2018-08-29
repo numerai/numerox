@@ -141,7 +141,21 @@ You can also index by Numerai row ids::
     rows      3
     era       1, [era1, era1]
     x         50, min 0.1675, mean 0.5077, max 0.8898
-    y         mean 0.333333, fraction missing 0.000
+    y         mean 0.333333, fraction missing 0.0000
+
+Slicing
+-------
+
+You can slice a Data object by era::
+
+    >>> data['era90':'era120']
+    region    train
+    rows      111587
+    era       31, [era90, era120]
+    x         50, min 0.0000, mean 0.5026, max 1.0000
+    y         mean 0.499578, fraction missing 0.0000
+
+Note that the slice is inclusive of the ending era.
 
 Why so many y's?
 ----------------

@@ -71,6 +71,20 @@ def test_data_indexing():
     assert_raises(IndexError, d.__getitem__, None)
 
 
+def test_data_slice():
+    "test data slicing"
+
+    d = micro_data()
+
+    msg = 'error slicing data by era'
+    ade(d['era1':'era2'], micro_data([0, 1, 2]), msg)
+    ade(d['era3':'era3'], micro_data([3, 4, 5]), msg)
+
+    assert_raises(IndexError, d.__getitem__, slice('era2', 'era1'))
+    assert_raises(IndexError, d.__getitem__, slice('era1', 'era2', 2))
+    assert_raises(IndexError, d.__getitem__, slice(1, 2))
+
+
 def test_data_y_indexing():
     "test data y indexing"
 
