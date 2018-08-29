@@ -55,6 +55,13 @@ class TournamentSplitter(Splitter):
         return self.data['train'], self.data['tournament']
 
 
+class FlipSplitter(Splitter):
+    "Fit on validation data, evaluate on train data"
+
+    def next_split(self):
+        return self.data['validation'], self.data['train']
+
+
 class ValidationSplitter(Splitter):
     "Single split of data into train, validation"
 

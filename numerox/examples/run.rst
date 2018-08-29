@@ -33,9 +33,10 @@ around the ``run`` function::
     >>> prediction = nx.run(model, splitter, tournament, verbosity=2)
 
 where ``splitter`` iterates through fit, predict splits of the data. Numerox
-comes with nine splitters:
+comes with ten splitters:
 
 - ``TournamentSplitter`` fit: train; predict: tournament (production)
+- ``FlipSplitter`` fit: validation; predict: train
 - ``ValidationSplitter`` fit: train; predict validation
 - ``CheatSplitter`` fit: train+validation; predict tournament
 - ``CVSplitter`` k-fold cross validation across train eras (backtest)

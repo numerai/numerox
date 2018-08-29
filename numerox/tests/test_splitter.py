@@ -9,6 +9,7 @@ def test_splitter_overlap():
     "prediction data should not overlap"
     d = nx.play_data()
     splitters = [nx.TournamentSplitter(d),
+                 nx.FlipSplitter(d),
                  nx.ValidationSplitter(d),
                  nx.CheatSplitter(d),
                  nx.CVSplitter(d),
@@ -27,6 +28,7 @@ def test_splitter_reset():
     "splitter reset should not change results"
     d = nx.play_data()
     splitters = [nx.TournamentSplitter(d),
+                 nx.FlipSplitter(d),
                  nx.ValidationSplitter(d),
                  nx.CheatSplitter(d),
                  nx.CVSplitter(d),

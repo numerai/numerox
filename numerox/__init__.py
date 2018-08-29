@@ -24,6 +24,7 @@ from numerox.prediction import load_example_predictions
 
 # splitters
 from numerox.splitter import TournamentSplitter
+from numerox.splitter import FlipSplitter
 from numerox.splitter import ValidationSplitter
 from numerox.splitter import SplitSplitter
 from numerox.splitter import CheatSplitter
