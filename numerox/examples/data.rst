@@ -11,6 +11,13 @@ Let's download the current Numerai dataset::
     >>> import numerox as nx
     >>> nx.download('numerai_dataset.zip')
 
+Or::
+
+    >>> data = nx.download_deluxe('numerai_dataset.zip')
+
+The second example will retry the download if it fails and it loads and returns
+the data object.
+
 Load data
 ---------
 

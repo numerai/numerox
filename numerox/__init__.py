@@ -41,6 +41,7 @@ from numerox.run import run
 
 # numerai
 from numerox.numerai import download
+from numerox.numerai import download_deluxe
 from numerox.numerai import upload
 from numerox.numerai import round_resolution_date
 from numerox.numerai import year_to_round_range

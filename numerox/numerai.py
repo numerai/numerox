@@ -28,6 +28,28 @@ def download(filename, verbose=False):
     download_file(url, filename)
 
 
+def download_deluxe(filename, n_tries=100, sleep_seconds=300, verbose=False):
+    """
+    Download current Numerai dataset; overwrites if file exists.
+
+    If download fails then retry download `n_tries` times, pausing
+    `sleep_seconds` between each try.
+
+    Unlike nx.download() this function loads and returns the data object.
+    """
+    count = 0
+    while count < n_tries:
+        try:
+            nx.download(filename, verbose=verbose)
+            break
+        except: # noqa
+            print('download failed')
+            time.sleep(300)
+        count += 1
+    data = nx.load_zip(filename, verbose=verbose)
+    return data
+
+
 def download_data_object(verbose=False):
     "Used by numerox to avoid hard coding paths; probably not useful to users"
     with tempfile.NamedTemporaryFile() as temp:
