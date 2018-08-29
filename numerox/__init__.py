@@ -43,6 +43,7 @@ from numerox.run import run
 from numerox.numerai import download
 from numerox.numerai import download_deluxe
 from numerox.numerai import upload
+from numerox.numerai import upload_deluxe
 from numerox.numerai import round_resolution_date
 from numerox.numerai import year_to_round_range
 from numerox.numerai import get_user_names

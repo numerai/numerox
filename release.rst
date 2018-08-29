@@ -7,6 +7,7 @@ Release Notes
 
   * Data object can now be sliced with era names: ``data['era12':'era17']``
   * Add ``download_deluxe``
+  * Add ``upload_deluxe``
   * Add ``FlipSplitter``
 
 - v2.6.0

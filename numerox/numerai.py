@@ -40,11 +40,11 @@ def download_deluxe(filename, n_tries=100, sleep_seconds=300, verbose=False):
     count = 0
     while count < n_tries:
         try:
-            nx.download(filename, verbose=verbose)
+            download(filename, verbose=verbose)
             break
         except: # noqa
             print('download failed')
-            time.sleep(300)
+            time.sleep(sleep_seconds)
         count += 1
     data = nx.load_zip(filename, verbose=verbose)
     return data
@@ -77,6 +77,27 @@ def upload(filename, tournament, public_id, secret_key, block=True):
         status = status_block(upload_id, public_id, secret_key)
     else:
         status = upload_status(upload_id, public_id, secret_key)
+    return upload_id, status
+
+
+def upload_deluxe(filename, tournament, public_id, secret_key,
+                  n_tries=100, sleep_seconds=60, verbose=False):
+    """
+    Upload tournament submission (csv file) to Numerai.
+
+    If upload fails then retry upload `n_tries` times, pausing
+    `sleep_seconds` between each try.
+    """
+    count = 0
+    while count < n_tries:
+        try:
+            upload_id, status = upload(filename, tournament, public_id,
+                                       secret_key, block=True)
+            break
+        except: # noqa
+            print('upload failed')
+            time.sleep(sleep_seconds)
+        count += 1
     return upload_id, status
 
 
