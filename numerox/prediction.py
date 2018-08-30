@@ -31,7 +31,13 @@ class Prediction(object):
         "List (copy) of names in prediction object"
         if self.df is None:
             return []
-        return self.df.columns.tolist()
+        names = self.private_names
+        names = [n[:-3] for n in names]
+        name = []
+        for n in names:
+            if n not in name:
+                name.append(n)
+        return name
 
     def rename(self, mapper):
         """
@@ -101,8 +107,9 @@ class Prediction(object):
         for name in self.names:
             yield self[name]
 
-    def merge_arrays(self, ids, y, name):
+    def merge_arrays(self, ids, y, name, tournament):
         "Merge numpy arrays `ids` and `y` with name `name`"
+        name = self.make_private_name(name, tournament)
         df = pd.DataFrame(data={name: y}, index=ids)
         prediction = Prediction(df)
         return self.merge(prediction)
@@ -436,6 +443,48 @@ class Prediction(object):
 
         return comp
 
+    def isin(self, name, tournament):
+        "Is name/tournament in Prediction object (return True) or not (False)"
+        name = self.make_private_name(name, tournament)
+        if name in self:
+            return True
+        return False
+
+    def make_private_name(self, name, tournament):
+        "Combine `name` and `tournament` into dataframe column name"
+        name = name + '_t' + str(nx.tournament_int(tournament))
+        return name
+
+    def split_private_name(self, name):
+        "Split dataframe column name into model name and tournament int"
+        tournament = int(name[-1])
+        name = name[:-3]
+        return name, tournament
+
+    def name_tournament_tuples(self):
+        "Split private names into list of name, tournament integer tuples"
+        nt = self.private_names
+        tup = [self.split_private_name(n) for n in nt]
+        return tup
+
+    @property
+    def private_names(self):
+        "Copy of list of dataframe column names"
+        return self.df.columns.tolist()
+
+    def tournament(self, name, as_str=True):
+        "Tournament for given `name`"
+        if name not in self:
+            raise ValueError('`name` is not in Prediction')
+        t = self.df[name].loc['tournament']
+        if not nx.isstring(t):
+            t = int(t)
+        if as_str:
+            t = nx.tournament_str(t)
+        else:
+            t = nx.tournament_int(t)
+        return t
+
     def copy(self):
         "Copy of prediction"
         if self.df is None:
@@ -515,13 +564,14 @@ class Prediction(object):
         return self.df.__len__()
 
     def __repr__(self):
-        shape = self.shape
-        if shape[1] == 0:
-            frac_miss = 0.0
-        else:
-            frac_miss = self.df.isna().mean().mean()
-        fmt = 'Prediction({} rows x {} names; {:.4f} missing)'
-        return fmt.format(shape[0], shape[1], frac_miss)
+        tourns = ['bernie', 'elizabeth', 'jordan', 'ken', 'charles']
+        df = pd.DataFrame(columns=tourns)
+        for name in self.names:
+            d = []
+            for tourn in tourns:
+                d.append(self.isin(name, tourn))
+            df.loc[name] = d
+        return df.to_string(index=True)
 
 
 class Loc(object):
@@ -574,7 +624,7 @@ def merge_predictions(prediction_list):
     p = prediction_list[0].copy()
     for i in range(1, len(prediction_list)):
         pi = prediction_list[i]
-        for name in pi.names:
+        for name in pi.private_names:
             p = _merge_predictions(p, pi[name])
     return p
 

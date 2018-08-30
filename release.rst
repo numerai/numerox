@@ -5,6 +5,9 @@ Release Notes
 
 - v2.8.0 (in development; not yet released)
 
+  * Add ``prediction.isin``
+  * Add ``prediction.tournament``
+
 - v2.7.0
 
   * Data object can now be sliced with era names: ``data['era12':'era17']``

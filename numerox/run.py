@@ -46,7 +46,7 @@ def run(model, splitter, tournament, name=None, verbosity=2):
         # that you are trying to predict to prevent accidental cheating
         data_predict = data_predict.y_to_nan()
         ids, yhat = model.fit_predict(data_fit, data_predict, tournament)
-        prediction = prediction.merge_arrays(ids, yhat, name)
+        prediction = prediction.merge_arrays(ids, yhat, name, tournament)
         if verbosity > 1:
             print(prediction.summary(data.region_isnotin(['test', 'live']),
                                      tournament))
