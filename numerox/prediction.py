@@ -509,28 +509,28 @@ class Prediction(object):
 
     # indexing --------------------------------------------------------------
 
-    def __getitem__(self, name):
-        "Prediction indexing is by model name(s)"
-        if isinstance(name, tuple):
-            p = Prediction(pd.DataFrame(self.df[name], columns=[name]))
+    def __getitem__(self, index):
+        "Prediction indexing is by model pair(s)"
+        if isinstance(index, tuple):
+            p = Prediction(pd.DataFrame(self.df[index], columns=[index]))
         else:
-            p = Prediction(self.df[name])
+            p = Prediction(self.df[index])
         return p
 
-    def __setitem__(self, name, prediction):
-        "Add (or replace) a prediction by name"
+    def __setitem__(self, index, prediction):
+        "Add (or replace) a prediction by pair"
         if prediction.df.shape[1] != 1:
             raise ValueError("Can only insert a single model at a time")
-        prediction.df.columns = [name]
+        prediction.df.columns = [index]
         self.df = self.merge(prediction).df
 
     # utilities -------------------------------------------------------------
 
-    def drop(self, name):
-        "Drop name (str) or names (e.g. a list of names) from prediction"
+    def drop(self, pair):
+        "Drop pair (tuple) or list of pairs from prediction; return copy"
         if self.df is None:
-            raise ValueError("Cannot drop a name from an empty prediction")
-        df = self.df.drop(columns=name)
+            raise ValueError("Cannot drop a pair from an empty prediction")
+        df = self.df.drop(columns=pair)
         return Prediction(df)
 
     def iter(self):
