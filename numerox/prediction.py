@@ -189,7 +189,7 @@ class Prediction(object):
 
     def merge_arrays(self, ids, y, name, tournament):
         "Merge numpy arrays `ids` and `y` with name `name`"
-        pair = (name, nx.tournament_int(tournament))
+        pair = self.make_pair(name, tournament)
         df = pd.DataFrame(data=y, columns=[pair], index=ids)
         prediction = Prediction(df)
         return self.merge(prediction)
@@ -640,8 +640,8 @@ def merge_predictions(prediction_list):
     p = prediction_list[0].copy()
     for i in range(1, len(prediction_list)):
         pi = prediction_list[i]
-        for name in pi.names:
-            p = _merge_predictions(p, pi[name])
+        for pair in pi.pairs(as_str=False):
+            p = _merge_predictions(p, pi[pair])
     return p
 
 
@@ -649,24 +649,24 @@ def _merge_predictions(prediction1, prediction2):
     "Merge a possibly multi-name prediction1 with a single-name prediction2"
     if prediction2.shape[1] != 1:
         raise ValueError("`prediction2` must contain a single name")
-    name = prediction2.names[0]
+    pair = prediction2.pairs()[0]
     if prediction1.df is None:
         # empty prediction
         df = prediction2.df
-    elif name not in prediction1:
+    elif pair not in prediction1:
         # inserting predictions from a model not already in report
         df = pd.merge(prediction1.df, prediction2.df, how='outer',
                       left_index=True, right_index=True)
     else:
         # add more ys from a model whose name already exists
-        y = prediction1.df[name]
+        y = prediction1.df[pair]
         y = y.dropna()
         s = prediction2.df.iloc[:, 0]
         s = s.dropna()
         s = pd.concat([s, y], join='outer', ignore_index=False,
                       verify_integrity=True)
-        dfnew = s.to_frame(name)
-        df = pd.merge(prediction1.df, dfnew, how='outer', on=name,
+        dfnew = s.to_frame(pair)
+        df = pd.merge(prediction1.df, dfnew, how='outer', on=pair,
                       left_index=True, right_index=True)
-        df[name] = dfnew
+        df[pair] = dfnew
     return Prediction(df)

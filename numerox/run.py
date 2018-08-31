@@ -22,11 +22,7 @@ def run(model, splitter, tournament, name=None, verbosity=2):
     "Run a single model through a data splitter"
     t0 = time.time()
     if name is None:
-        if nx.isint(tournament):
-            postfix = '_t' + str(tournament)
-        else:
-            postfix = '_' + tournament
-        name = model.__class__.__name__ + postfix
+        name = model.__class__.__name__
     else:
         if verbosity > 2:
             print(name)
