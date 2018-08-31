@@ -396,7 +396,7 @@ class Prediction(object):
         "Less than 0.12 is passing; data should be the full dataset."
         return concordance(data, self)
 
-    def check(self, data, example_predictions, verbose=True):
+    def check(self, data, verbose=True):
         """
         Run Numerai upload checks.
 
@@ -404,52 +404,45 @@ class Prediction(object):
         ----------
         data : nx.Data
             Data object of Numerai dataset.
-        example_predictions : int, str, or nx.Prediction
-            The examples predictions. If an integer, e.g. 1, or string
-            ('bernie') is given then numerox will calculate the example
-            predictions for tournament 1. Or you can pass in a Prediction
-            object that contain the example predictions.
         verbose : bool
             By default, True, output is printed to stdout.
 
         Returns
         -------
         check : dict
-            A dictionary where the keys are the model names and the values
-            are Pandas DataFrames that contain the results of the checks.
+            A dictionary where the keys are the (name, tournament) pairs and
+            the values are Pandas DataFrames that contain the results of the
+            checks.
         """
 
-        if not isinstance(example_predictions, nx.Prediction):
-            t_int = nx.tournament_int(example_predictions)
-            example_predictions = nx.production(nx.example_predictions(),
-                                                data,
-                                                tournament=t_int,
-                                                verbosity=0)
-        else:
-            if example_predictions.shape[1] != 1:
-                raise ValueError('Expecting only one example prediction')
-
-        example_predictions = example_predictions.loc[self.ids]
-        yex = example_predictions.y[:, 0]
-        names = list(self.names)
+        # calc example predictions
+        example_y = {}
+        for tournament in self.tournaments(as_str=False):
+            ep = nx.production(nx.example_predictions(), data,
+                               tournament=tournament, verbosity=0)
+            ep = ep.loc[self.ids]
+            example_y[tournament] = ep.y[:, 0]
 
         df_dict = {}
         columns = ['validation', 'test', 'live', 'all', 'pass']
         data = data.loc[self.ids]
         regions = data.region
-        for name in names:
-            print(name)
+        pairs = list(self.pairs(as_str=False))
+
+        # check each model, tournament pair
+        for pair in pairs:
+            print(pair)
             df = pd.DataFrame(columns=columns)
-            idx = self.names.index(name)
+            idx = pairs.index(pair)
             y = self.y[:, idx]
             for region in ('validation', 'test', 'live', 'all'):
+                yexi = example_y[pair[1]]
                 if region == 'all':
                     yi = y
-                    yexi = yex
                 else:
                     idx = regions == region
                     yi = y[idx]
-                    yexi = yex[idx]
+                    yexi = yexi[idx]
                 df.loc['corr', region] = pearsonr(yi, yexi)[0]
                 df.loc['rcorr', region] = spearmanr(yi, yexi)[0]
                 df.loc['min', region] = yi.min()
@@ -465,7 +458,7 @@ class Prediction(object):
 
             print(df)
 
-            df_dict[name] = df
+            df_dict[pair] = df
 
         return df_dict
 
