@@ -267,7 +267,7 @@ class Prediction(object):
         # metrics
         metrics, regions = metrics_per_era(data, self, tournament,
                                            region_as_str=True)
-        metrics = metrics.drop(['era', 'name'], axis=1)
+        metrics = metrics.drop(['era', 'pair'], axis=1)
 
         # additional metrics
         region_str = ', '.join(regions)
@@ -311,7 +311,7 @@ class Prediction(object):
                 print(df_dict[pair])
         return df_dict
 
-    def metrics_per_era(self, data, tournament,
+    def metrics_per_era(self, data, tournament=None,
                         metrics=['logloss', 'auc', 'acc', 'ystd'],
                         era_as_str=True):
         "DataFrame containing given metrics versus era (as index)"
@@ -335,7 +335,7 @@ class Prediction(object):
         df = df.sort_values('mean')
         return df
 
-    def performance(self, data, tournament, era_as_str=True,
+    def performance(self, data, tournament=None, era_as_str=True,
                     region_as_str=True,
                     columns=['logloss', 'auc', 'acc', 'ystd', 'sharpe',
                              'consis'], sort_by='logloss'):
@@ -364,21 +364,21 @@ class Prediction(object):
                     ascending.append('True')
                 df = df.sort_values(by=by, ascending=ascending)
             else:
-                raise ValueError("`sort_by` name not recognized")
+                raise ValueError("`sort_by` method not recognized")
         return df
 
-    def dominance(self, data, tournament, sort_by='logloss'):
+    def dominance(self, data, tournament=None, sort_by='logloss'):
         "Mean (across eras) of fraction of models bested per era"
         columns = ['logloss', 'auc', 'acc']
         mpe, regions = metrics_per_era(data, self, tournament, columns=columns)
         dfs = []
         for i, col in enumerate(columns):
-            pivot = mpe.pivot(index='era', columns='name', values=col)
-            names = pivot.columns.tolist()
+            pivot = mpe.pivot(index='era', columns='pair', values=col)
+            pairs = pivot.columns.tolist()
             a = pivot.values
             n = a.shape[1] - 1.0
             if n == 0:
-                raise ValueError("Must have at least two names")
+                raise ValueError("Must have at least two pairs")
             m = []
             for j in range(pivot.shape[1]):
                 if col == 'logloss':
@@ -386,7 +386,7 @@ class Prediction(object):
                 else:
                     z = (a[:, j].reshape(-1, 1) > a).sum(axis=1) / n
                 m.append(z.mean())
-            df = pd.DataFrame(data=m, index=names, columns=[col])
+            df = pd.DataFrame(data=m, index=pairs, columns=[col])
             dfs.append(df)
         df = pd.concat(dfs, axis=1)
         df = df.sort_values([sort_by], ascending=[False])

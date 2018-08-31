@@ -57,7 +57,7 @@ def metrics_per_era(data, prediction, tournament, join='data',
             m = [era, name] + m
             metrics.append(m)
 
-    columns = ['era', 'name'] + columns
+    columns = ['era', 'pair'] + columns
     metrics = pd.DataFrame(metrics, columns=columns)
 
     return metrics, regions
@@ -88,17 +88,17 @@ def metrics_per_name(data, prediction, tournament, join='data',
     if 'logloss' in cols:
         # pivot is a dataframe with:
         #     era for rows
-        #     name for columns
+        #     pair for columns
         #     logloss for cell values
-        pivot = mpe.pivot(index='era', columns='name', values='logloss')
+        pivot = mpe.pivot(index='era', columns='pair', values='logloss')
 
     # mm is a dataframe with:
-    #    name as rows
+    #    pair as rows
     #    `cols` as columns
-    mm = mpe.groupby('name').mean()
+    mm = mpe.groupby('pair').mean()
 
     # metrics is the output with:
-    #    name as rows
+    #    pair as rows
     #    `columns` as columns
     metrics = pd.DataFrame(index=mm.index, columns=columns)
 
@@ -167,7 +167,8 @@ def calc_metrics_arrays(y, yhat, columns):
 def concordance(data, prediction):
     "Concordance; less than 0.12 is passing; data should be the full dataset."
 
-    concords = pd.DataFrame(columns=['concord'], index=prediction.names)
+    pairs = prediction.pairs(as_str=False)
+    concords = pd.DataFrame(columns=['concord'], index=[pairs])
 
     # fit clusters
     kmeans = MiniBatchKMeans(n_clusters=5, random_state=1337)
@@ -184,7 +185,7 @@ def concordance(data, prediction):
         yhats.append(yh)
 
     # cross cluster distance (KS distance)
-    for i, name in enumerate(prediction.names):
+    for i in range(len(pairs)):
         ks = []
         for j in set(clusters[0]):
             yhat0 = yhats[0][:, i][clusters[0] == j]
@@ -195,7 +196,7 @@ def concordance(data, prediction):
                  ks_2samp(yhat2, yhat1)[0]]
             ks.append(max(d))
         concord = np.mean(ks)
-        concords.loc[name] = concord
+        concords.iloc[i] = concord
 
     concords = concords.sort_values('concord')
 
