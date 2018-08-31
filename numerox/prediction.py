@@ -244,12 +244,12 @@ class Prediction(object):
         else:
             self.df.to_hdf(path_or_buf, HDF_PREDICTION_KEY)
 
-    def to_csv(self, path_or_buf, tournament, decimals=6, verbose=False):
-        "Save a csv file of predictions; predictin must contain only one name"
+    def to_csv(self, path_or_buf, decimals=6, verbose=False):
+        "Save a csv file of predictions; prediction must contain only one pair"
         if self.shape[1] != 1:
-            raise ValueError("prediction must contain a single name")
-        name = nx.tournament_str(tournament)
-        df = self.df.iloc[:, 0].to_frame('probability_' + name)
+            raise ValueError("prediction must contain a single pair")
+        tourn = self.tournaments(as_str=True)[0]
+        df = self.df.iloc[:, 0].to_frame('probability_' + tourn)
         df.index.rename('id', inplace=True)
         float_format = "%.{}f".format(decimals)
         df.to_csv(path_or_buf, float_format=float_format)
