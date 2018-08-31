@@ -26,18 +26,80 @@ class Prediction(object):
     def __init__(self, df=None):
         self.df = df
 
+    # ids -------------------------------------------------------------------
+
     @property
+    def ids(self):
+        "View of ids as a numpy str array"
+        if self.df is None:
+            return np.array([], dtype=str)
+        return self.df.index.values
+
+    @property
+    def loc(self):
+        "indexing by row ids"
+        return Loc(self)
+
+    # names, tournaments, pairs ---------------------------------------------
+
+    def pairs(self, as_str=True):
+        "List (copy) of (name, tournament) tuple in prediction object"
+        pairs = self.df.columns.tolist()
+        if as_str:
+            pairs = [(n, nx.tournament_str(t)) for n, t in pairs]
+        return pairs
+
     def names(self):
         "List (copy) of names in prediction object"
-        if self.df is None:
-            return []
-        names = self.private_names
-        names = [n[:-3] for n in names]
-        name = []
-        for n in names:
-            if n not in name:
-                name.append(n)
-        return name
+        pairs = self.pairs()
+        names = []
+        for n, t in pairs:
+            if n not in names:
+                names.append(n)
+        return names
+
+    def tournaments(self, as_str=True):
+        "List (copy) of tournaments in prediction object"
+        pairs = self.pairs(as_str=False)
+        tournaments = [t for n, t in pairs]
+        tournaments = sorted(set(tournaments))
+        if as_str:
+            tournaments = [nx.tournament_str(t) for t in tournaments]
+        return tournaments
+
+    def pairs_df(self):
+        "Bool dataframe with names as index and tournaments as columns"
+        names = self.names()
+        tourns = ['bernie', 'elizabeth', 'jordan', 'ken', 'charles']
+        df = pd.DataFrame(index=names, columns=tourns)
+        for name in names:
+            for tourn in tourns:
+                df.loc[name, tourn] = (name, tourn) in self
+        return df
+
+    def pair_isin(self, pair):
+        "Is (name, tournament) tuple in Prediction object? True or False."
+        return pair in self
+
+    def name_isin(self, name):
+        "Is name in Prediction object? True or False."
+        names = self.names()
+        return name in names
+
+    def tournament_isin(self, tournament):
+        "Is tournament in Prediction object? True or False."
+        tournaments = self.tournaments(as_str=False)
+        tournament = nx.tournament_int(tournament)
+        return tournament in tournaments
+
+    def __contains__(self, pair):
+        "Is `pair` already in prediction? True or False"
+        pair = (pair[0], nx.tournament_int(pair[1]))
+        return pair in self.df
+
+    def make_pair(self, name, tournament):
+        "Combine `name` and `tournament` into a pair (dataframe column name)"
+        return (name, nx.tournament_int(tournament))
 
     def rename(self, mapper):
         """
@@ -57,26 +119,22 @@ class Prediction(object):
         """
         if self.df is None:
             raise ValueError("Cannot rename an empty prediction")
+        names = self.names()
         if nx.isstring(mapper):
-            if self.shape[1] != 1:
-                raise ValueError("prediction must contain a single name")
-            mapper = {self.names[0]: mapper}
+            if len(names) != 1:
+                msg = 'prediction contains more than one name; use dict mapper'
+                raise ValueError(msg)
+            pairs = self.pairs(as_str=False)
+            pairs = [(mapper, t) for n, t in pairs]
+            df = self.df.copy()
+            df.columns = pairs
+        elif isinstance(mapper, dict):
+            pairs = self.pairs(as_str=False)
+
         df = self.df.rename(columns=mapper, copy=True)
         return Prediction(df)
 
-    def drop(self, name):
-        "Drop name (str) or names (e.g. a list of names) from prediction"
-        if self.df is None:
-            raise ValueError("Cannot drop a name from an empty prediction")
-        df = self.df.drop(columns=name)
-        return Prediction(df)
-
-    @property
-    def ids(self):
-        "View of ids as a numpy str array"
-        if self.df is None:
-            return np.array([], dtype=str)
-        return self.df.index.values
+    # y ---------------------------------------------------------------------
 
     @property
     def y(self):
@@ -102,21 +160,53 @@ class Prediction(object):
                           columns=self.df.columns.copy())
         return Prediction(df)
 
-    def iter(self):
-        "Yield a prediction object with only one model at a time"
-        for name in self.names:
-            yield self[name]
+    def y_correlation(self):
+        "Correlation matrix of y's (predictions) as dataframe"
+        return self.df.corr()
+
+    def correlation(self, pair=None, as_str=True):
+        "Correlation of predictions; by default reports given for each model"
+        if pair is None:
+            pairs = self.pairs(as_str)
+        else:
+            pairs = [pair]
+        z = self.df.values
+        zpairs = self.pairs(as_str)
+        idx = np.isfinite(z.sum(axis=1))
+        z = z[idx]
+        z = (z - z.mean(axis=0)) / z.std(axis=0)
+        for pair in pairs:
+            print('{}, {}'.format(*pair))
+            idx = zpairs.index(pair)
+            corr = np.dot(z[:, idx], z) / z.shape[0]
+            index = (-corr).argsort()
+            for ix in index:
+                zpair = zpairs[ix]
+                if pair != zpair:
+                    print("   {:.4f} {}, {}".format(corr[ix], *zpair))
+
+    # merge -----------------------------------------------------------------
 
     def merge_arrays(self, ids, y, name, tournament):
         "Merge numpy arrays `ids` and `y` with name `name`"
-        name = self.make_private_name(name, tournament)
-        df = pd.DataFrame(data={name: y}, index=ids)
+        pair = (name, nx.tournament_int(tournament))
+        df = pd.DataFrame(data=y, columns=[pair], index=ids)
         prediction = Prediction(df)
         return self.merge(prediction)
 
     def merge(self, prediction):
         "Merge prediction"
         return merge_predictions([self, prediction])
+
+    def __add__(self, prediction):
+        "Merge predictions"
+        return self.merge(prediction)
+
+    def __iadd__(self, prediction):
+        "Merge predictions"
+        return self.merge(prediction)
+
+    # io --------------------------------------------------------------------
 
     def save(self, path_or_buf, compress=True, mode='w'):
         """
@@ -166,9 +256,7 @@ class Prediction(object):
         if verbose:
             print("Save {}".format(path_or_buf))
 
-    def y_correlation(self):
-        "Correlation matrix of y's (predictions) as dataframe"
-        return self.df.corr()
+    # metrics ---------------------------------------------------------------
 
     def summary(self, data, tournament, round_output=True):
         "Performance summary of prediction object that contains a single name"
@@ -211,12 +299,12 @@ class Prediction(object):
     def summaries(self, data, tournament, round_output=True, display=True):
         "Dictionary of performance summaries of predictions"
         df_dict = {}
-        for name in self.names:
-            df_dict[name] = self[name].summary(data, tournament,
-                                               round_output=round_output)
+        for col in self.columns:
+            df_dict[col] = self[col].summary(data, tournament,
+                                             round_output=round_output)
             if display:
-                print(name)
-                print(df_dict[name])
+                print(col)
+                print(df_dict[col])
         return df_dict
 
     def metrics_per_era(self, data, tournament,
@@ -303,27 +391,6 @@ class Prediction(object):
     def concordance(self, data):
         "Less than 0.12 is passing; data should be the full dataset."
         return concordance(data, self)
-
-    def correlation(self, name=None):
-        "Correlation of predictions; by default reports given for each model"
-        if name is None:
-            names = self.names
-        else:
-            names = [name]
-        z = self.df.values
-        znames = self.names
-        idx = np.isfinite(z.sum(axis=1))
-        z = z[idx]
-        z = (z - z.mean(axis=0)) / z.std(axis=0)
-        for name in names:
-            print(name)
-            idx = znames.index(name)
-            corr = np.dot(z[:, idx], z) / z.shape[0]
-            index = (-corr).argsort()
-            for ix in index:
-                zname = znames[ix]
-                if name != zname:
-                    print("   {:.4f} {}".format(corr[ix], zname))
 
     def check(self, data, example_predictions, verbose=True):
         """
@@ -443,47 +510,17 @@ class Prediction(object):
 
         return comp
 
-    def isin(self, name, tournament):
-        "Is name/tournament in Prediction object (return True) or not (False)"
-        name = self.make_private_name(name, tournament)
-        if name in self:
-            return True
-        return False
+    def drop(self, name):
+        "Drop name (str) or names (e.g. a list of names) from prediction"
+        if self.df is None:
+            raise ValueError("Cannot drop a name from an empty prediction")
+        df = self.df.drop(columns=name)
+        return Prediction(df)
 
-    def make_private_name(self, name, tournament):
-        "Combine `name` and `tournament` into dataframe column name"
-        name = name + '_t' + str(nx.tournament_int(tournament))
-        return name
-
-    def split_private_name(self, name):
-        "Split dataframe column name into model name and tournament int"
-        tournament = int(name[-1])
-        name = name[:-3]
-        return name, tournament
-
-    def name_tournament_tuples(self):
-        "Split private names into list of name, tournament integer tuples"
-        nt = self.private_names
-        tup = [self.split_private_name(n) for n in nt]
-        return tup
-
-    @property
-    def private_names(self):
-        "Copy of list of dataframe column names"
-        return self.df.columns.tolist()
-
-    def tournament(self, name, as_str=True):
-        "Tournament for given `name`"
-        if name not in self:
-            raise ValueError('`name` is not in Prediction')
-        t = self.df[name].loc['tournament']
-        if not nx.isstring(t):
-            t = int(t)
-        if as_str:
-            t = nx.tournament_str(t)
-        else:
-            t = nx.tournament_int(t)
-        return t
+    def iter(self):
+        "Yield a prediction object with only one model at a time"
+        for col in self.columns:
+            yield self[col]
 
     def copy(self):
         "Copy of prediction"
@@ -509,8 +546,8 @@ class Prediction(object):
 
     def __getitem__(self, name):
         "Prediction indexing is by model name(s)"
-        if nx.isstring(name):
-            p = Prediction(self.df[name].to_frame(name))
+        if isinstance(name, tuple):
+            p = Prediction(pd.DataFrame(self.df[name], columns=[name]))
         else:
             p = Prediction(self.df[name])
         return p
@@ -521,23 +558,6 @@ class Prediction(object):
             raise ValueError("Can only insert a single model at a time")
         prediction.df.columns = [name]
         self.df = self.merge(prediction).df
-
-    @property
-    def loc(self):
-        "indexing by row ids"
-        return Loc(self)
-
-    def __add__(self, prediction):
-        "Merge predictions"
-        return self.merge(prediction)
-
-    def __iadd__(self, prediction):
-        "Merge predictions"
-        return self.merge(prediction)
-
-    def __contains__(self, name):
-        "Is `name` already in prediction? True or False"
-        return name in self.df
 
     def __eq__(self, prediction):
         "Check if prediction objects are equal or not; order matters"
@@ -564,13 +584,9 @@ class Prediction(object):
         return self.df.__len__()
 
     def __repr__(self):
-        tourns = ['bernie', 'elizabeth', 'jordan', 'ken', 'charles']
-        df = pd.DataFrame(columns=tourns)
-        for name in self.names:
-            d = []
-            for tourn in tourns:
-                d.append(self.isin(name, tourn))
-            df.loc[name] = d
+        df = self.pairs_df()
+        df = df.replace(to_replace=True, value='x')
+        df = df.replace(to_replace=False, value='')
         return df.to_string(index=True)
 
 
@@ -624,7 +640,7 @@ def merge_predictions(prediction_list):
     p = prediction_list[0].copy()
     for i in range(1, len(prediction_list)):
         pi = prediction_list[i]
-        for name in pi.private_names:
+        for name in pi.names:
             p = _merge_predictions(p, pi[name])
     return p
 

@@ -90,18 +90,18 @@ def micro_data(index=None):
 
 def micro_prediction(index=None):
     "Returns a tiny prediction object for use in unit testing"
-    cols = ['model0', 'model1', 'model2']
+    cols = [('model0', 2), ('model1', 1), ('model2', 3), ('model0', 5)]
     df = pd.DataFrame(columns=cols)
-    df.loc['index0'] = [0.00, 0.01, 0.02]
-    df.loc['index1'] = [0.10, 0.11, 0.12]
-    df.loc['index2'] = [0.20, 0.21, 0.22]
-    df.loc['index3'] = [0.30, 0.31, 0.32]
-    df.loc['index4'] = [0.40, 0.41, 0.42]
-    df.loc['index5'] = [0.50, 0.51, 0.52]
-    df.loc['index6'] = [0.60, 0.61, 0.62]
-    df.loc['index7'] = [0.70, 0.71, 0.72]
-    df.loc['index8'] = [0.80, 0.81, 0.82]
-    df.loc['index9'] = [0.90, 0.91, 0.92]
+    df.loc['index0'] = [0.002, 0.011, 0.023, 0.005]
+    df.loc['index1'] = [0.102, 0.111, 0.123, 0.105]
+    df.loc['index2'] = [0.202, 0.211, 0.223, 0.205]
+    df.loc['index3'] = [0.302, 0.311, 0.323, 0.305]
+    df.loc['index4'] = [0.402, 0.411, 0.423, 0.405]
+    df.loc['index5'] = [0.502, 0.511, 0.523, 0.505]
+    df.loc['index6'] = [0.602, 0.611, 0.623, 0.605]
+    df.loc['index7'] = [0.702, 0.711, 0.723, 0.705]
+    df.loc['index8'] = [0.802, 0.811, 0.823, 0.805]
+    df.loc['index9'] = [0.902, 0.911, 0.923, 0.905]
     if index is not None:
         df = df.iloc[index]
     df = df.copy()  # assure contiguous memory
