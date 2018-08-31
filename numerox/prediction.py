@@ -258,11 +258,11 @@ class Prediction(object):
 
     # metrics ---------------------------------------------------------------
 
-    def summary(self, data, tournament, round_output=True):
-        "Performance summary of prediction object that contains a single name"
+    def summary(self, data, tournament=None, round_output=True):
+        "Performance summary of prediction object that contains a single pair"
 
         if self.shape[1] != 1:
-            raise ValueError("prediction must contain a single name")
+            raise ValueError("prediction must contain a single pair")
 
         # metrics
         metrics, regions = metrics_per_era(data, self, tournament,
@@ -276,7 +276,10 @@ class Prediction(object):
         consis = (logloss < LOGLOSS_BENCHMARK).mean()
 
         # summary of metrics
-        t_str = nx.tournament_str(tournament)
+        if tournament is None:
+            t_str = self.tournaments(as_str=True)[0]
+        else:
+            t_str = nx.tournament_str(tournament)
         m1 = metrics.mean(axis=0).tolist() + ['tourn', t_str]
         m2 = metrics.std(axis=0).tolist() + ['region', region_str]
         m3 = metrics.min(axis=0).tolist() + ['eras', nera]
@@ -296,15 +299,16 @@ class Prediction(object):
 
         return df
 
-    def summaries(self, data, tournament, round_output=True, display=True):
+    def summaries(self, data, tournament=None, round_output=True,
+                  display=True):
         "Dictionary of performance summaries of predictions"
         df_dict = {}
-        for col in self.columns:
-            df_dict[col] = self[col].summary(data, tournament,
-                                             round_output=round_output)
+        for pair in self.pairs(as_str=False):
+            df_dict[pair] = self[pair].summary(data, tournament,
+                                               round_output=round_output)
             if display:
-                print(col)
-                print(df_dict[col])
+                print('{}, {}'.format(*pair))
+                print(df_dict[pair])
         return df_dict
 
     def metrics_per_era(self, data, tournament,
@@ -510,6 +514,25 @@ class Prediction(object):
 
         return comp
 
+    # indexing --------------------------------------------------------------
+
+    def __getitem__(self, name):
+        "Prediction indexing is by model name(s)"
+        if isinstance(name, tuple):
+            p = Prediction(pd.DataFrame(self.df[name], columns=[name]))
+        else:
+            p = Prediction(self.df[name])
+        return p
+
+    def __setitem__(self, name, prediction):
+        "Add (or replace) a prediction by name"
+        if prediction.df.shape[1] != 1:
+            raise ValueError("Can only insert a single model at a time")
+        prediction.df.columns = [name]
+        self.df = self.merge(prediction).df
+
+    # utilities -------------------------------------------------------------
+
     def drop(self, name):
         "Drop name (str) or names (e.g. a list of names) from prediction"
         if self.df is None:
@@ -543,21 +566,6 @@ class Prediction(object):
         b = self.df.values.tobytes(order='A')
         h = hash(b)
         return h
-
-    def __getitem__(self, name):
-        "Prediction indexing is by model name(s)"
-        if isinstance(name, tuple):
-            p = Prediction(pd.DataFrame(self.df[name], columns=[name]))
-        else:
-            p = Prediction(self.df[name])
-        return p
-
-    def __setitem__(self, name, prediction):
-        "Add (or replace) a prediction by name"
-        if prediction.df.shape[1] != 1:
-            raise ValueError("Can only insert a single model at a time")
-        prediction.df.columns = [name]
-        self.df = self.merge(prediction).df
 
     def __eq__(self, prediction):
         "Check if prediction objects are equal or not; order matters"

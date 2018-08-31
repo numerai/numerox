@@ -19,6 +19,9 @@ def metrics_per_era(data, prediction, tournament, join='data',
 
     df = prediction.df
 
+    if tournament is None:
+        tournament = prediction.tournaments(as_str=True)[0]
+
     # merge prediction with data (remove features x)
     if join == 'data':
         how = 'left'

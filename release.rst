@@ -3,10 +3,10 @@
 Release Notes
 =============
 
-- v2.8.0 (in development; not yet released)
+- v3.0.0 (in development; not yet released)
 
-  * Add ``prediction.isin``
-  * Add ``prediction.tournament``
+  * Complete redesign of Prediction class
+  * Prediction object now stores tournament info
 
 - v2.7.0
 
