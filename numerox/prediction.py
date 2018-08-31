@@ -462,30 +462,30 @@ class Prediction(object):
 
         return df_dict
 
-    def compare(self, data, prediction, tournament):
+    def compare(self, data, prediction, tournament=None):
         "Compare performance of predictions with the same names"
+        pairs = []
+        for pair in self.pairs(as_str=False):
+            if pair in prediction:
+                pairs.append(pair)
         cols = ['logloss1', 'logloss2', 'win1',
                 'corr', 'maxdiff', 'ystd1', 'ystd2']
-        comp = pd.DataFrame(columns=cols)
-        names = []
-        for name in self.names:
-            if name in prediction:
-                names.append(name)
-        if len(names) == 0:
+        comp = pd.DataFrame(columns=cols, index=pairs)
+        if len(pairs) == 0:
             return comp
         ids = data.ids
         df1 = self.loc[ids]
         df2 = prediction.loc[ids]
-        p1 = self[names]
-        p2 = prediction[names]
+        p1 = self[pairs]
+        p2 = prediction[pairs]
         m1 = p1.metrics_per_era(data, tournament, metrics=['logloss'],
                                 era_as_str=False)
         m2 = p2.metrics_per_era(data, tournament, metrics=['logloss'],
                                 era_as_str=False)
-        for name in names:
+        for i, pair in enumerate(pairs):
 
-            m1i = m1[m1.name == name]
-            m2i = m2[m2.name == name]
+            m1i = m1[m1.pair == pair]
+            m2i = m2[m2.pair == pair]
 
             if (m1i.index != m2i.index).any():
                 raise IndexError("Can only handle aligned eras")
@@ -494,8 +494,8 @@ class Prediction(object):
             logloss2 = m2i.logloss.mean()
             win1 = (m1i.logloss < m2i.logloss).mean()
 
-            y1 = df1[name].y.reshape(-1)
-            y2 = df2[name].y.reshape(-1)
+            y1 = df1[pair].y.reshape(-1)
+            y2 = df2[pair].y.reshape(-1)
 
             corr = np.corrcoef(y1, y2)[0, 1]
             maxdiff = np.abs(y1 - y2).max()
@@ -503,7 +503,7 @@ class Prediction(object):
             ystd2 = y2.std()
 
             m = [logloss1, logloss2, win1, corr, maxdiff, ystd1, ystd2]
-            comp.loc[name] = m
+            comp.iloc[i] = m
 
         return comp
 
