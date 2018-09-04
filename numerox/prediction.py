@@ -44,6 +44,8 @@ class Prediction(object):
 
     def pairs(self, as_str=True):
         "List (copy) of (name, tournament) tuple in prediction object"
+        if self.df is None:
+            return list()
         pairs = self.df.columns.tolist()
         if as_str:
             pairs = [(n, nx.tournament_str(t)) for n, t in pairs]
@@ -653,7 +655,7 @@ def _merge_predictions(prediction1, prediction2):
     "Merge a possibly multi-name prediction1 with a single-name prediction2"
     if prediction2.shape[1] != 1:
         raise ValueError("`prediction2` must contain a single name")
-    pair = prediction2.pairs()[0]
+    pair = prediction2.pairs(as_str=False)[0]
     if prediction1.df is None:
         # empty prediction
         df = prediction2.df
@@ -669,8 +671,8 @@ def _merge_predictions(prediction1, prediction2):
         s = s.dropna()
         s = pd.concat([s, y], join='outer', ignore_index=False,
                       verify_integrity=True)
-        dfnew = s.to_frame(pair)
-        df = pd.merge(prediction1.df, dfnew, how='outer', on=pair,
+        dfnew = pd.DataFrame(s, columns=[pair])
+        df = pd.merge(prediction1.df, dfnew, how='outer', on=[pair],
                       left_index=True, right_index=True)
         df[pair] = dfnew
     return Prediction(df)
