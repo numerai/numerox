@@ -1,5 +1,6 @@
 import os
 import zipfile
+import warnings
 
 import pandas as pd
 import numpy as np
@@ -242,11 +243,16 @@ class Prediction(object):
         if mode == 'a':
             p = nx.load_prediction(path_or_buf)
             self = p.merge(self)
-        if compress:
-            self.df.to_hdf(path_or_buf, HDF_PREDICTION_KEY,
-                           complib='zlib', complevel=4)
-        else:
-            self.df.to_hdf(path_or_buf, HDF_PREDICTION_KEY)
+        with warnings.catch_warnings():
+            # pytables warns (through pandas) that pairs will be pickled which
+            # is a performance hit but there are never a large number of models
+            # and hence pairs in a prediction object
+            warnings.simplefilter("ignore")
+            if compress:
+                self.df.to_hdf(path_or_buf, HDF_PREDICTION_KEY,
+                               complib='zlib', complevel=4)
+            else:
+                self.df.to_hdf(path_or_buf, HDF_PREDICTION_KEY)
 
     def to_csv(self, path_or_buf, decimals=6, verbose=False):
         "Save a csv file of predictions; prediction must contain only one pair"
