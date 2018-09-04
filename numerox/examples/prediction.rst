@@ -270,7 +270,7 @@ And then load them::
 
 And you can save one model's predictions to csv for future upload to Numerai::
 
-    >>> p['logistic_bernie'].to_csv('logistic_bernie.csv', tournament='bernie')
+    >>> p['logistic_bernie'].to_csv('logistic_bernie.csv')
 
 It is better to load your predictions from an HDF5 file (faster, no rounding
 errors, can contain predictions from multiple models) but you can load from

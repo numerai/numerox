@@ -50,7 +50,7 @@ for the tournament data::
 
 Let's upload our predictions to enter the tournament::
 
-    >>> prediction.to_csv('logistic.csv', tournament='bernie')
+    >>> prediction.to_csv('logistic.csv')
     >>> upload_id, status = nx.upload('logistic.csv', 'bernie',
                                       public_id, secret_key)
     metric                  value   minutes

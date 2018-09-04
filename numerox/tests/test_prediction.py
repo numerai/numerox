@@ -79,9 +79,9 @@ def test_prediction_to_csv():
     path = None
     try:
         path = testing.create_tempfile('numerox.h5')
-        p['model1'].to_csv(path, tournament=1)
+        p['model1'].to_csv(path)
         with testing.HiddenPrints():
-            p['model1'].to_csv(path, tournament='bernie', verbose=True)
+            p['model1'].to_csv(path, verbose=True)
         p2 = nx.load_prediction_csv(path, 'model1')
     finally:
         testing.delete_tempfile(path)

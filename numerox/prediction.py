@@ -99,6 +99,8 @@ class Prediction(object):
 
     def make_pair(self, name, tournament):
         "Combine `name` and `tournament` into a pair (dataframe column name)"
+        if not nx.isstring(name):
+            raise ValueError("`name` must be a string")
         return (name, nx.tournament_int(tournament))
 
     def rename(self, mapper):
@@ -612,11 +614,12 @@ def load_prediction_csv(filename, name=None):
     df = pd.read_csv(filename, index_col='id')
     if df.shape[1] != 1:
         raise ValueError("csv file must contain one column of predictions")
+    tournament = nx.tournament_int(df.columns[0].split('_')[-1])
     if name is None:
         name = os.path.split(filename)[-1]
         if name.endswith('.csv'):
             name = name[:-4]
-    df.columns = [name]
+    df.columns = [(name, tournament)]
     return Prediction(df)
 
 
