@@ -32,7 +32,7 @@ def shares_memory(data1, data_or_array2):
     if hasattr(data1, 'column_list'):
         cols = data1.column_list()
     else:
-        cols = data1.names
+        cols = data1.pairs(as_str=False)
     cols += ['ids']
 
     for col in cols:

@@ -125,18 +125,21 @@ class Prediction(object):
         if self.df is None:
             raise ValueError("Cannot rename an empty prediction")
         names = self.names()
+        df = self.df.copy()
         if nx.isstring(mapper):
             if len(names) != 1:
                 msg = 'prediction contains more than one name; use dict mapper'
                 raise ValueError(msg)
             pairs = self.pairs(as_str=False)
             pairs = [(mapper, t) for n, t in pairs]
-            df = self.df.copy()
-            df.columns = pairs
         elif isinstance(mapper, dict):
-            pairs = self.pairs(as_str=False)
-
-        df = self.df.rename(columns=mapper, copy=True)
+            prs = self.pairs(as_str=False)
+            pairs = []
+            for pr in prs:
+                if pr[0] in mapper:
+                    pr = (mapper[pr[0]], pr[1])
+                pairs.append(pr)
+        df.columns = pairs
         return Prediction(df)
 
     # y ---------------------------------------------------------------------
@@ -531,6 +534,10 @@ class Prediction(object):
         "Add (or replace) a prediction by pair"
         if prediction.df.shape[1] != 1:
             raise ValueError("Can only insert a single model at a time")
+        if not isinstance(index, tuple):
+            raise IndexError('`index` must be a tuple pair')
+        if len(index) != 2:
+            raise IndexError('`index` must be a tuple pair of length 2')
         prediction.df.columns = [index]
         self.df = self.merge(prediction).df
 
@@ -545,8 +552,8 @@ class Prediction(object):
 
     def iter(self):
         "Yield a prediction object with only one model at a time"
-        for col in self.columns:
-            yield self[col]
+        for pair in self.pairs(as_str=False):
+            yield self[pair]
 
     def copy(self):
         "Copy of prediction"

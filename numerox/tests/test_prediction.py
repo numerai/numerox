@@ -59,8 +59,8 @@ def test_prediction_roundtrip():
 def test_prediction_save():
     "test prediction.save with mode='a'"
     p = nx.testing.micro_prediction()
-    p1 = p['model0']
-    p2 = p[['model1', 'model2']]
+    p1 = p[('model0', 2)]
+    p2 = p[[('model1', 1), ('model2', 3), ('model0', 5)]]
     path = None
     try:
         path = nx.testing.create_tempfile('numerox.h5')
@@ -78,13 +78,13 @@ def test_prediction_to_csv():
     path = None
     try:
         path = nx.testing.create_tempfile('numerox.h5')
-        p['model1'].to_csv(path)
+        p[('model1', 1)].to_csv(path)
         with nx.testing.HiddenPrints():
-            p['model1'].to_csv(path, verbose=True)
+            p[('model1', 1)].to_csv(path, verbose=True)
         p2 = nx.load_prediction_csv(path, 'model1')
     finally:
         nx.testing.delete_tempfile(path)
-    ade(p2, p['model1'], "prediction corrupted during roundtrip")
+    ade(p2, p[('model1', 1)], "prediction corrupted during roundtrip")
     assert_raises(ValueError, p.to_csv, 'unused', 2)
     assert_raises(ValueError, p.to_csv, 'model1', 99)
 
@@ -113,8 +113,8 @@ def test_prediction_properties():
 
     d = nx.testing.micro_data()
     p = nx.Prediction()
-    p = p.merge_arrays(d.ids, d.y['bernie'], 'model1')
-    p = p.merge_arrays(d.ids, d.y['elizabeth'], 'model2')
+    p = p.merge_arrays(d.ids, d.y['bernie'], 'model1', 1)
+    p = p.merge_arrays(d.ids, d.y['elizabeth'], 'model2', 2)
 
     ok_((p.ids == p.df.index).all(), "ids is corrupted")
     ok_((p.ids == d.df.index).all(), "ids is corrupted")
@@ -128,28 +128,29 @@ def test_prediction_rename():
     p = nx.testing.micro_prediction()
     rename_dict = {}
     names = []
-    original_names = p.names
-    for i in range(p.shape[1]):
+    original_names = p.names()
+    for i in range(len(original_names)):
         key = original_names[i]
         value = 'm_%d' % i
         names.append(value)
         rename_dict[key] = value
     p2 = p.rename(rename_dict)
-    ok_(p2.names == names, 'prediction.rename failed')
+    ok_(p2.names() == names, 'prediction.rename failed')
 
     p = nx.testing.micro_prediction()
     assert_raises(ValueError, p.rename, 'modelX')
 
-    p = p['model1']
+    p = p[('model1', 1)]
     p2 = p.rename('modelX')
-    ok_(p2.names[0] == 'modelX', 'prediction.rename failed')
+    ok_(p2.names()[0] == 'modelX', 'prediction.rename failed')
 
 
 def test_prediction_drop():
     "prediction.drop"
     p = nx.testing.micro_prediction()
-    p = p.drop(['model1'])
-    ok_(p.names == ['model0', 'model2'], 'prediction.drop failed')
+    p = p.drop(('model1', 1))
+    prs = [('model0', 2), ('model2', 3), ('model0', 5)]
+    ok_(p.pairs(as_str=False) == prs, 'prediction.drop failed')
 
 
 def test_prediction_add():
@@ -163,8 +164,8 @@ def test_prediction_add():
     rs = np.random.RandomState(0)
     y1 = 0.2 * (rs.rand(len(d1)) - 0.5) + 0.5
     y2 = 0.2 * (rs.rand(len(d2)) - 0.5) + 0.5
-    p1 = p1.merge_arrays(d1.ids, y1, 'model1')
-    p2 = p2.merge_arrays(d2.ids, y2, 'model1')
+    p1 = p1.merge_arrays(d1.ids, y1, 'model1', 1)
+    p2 = p2.merge_arrays(d2.ids, y2, 'model1', 1)
 
     p = p1 + p2  # just make sure that it runs
 
@@ -175,10 +176,10 @@ def test_prediction_add():
 def test_prediction_getitem():
     "prediction.__getitem__"
     p = nx.testing.micro_prediction()
-    names = ['model2', 'model0']
-    p2 = p[names]
+    pairs = [('model2', 3), ('model0', 2)]
+    p2 = p[pairs]
     ok_(isinstance(p2, nx.Prediction), 'expecting a prediction')
-    ok_(p2.names == names, 'names corrcupted')
+    ok_(p2.pairs(as_str=False) == pairs, 'pairs corrupted')
 
 
 def test_prediction_loc():
@@ -203,7 +204,7 @@ def test_prediction_summary():
     "make sure prediction.summary runs"
     d = nx.testing.micro_data()
     p = nx.testing.micro_prediction()
-    df = p['model1'].summary(d, 3)
+    df = p[('model1', 1)].summary(d, 3)
     ok_(isinstance(df, pd.DataFrame), 'expecting a dataframe')
 
 
@@ -228,15 +229,15 @@ def test_prediction_dominance():
     d = d['validation']
 
     p = nx.Prediction()
-    p = p.merge_arrays(d.ids, d.y['bernie'], 'model1')
-    p = p.merge_arrays(d.ids, d.y['elizabeth'], 'model2')
-    p = p.merge_arrays(d.ids, d.y['jordan'], 'model3')
+    p = p.merge_arrays(d.ids, d.y['bernie'], 'model1', 1)
+    p = p.merge_arrays(d.ids, d.y['elizabeth'], 'model2', 2)
+    p = p.merge_arrays(d.ids, d.y['jordan'], 'model3', 3)
 
     df = p.dominance(d, 3)
     df = p.dominance(d, 'jordan')
 
     ok_(isinstance(df, pd.DataFrame), 'expecting a dataframe')
-    assert_raises(ValueError, p['model1'].dominance, d, 1)
+    assert_raises(ValueError, p[('model1', 1)].dominance, d, 1)
 
 
 def test_prediction_correlation():
@@ -254,9 +255,8 @@ def test_prediction_check():
     p2 = p2.rename('example_predictions')
     p = p1 + p2
     with nx.testing.HiddenPrints():
-        df = p.check(d, example_predictions='ken')
+        df = p.check(d)
     ok_(isinstance(df, dict), 'expecting a dictionary')
-    assert_raises(ValueError, p1.check, d, None)
 
 
 def test_prediction_concordance():
@@ -285,10 +285,10 @@ def test_prediction_setitem():
     p4 = nx.backtest(nx.logistic(), data, 4, 'model1',  verbosity=0)
 
     p = nx.Prediction()
-    p['model1'] = p1
-    p['model2'] = p2
-    p['model3'] = p3
-    p['model1'] = p4
+    p[('model1', 1)] = p1
+    p[('model2', 2)] = p2
+    p[('model3', 3)] = p3
+    p[('model1', 4)] = p4
 
     pp = nx.Prediction()
     pp = pp.merge(p1)
@@ -298,8 +298,8 @@ def test_prediction_setitem():
 
     pd.testing.assert_frame_equal(p.df, pp.df)
 
-    assert_raises(ValueError, p.__setitem__, 'model1', p1)
-    assert_raises(ValueError, p.__setitem__, 'model1', p)
+    assert_raises(ValueError, p.__setitem__, ('model1', 1), p1)
+    assert_raises(ValueError, p.__setitem__, ('model1', 1), p)
 
 
 def test_prediction_ynew():
@@ -328,12 +328,12 @@ def test_prediction_y_df():
 def test_prediction_iter():
     "test prediction.iter"
     p = nx.testing.micro_prediction()
-    names = []
+    pairs = []
     for pi in p.iter():
-        n = pi.names
+        n = pi.pairs()
         ok_(len(n) == 1, 'should only yield a single name')
-        names.append(n[0])
-    ok_(p.names == names, 'prediction.iter failed')
+        pairs.append(n[0])
+    ok_(p.pairs() == pairs, 'prediction.iter failed')
 
 
 def test_prediction_repr():
@@ -377,10 +377,10 @@ def test_merge_predictions():
     ade(p123, p, 'corruption of merge predictions')
 
     p1 = nx.testing.micro_prediction([0, 1, 2, 3, 4])
-    p11 = p1[['model0', 'model1']]
-    p12 = p1['model2']
+    p11 = p1[[('model0', 2), ('model1', 1), ('model2', 3)]]
+    p12 = p1['model0', 5]
     p2 = nx.testing.micro_prediction([5, 6, 7, 8, 9])
-    p21 = p2['model0']
-    p22 = p2[['model1', 'model2']]
+    p21 = p2['model0', 2]
+    p22 = p2[[('model1', 1), ('model2', 3), ('model0', 5)]]
     p12 = nx.merge_predictions([p11, p21, p22, p12])
     ade(p12, p, 'corruption of merge predictions')
