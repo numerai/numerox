@@ -77,15 +77,15 @@ from numerox.data import compare_data
 from numerox.version import __version__
 from numerox.prediction import merge_predictions
 
+# tournament
+from numerox.tournament import tournament_int
+from numerox.tournament import tournament_str
+from numerox.tournament import tournament_iter
+
 # util
 from numerox.util import isint
 from numerox.util import isstring
 from numerox.util import history
-from numerox.util import tournament_int2str
-from numerox.util import tournament_str2int
-from numerox.util import tournament_iter
-from numerox.util import tournament_int
-from numerox.util import tournament_str
 
 try:
     from numpy.testing import Tester
