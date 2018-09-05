@@ -95,9 +95,30 @@ class Prediction(object):
         tournament = nx.tournament_int(tournament)
         return tournament in tournaments
 
+    def pairs_with_name(self, name, as_str=True):
+        "List of pairs with given `name`"
+        prs = self.pairs(as_str)
+        pairs = []
+        for pr in prs:
+            if pr[0] == name:
+                pairs.append(pr)
+        return pairs
+
+    def pairs_with_tournament(self, tournament, as_str=True):
+        "List of pairs with given `tournament`"
+        tournament = nx.tournament_int(tournament)
+        prs = self.pairs(as_str=False)
+        pairs = []
+        for pr in prs:
+            if pr[1] == tournament:
+                if as_str:
+                    pr = (pr[0], nx.tournament_str(pr[1]))
+                pairs.append(pr)
+        return pairs
+
     def __contains__(self, pair):
         "Is `pair` already in prediction? True or False"
-        pair = (pair[0], nx.tournament_int(pair[1]))
+        pair = self.make_pair(*pair)
         return pair in self.df
 
     def make_pair(self, name, tournament):
