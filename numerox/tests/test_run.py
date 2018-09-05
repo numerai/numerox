@@ -1,3 +1,5 @@
+from nose.tools import ok_
+
 import numerox as nx
 from numerox import testing
 from numerox.model import fifty
@@ -16,6 +18,8 @@ def test_run():
         for splitter in splitters:
             nx.run(model, splitter, tournament=2, verbosity=0)
             nx.run(model, splitter, tournament='bernie', verbosity=0)
+            p = nx.run(model, splitter, tournament=None, verbosity=0)
+            ok_(p.shape[1] != 5, 'wrong number of tournaments')
 
 
 def test_backtest_production():
@@ -27,6 +31,7 @@ def test_backtest_production():
             nx.backtest(model, d, tournament=3, kfold=2, verbosity=verbosity)
             nx.production(model, d, tournament='ken', verbosity=verbosity)
             nx.production(model, d, tournament=4, verbosity=verbosity)
+            nx.production(model, d, tournament=None, verbosity=verbosity)
             if verbosity == 3:
                 nx.production(model, d, tournament=5, name='test',
                               verbosity=verbosity)

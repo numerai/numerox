@@ -19,7 +19,26 @@ def backtest(model, data, tournament, name=None, kfold=5, seed=0, verbosity=2):
 
 
 def run(model, splitter, tournament, name=None, verbosity=2):
-    "Run a single model through a data splitter"
+    """
+    Run a single model through a data splitter.
+
+    If `tournament` is None then run the model through all tournaments.
+
+    """
+    if tournament is None:
+        p = nx.Prediction()
+        for t_number, t_name in nx.tournament_iter():
+            p += run_one(model, splitter, t_name, name=name,
+                         verbosity=verbosity)
+            splitter.reset()
+    else:
+        p = run_one(model, splitter, tournament, name=name,
+                    verbosity=verbosity)
+    return p
+
+
+def run_one(model, splitter, tournament, name=None, verbosity=2):
+    "Run a single model through a data splitter for a single tournament"
     t0 = time.time()
     if name is None:
         name = model.__class__.__name__
