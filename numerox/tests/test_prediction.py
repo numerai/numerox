@@ -180,6 +180,14 @@ def test_prediction_getitem():
     p2 = p[pairs]
     ok_(isinstance(p2, nx.Prediction), 'expecting a prediction')
     ok_(p2.pairs(as_str=False) == pairs, 'pairs corrupted')
+    pairs = [('model0', 2), ('model0', 5)]
+    p2 = p['model0']
+    ok_(p2.pairs(as_str=False) == pairs, 'pairs corrupted')
+    p2 = p['model0', :]
+    ok_(p2.pairs(as_str=False) == pairs, 'pairs corrupted')
+    pairs = [('model1', 1)]
+    p2 = p[:, 'bernie']
+    ok_(p2.pairs(as_str=False) == pairs, 'pairs corrupted')
 
 
 def test_prediction_loc():

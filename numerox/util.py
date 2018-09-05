@@ -98,6 +98,17 @@ def flatten_dict(dictionary):
     return dict(items)
 
 
+def is_none_slice(index):
+    "Is the slice `index` a slice(None, None, None)? True or False."
+    if index.start is not None:
+        return False
+    if index.stop is not None:
+        return False
+    if index.step is not None:
+        return False
+    return True
+
+
 def tournament_int2str(tournament_int):
     "Convert tournament integer to string name"
     if tournament_int < 1:

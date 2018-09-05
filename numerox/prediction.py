@@ -12,6 +12,7 @@ from numerox.metrics import metrics_per_era
 from numerox.metrics import metrics_per_name
 from numerox.metrics import concordance
 from numerox.metrics import LOGLOSS_BENCHMARK
+from numerox.util import is_none_slice
 
 HDF_PREDICTION_KEY = 'numerox_prediction'
 EXAMPLE_PREDICTIONS = 'example_predictions_target_{}.csv'
@@ -546,7 +547,34 @@ class Prediction(object):
     def __getitem__(self, index):
         "Prediction indexing is by model pair(s)"
         if isinstance(index, tuple):
-            p = Prediction(pd.DataFrame(self.df[index], columns=[index]))
+            if len(index) != 2:
+                raise IndexError("When indexing by tuple must be length 2")
+            if isinstance(index[0], slice):
+                if not is_none_slice(index[0]):
+                    raise IndexError("Slces must be slice(None, None, None,)")
+                pairs1 = self.pairs(as_str=False)
+            elif nx.isstring(index[0]):
+                pairs1 = self.pairs_with_name(index[0], as_str=False)
+            else:
+                raise IndexError("indexing method not recognized")
+            if isinstance(index[1], slice):
+                if not is_none_slice(index[1]):
+                    raise IndexError("Slces must be slice(None, None, None,)")
+                pairs2 = self.pairs(as_str=False)
+            elif nx.isint(index[1]):
+                pairs2 = self.pairs_with_tournament(index[1], as_str=False)
+            elif nx.isstring(index[1]):
+                pairs2 = self.pairs_with_tournament(index[1], as_str=False)
+            else:
+                raise IndexError("indexing method not recognized")
+            pairs = []
+            for pair in pairs1:
+                if pair in pairs2:
+                    pairs.append(pair)
+            p = Prediction(pd.DataFrame(data=self.df[pairs]))
+        elif nx.isstring(index):
+            pairs = self.pairs_with_name(index, as_str=False)
+            p = Prediction(self.df[pairs])
         else:
             p = Prediction(self.df[index])
         return p
