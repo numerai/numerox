@@ -34,3 +34,12 @@ def test_tournament_str():
     assert_raises(ValueError, nx.tournament_str, 0)
     assert_raises(ValueError, nx.tournament_str, 'burn')
     assert_raises(ValueError, nx.tournament_int, None)
+
+
+def test_tournament_all():
+    "test tournament_all"
+    t = ['bernie', 'elizabeth', 'jordan', 'ken', 'charles']
+    ok_(nx.tournament_all() == t, 'wrong tournaments')
+    ok_(nx.tournament_all(True) == t, 'wrong tournaments')
+    t = [1, 2, 3, 4, 5]
+    ok_(nx.tournament_all(False) == t, 'wrong tournaments')

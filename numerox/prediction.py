@@ -74,7 +74,7 @@ class Prediction(object):
     def pairs_df(self):
         "Bool dataframe with names as index and tournaments as columns"
         names = self.names()
-        tourns = ['bernie', 'elizabeth', 'jordan', 'ken', 'charles']
+        tourns = nx.tournament_all()
         df = pd.DataFrame(index=names, columns=tourns)
         for name in names:
             for tourn in tourns:

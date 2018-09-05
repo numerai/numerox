@@ -7,8 +7,6 @@ if sys.version_info[0] == 2:
 else:
     BASE_STRING = str  # pragma: no cover
 
-TOURNAMENT_NAMES = ['bernie', 'elizabeth', 'jordan', 'ken', 'charles']
-
 
 def isint(x):
     """

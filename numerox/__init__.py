@@ -80,6 +80,7 @@ from numerox.prediction import merge_predictions
 # tournament
 from numerox.tournament import tournament_int
 from numerox.tournament import tournament_str
+from numerox.tournament import tournament_all
 from numerox.tournament import tournament_iter
 
 # util
