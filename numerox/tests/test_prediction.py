@@ -230,6 +230,21 @@ def test_prediction_performance():
     p.performance(d, 1, sort_by='consis')
 
 
+def test_prediction_performance_mean():
+    "make sure prediction.performance_mean runs"
+    d = nx.testing.micro_data()
+    p = nx.testing.micro_prediction()
+    df = p.performance_mean(d, across='tournament')
+    df = p.performance_mean(d)
+    ok_(isinstance(df, pd.DataFrame), 'expecting a dataframe')
+    p.performance_mean(d, sort_by='auc')
+    p.performance_mean(d, sort_by='auc')
+    p.performance_mean(d, sort_by='acc')
+    p.performance_mean(d, sort_by='ystd')
+    p.performance_mean(d, sort_by='sharpe')
+    p.performance_mean(d, sort_by='consis')
+
+
 def test_prediction_dominance():
     "make sure prediction.dominance runs"
 
