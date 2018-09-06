@@ -412,19 +412,19 @@ class Prediction(object):
                 raise ValueError("`sort_by` method not recognized")
         return df
 
-    def performance_mean(self, data, across='name', era_as_str=True,
+    def performance_mean(self, data, mean_of='name', era_as_str=True,
                          region_as_str=True,
                          columns=['logloss', 'auc', 'acc', 'ystd', 'sharpe',
                                   'consis'], sort_by='logloss'):
         "Mean performance averaged across names (default) or tournaments,"
         df = self.performance(data, era_as_str=era_as_str,
                               region_as_str=region_as_str, columns=columns)
-        if across == 'name':
+        if mean_of == 'name':
             g = df.groupby('name')
             df = g.mean()
             c = g.count()
             df.insert(0, 'N', c['tournament'])
-        elif across == 'tournament':
+        elif mean_of == 'tournament':
             g = df.groupby('tournament')
             df = g.mean()
             c = g.count()

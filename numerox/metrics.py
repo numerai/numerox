@@ -19,9 +19,6 @@ def metrics_per_era(data, prediction, tournament, join='data',
 
     df = prediction.df
 
-    if tournament is None:
-        tournament = prediction.tournaments(as_str=True)[0]
-
     # merge prediction with data (remove features x)
     if join == 'data':
         how = 'left'
@@ -32,8 +29,8 @@ def metrics_per_era(data, prediction, tournament, join='data',
     else:
         raise ValueError("`join` method not recognized")
     yhats_df = df.dropna()
-    y_name = nx.tournament_str(tournament)
-    data_df = data.df[['era', 'region', y_name]]
+    cols = ['era', 'region'] + nx.tournament_all(as_str=True)
+    data_df = data.df[cols]
     df = pd.merge(data_df, yhats_df, left_index=True, right_index=True,
                   how=how)
 
@@ -42,19 +39,25 @@ def metrics_per_era(data, prediction, tournament, join='data',
         regions = [REGION_INT_TO_STR[r] for r in regions]
 
     # calc metrics for each era
-    names = yhats_df.columns.values
+    pairs = yhats_df.columns.values
     metrics = []
     unique_eras = df.era.unique()
     for era in unique_eras:
         idx = df.era.isin([era])
         df_era = df[idx]
-        y = df_era[y_name].values
         if era_as_str:
             era = ERA_INT_TO_STR[era]
-        for name in names:
-            yhat = df_era[name].values
+        for pair in pairs:
+            if tournament is None:
+                # evaluate with targets that model trained on
+                tourni = nx.tournament_str(pair[1])
+            else:
+                # force evaluation targets to be from given tournament
+                tourni = nx.tournament_str(tournament)
+            y = df_era[tourni].values
+            yhat = df_era[pair].values
             m = calc_metrics_arrays(y, yhat, columns)
-            m = [era, name] + m
+            m = [era, pair] + m
             metrics.append(m)
 
     columns = ['era', 'pair'] + columns

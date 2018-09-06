@@ -55,3 +55,12 @@ and the ``production`` function::
 
     >>> splitter = nx.TournamentSplitter(data)
     >>> prediction = nx.run(model, splitter, tournament)
+
+If you set ``tournament`` to ``None`` then the model will be run through all
+five tournaments::
+
+    >>> p = nx.production(nx.logistic(), data, tournament=None, verbosity=0)
+    >>> p
+             bernie elizabeth jordan ken charles
+    logistic      x         x      x   x       x
+

@@ -234,7 +234,8 @@ def test_prediction_performance_mean():
     "make sure prediction.performance_mean runs"
     d = nx.testing.micro_data()
     p = nx.testing.micro_prediction()
-    df = p.performance_mean(d, across='tournament')
+    df = p.performance_mean(d, mean_of='tournament')
+    df = p.performance_mean(d, mean_of='name')
     df = p.performance_mean(d)
     ok_(isinstance(df, pd.DataFrame), 'expecting a dataframe')
     p.performance_mean(d, sort_by='auc')
@@ -243,6 +244,20 @@ def test_prediction_performance_mean():
     p.performance_mean(d, sort_by='ystd')
     p.performance_mean(d, sort_by='sharpe')
     p.performance_mean(d, sort_by='consis')
+
+
+def test_prediction_regression():
+    "regression test of prediction performance evaluation"
+    d = nx.play_data()
+    p = nx.production(nx.logistic(), d, tournament=None, verbosity=0)
+    for number, name in nx.tournament_iter():
+        p2 = nx.production(nx.logistic(), d, tournament=name, verbosity=0)
+        df = p.performance_mean(d['validation'], mean_of='tournament')
+        logloss1 = df.loc[name]['logloss']
+        logloss2 = p2.summary(d['validation']).loc['mean']['logloss']
+        diff = np.abs(logloss1 - logloss2)
+        msg = 'failed on {}'.format(name)
+        ok_(diff < 1e-6, msg)
 
 
 def test_prediction_dominance():
