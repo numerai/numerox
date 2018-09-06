@@ -14,7 +14,7 @@ LOGLOSS_BENCHMARK = 0.693
 
 def metrics_per_era(data, prediction, tournament, join='data',
                     columns=['logloss', 'auc', 'acc', 'ystd'],
-                    era_as_str=False, region_as_str=False):
+                    era_as_str=False, region_as_str=False, split_pairs=True):
     "Dataframe with columns era, model, and specified metrics. And region list"
 
     df = prediction.df
@@ -60,12 +60,15 @@ def metrics_per_era(data, prediction, tournament, join='data',
     columns = ['era', 'pair'] + columns
     metrics = pd.DataFrame(metrics, columns=columns)
 
+    if split_pairs:
+        metrics = add_split_pairs(metrics)
+
     return metrics, regions
 
 
 def metrics_per_name(data, prediction, tournament, join='data',
                      columns=['logloss', 'auc', 'acc', 'ystd'],
-                     era_as_str=True, region_as_str=True):
+                     era_as_str=True, region_as_str=True, split_pairs=True):
 
     # calc metrics per era
     skip = ['sharpe', 'consis']
@@ -118,6 +121,9 @@ def metrics_per_name(data, prediction, tournament, join='data',
         else:
             raise ValueError("unknown metric ({})".format(col))
         metrics[col] = m
+
+    if split_pairs:
+        metrics = add_split_pairs(metrics)
 
     return metrics, info
 
@@ -201,3 +207,17 @@ def concordance(data, prediction):
     concords = concords.sort_values('concord')
 
     return concords
+
+
+def add_split_pairs(df, as_str=True):
+    "Add name and tournament columns and optional drop pair column"
+    if 'pair' in df:
+        pairs = df['pair'].tolist()
+    else:
+        pairs = df.index.tolist()
+    name, tournament = zip(*pairs)
+    if as_str:
+        tournament = [nx.tournament_str(t) for t in tournament]
+    df.insert(0, 'tournament', tournament)
+    df.insert(0, 'name', name)
+    return df

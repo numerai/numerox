@@ -25,7 +25,7 @@ If your existing code already has both predictions ``yhat`` and Numerai row
 ``ids`` as numpy arrays::
 
     >>> p = nx.Prediction()
-    >>> p = p.merge_arrays(ids, yhat, 'my_model')
+    >>> p = p.merge_arrays(ids, yhat, 'my_model', 'bernie')
 
 Multiple models
 ---------------
@@ -43,8 +43,8 @@ or::
 or::
 
     >>> p = nx.Prediction()
-    >>> p = p.merge_arrays(ids, yhat, 'my_model_1')
-    >>> p += p.merge_arrays(ids, yhat, 'my_model_2')
+    >>> p = p.merge_arrays(ids, yhat, 'my_model_1', 'charles')
+    >>> p += p.merge_arrays(ids, yhat, 'my_model_2', 'charles')
 
 or::
 

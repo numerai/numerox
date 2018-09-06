@@ -12,6 +12,7 @@ from numerox.metrics import metrics_per_era
 from numerox.metrics import metrics_per_name
 from numerox.metrics import concordance
 from numerox.metrics import LOGLOSS_BENCHMARK
+from numerox.metrics import add_split_pairs
 from numerox.util import is_none_slice
 
 HDF_PREDICTION_KEY = 'numerox_prediction'
@@ -116,6 +117,12 @@ class Prediction(object):
                     pr = (pr[0], nx.tournament_str(pr[1]))
                 pairs.append(pr)
         return pairs
+
+    def pairs_split(self, as_str=True):
+        "Split pairs into two lists: names and tournaments"
+        pairs = self.pairs(as_str)
+        name, tournament = zip(*pairs)
+        return name, tournament
 
     def __contains__(self, pair):
         "Is `pair` already in prediction? True or False"
@@ -301,7 +308,8 @@ class Prediction(object):
 
         # metrics
         metrics, regions = metrics_per_era(data, self, tournament,
-                                           region_as_str=True)
+                                           region_as_str=True,
+                                           split_pairs=False)
         metrics = metrics.drop(['era', 'pair'], axis=1)
 
         # additional metrics
@@ -355,6 +363,7 @@ class Prediction(object):
                                            era_as_str=era_as_str)
         metrics.index = metrics['era']
         metrics = metrics.drop(['era'], axis=1)
+        metrics = metrics.drop('pair', axis=1)
         return metrics
 
     def metric_per_tournament(self, data, metric='logloss'):
@@ -362,7 +371,8 @@ class Prediction(object):
         dfs = []
         for t_int, t_name in nx.tournament_iter():
                 df, info = metrics_per_name(data, self, t_int,
-                                            columns=[metric])
+                                            columns=[metric],
+                                            split_pairs=False)
                 df.columns = [t_name]
                 dfs.append(df)
         df = pd.concat(dfs, axis=1)
@@ -424,6 +434,7 @@ class Prediction(object):
             df = pd.DataFrame(data=m, index=pairs, columns=[col])
             dfs.append(df)
         df = pd.concat(dfs, axis=1)
+        df = add_split_pairs(df)
         df = df.sort_values([sort_by], ascending=[False])
         return df
 
@@ -519,8 +530,10 @@ class Prediction(object):
                                 era_as_str=False)
         for i, pair in enumerate(pairs):
 
-            m1i = m1[m1.pair == pair]
-            m2i = m2[m2.pair == pair]
+            m1i = m1[(m1.name == pair[0]) &
+                     (m1.tournament == nx.tournament_str(pair[1]))]
+            m2i = m2[(m2.name == pair[0]) &
+                     (m2.tournament == nx.tournament_str(pair[1]))]
 
             if (m1i.index != m2i.index).any():
                 raise IndexError("Can only handle aligned eras")
@@ -539,6 +552,8 @@ class Prediction(object):
 
             m = [logloss1, logloss2, win1, corr, maxdiff, ystd1, ystd2]
             comp.iloc[i] = m
+
+        comp = add_split_pairs(comp)
 
         return comp
 
