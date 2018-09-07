@@ -350,7 +350,7 @@ class Prediction(object):
             df_dict[pair] = self[pair].summary(data, tournament,
                                                round_output=round_output)
             if display:
-                print('{}, {}'.format(*pair))
+                print('{}, {}'.format(pair[0], nx.tournament_str(pair[1])))
                 print(df_dict[pair])
         return df_dict
 
@@ -518,7 +518,7 @@ class Prediction(object):
 
         # check each model, tournament pair
         for pair in pairs:
-            print(pair)
+            print('{}, {}'.format(pair[0], nx.tournament_str(pair[1])))
             df = pd.DataFrame(columns=columns)
             idx = pairs.index(pair)
             y = self.y[:, idx]

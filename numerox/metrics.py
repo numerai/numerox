@@ -173,11 +173,11 @@ def calc_metrics_arrays(y, yhat, columns):
     return metrics
 
 
-def concordance(data, prediction):
+def concordance(data, prediction, split_pairs=True):
     "Concordance; less than 0.12 is passing; data should be the full dataset."
 
     pairs = prediction.pairs(as_str=False)
-    concords = pd.DataFrame(columns=['concord'], index=[pairs])
+    concords = pd.DataFrame(columns=['concord'], index=pairs)
 
     # fit clusters
     kmeans = MiniBatchKMeans(n_clusters=5, random_state=1337)
@@ -208,6 +208,9 @@ def concordance(data, prediction):
         concords.iloc[i] = concord
 
     concords = concords.sort_values('concord')
+
+    if split_pairs:
+        concords = add_split_pairs(concords)
 
     return concords
 
