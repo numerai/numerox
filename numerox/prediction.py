@@ -356,14 +356,19 @@ class Prediction(object):
 
     def metrics_per_era(self, data, tournament=None,
                         metrics=['logloss', 'auc', 'acc', 'ystd'],
-                        era_as_str=True):
+                        era_as_str=True, split_pairs=True):
         "DataFrame containing given metrics versus era (as index)"
         metrics, regions = metrics_per_era(data, self, tournament,
                                            columns=metrics,
                                            era_as_str=era_as_str)
         metrics.index = metrics['era']
         metrics = metrics.drop(['era'], axis=1)
-        metrics = metrics.drop('pair', axis=1)
+        if split_pairs:
+            pair = metrics['pair']
+            metrics = metrics.drop('pair', axis=1)
+            metrics.insert(0, 'pair', pair)
+        else:
+            metrics = metrics.drop('pair', axis=1)
         return metrics
 
     def metric_per_tournament(self, data, metric='logloss'):
