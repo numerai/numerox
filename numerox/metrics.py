@@ -14,7 +14,7 @@ LOGLOSS_BENCHMARK = 0.693
 
 def metrics_per_era(data, prediction, tournament, join='data',
                     columns=['logloss', 'auc', 'acc', 'ystd'],
-                    era_as_str=False, region_as_str=False):
+                    era_as_str=False, region_as_str=False, split_pairs=True):
     "Dataframe with columns era, model, and specified metrics. And region list"
 
     df = prediction.df
@@ -29,8 +29,8 @@ def metrics_per_era(data, prediction, tournament, join='data',
     else:
         raise ValueError("`join` method not recognized")
     yhats_df = df.dropna()
-    y_name = nx.tournament_str(tournament)
-    data_df = data.df[['era', 'region', y_name]]
+    cols = ['era', 'region'] + nx.tournament_all(as_str=True)
+    data_df = data.df[cols]
     df = pd.merge(data_df, yhats_df, left_index=True, right_index=True,
                   how=how)
 
@@ -39,30 +39,39 @@ def metrics_per_era(data, prediction, tournament, join='data',
         regions = [REGION_INT_TO_STR[r] for r in regions]
 
     # calc metrics for each era
-    names = yhats_df.columns.values
+    pairs = yhats_df.columns.values
     metrics = []
     unique_eras = df.era.unique()
     for era in unique_eras:
         idx = df.era.isin([era])
         df_era = df[idx]
-        y = df_era[y_name].values
         if era_as_str:
             era = ERA_INT_TO_STR[era]
-        for name in names:
-            yhat = df_era[name].values
+        for pair in pairs:
+            if tournament is None:
+                # evaluate with targets that model trained on
+                tourni = nx.tournament_str(pair[1])
+            else:
+                # force evaluation targets to be from given tournament
+                tourni = nx.tournament_str(tournament)
+            y = df_era[tourni].values
+            yhat = df_era[pair].values
             m = calc_metrics_arrays(y, yhat, columns)
-            m = [era, name] + m
+            m = [era, pair] + m
             metrics.append(m)
 
-    columns = ['era', 'name'] + columns
+    columns = ['era', 'pair'] + columns
     metrics = pd.DataFrame(metrics, columns=columns)
+
+    if split_pairs:
+        metrics = add_split_pairs(metrics)
 
     return metrics, regions
 
 
 def metrics_per_name(data, prediction, tournament, join='data',
                      columns=['logloss', 'auc', 'acc', 'ystd'],
-                     era_as_str=True, region_as_str=True):
+                     era_as_str=True, region_as_str=True, split_pairs=True):
 
     # calc metrics per era
     skip = ['sharpe', 'consis']
@@ -85,17 +94,17 @@ def metrics_per_name(data, prediction, tournament, join='data',
     if 'logloss' in cols:
         # pivot is a dataframe with:
         #     era for rows
-        #     name for columns
+        #     pair for columns
         #     logloss for cell values
-        pivot = mpe.pivot(index='era', columns='name', values='logloss')
+        pivot = mpe.pivot(index='era', columns='pair', values='logloss')
 
     # mm is a dataframe with:
-    #    name as rows
+    #    pair as rows
     #    `cols` as columns
-    mm = mpe.groupby('name').mean()
+    mm = mpe.groupby('pair').mean()
 
     # metrics is the output with:
-    #    name as rows
+    #    pair as rows
     #    `columns` as columns
     metrics = pd.DataFrame(index=mm.index, columns=columns)
 
@@ -115,6 +124,9 @@ def metrics_per_name(data, prediction, tournament, join='data',
         else:
             raise ValueError("unknown metric ({})".format(col))
         metrics[col] = m
+
+    if split_pairs:
+        metrics = add_split_pairs(metrics)
 
     return metrics, info
 
@@ -161,10 +173,11 @@ def calc_metrics_arrays(y, yhat, columns):
     return metrics
 
 
-def concordance(data, prediction):
+def concordance(data, prediction, split_pairs=True):
     "Concordance; less than 0.12 is passing; data should be the full dataset."
 
-    concords = pd.DataFrame(columns=['concord'], index=prediction.names)
+    pairs = prediction.pairs(as_str=False)
+    concords = pd.DataFrame(columns=['concord'], index=pairs)
 
     # fit clusters
     kmeans = MiniBatchKMeans(n_clusters=5, random_state=1337)
@@ -181,7 +194,7 @@ def concordance(data, prediction):
         yhats.append(yh)
 
     # cross cluster distance (KS distance)
-    for i, name in enumerate(prediction.names):
+    for i in range(len(pairs)):
         ks = []
         for j in set(clusters[0]):
             yhat0 = yhats[0][:, i][clusters[0] == j]
@@ -192,8 +205,25 @@ def concordance(data, prediction):
                  ks_2samp(yhat2, yhat1)[0]]
             ks.append(max(d))
         concord = np.mean(ks)
-        concords.loc[name] = concord
+        concords.iloc[i] = concord
 
     concords = concords.sort_values('concord')
 
+    if split_pairs:
+        concords = add_split_pairs(concords)
+
     return concords
+
+
+def add_split_pairs(df, as_str=True):
+    "Add name and tournament columns and optional drop pair column"
+    if 'pair' in df:
+        pairs = df['pair'].tolist()
+    else:
+        pairs = df.index.tolist()
+    name, tournament = zip(*pairs)
+    if as_str:
+        tournament = [nx.tournament_str(t) for t in tournament]
+    df.insert(0, 'tournament', tournament)
+    df.insert(0, 'name', name)
+    return df

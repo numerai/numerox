@@ -21,11 +21,15 @@ from a Numerai-style csv file::
 
     >>> p = nx.load_prediction_csv('my_model.csv')
 
+Or you can use one of numerox's builtin models::
+
+    >>> p = nx.production(nx.logistic(), data, 'bernie')
+
 If your existing code already has both predictions ``yhat`` and Numerai row
 ``ids`` as numpy arrays::
 
     >>> p = nx.Prediction()
-    >>> p = p.merge_arrays(ids, yhat, 'my_model')
+    >>> p = p.merge_arrays(ids, yhat, 'my_model', 'bernie')
 
 Multiple models
 ---------------
@@ -43,8 +47,8 @@ or::
 or::
 
     >>> p = nx.Prediction()
-    >>> p = p.merge_arrays(ids, yhat, 'my_model_1')
-    >>> p += p.merge_arrays(ids, yhat, 'my_model_2')
+    >>> p = p.merge_arrays(ids, yhat, 'my_model_1', 'charles')
+    >>> p += p.merge_arrays(ids, yhat, 'my_model_2', 'charles')
 
 or::
 
@@ -54,179 +58,199 @@ or::
 
     >>> p = p.merge(p2)
 
+or (``tournament=None`` means to run the model across all five tournaments)::
+
+    >>> p = nx.production(nx.logistic(), data, tournament=None)
+
+
 Evaluate predictions
 --------------------
 
-Let's start by running some models::
+Let's start by running some models (``tournament=None`` runs the model five
+times, one for each tournament)::
 
     >>> data = nx.load_zip('numerai_dataset.zip')
-    >>> p = nx.production(nx.logistic(), data, 'bernie')
-    >>> p += nx.production(nx.randomforest(), data, 'bernie')
-    >>> p += nx.production(nx.example_predictions(), data, 'bernie')
+    >>> p = nx.production(nx.logistic(), data, tournament=None, verbosity=0)
+    >>> p += nx.production(nx.randomforest(), data, tournament=None, verbosity=0)
+    >>> p += nx.production(nx.example_predictions(), data, tournament=None, verbosity=0)
 
-which gives the output::
+The (model) names and tournaments contained in the prediction object::
 
-    logistic(inverse_l2=0.0001)
-           logloss     auc     acc    ystd   stats            
+    >>> p
+                        bernie elizabeth jordan ken charles
+    logistic                 x         x      x   x       x
+    randomforest             x         x      x   x       x
+    example_predictions      x         x      x   x       x
+
+The mean performance of each model averaged over the five tournaments::
+
+    >>> p.performance_mean(data['validation'], mean_of='name', sort_by='consis')
+                         N   logloss       auc       acc      ystd    sharpe    consis
+    name
+    logistic             5  0.692813  0.520050  0.513910  0.005877  0.548698  0.750000
+    randomforest         5  0.692873  0.518583  0.513771  0.005154  0.474319  0.716667
+    example_predictions  5  0.692849  0.515931  0.511935  0.007615  0.406432  0.666667
+
+The mean performance in each tournament averaged over the five (model) names::
+
+    >>> p.performance_mean(data['validation'], mean_of='tournament', sort_by='consis')
+                N   logloss       auc       acc      ystd    sharpe    consis
+    tournament
+    charles     3  0.692830  0.521548  0.514893  0.004850  0.719120  0.833333
+    ken         3  0.692783  0.520875  0.515404  0.006260  0.661760  0.805556
+    bernie      3  0.692848  0.517438  0.513737  0.006672  0.402646  0.694444
+    jordan      3  0.692880  0.515928  0.511663  0.006618  0.339453  0.638889
+    elizabeth   3  0.692884  0.515149  0.510329  0.006676  0.259435  0.583333
+
+We can look at the detailed performance of each of the 15 runs in the
+prediction object::
+
+    >>> p.summaries(data['validation'])
+    logistic, bernie
+           logloss     auc     acc    ystd   stats
     mean  0.692808  0.5194  0.5142  0.0063   tourn      bernie
     std   0.000375  0.0168  0.0137  0.0001  region  validation
     min   0.691961  0.4903  0.4925  0.0062    eras          12
     max   0.693460  0.5553  0.5342  0.0064  consis        0.75
-    Done in 0.05 minutes
+    logistic, elizabeth
+           logloss     auc     acc    ystd   stats
+    mean  0.692859  0.5168  0.5101  0.0061   tourn   elizabeth
+    std   0.000410  0.0188  0.0137  0.0001  region  validation
+    min   0.691911  0.4909  0.4947  0.0060    eras          12
+    max   0.693434  0.5593  0.5370  0.0063  consis    0.666667
+    <snip>
 
-    randomforest(max_features=2, depth=3, ntrees=100, seed=0)
-           logloss     auc     acc    ystd   stats            
-    mean  0.692874  0.5176  0.5138  0.0055   tourn      bernie
-    std   0.000303  0.0138  0.0115  0.0001  region  validation
-    min   0.692236  0.4902  0.4954  0.0054    eras          12
-    max   0.693495  0.5457  0.5342  0.0056  consis    0.666667
-    Done in 0.14 minutes
-    
-    example_predictions()
-           logloss     auc     acc    ystd   stats            
-    mean  0.692867  0.5150  0.5121  0.0081   tourn      bernie
-    std   0.000435  0.0144  0.0115  0.0001  region  validation
-    min   0.691768  0.4959  0.4960  0.0080    eras          12
-    max   0.693519  0.5508  0.5378  0.0082  consis    0.583333
-    Done in 0.26 minutes
+Or we can look in even more detail by looking at performance in every era::
 
-We can rerun the performance summaries at any time::
+    >>> p.metrics_per_era(data['validation'])
+                           name tournament   logloss       auc       acc      ystd
+    era
+    era121             logistic     bernie  0.692785  0.520504  0.520613  0.006376
+    era121             logistic  elizabeth  0.692895  0.514934  0.505814  0.006209
+    era121             logistic     jordan  0.692871  0.517478  0.512685  0.006324
+    era121             logistic        ken  0.692824  0.519075  0.519820  0.005995
+    era121             logistic    charles  0.692778  0.526620  0.521406  0.004794
+    era121         randomforest     bernie  0.692712  0.522860  0.523520  0.005608
+    <snip>
 
-    >>> df_dict = p.summaries(data['validation'], 'bernie')
-    logistic_bernie
-           logloss     auc     acc    ystd   stats            
-    mean  0.692808  0.5194  0.5142  0.0063   tourn      bernie
-    std   0.000375  0.0168  0.0137  0.0001  region  validation
-    min   0.691961  0.4903  0.4925  0.0062    eras          12
-    max   0.693460  0.5553  0.5342  0.0064  consis        0.75
-    randomforest_bernie
-           logloss     auc     acc    ystd   stats            
-    mean  0.692874  0.5176  0.5138  0.0055   tourn      bernie
-    std   0.000303  0.0138  0.0115  0.0001  region  validation
-    min   0.692236  0.4902  0.4954  0.0054    eras          12
-    max   0.693495  0.5457  0.5342  0.0056  consis    0.666667
-    example_predictions_bernie
-           logloss     auc     acc    ystd   stats            
-    mean  0.692867  0.5150  0.5121  0.0081   tourn      bernie
-    std   0.000435  0.0144  0.0115  0.0001  region  validation
-    min   0.691768  0.4959  0.4960  0.0080    eras          12
-    max   0.693519  0.5508  0.5378  0.0082  consis    0.583333
+or::
 
-Notice how the predictions from the models are highly correlated::
+    >>> p['logistic', 'bernie'].metrics_per_era(data['validation'])
+                name tournament   logloss       auc       acc      ystd
+    era
+    era121  logistic     bernie  0.692785  0.520504  0.520613  0.006376
+    era122  logistic     bernie  0.692467  0.537129  0.534193  0.006298
+    era123  logistic     bernie  0.692980  0.512810  0.507495  0.006316
+    era124  logistic     bernie  0.692617  0.527354  0.525091  0.006286
+    era125  logistic     bernie  0.692895  0.517678  0.517215  0.006387
+    era126  logistic     bernie  0.692561  0.531445  0.519849  0.006438
+    era127  logistic     bernie  0.693080  0.506166  0.499074  0.006302
+    era128  logistic     bernie  0.693008  0.509709  0.505609  0.006390
+    era129  logistic     bernie  0.691961  0.555262  0.532180  0.006443
+    era130  logistic     bernie  0.692914  0.515733  0.519341  0.006251
+    era131  logistic     bernie  0.692973  0.508727  0.492481  0.006164
+    era132  logistic     bernie  0.693460  0.490316  0.497259  0.006216
 
-    >>> p.correlation()
-    logistic_bernie
-       0.9311 randomforest_bernie
-       0.8631 example_predictions_bernie
-    randomforest_bernie
-       0.9311 logistic_bernie
-       0.8935 example_predictions_bernie
-    example_predictions_bernie
-       0.8935 randomforest_bernie
-       0.8631 logistic_bernie
+We can also look in less detail::
 
-Comparison of model performance sorted by logloss::
+    >>> df = p.performance(data['validation'], sort_by='consis')
+    >>> print(df.to_string(index=False))
+    name tournament   logloss       auc       acc      ystd    sharpe    consis
 
-    >>> p.performance(data['validation'], 'bernie', sort_by='logloss')
-                                 logloss       auc       acc      ystd    sharpe    consis
-    name                                                                                  
-    logistic_bernie             0.692808  0.519403  0.514200  0.006322  0.510818  0.750000
-    example_predictions_bernie  0.692867  0.515008  0.512093  0.008115  0.304800  0.583333
-    randomforest_bernie         0.692874  0.517564  0.513843  0.005544  0.414636  0.666667
+               logistic        ken  0.692751  0.522883  0.516185  0.005941  0.706879  0.833333
+           randomforest        ken  0.692808  0.521669  0.515534  0.005184  0.702168  0.833333
+    example_predictions    charles  0.692815  0.518958  0.511656  0.005790  0.713454  0.833333
+               logistic    charles  0.692821  0.522683  0.516508  0.004713  0.692814  0.833333
+           randomforest    charles  0.692855  0.523003  0.516517  0.004048  0.751093  0.833333
+    example_predictions        ken  0.692789  0.518074  0.514492  0.007655  0.576234  0.750000
+               logistic     bernie  0.692808  0.519403  0.514200  0.006322  0.510818  0.750000
+           randomforest     bernie  0.692868  0.517903  0.514917  0.005578  0.392321  0.750000
+               logistic     jordan  0.692826  0.518525  0.512537  0.006284  0.488683  0.666667
+               logistic  elizabeth  0.692859  0.516755  0.510123  0.006124  0.344298  0.666667
+           randomforest     jordan  0.692891  0.516556  0.512597  0.005590  0.360619  0.666667
+    example_predictions  elizabeth  0.692853  0.514909  0.511578  0.008534  0.268613  0.583333
+    example_predictions     bernie  0.692867  0.515008  0.512093  0.008115  0.304800  0.583333
+    example_predictions     jordan  0.692922  0.512705  0.509855  0.007979  0.169058  0.583333
+           randomforest  elizabeth  0.692941  0.513783  0.509287  0.005368  0.165394  0.500000
 
-Even though the models were trained on bernie targets we can evaluate performance
-in other tournaments. Let's see how well the predictions perform on Elizabeth targets::
+or::
 
-    >>> p.performance(data['validation'], 'elizabeth', sort_by='logloss')
-                                 logloss       auc       acc      ystd    sharpe    consis
-    name                                                                                  
-    example_predictions_bernie  0.692879  0.514126  0.510926  0.008115  0.227803  0.416667
-    logistic_bernie             0.692881  0.515328  0.510151  0.006322  0.282277  0.583333
-    randomforest_bernie         0.692954  0.512626  0.509476  0.005544  0.129843  0.500000
+    >>> df = p[:, 'bernie'].performance(data['validation'], sort_by='consis')
+    >>> print(df.to_string(index=False))
+    name tournament   logloss       auc       acc      ystd    sharpe    consis
 
-You can even look at the performance in a single era::
+               logistic     bernie  0.692808  0.519403  0.514200  0.006322  0.510818  0.750000
+           randomforest     bernie  0.692868  0.517903  0.514917  0.005578  0.392321  0.750000
+    example_predictions     bernie  0.692867  0.515008  0.512093  0.008115  0.304800  0.583333
 
-    >>> p.performance(data['era127'], 'bernie', sort_by='logloss')
-                                 logloss       auc       acc      ystd  sharpe  consis
-    name                                                                              
-    example_predictions_bernie  0.692803  0.519303  0.512834  0.008094     NaN     1.0
-    randomforest_bernie         0.692944  0.514694  0.504895  0.005543     NaN     1.0
-    logistic_bernie             0.693080  0.506166  0.499074  0.006302     NaN     0.0
+I won't give an example but you can also check the correlation between the
+predictions with ``p.correlation()`` and ``p.y_df.corr()``.
 
-Next, let's look at model dominance. For each model calculate what fraction
-of models it beats (in terms of logloss) in each era. Then take the mean for
-each model across all eras. Repeat for auc and acc. A score of 1 means the
-model was the top performer in every era; a score of 0 means the model was the
-worst performer in every era::
+Next, let's look at model dominance. For each model calculate what fraction of
+models it beats (in terms of logloss) in each era. Then take the mean for each
+model across all eras. Repeat for auc and acc. A score of 1 means the model was
+the top performer in every era; a score of 0 means the model was the worst
+performer in every era. To keep the report short let's only look at 'bernie'::
 
-    >>> p.dominance(data['validation'], 'bernie', sort_by='logloss')
-                                 logloss       auc       acc
-    logistic_bernie             0.666667  0.666667  0.541667
-    randomforest_bernie         0.458333  0.416667  0.541667
-    example_predictions_bernie  0.375000  0.416667  0.416667
+    >> p[:, 'bernie'].dominance(data['validation'])
+                                             name tournament   logloss       auc       acc
+    (logistic, 1)                        logistic     bernie  0.708333  0.666667  0.541667
+    (randomforest, 1)                randomforest     bernie  0.416667  0.458333  0.625000
+    (example_predictions, 1)  example_predictions     bernie  0.375000  0.375000  0.333333
 
-We can also look at performance in every era::
+So in about 71% of the eras the logistic model had the lowest logloss.
 
-        >>> m = p.metrics_per_era(data['validation'], 'bernie', metrics=['logloss', 'logloss_pass', 'auc'])
-        >>> m
-                                      name   logloss  logloss_pass       auc
-        era                                                                           
-        era121             logistic_bernie  0.692785          True  0.520504
-        era121         randomforest_bernie  0.692780          True  0.520509
-        era121  example_predictions_bernie  0.692964          True  0.509787
-        era122             logistic_bernie  0.692467          True  0.537129
-        era122         randomforest_bernie  0.692531          True  0.534318
-        era122  example_predictions_bernie  0.692620          True  0.522543
-        era123             logistic_bernie  0.692980          True  0.512810
-        era123         randomforest_bernie  0.693044         False  0.511115
-        era123  example_predictions_bernie  0.692703          True  0.521525
-        era124             logistic_bernie  0.692617          True  0.527354
-        era124         randomforest_bernie  0.692824          True  0.521125
-        <snip>
+Indexing
+--------
 
-Let's zoom in on logloss::
+We start with a prediction object, ``p``, that contains::
 
-    >>> m.pivot(columns='name', values='logloss')
-    name    example_predictions_bernie  logistic_bernie  randomforest_bernie
-    era                                                                     
-    era121                    0.692964         0.692785             0.692780
-    era122                    0.692620         0.692467             0.692531
-    era123                    0.692703         0.692980             0.693044
-    era124                    0.693064         0.692617             0.692824
-    era125                    0.693169         0.692895             0.692885
-    era126                    0.692607         0.692561             0.692824
-    era127                    0.692803         0.693080             0.692944
-    era128                    0.692923         0.693008             0.693063
-    era129                    0.691768         0.691961             0.692236
-    era130                    0.693176         0.692914             0.692854
-    era131                    0.693094         0.692973             0.693009
-    era132                    0.693519         0.693460             0.693495
+    >>> p
+                        bernie elizabeth jordan ken charles
+    logistic                 x         x      x   x       x
+    randomforest             x         x      x   x       x
+    example_predictions      x         x      x   x       x
 
-Instead of evaluting performance per era we can evaluate performance per
-tournament::
+You can index by (model) name::
 
-    >>> m = p.metric_per_tournament(data['validation'], metric='logloss')
-    >>> m
-                                  bernie  elizabeth    jordan       ken   charles      mean
-    name                                                                                   
-    logistic_bernie             0.692808   0.692881  0.692825  0.692750  0.692842  0.692821
-    example_predictions_bernie  0.692867   0.692879  0.692876  0.692797  0.692893  0.692863
-    randomforest_bernie         0.692874   0.692954  0.692884  0.692813  0.692894  0.692884
+    >>> p['logistic']
+             bernie elizabeth jordan ken charles
+    logistic      x         x      x   x       x
 
-Note that every model above was trained on bernie targets yet obtains the
-lowest logloss on ken targets.
+You can index by tournament::
+
+    >>> p[:, 'ken']
+                        bernie elizabeth jordan ken charles
+    logistic                                      x
+    randomforest                                  x
+    example_predictions                           x
+
+You can index by name and tournament::
+
+    >>> p['randomforest', 'charles']
+                 bernie elizabeth jordan ken charles
+    randomforest                                   x
+
+You can index by (name, tournament) pairs::
+
+    >>> p[[('randomforest', 'charles'), ('logistic', 'jordan')]]
+                 bernie elizabeth jordan ken charles
+    randomforest                                   x
+    logistic                           x
 
 Upload checks
 -------------
 
 Do the predictions pass concordance? A concordance of less than 0.12 is needed
 to pass Numerai's test (so, yes, they all pass)::
-  
-    >>> p.concordance(data)
-                                  concord
-    example_predictions_bernie  0.0394123
-    randomforest_bernie         0.0434942
-    logistic_bernie             0.0476868
+
+    >>> p['logistic'].concordance(data)
+                       name tournament    concord
+    (logistic, 5)  logistic    charles  0.0398208
+    (logistic, 2)  logistic  elizabeth   0.041147
+    (logistic, 3)  logistic     jordan   0.042649
+    (logistic, 1)  logistic     bernie  0.0430744
+    (logistic, 4)  logistic        ken  0.0448813
 
 If your tournament submission does not pass Numerai's upload checks then
 Numerai will reject the submission immediately. You can use Numerox to make
@@ -234,28 +258,24 @@ sure the checks will pass before you upload.
 
 Let's run the checks::
 
-    >>> check = prediction.check(data, example_predictions='bernie')
-    logistic_bernie
+    >>> p.check(data)
+    logistic, bernie
           validation      test      live       all  pass
-    corr    0.868204  0.861861  0.869963   0.86325  True
-    rcorr   0.868637  0.862757  0.874491  0.864123  True
-    min     0.475277  0.476348  0.475243  0.475243  True
-    max      0.52378  0.524316  0.518989  0.524316  True
-    maz       3.8993   3.92653    3.8589   3.96304  True
+    corr    0.868204  0.861861  0.868509  0.863216  True
+    rcorr   0.868637  0.862757  0.870403  0.864034  True
+    min     0.475277  0.476348  0.481861  0.475277  True
+    max      0.52378  0.524316  0.522606  0.524316  True
+    maz       3.8993   3.92653   3.53621    3.9575  True
+    logistic, elizabeth
+          validation      test      live       all  pass
+    corr    0.830666  0.819013  0.827738  0.821461  True
+    rcorr   0.830695  0.819362   0.82823  0.821722  True
+    min     0.474478  0.476066  0.481326  0.474478  True
+    max     0.522743  0.523472  0.522443  0.523472  True
+    maz      4.06343   4.01284   3.70983   4.12892  True
+    <snip>
 
 All checks passed!
-
-If you pass the tournament number or tournament name to the ``check`` method
-then numerox will calculate the example prediction. Alternatively, to run
-fast if you wish to check more than one model, you can pass in the example
-predictions as a prediction object, which you can generate in one of two ways::
-
-    >>> example_predictions = nx.load_example_predictions('data.zip', 'bernie')
-
-or::
-
-    >>> model = nx.example_predictions()
-    >>> example_predictions = nx.production(data, model, 'bernie')
 
 Save and load
 -------------
@@ -270,7 +290,7 @@ And then load them::
 
 And you can save one model's predictions to csv for future upload to Numerai::
 
-    >>> p['logistic_bernie'].to_csv('logistic_bernie.csv', tournament='bernie')
+    >>> p['logistic', 'bernie'].to_csv('logistic_bernie.csv')
 
 It is better to load your predictions from an HDF5 file (faster, no rounding
 errors, can contain predictions from multiple models) but you can load from
@@ -281,16 +301,6 @@ to Numerai::
 
 Odds and ends
 -------------
-
-I forget, is 'logistic_bernie' in the prediction::
-
-    >>> 'logistic_bernie' in p
-    True
-
-If you have a lot of models in youe prediction object and only want to
-evaluate, say, two of them::
-
-    >>> p2 = p[['model1', 'model2']]
 
 Some other things you can do::
 
@@ -303,10 +313,28 @@ Some other things you can do::
     >>> p.size
     729666
     >>> p2 = p.copy()
-    >>> p
-    Prediction(243222 rows x 3 names; 0.0000 missing)
-    >>> p.names
-    ['logistic_bernie', 'randomforest_bernie', 'example_predictions_bernie']
+    >>> p.names()
+    >>> ['logistic', 'randomforest', 'example_predictions']
+    >>> p.tournaments()
+    ['bernie', 'elizabeth', 'jordan', 'ken', 'charles']
+    >>> p.tournaments(as_str=False)
+    [1, 2, 3, 4, 5]
+    >>> p.pairs()
+    [('logistic', 'bernie'),
+     ('logistic', 'elizabeth'),
+     ('logistic', 'jordan'),
+     ('logistic', 'ken'),
+     ('logistic', 'charles'),
+     ('randomforest', 'bernie'),
+     ('randomforest', 'elizabeth'),
+     ('randomforest', 'jordan'),
+     ('randomforest', 'ken'),
+     ('randomforest', 'charles'),
+     ('example_predictions', 'bernie'),
+     ('example_predictions', 'elizabeth'),
+     ('example_predictions', 'jordan'),
+     ('example_predictions', 'ken'),
+     ('example_predictions', 'charles')]
 
 But wait! There's more
 ----------------------

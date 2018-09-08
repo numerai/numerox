@@ -1,5 +1,6 @@
 import os
 import zipfile
+import warnings
 
 import pandas as pd
 import numpy as np
@@ -11,6 +12,8 @@ from numerox.metrics import metrics_per_era
 from numerox.metrics import metrics_per_name
 from numerox.metrics import concordance
 from numerox.metrics import LOGLOSS_BENCHMARK
+from numerox.metrics import add_split_pairs
+from numerox.util import is_none_slice
 
 HDF_PREDICTION_KEY = 'numerox_prediction'
 EXAMPLE_PREDICTIONS = 'example_predictions_target_{}.csv'
@@ -26,12 +29,111 @@ class Prediction(object):
     def __init__(self, df=None):
         self.df = df
 
+    # ids -------------------------------------------------------------------
+
     @property
+    def ids(self):
+        "View of ids as a numpy str array"
+        if self.df is None:
+            return np.array([], dtype=str)
+        return self.df.index.values
+
+    @property
+    def loc(self):
+        "indexing by row ids"
+        return Loc(self)
+
+    # names, tournaments, pairs ---------------------------------------------
+
+    def pairs(self, as_str=True):
+        "List (copy) of (name, tournament) tuple in prediction object"
+        if self.df is None:
+            return list()
+        pairs = self.df.columns.tolist()
+        if as_str:
+            pairs = [(n, nx.tournament_str(t)) for n, t in pairs]
+        return pairs
+
     def names(self):
         "List (copy) of names in prediction object"
-        if self.df is None:
-            return []
-        return self.df.columns.tolist()
+        pairs = self.pairs()
+        names = []
+        for n, t in pairs:
+            if n not in names:
+                names.append(n)
+        return names
+
+    def tournaments(self, as_str=True):
+        "List (copy) of tournaments in prediction object"
+        pairs = self.pairs(as_str=False)
+        tournaments = [t for n, t in pairs]
+        tournaments = sorted(set(tournaments))
+        if as_str:
+            tournaments = [nx.tournament_str(t) for t in tournaments]
+        return tournaments
+
+    def pairs_df(self):
+        "Bool dataframe with names as index and tournaments as columns"
+        names = self.names()
+        tourns = nx.tournament_all()
+        df = pd.DataFrame(index=names, columns=tourns)
+        for name in names:
+            for tourn in tourns:
+                df.loc[name, tourn] = (name, tourn) in self
+        return df
+
+    def pair_isin(self, pair):
+        "Is (name, tournament) tuple in Prediction object? True or False."
+        return pair in self
+
+    def name_isin(self, name):
+        "Is name in Prediction object? True or False."
+        names = self.names()
+        return name in names
+
+    def tournament_isin(self, tournament):
+        "Is tournament in Prediction object? True or False."
+        tournaments = self.tournaments(as_str=False)
+        tournament = nx.tournament_int(tournament)
+        return tournament in tournaments
+
+    def pairs_with_name(self, name, as_str=True):
+        "List of pairs with given `name`"
+        prs = self.pairs(as_str)
+        pairs = []
+        for pr in prs:
+            if pr[0] == name:
+                pairs.append(pr)
+        return pairs
+
+    def pairs_with_tournament(self, tournament, as_str=True):
+        "List of pairs with given `tournament`"
+        tournament = nx.tournament_int(tournament)
+        prs = self.pairs(as_str=False)
+        pairs = []
+        for pr in prs:
+            if pr[1] == tournament:
+                if as_str:
+                    pr = (pr[0], nx.tournament_str(pr[1]))
+                pairs.append(pr)
+        return pairs
+
+    def pairs_split(self, as_str=True):
+        "Split pairs into two lists: names and tournaments"
+        pairs = self.pairs(as_str)
+        name, tournament = zip(*pairs)
+        return name, tournament
+
+    def __contains__(self, pair):
+        "Is `pair` already in prediction? True or False"
+        pair = self.make_pair(*pair)
+        return pair in self.df
+
+    def make_pair(self, name, tournament):
+        "Combine `name` and `tournament` into a pair (dataframe column name)"
+        if not nx.isstring(name):
+            raise ValueError("`name` must be a string")
+        return (name, nx.tournament_int(tournament))
 
     def rename(self, mapper):
         """
@@ -51,26 +153,25 @@ class Prediction(object):
         """
         if self.df is None:
             raise ValueError("Cannot rename an empty prediction")
+        names = self.names()
+        df = self.df.copy()
         if nx.isstring(mapper):
-            if self.shape[1] != 1:
-                raise ValueError("prediction must contain a single name")
-            mapper = {self.names[0]: mapper}
-        df = self.df.rename(columns=mapper, copy=True)
+            if len(names) != 1:
+                msg = 'prediction contains more than one name; use dict mapper'
+                raise ValueError(msg)
+            pairs = self.pairs(as_str=False)
+            pairs = [(mapper, t) for n, t in pairs]
+        elif isinstance(mapper, dict):
+            prs = self.pairs(as_str=False)
+            pairs = []
+            for pr in prs:
+                if pr[0] in mapper:
+                    pr = (mapper[pr[0]], pr[1])
+                pairs.append(pr)
+        df.columns = pairs
         return Prediction(df)
 
-    def drop(self, name):
-        "Drop name (str) or names (e.g. a list of names) from prediction"
-        if self.df is None:
-            raise ValueError("Cannot drop a name from an empty prediction")
-        df = self.df.drop(columns=name)
-        return Prediction(df)
-
-    @property
-    def ids(self):
-        "View of ids as a numpy str array"
-        if self.df is None:
-            return np.array([], dtype=str)
-        return self.df.index.values
+    # y ---------------------------------------------------------------------
 
     @property
     def y(self):
@@ -96,20 +197,53 @@ class Prediction(object):
                           columns=self.df.columns.copy())
         return Prediction(df)
 
-    def iter(self):
-        "Yield a prediction object with only one model at a time"
-        for name in self.names:
-            yield self[name]
+    def y_correlation(self):
+        "Correlation matrix of y's (predictions) as dataframe"
+        return self.df.corr()
 
-    def merge_arrays(self, ids, y, name):
+    def correlation(self, pair=None, as_str=True):
+        "Correlation of predictions; by default reports given for each model"
+        if pair is None:
+            pairs = self.pairs(as_str)
+        else:
+            pairs = [pair]
+        z = self.df.values
+        zpairs = self.pairs(as_str)
+        idx = np.isfinite(z.sum(axis=1))
+        z = z[idx]
+        z = (z - z.mean(axis=0)) / z.std(axis=0)
+        for pair in pairs:
+            print('{}, {}'.format(*pair))
+            idx = zpairs.index(pair)
+            corr = np.dot(z[:, idx], z) / z.shape[0]
+            index = (-corr).argsort()
+            for ix in index:
+                zpair = zpairs[ix]
+                if pair != zpair:
+                    print("   {:.4f} {}, {}".format(corr[ix], *zpair))
+
+    # merge -----------------------------------------------------------------
+
+    def merge_arrays(self, ids, y, name, tournament):
         "Merge numpy arrays `ids` and `y` with name `name`"
-        df = pd.DataFrame(data={name: y}, index=ids)
+        pair = self.make_pair(name, tournament)
+        df = pd.DataFrame(data=y, columns=[pair], index=ids)
         prediction = Prediction(df)
         return self.merge(prediction)
 
     def merge(self, prediction):
         "Merge prediction"
         return merge_predictions([self, prediction])
+
+    def __add__(self, prediction):
+        "Merge predictions"
+        return self.merge(prediction)
+
+    def __iadd__(self, prediction):
+        "Merge predictions"
+        return self.merge(prediction)
+
+    # io --------------------------------------------------------------------
 
     def save(self, path_or_buf, compress=True, mode='w'):
         """
@@ -141,38 +275,42 @@ class Prediction(object):
         if mode == 'a':
             p = nx.load_prediction(path_or_buf)
             self = p.merge(self)
-        if compress:
-            self.df.to_hdf(path_or_buf, HDF_PREDICTION_KEY,
-                           complib='zlib', complevel=4)
-        else:
-            self.df.to_hdf(path_or_buf, HDF_PREDICTION_KEY)
+        with warnings.catch_warnings():
+            # pytables warns (through pandas) that pairs will be pickled which
+            # is a performance hit but there are never a large number of models
+            # and hence pairs in a prediction object
+            warnings.simplefilter("ignore")
+            if compress:
+                self.df.to_hdf(path_or_buf, HDF_PREDICTION_KEY,
+                               complib='zlib', complevel=4)
+            else:
+                self.df.to_hdf(path_or_buf, HDF_PREDICTION_KEY)
 
-    def to_csv(self, path_or_buf, tournament, decimals=6, verbose=False):
-        "Save a csv file of predictions; predictin must contain only one name"
+    def to_csv(self, path_or_buf, decimals=6, verbose=False):
+        "Save a csv file of predictions; prediction must contain only one pair"
         if self.shape[1] != 1:
-            raise ValueError("prediction must contain a single name")
-        name = nx.tournament_str(tournament)
-        df = self.df.iloc[:, 0].to_frame('probability_' + name)
+            raise ValueError("prediction must contain a single pair")
+        tourn = self.tournaments(as_str=True)[0]
+        df = self.df.iloc[:, 0].to_frame('probability_' + tourn)
         df.index.rename('id', inplace=True)
         float_format = "%.{}f".format(decimals)
         df.to_csv(path_or_buf, float_format=float_format)
         if verbose:
             print("Save {}".format(path_or_buf))
 
-    def y_correlation(self):
-        "Correlation matrix of y's (predictions) as dataframe"
-        return self.df.corr()
+    # metrics ---------------------------------------------------------------
 
-    def summary(self, data, tournament, round_output=True):
-        "Performance summary of prediction object that contains a single name"
+    def summary(self, data, tournament=None, round_output=True):
+        "Performance summary of prediction object that contains a single pair"
 
         if self.shape[1] != 1:
-            raise ValueError("prediction must contain a single name")
+            raise ValueError("prediction must contain a single pair")
 
         # metrics
         metrics, regions = metrics_per_era(data, self, tournament,
-                                           region_as_str=True)
-        metrics = metrics.drop(['era', 'name'], axis=1)
+                                           region_as_str=True,
+                                           split_pairs=False)
+        metrics = metrics.drop(['era', 'pair'], axis=1)
 
         # additional metrics
         region_str = ', '.join(regions)
@@ -181,7 +319,10 @@ class Prediction(object):
         consis = (logloss < LOGLOSS_BENCHMARK).mean()
 
         # summary of metrics
-        t_str = nx.tournament_str(tournament)
+        if tournament is None:
+            t_str = self.tournaments(as_str=True)[0]
+        else:
+            t_str = nx.tournament_str(tournament)
         m1 = metrics.mean(axis=0).tolist() + ['tourn', t_str]
         m2 = metrics.std(axis=0).tolist() + ['region', region_str]
         m3 = metrics.min(axis=0).tolist() + ['eras', nera]
@@ -201,26 +342,33 @@ class Prediction(object):
 
         return df
 
-    def summaries(self, data, tournament, round_output=True, display=True):
+    def summaries(self, data, tournament=None, round_output=True,
+                  display=True):
         "Dictionary of performance summaries of predictions"
         df_dict = {}
-        for name in self.names:
-            df_dict[name] = self[name].summary(data, tournament,
+        for pair in self.pairs(as_str=False):
+            df_dict[pair] = self[pair].summary(data, tournament,
                                                round_output=round_output)
             if display:
-                print(name)
-                print(df_dict[name])
+                print('{}, {}'.format(pair[0], nx.tournament_str(pair[1])))
+                print(df_dict[pair])
         return df_dict
 
-    def metrics_per_era(self, data, tournament,
+    def metrics_per_era(self, data, tournament=None,
                         metrics=['logloss', 'auc', 'acc', 'ystd'],
-                        era_as_str=True):
+                        era_as_str=True, split_pairs=True):
         "DataFrame containing given metrics versus era (as index)"
         metrics, regions = metrics_per_era(data, self, tournament,
                                            columns=metrics,
                                            era_as_str=era_as_str)
         metrics.index = metrics['era']
         metrics = metrics.drop(['era'], axis=1)
+        if split_pairs:
+            pair = metrics['pair']
+            metrics = metrics.drop('pair', axis=1)
+            metrics.insert(0, 'pair', pair)
+        else:
+            metrics = metrics.drop('pair', axis=1)
         return metrics
 
     def metric_per_tournament(self, data, metric='logloss'):
@@ -228,7 +376,8 @@ class Prediction(object):
         dfs = []
         for t_int, t_name in nx.tournament_iter():
                 df, info = metrics_per_name(data, self, t_int,
-                                            columns=[metric])
+                                            columns=[metric],
+                                            split_pairs=False)
                 df.columns = [t_name]
                 dfs.append(df)
         df = pd.concat(dfs, axis=1)
@@ -236,7 +385,7 @@ class Prediction(object):
         df = df.sort_values('mean')
         return df
 
-    def performance(self, data, tournament, era_as_str=True,
+    def performance(self, data, tournament=None, era_as_str=True,
                     region_as_str=True,
                     columns=['logloss', 'auc', 'acc', 'ystd', 'sharpe',
                              'consis'], sort_by='logloss'):
@@ -265,21 +414,62 @@ class Prediction(object):
                     ascending.append('True')
                 df = df.sort_values(by=by, ascending=ascending)
             else:
-                raise ValueError("`sort_by` name not recognized")
+                raise ValueError("`sort_by` method not recognized")
         return df
 
-    def dominance(self, data, tournament, sort_by='logloss'):
+    def performance_mean(self, data, mean_of='name', era_as_str=True,
+                         region_as_str=True,
+                         columns=['logloss', 'auc', 'acc', 'ystd', 'sharpe',
+                                  'consis'], sort_by='logloss'):
+        "Mean performance averaged across names (default) or tournaments,"
+        df = self.performance(data, era_as_str=era_as_str,
+                              region_as_str=region_as_str, columns=columns)
+        if mean_of == 'name':
+            g = df.groupby('name')
+            df = g.mean()
+            c = g.count()
+            df.insert(0, 'N', c['tournament'])
+        elif mean_of == 'tournament':
+            g = df.groupby('tournament')
+            df = g.mean()
+            c = g.count()
+            df.insert(0, 'N', c['name'])
+        else:
+            raise ValueError("`across` must be 'name' or 'tournament'")
+        if sort_by in columns:
+            if sort_by == 'logloss':
+                df = df.sort_values(by='logloss', ascending=True)
+            elif sort_by == 'auc':
+                df = df.sort_values(by='auc', ascending=False)
+            elif sort_by == 'acc':
+                df = df.sort_values(by='acc', ascending=False)
+            elif sort_by == 'ystd':
+                df = df.sort_values(by='ystd', ascending=False)
+            elif sort_by == 'sharpe':
+                df = df.sort_values(by='sharpe', ascending=False)
+            elif sort_by == 'consis':
+                by = ['consis']
+                ascending = [False]
+                if 'logloss' in df:
+                    by.append('logloss')
+                    ascending.append('True')
+                df = df.sort_values(by=by, ascending=ascending)
+            else:
+                raise ValueError("`sort_by` method not recognized")
+        return df
+
+    def dominance(self, data, tournament=None, sort_by='logloss'):
         "Mean (across eras) of fraction of models bested per era"
         columns = ['logloss', 'auc', 'acc']
         mpe, regions = metrics_per_era(data, self, tournament, columns=columns)
         dfs = []
         for i, col in enumerate(columns):
-            pivot = mpe.pivot(index='era', columns='name', values=col)
-            names = pivot.columns.tolist()
+            pivot = mpe.pivot(index='era', columns='pair', values=col)
+            pairs = pivot.columns.tolist()
             a = pivot.values
             n = a.shape[1] - 1.0
             if n == 0:
-                raise ValueError("Must have at least two names")
+                raise ValueError("Must have at least two pairs")
             m = []
             for j in range(pivot.shape[1]):
                 if col == 'logloss':
@@ -287,9 +477,10 @@ class Prediction(object):
                 else:
                     z = (a[:, j].reshape(-1, 1) > a).sum(axis=1) / n
                 m.append(z.mean())
-            df = pd.DataFrame(data=m, index=names, columns=[col])
+            df = pd.DataFrame(data=m, index=pairs, columns=[col])
             dfs.append(df)
         df = pd.concat(dfs, axis=1)
+        df = add_split_pairs(df)
         df = df.sort_values([sort_by], ascending=[False])
         return df
 
@@ -297,28 +488,7 @@ class Prediction(object):
         "Less than 0.12 is passing; data should be the full dataset."
         return concordance(data, self)
 
-    def correlation(self, name=None):
-        "Correlation of predictions; by default reports given for each model"
-        if name is None:
-            names = self.names
-        else:
-            names = [name]
-        z = self.df.values
-        znames = self.names
-        idx = np.isfinite(z.sum(axis=1))
-        z = z[idx]
-        z = (z - z.mean(axis=0)) / z.std(axis=0)
-        for name in names:
-            print(name)
-            idx = znames.index(name)
-            corr = np.dot(z[:, idx], z) / z.shape[0]
-            index = (-corr).argsort()
-            for ix in index:
-                zname = znames[ix]
-                if name != zname:
-                    print("   {:.4f} {}".format(corr[ix], zname))
-
-    def check(self, data, example_predictions, verbose=True):
+    def check(self, data, verbose=True):
         """
         Run Numerai upload checks.
 
@@ -326,52 +496,45 @@ class Prediction(object):
         ----------
         data : nx.Data
             Data object of Numerai dataset.
-        example_predictions : int, str, or nx.Prediction
-            The examples predictions. If an integer, e.g. 1, or string
-            ('bernie') is given then numerox will calculate the example
-            predictions for tournament 1. Or you can pass in a Prediction
-            object that contain the example predictions.
         verbose : bool
             By default, True, output is printed to stdout.
 
         Returns
         -------
         check : dict
-            A dictionary where the keys are the model names and the values
-            are Pandas DataFrames that contain the results of the checks.
+            A dictionary where the keys are the (name, tournament) pairs and
+            the values are Pandas DataFrames that contain the results of the
+            checks.
         """
 
-        if not isinstance(example_predictions, nx.Prediction):
-            t_int = nx.tournament_int(example_predictions)
-            example_predictions = nx.production(nx.example_predictions(),
-                                                data,
-                                                tournament=t_int,
-                                                verbosity=0)
-        else:
-            if example_predictions.shape[1] != 1:
-                raise ValueError('Expecting only one example prediction')
-
-        example_predictions = example_predictions.loc[self.ids]
-        yex = example_predictions.y[:, 0]
-        names = list(self.names)
+        # calc example predictions
+        example_y = {}
+        for tournament in self.tournaments(as_str=False):
+            ep = nx.production(nx.example_predictions(), data,
+                               tournament=tournament, verbosity=0)
+            ep = ep.loc[self.ids]
+            example_y[tournament] = ep.y[:, 0]
 
         df_dict = {}
         columns = ['validation', 'test', 'live', 'all', 'pass']
         data = data.loc[self.ids]
         regions = data.region
-        for name in names:
-            print(name)
+        pairs = list(self.pairs(as_str=False))
+
+        # check each model, tournament pair
+        for pair in pairs:
+            print('{}, {}'.format(pair[0], nx.tournament_str(pair[1])))
             df = pd.DataFrame(columns=columns)
-            idx = self.names.index(name)
+            idx = pairs.index(pair)
             y = self.y[:, idx]
             for region in ('validation', 'test', 'live', 'all'):
+                yexi = example_y[pair[1]]
                 if region == 'all':
                     yi = y
-                    yexi = yex
                 else:
                     idx = regions == region
                     yi = y[idx]
-                    yexi = yex[idx]
+                    yexi = yexi[idx]
                 df.loc['corr', region] = pearsonr(yi, yexi)[0]
                 df.loc['rcorr', region] = spearmanr(yi, yexi)[0]
                 df.loc['min', region] = yi.min()
@@ -387,34 +550,36 @@ class Prediction(object):
 
             print(df)
 
-            df_dict[name] = df
+            df_dict[pair] = df
 
         return df_dict
 
-    def compare(self, data, prediction, tournament):
+    def compare(self, data, prediction, tournament=None):
         "Compare performance of predictions with the same names"
+        pairs = []
+        for pair in self.pairs(as_str=False):
+            if pair in prediction:
+                pairs.append(pair)
         cols = ['logloss1', 'logloss2', 'win1',
                 'corr', 'maxdiff', 'ystd1', 'ystd2']
-        comp = pd.DataFrame(columns=cols)
-        names = []
-        for name in self.names:
-            if name in prediction:
-                names.append(name)
-        if len(names) == 0:
+        comp = pd.DataFrame(columns=cols, index=pairs)
+        if len(pairs) == 0:
             return comp
         ids = data.ids
         df1 = self.loc[ids]
         df2 = prediction.loc[ids]
-        p1 = self[names]
-        p2 = prediction[names]
+        p1 = self[pairs]
+        p2 = prediction[pairs]
         m1 = p1.metrics_per_era(data, tournament, metrics=['logloss'],
                                 era_as_str=False)
         m2 = p2.metrics_per_era(data, tournament, metrics=['logloss'],
                                 era_as_str=False)
-        for name in names:
+        for i, pair in enumerate(pairs):
 
-            m1i = m1[m1.name == name]
-            m2i = m2[m2.name == name]
+            m1i = m1[(m1.name == pair[0]) &
+                     (m1.tournament == nx.tournament_str(pair[1]))]
+            m2i = m2[(m2.name == pair[0]) &
+                     (m2.tournament == nx.tournament_str(pair[1]))]
 
             if (m1i.index != m2i.index).any():
                 raise IndexError("Can only handle aligned eras")
@@ -423,8 +588,8 @@ class Prediction(object):
             logloss2 = m2i.logloss.mean()
             win1 = (m1i.logloss < m2i.logloss).mean()
 
-            y1 = df1[name].y.reshape(-1)
-            y2 = df2[name].y.reshape(-1)
+            y1 = df1[pair].y.reshape(-1)
+            y2 = df2[pair].y.reshape(-1)
 
             corr = np.corrcoef(y1, y2)[0, 1]
             maxdiff = np.abs(y1 - y2).max()
@@ -432,9 +597,80 @@ class Prediction(object):
             ystd2 = y2.std()
 
             m = [logloss1, logloss2, win1, corr, maxdiff, ystd1, ystd2]
-            comp.loc[name] = m
+            comp.iloc[i] = m
+
+        comp = add_split_pairs(comp)
 
         return comp
+
+    # indexing --------------------------------------------------------------
+
+    def __getitem__(self, index):
+        "Prediction indexing is by model pair(s)"
+        if isinstance(index, tuple):
+            if len(index) != 2:
+                raise IndexError("When indexing by tuple must be length 2")
+            if isinstance(index[0], slice):
+                if not is_none_slice(index[0]):
+                    raise IndexError("Slces must be slice(None, None, None,)")
+                pairs1 = self.pairs(as_str=False)
+            elif nx.isstring(index[0]):
+                pairs1 = self.pairs_with_name(index[0], as_str=False)
+            else:
+                raise IndexError("indexing method not recognized")
+            if isinstance(index[1], slice):
+                if not is_none_slice(index[1]):
+                    raise IndexError("Slces must be slice(None, None, None,)")
+                pairs2 = self.pairs(as_str=False)
+            elif nx.isint(index[1]):
+                pairs2 = self.pairs_with_tournament(index[1], as_str=False)
+            elif nx.isstring(index[1]):
+                pairs2 = self.pairs_with_tournament(index[1], as_str=False)
+            else:
+                raise IndexError("indexing method not recognized")
+            pairs = []
+            for pair in pairs1:
+                if pair in pairs2:
+                    pairs.append(pair)
+            p = Prediction(pd.DataFrame(data=self.df[pairs]))
+        elif nx.isstring(index):
+            pairs = self.pairs_with_name(index, as_str=False)
+            p = Prediction(self.df[pairs])
+        else:
+            # assume an iterable of tuple pairs
+            idx = []
+            for ix in index:
+                if len(ix) != 2:
+                    msg = "Expecting list of tuple pairs with length 2"
+                    raise IndexError(msg)
+                idx.append((ix[0], nx.tournament_int(ix[1])))
+            p = Prediction(self.df[idx])
+        return p
+
+    def __setitem__(self, index, prediction):
+        "Add (or replace) a prediction by pair"
+        if prediction.df.shape[1] != 1:
+            raise ValueError("Can only insert a single model at a time")
+        if not isinstance(index, tuple):
+            raise IndexError('`index` must be a tuple pair')
+        if len(index) != 2:
+            raise IndexError('`index` must be a tuple pair of length 2')
+        prediction.df.columns = [index]
+        self.df = self.merge(prediction).df
+
+    # utilities -------------------------------------------------------------
+
+    def drop(self, pair):
+        "Drop pair (tuple) or list of pairs from prediction; return copy"
+        if self.df is None:
+            raise ValueError("Cannot drop a pair from an empty prediction")
+        df = self.df.drop(columns=pair)
+        return Prediction(df)
+
+    def iter(self):
+        "Yield a prediction object with only one model at a time"
+        for pair in self.pairs(as_str=False):
+            yield self[pair]
 
     def copy(self):
         "Copy of prediction"
@@ -457,38 +693,6 @@ class Prediction(object):
         b = self.df.values.tobytes(order='A')
         h = hash(b)
         return h
-
-    def __getitem__(self, name):
-        "Prediction indexing is by model name(s)"
-        if nx.isstring(name):
-            p = Prediction(self.df[name].to_frame(name))
-        else:
-            p = Prediction(self.df[name])
-        return p
-
-    def __setitem__(self, name, prediction):
-        "Add (or replace) a prediction by name"
-        if prediction.df.shape[1] != 1:
-            raise ValueError("Can only insert a single model at a time")
-        prediction.df.columns = [name]
-        self.df = self.merge(prediction).df
-
-    @property
-    def loc(self):
-        "indexing by row ids"
-        return Loc(self)
-
-    def __add__(self, prediction):
-        "Merge predictions"
-        return self.merge(prediction)
-
-    def __iadd__(self, prediction):
-        "Merge predictions"
-        return self.merge(prediction)
-
-    def __contains__(self, name):
-        "Is `name` already in prediction? True or False"
-        return name in self.df
 
     def __eq__(self, prediction):
         "Check if prediction objects are equal or not; order matters"
@@ -515,13 +719,10 @@ class Prediction(object):
         return self.df.__len__()
 
     def __repr__(self):
-        shape = self.shape
-        if shape[1] == 0:
-            frac_miss = 0.0
-        else:
-            frac_miss = self.df.isna().mean().mean()
-        fmt = 'Prediction({} rows x {} names; {:.4f} missing)'
-        return fmt.format(shape[0], shape[1], frac_miss)
+        df = self.pairs_df()
+        df = df.replace(to_replace=True, value='x')
+        df = df.replace(to_replace=False, value='')
+        return df.to_string(index=True)
 
 
 class Loc(object):
@@ -545,11 +746,12 @@ def load_prediction_csv(filename, name=None):
     df = pd.read_csv(filename, index_col='id')
     if df.shape[1] != 1:
         raise ValueError("csv file must contain one column of predictions")
+    tournament = nx.tournament_int(df.columns[0].split('_')[-1])
     if name is None:
         name = os.path.split(filename)[-1]
         if name.endswith('.csv'):
             name = name[:-4]
-    df.columns = [name]
+    df.columns = [(name, tournament)]
     return Prediction(df)
 
 
@@ -574,8 +776,8 @@ def merge_predictions(prediction_list):
     p = prediction_list[0].copy()
     for i in range(1, len(prediction_list)):
         pi = prediction_list[i]
-        for name in pi.names:
-            p = _merge_predictions(p, pi[name])
+        for pair in pi.pairs(as_str=False):
+            p = _merge_predictions(p, pi[pair])
     return p
 
 
@@ -583,24 +785,24 @@ def _merge_predictions(prediction1, prediction2):
     "Merge a possibly multi-name prediction1 with a single-name prediction2"
     if prediction2.shape[1] != 1:
         raise ValueError("`prediction2` must contain a single name")
-    name = prediction2.names[0]
+    pair = prediction2.pairs(as_str=False)[0]
     if prediction1.df is None:
         # empty prediction
         df = prediction2.df
-    elif name not in prediction1:
+    elif pair not in prediction1:
         # inserting predictions from a model not already in report
         df = pd.merge(prediction1.df, prediction2.df, how='outer',
                       left_index=True, right_index=True)
     else:
         # add more ys from a model whose name already exists
-        y = prediction1.df[name]
+        y = prediction1.df[pair]
         y = y.dropna()
         s = prediction2.df.iloc[:, 0]
         s = s.dropna()
         s = pd.concat([s, y], join='outer', ignore_index=False,
                       verify_integrity=True)
-        dfnew = s.to_frame(name)
-        df = pd.merge(prediction1.df, dfnew, how='outer', on=name,
+        dfnew = pd.DataFrame(s, columns=[pair])
+        df = pd.merge(prediction1.df, dfnew, how='outer', on=[pair],
                       left_index=True, right_index=True)
-        df[name] = dfnew
+        df[pair] = dfnew
     return Prediction(df)
