@@ -632,7 +632,14 @@ class Prediction(object):
             pairs = self.pairs_with_name(index, as_str=False)
             p = Prediction(self.df[pairs])
         else:
-            p = Prediction(self.df[index])
+            # assume an iterable of tuple pairs
+            idx = []
+            for ix in index:
+                if len(ix) != 2:
+                    msg = "Expecting list of tuple pairs with length 2"
+                    raise IndexError(msg)
+                idx.append((ix[0], nx.tournament_int(ix[1])))
+            p = Prediction(self.df[idx])
         return p
 
     def __setitem__(self, index, prediction):

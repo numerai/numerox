@@ -57,8 +57,8 @@ or::
 or::
 
     >>> p = p.merge(p2)
-   
-or::
+
+or (``tournament=None`` means to run the model across all five tournaments)::
 
     >>> p = nx.production(nx.logistic(), data, tournament=None)
 
@@ -86,7 +86,7 @@ The mean performance of each model averaged over the five tournaments::
 
     >>> p.performance_mean(data['validation'], mean_of='name', sort_by='consis')
                          N   logloss       auc       acc      ystd    sharpe    consis
-    name                                                                              
+    name
     logistic             5  0.692813  0.520050  0.513910  0.005877  0.548698  0.750000
     randomforest         5  0.692873  0.518583  0.513771  0.005154  0.474319  0.716667
     example_predictions  5  0.692849  0.515931  0.511935  0.007615  0.406432  0.666667
@@ -95,7 +95,7 @@ The mean performance in each tournament averaged over the five (model) names::
 
     >>> p.performance_mean(data['validation'], mean_of='tournament', sort_by='consis')
                 N   logloss       auc       acc      ystd    sharpe    consis
-    tournament                                                               
+    tournament
     charles     3  0.692830  0.521548  0.514893  0.004850  0.719120  0.833333
     ken         3  0.692783  0.520875  0.515404  0.006260  0.661760  0.805556
     bernie      3  0.692848  0.517438  0.513737  0.006672  0.402646  0.694444
@@ -107,13 +107,13 @@ prediction object::
 
     >>> p.summaries(data['validation'])
     logistic, bernie
-           logloss     auc     acc    ystd   stats            
+           logloss     auc     acc    ystd   stats
     mean  0.692808  0.5194  0.5142  0.0063   tourn      bernie
     std   0.000375  0.0168  0.0137  0.0001  region  validation
     min   0.691961  0.4903  0.4925  0.0062    eras          12
     max   0.693460  0.5553  0.5342  0.0064  consis        0.75
     logistic, elizabeth
-           logloss     auc     acc    ystd   stats            
+           logloss     auc     acc    ystd   stats
     mean  0.692859  0.5168  0.5101  0.0061   tourn   elizabeth
     std   0.000410  0.0188  0.0137  0.0001  region  validation
     min   0.691911  0.4909  0.4947  0.0060    eras          12
@@ -124,7 +124,7 @@ Or we can look in even more detail by looking at performance in every era::
 
     >>> p.metrics_per_era(data['validation'])
                            name tournament   logloss       auc       acc      ystd
-    era                                                                           
+    era
     era121             logistic     bernie  0.692785  0.520504  0.520613  0.006376
     era121             logistic  elizabeth  0.692895  0.514934  0.505814  0.006209
     era121             logistic     jordan  0.692871  0.517478  0.512685  0.006324
@@ -137,7 +137,7 @@ or::
 
     >>> p['logistic', 'bernie'].metrics_per_era(data['validation'])
                 name tournament   logloss       auc       acc      ystd
-    era                                                                
+    era
     era121  logistic     bernie  0.692785  0.520504  0.520613  0.006376
     era122  logistic     bernie  0.692467  0.537129  0.534193  0.006298
     era123  logistic     bernie  0.692980  0.512810  0.507495  0.006316
@@ -156,7 +156,7 @@ We can also look in less detail::
     >>> df = p.performance(data['validation'], sort_by='consis')
     >>> print(df.to_string(index=False))
     name tournament   logloss       auc       acc      ystd    sharpe    consis
-                                                                                              
+
                logistic        ken  0.692751  0.522883  0.516185  0.005941  0.706879  0.833333
            randomforest        ken  0.692808  0.521669  0.515534  0.005184  0.702168  0.833333
     example_predictions    charles  0.692815  0.518958  0.511656  0.005790  0.713454  0.833333
@@ -178,7 +178,7 @@ or::
     >>> df = p[:, 'bernie'].performance(data['validation'], sort_by='consis')
     >>> print(df.to_string(index=False))
     name tournament   logloss       auc       acc      ystd    sharpe    consis
-                                                                                              
+
                logistic     bernie  0.692808  0.519403  0.514200  0.006322  0.510818  0.750000
            randomforest     bernie  0.692868  0.517903  0.514917  0.005578  0.392321  0.750000
     example_predictions     bernie  0.692867  0.515008  0.512093  0.008115  0.304800  0.583333
@@ -200,6 +200,44 @@ performer in every era. To keep the report short let's only look at 'bernie'::
 
 So in about 71% of the eras the logistic model had the lowest logloss.
 
+Indexing
+--------
+
+We start with a prediction object, ``p``, that contains::
+
+    >>> p
+                        bernie elizabeth jordan ken charles
+    logistic                 x         x      x   x       x
+    randomforest             x         x      x   x       x
+    example_predictions      x         x      x   x       x
+
+You can index by (model) name::
+
+    >>> p['logistic']
+             bernie elizabeth jordan ken charles
+    logistic      x         x      x   x       x
+
+You can index by tournament::
+
+    >>> p[:, 'ken']
+                        bernie elizabeth jordan ken charles
+    logistic                                      x
+    randomforest                                  x
+    example_predictions                           x
+
+You can index by name and tournament::
+
+    >>> p['randomforest', 'charles']
+                 bernie elizabeth jordan ken charles
+    randomforest                                   x
+
+You can index by (name, tournament) pairs::
+
+    >>> p[[('randomforest', 'charles'), ('logistic', 'jordan')]]
+                 bernie elizabeth jordan ken charles
+    randomforest                                   x
+    logistic                           x
+
 Upload checks
 -------------
 
@@ -220,28 +258,24 @@ sure the checks will pass before you upload.
 
 Let's run the checks::
 
-    >>> check = prediction.check(data)
-    logistic_bernie
+    >>> p.check(data)
+    logistic, bernie
           validation      test      live       all  pass
-    corr    0.868204  0.861861  0.869963   0.86325  True
-    rcorr   0.868637  0.862757  0.874491  0.864123  True
-    min     0.475277  0.476348  0.475243  0.475243  True
-    max      0.52378  0.524316  0.518989  0.524316  True
-    maz       3.8993   3.92653    3.8589   3.96304  True
+    corr    0.868204  0.861861  0.868509  0.863216  True
+    rcorr   0.868637  0.862757  0.870403  0.864034  True
+    min     0.475277  0.476348  0.481861  0.475277  True
+    max      0.52378  0.524316  0.522606  0.524316  True
+    maz       3.8993   3.92653   3.53621    3.9575  True
+    logistic, elizabeth
+          validation      test      live       all  pass
+    corr    0.830666  0.819013  0.827738  0.821461  True
+    rcorr   0.830695  0.819362   0.82823  0.821722  True
+    min     0.474478  0.476066  0.481326  0.474478  True
+    max     0.522743  0.523472  0.522443  0.523472  True
+    maz      4.06343   4.01284   3.70983   4.12892  True
+    <snip>
 
 All checks passed!
-
-If you pass the tournament number or tournament name to the ``check`` method
-then numerox will calculate the example prediction. Alternatively, to run
-fast if you wish to check more than one model, you can pass in the example
-predictions as a prediction object, which you can generate in one of two ways::
-
-    >>> example_predictions = nx.load_example_predictions('data.zip', 'bernie')
-
-or::
-
-    >>> model = nx.example_predictions()
-    >>> example_predictions = nx.production(data, model, 'bernie')
 
 Save and load
 -------------
@@ -256,7 +290,7 @@ And then load them::
 
 And you can save one model's predictions to csv for future upload to Numerai::
 
-    >>> p['logistic_bernie'].to_csv('logistic_bernie.csv')
+    >>> p['logistic', 'bernie'].to_csv('logistic_bernie.csv')
 
 It is better to load your predictions from an HDF5 file (faster, no rounding
 errors, can contain predictions from multiple models) but you can load from
@@ -267,16 +301,6 @@ to Numerai::
 
 Odds and ends
 -------------
-
-I forget, is 'logistic_bernie' in the prediction::
-
-    >>> 'logistic_bernie' in p
-    True
-
-If you have a lot of models in youe prediction object and only want to
-evaluate, say, two of them::
-
-    >>> p2 = p[['model1', 'model2']]
 
 Some other things you can do::
 
@@ -289,10 +313,28 @@ Some other things you can do::
     >>> p.size
     729666
     >>> p2 = p.copy()
-    >>> p
-    Prediction(243222 rows x 3 names; 0.0000 missing)
-    >>> p.names
-    ['logistic_bernie', 'randomforest_bernie', 'example_predictions_bernie']
+    >>> p.names()
+    >>> ['logistic', 'randomforest', 'example_predictions']
+    >>> p.tournaments()
+    ['bernie', 'elizabeth', 'jordan', 'ken', 'charles']
+    >>> p.tournaments(as_str=False)
+    [1, 2, 3, 4, 5]
+    >>> p.pairs()
+    [('logistic', 'bernie'),
+     ('logistic', 'elizabeth'),
+     ('logistic', 'jordan'),
+     ('logistic', 'ken'),
+     ('logistic', 'charles'),
+     ('randomforest', 'bernie'),
+     ('randomforest', 'elizabeth'),
+     ('randomforest', 'jordan'),
+     ('randomforest', 'ken'),
+     ('randomforest', 'charles'),
+     ('example_predictions', 'bernie'),
+     ('example_predictions', 'elizabeth'),
+     ('example_predictions', 'jordan'),
+     ('example_predictions', 'ken'),
+     ('example_predictions', 'charles')]
 
 But wait! There's more
 ----------------------

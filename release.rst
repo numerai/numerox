@@ -7,6 +7,8 @@ Release Notes
 
   * Complete redesign of Prediction class
   * Prediction object now stores tournament info
+  * Predictions saved to HDF5 with old versions of numerox cannot be loaded
+  * Many new features added
 
 - v2.7.0
 
