@@ -3,7 +3,7 @@
 Release Notes
 =============
 
-- v3.0.0 (in development; not yet released)
+- v3.0.0
 
   * Complete redesign of Prediction class
   * Prediction object now stores tournament info
