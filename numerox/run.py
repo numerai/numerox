@@ -26,16 +26,16 @@ def run(model, splitter, tournament=None, name=None, verbosity=2):
     If `tournament` is None then run the model through all tournaments.
 
     """
+    models = make_model_list(model)
     if tournament is None:
-        p = nx.Prediction()
-        for t_number, t_name in nx.tournament_iter():
-            splitter.reset()
-            p += run_one(model, splitter, t_name, name=name,
-                         verbosity=verbosity)
+        tournaments = nx.tournament_all()
     else:
-        splitter.reset()
-        p = run_one(model, splitter, tournament, name=name,
-                    verbosity=verbosity)
+        tournaments = [tournament]
+    p = nx.Prediction()
+    for m in models:
+        for t in tournaments:
+            splitter.reset()
+            p += run_one(m, splitter, t, name=name, verbosity=verbosity)
     splitter.reset()
     return p
 
@@ -75,3 +75,14 @@ def run_one(model, splitter, tournament, name=None, verbosity=2):
         minutes = (time.time() - t0) / 60
         print('Done in {:.2f} minutes'.format(minutes))
     return prediction
+
+
+def make_model_list(model):
+    "List of models where `model` is a model or list or tuple of models"
+    if isinstance(model, nx.Model):
+        models = [model]
+    elif isinstance(model, list) or isinstance(model, tuple):
+        models = list(model)
+    else:
+        raise ValueError('`model` must be a model, list, or tuple of models')
+    return models

@@ -26,6 +26,29 @@ def test_run():
             ok_(p.tournaments() == nx.tournament_all(), 'wrong tournaments')
 
 
+def test_multiple_runs():
+    "test running multiple models through multiple tournaments"
+
+    d = testing.play_data()
+    models = [nx.logistic(), fifty()]
+
+    with testing.HiddenPrints():
+
+        p = nx.production(models, d, 'bernie')
+        ok_(p.shape[1] == 2, 'wrong number of tournaments')
+        p = nx.backtest(models, d, 2)
+        ok_(p.shape[1] == 2, 'wrong number of tournaments')
+        p = nx.run(models, nx.ValidationSplitter(d), 'ken')
+        ok_(p.shape[1] == 2, 'wrong number of tournaments')
+
+        p = nx.production(models, d)
+        ok_(p.shape[1] == 10, 'wrong number of tournaments')
+        p = nx.backtest(models, d)
+        ok_(p.shape[1] == 10, 'wrong number of tournaments')
+        p = nx.run(models, nx.ValidationSplitter(d))
+        ok_(p.shape[1] == 10, 'wrong number of tournaments')
+
+
 def test_backtest_production():
     "Make sure backtest and production run"
     d = testing.micro_data()
