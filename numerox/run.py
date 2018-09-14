@@ -4,22 +4,21 @@ import pprint
 import numerox as nx
 
 
-def production(model, data, tournament=None, name=None, verbosity=2):
+def production(model, data, tournament=None, verbosity=2):
     "Fit a model with train data; make prediction on tournament data"
     splitter = nx.TournamentSplitter(data)
-    prediction = run(model, splitter, tournament, name, verbosity=verbosity)
+    prediction = run(model, splitter, tournament, verbosity=verbosity)
     return prediction
 
 
-def backtest(model, data, tournament=None, name=None, kfold=5, seed=0,
-             verbosity=2):
+def backtest(model, data, tournament=None, kfold=5, seed=0, verbosity=2):
     "K-fold cross validation of model through train data"
     splitter = nx.CVSplitter(data, kfold=kfold, seed=seed, train_only=True)
-    prediction = run(model, splitter, tournament, name, verbosity)
+    prediction = run(model, splitter, tournament, verbosity)
     return prediction
 
 
-def run(model, splitter, tournament=None, name=None, verbosity=2):
+def run(model, splitter, tournament=None, verbosity=2):
     """
     Run a model/tournament pair (or pairs) through a data splitter.
 
@@ -34,9 +33,6 @@ def run(model, splitter, tournament=None, name=None, verbosity=2):
         model is run through all five tournaments. If a list or tuple of
         tournaments is given then it must must not contain duplicate
         tournaments.
-    name : str, optional
-        You can optionally change the name of the model that appears in the
-        prediction object returned by this function.
     verbosity : int, optional
         An integer that determines verbosity. Zero is silent.
 
@@ -75,20 +71,16 @@ def run(model, splitter, tournament=None, name=None, verbosity=2):
     for m in models:
         for t in tournaments:
             splitter.reset()
-            p += run_one(m, splitter, t, name=name, verbosity=verbosity)
+            p += run_one(m, splitter, t, verbosity=verbosity)
     splitter.reset()
 
     return p
 
 
-def run_one(model, splitter, tournament, name=None, verbosity=2):
+def run_one(model, splitter, tournament, verbosity=2):
     "Run a single model through a data splitter for a single tournament"
     t0 = time.time()
-    if name is None:
-        name = model.__class__.__name__
-    else:
-        if verbosity > 2:
-            print(name)
+    name = model.__class__.__name__
     if verbosity > 2:
         print(splitter)
     if verbosity > 0:

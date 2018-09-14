@@ -76,7 +76,6 @@ def test_backtest_production():
             nx.production(model, d, tournament=4, verbosity=verbosity)
             nx.production(model, d, tournament=None, verbosity=verbosity)
             if verbosity == 3:
-                nx.production(model, d, tournament=5, name='test',
-                              verbosity=verbosity)
-                nx.production(model, d, tournament='charles', name='test',
+                nx.production(model, d, tournament=5, verbosity=verbosity)
+                nx.production(model, d, tournament='charles',
                               verbosity=verbosity)

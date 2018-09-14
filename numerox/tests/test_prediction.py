@@ -300,7 +300,7 @@ def test_prediction_check():
 def test_prediction_concordance():
     "make sure prediction.concordance runs"
     d = nx.testing.play_data()
-    p = nx.production(nx.logistic(), d, 3, 'model1', verbosity=0)
+    p = nx.production(nx.logistic(), d, 3, verbosity=0)
     df = p.concordance(d)
     ok_(isinstance(df, pd.DataFrame), 'expecting a dataframe')
 
@@ -317,16 +317,16 @@ def test_prediction_setitem():
     "compare prediction._setitem__ with merge"
 
     data = nx.play_data()
-    p1 = nx.production(nx.logistic(), data, 'bernie', 'model1', verbosity=0)
-    p2 = nx.production(nx.logistic(1e-5), data, 2, 'model2',  verbosity=0)
-    p3 = nx.production(nx.logistic(1e-6), data, 3, 'model3',  verbosity=0)
-    p4 = nx.backtest(nx.logistic(), data, 4, 'model1',  verbosity=0)
+    p1 = nx.production(nx.logistic(), data, 'bernie', verbosity=0)
+    p2 = nx.production(nx.logistic(1e-5), data, 2,  verbosity=0)
+    p3 = nx.production(nx.logistic(1e-6), data, 3,  verbosity=0)
+    p4 = nx.backtest(nx.logistic(), data, 4,  verbosity=0)
 
     p = nx.Prediction()
-    p[('model1', 1)] = p1
-    p[('model2', 2)] = p2
-    p[('model3', 3)] = p3
-    p[('model1', 4)] = p4
+    p[('logistic', 1)] = p1
+    p[('logistic', 2)] = p2
+    p[('logistic', 3)] = p3
+    p[('logistic', 4)] = p4
 
     pp = nx.Prediction()
     pp = pp.merge(p1)
@@ -336,8 +336,8 @@ def test_prediction_setitem():
 
     pd.testing.assert_frame_equal(p.df, pp.df)
 
-    assert_raises(ValueError, p.__setitem__, ('model1', 1), p1)
-    assert_raises(ValueError, p.__setitem__, ('model1', 1), p)
+    assert_raises(ValueError, p.__setitem__, ('logistic', 1), p1)
+    assert_raises(ValueError, p.__setitem__, ('logistic', 1), p)
 
 
 def test_prediction_ynew():
