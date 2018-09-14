@@ -23,18 +23,30 @@ The model is just a thin wrapper around sklearn's ``LogisticRegression``. The
 wrapper allows ``LogisticRegression`` to receive data from numerox and for
 numerox to keep track of its predictions.
 
-Your model **must** have a ``fit_predict`` method that takes three inputs: The
+Your model must have a ``fit_predict`` method that takes three inputs: The
 first is training `data`_ (``dfit``), the second is prediction data (``dpre``),
 and the third is the `tournament` (integer, 1, or string, 'bernie').
 
-The ``fit_predict`` method **must** return two numpy arrays. The first contains
-the ids, the second the predictions. Make sure that these two arrays stay
-aligned!
+The ``fit_predict`` method must return two numpy arrays. The first contains the
+ids, the second the predictions. Make sure that these two arrays stay aligned!
 
-The model above inherits from the ``Model`` class. That is optional. But if you
-do inherit from ``Model`` and if you place your parameters in a ``self.p``
-dictionary as is done in the model above then you will get a nice printout
-(model name and parameters) when you run your model.
+Your model must inherit from the numerox ``Model`` class. If you optionally
+place your parameters in a ``self.p`` dictionary as is done in the model above
+then you will get a nice printout (model name and parameters)::
+
+    >>> nx.randomforest()
+    randomforest(max_features=2, depth=3, ntrees=100, seed=0)
+
+You can also rename your model::
+
+    >>> model = nx.randomforest(depth=5)
+    >>> model.rename('rf_experiment_1')
+    rf_experiment_1(max_features=2, depth=5, ntrees=100, seed=0)
+
+Or grab the name::
+
+    >> model.name
+    'rf_experiment_1'
 
 None of the `models in numerox`_ will likely be competitive in the Numerai
 tournament. You'll have to make your own model. If you already have a model

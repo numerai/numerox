@@ -80,7 +80,7 @@ def run(model, splitter, tournament=None, verbosity=2):
 def run_one(model, splitter, tournament, verbosity=2):
     "Run a single model through a data splitter for a single tournament"
     t0 = time.time()
-    name = model.__class__.__name__
+    name = model.name
     if verbosity > 2:
         print(splitter)
     if verbosity > 0:

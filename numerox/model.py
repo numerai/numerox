@@ -8,6 +8,8 @@ from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.pipeline import Pipeline
 from sklearn.decomposition import PCA
 
+import numerox as nx
+
 """
 
 Here are the directions for making your own model:
@@ -20,8 +22,8 @@ https://github.com/kwgoodman/numerox/blob/master/numerox/examples/model.rst
 class Model(object):
 
     def __repr__(self):
+        model = self.name
         msg = ""
-        model = self.__class__.__name__
         if hasattr(self, "p"):
             if len(self.p) == 0:
                 msg += model + "()"
@@ -34,6 +36,16 @@ class Model(object):
         else:
             msg += model + "()"
         return msg
+
+    @property
+    def name(self):
+        return self.__class__.__name__
+
+    def rename(self, name):
+        if not nx.isstring(name):
+            raise ValueError('`name` must be a string')
+        self.__class__.__name__ = name
+        return self
 
 
 class logistic(Model):

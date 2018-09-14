@@ -1,3 +1,5 @@
+from nose.tools import ok_
+
 import numerox as nx
 from numerox.model import fifty
 
@@ -26,7 +28,18 @@ def test_model_repr():
 def test_model_run():
     "Make sure models run"
     d = nx.play_data()
-    d_fit = d['train']
-    d_predict = d['tournament']
+    dfit = d['train']
+    dpre = d['tournament']
     for model in get_models():
-        model.fit_predict(d_fit, d_predict, tournament=5)
+        model.fit_predict(dfit, dpre, tournament=5)
+
+
+def test_model_rename():
+    "Test renaming a model"
+    model = nx.logistic()
+    ok_(model.name == 'logistic', 'wrong name')
+    model.rename('LR')
+    ok_(model.name == 'LR', 'wrong name')
+    model = model.rename('logreg')
+    ok_(model.name == 'logreg', 'wrong name')
+    ok_(model.__repr__().startswith('logreg'), 'wrong name')

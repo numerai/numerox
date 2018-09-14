@@ -8,6 +8,7 @@ Release Notes
   * Option to run multiple models in one function call
   * Option to run a list of arbitrary tournaments
   * You can no longer re-name a model through the run functions
+  * Add ``model.name`` and ``model.rename``
   * Default now runs model through all five tournaments; previously no default
   * Bugfix: reset splitter before running
 
