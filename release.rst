@@ -5,6 +5,8 @@ Release Notes
 
 - v3.1.0 (not yet released; in development)
 
+  * Bugfix: reset splitter before running
+
 - v3.0.0
 
   * Complete redesign of Prediction class
@@ -20,7 +22,7 @@ Release Notes
   * Add ``FlipSplitter``
 
 - v2.6.0
-  
+
   * Unit tests now run on Windows
   * Add continuous integration testing on Windows with Appveyor
   * Add ``ConsecutiveCVSplitter``
@@ -47,7 +49,7 @@ Release Notes
 - v2.3.0
 
   * ``data.y[tournament]`` replaces ``data.y_for_tournament(tournament)``
-  * ``data.y[:]`` is equivalent to ``data.y`` from previous releases 
+  * ``data.y[:]`` is equivalent to ``data.y`` from previous releases
   * Remove ``data.y1``, ``data.y2``, etc
   * Call using ``data.y_df`` instead of ``data.y_df()``
   * Internally Data object columns renamed, e.g., 'bernie' instead of y1

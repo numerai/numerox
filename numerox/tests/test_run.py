@@ -19,7 +19,7 @@ def test_run():
             nx.run(model, splitter, tournament=2, verbosity=0)
             nx.run(model, splitter, tournament='bernie', verbosity=0)
             p = nx.run(model, splitter, tournament=None, verbosity=0)
-            ok_(p.shape[1] != 5, 'wrong number of tournaments')
+            ok_(p.shape[1] == 5, 'wrong number of tournaments')
 
 
 def test_backtest_production():

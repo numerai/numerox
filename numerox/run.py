@@ -28,12 +28,14 @@ def run(model, splitter, tournament, name=None, verbosity=2):
     if tournament is None:
         p = nx.Prediction()
         for t_number, t_name in nx.tournament_iter():
+            splitter.reset()
             p += run_one(model, splitter, t_name, name=name,
                          verbosity=verbosity)
-            splitter.reset()
     else:
+        splitter.reset()
         p = run_one(model, splitter, tournament, name=name,
                     verbosity=verbosity)
+    splitter.reset()
     return p
 
 
