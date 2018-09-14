@@ -48,6 +48,16 @@ def test_multiple_runs():
         p = nx.run(models, nx.ValidationSplitter(d))
         ok_(p.shape[1] == 10, 'wrong number of tournaments')
 
+        p = nx.production(models, d, [1, 5])
+        ok_(p.shape[1] == 4, 'wrong number of tournaments')
+        ok_(p.tournaments() == ['bernie', 'charles'], 'wrong tournaments')
+        p = nx.backtest(models, d, ['charles', 'bernie'])
+        ok_(p.shape[1] == 4, 'wrong number of tournaments')
+        ok_(p.tournaments() == ['bernie', 'charles'], 'wrong tournaments')
+        p = nx.run(models, nx.ValidationSplitter(d), ['ken'])
+        ok_(p.shape[1] == 2, 'wrong number of tournaments')
+        ok_(p.tournaments() == ['ken'], 'wrong tournaments')
+
 
 def test_backtest_production():
     "Make sure backtest and production run"

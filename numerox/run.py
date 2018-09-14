@@ -29,9 +29,11 @@ def run(model, splitter, tournament=None, name=None, verbosity=2):
         Prediction model to run through the splitter.
     splitter : nx.Splitter
         An iterator of fit/predict data pairs.
-    tournament : {None, int, str}, optional
+    tournament : {None, int, str, list, tuple}, optional
         The tournament(s) to run the model through. By default (None) the
-        model is run through all five tournaments.
+        model is run through all five tournaments. If a list or tuple of
+        tournaments is given then it must must not contain duplicate
+        tournaments.
     name : str, optional
         You can optionally change the name of the model that appears in the
         prediction object returned by this function.
@@ -50,15 +52,23 @@ def run(model, splitter, tournament=None, name=None, verbosity=2):
     if isinstance(model, nx.Model):
         models = [model]
     elif isinstance(model, list) or isinstance(model, tuple):
-        models = list(model)
+        models = model
     else:
         raise ValueError('`model` must be a model, list, or tuple of models')
 
     # make list of tournaments
     if tournament is None:
         tournaments = nx.tournament_all()
-    else:
+    elif nx.isint(tournament) or nx.isstring(tournament):
         tournaments = [tournament]
+    elif isinstance(tournament, list) or isinstance(tournament, tuple):
+        tournaments = tournament
+    else:
+        msg = '`tournament` must be an integer, string, list, tuple, or None.'
+        raise ValueError(msg)
+    tournaments = [nx.tournament_str(t) for t in tournaments]
+    if len(tournaments) != len(set(tournaments)):
+        raise ValueError('`tournament` cannot contain duplicates')
 
     # loop over all model/tournament pairs
     p = nx.Prediction()

@@ -6,6 +6,7 @@ Release Notes
 - v3.1.0 (not yet released; in development)
 
   * Option to run multiple models in one function call
+  * Option to run a list of arbitrary tournaments
   * Default now runs model through all five tournaments; previously no default
   * Bugfix: reset splitter before running
 
