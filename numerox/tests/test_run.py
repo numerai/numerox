@@ -2,13 +2,12 @@ from nose.tools import ok_
 
 import numerox as nx
 from numerox import testing
-from numerox.model import fifty
 
 
 def test_run():
     "Make sure run runs"
     d = testing.play_data()
-    models = [nx.logistic(), fifty()]
+    models = [nx.logistic(), nx.fifty()]
     splitters = [nx.TournamentSplitter(d),
                  nx.ValidationSplitter(d),
                  nx.CheatSplitter(d),
@@ -30,7 +29,7 @@ def test_multiple_runs():
     "test running multiple models through multiple tournaments"
 
     d = testing.play_data()
-    models = [nx.logistic(), fifty()]
+    models = [nx.logistic(), nx.fifty()]
 
     with testing.HiddenPrints():
 
@@ -62,7 +61,7 @@ def test_multiple_runs():
 def test_backtest_production():
     "Make sure backtest and production run"
     d = testing.micro_data()
-    model = fifty()
+    model = nx.fifty()
     with testing.HiddenPrints():
         p = nx.production(model, d)
         ok_(p.shape[1] == 5, 'wrong number of tournaments')
