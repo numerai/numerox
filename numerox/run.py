@@ -21,22 +21,53 @@ def backtest(model, data, tournament=None, name=None, kfold=5, seed=0,
 
 def run(model, splitter, tournament=None, name=None, verbosity=2):
     """
-    Run a single model through a data splitter.
+    Run a model/tournament pair (or pairs) through a data splitter.
 
-    If `tournament` is None then run the model through all tournaments.
+    Parameters
+    ----------
+    model : nx.Model
+        Prediction model to run through the splitter.
+    splitter : nx.Splitter
+        An iterator of fit/predict data pairs.
+    tournament : {None, int, str}, optional
+        The tournament(s) to run the model through. By default (None) the
+        model is run through all five tournaments.
+    name : str, optional
+        You can optionally change the name of the model that appears in the
+        prediction object returned by this function.
+    verbosity : int, optional
+        An integer that determines verbosity. Zero is silent.
+
+    Returns
+    -------
+    p : nx.Prediction
+        A prediction object containing the predictions of the specified
+        model/tournament pairs.
 
     """
-    models = make_model_list(model)
+
+    # make list of models
+    if isinstance(model, nx.Model):
+        models = [model]
+    elif isinstance(model, list) or isinstance(model, tuple):
+        models = list(model)
+    else:
+        raise ValueError('`model` must be a model, list, or tuple of models')
+
+    # make list of tournaments
     if tournament is None:
         tournaments = nx.tournament_all()
     else:
         tournaments = [tournament]
+
+    # loop over all model/tournament pairs
     p = nx.Prediction()
     for m in models:
         for t in tournaments:
             splitter.reset()
             p += run_one(m, splitter, t, name=name, verbosity=verbosity)
     splitter.reset()
+
     return p
 
 
@@ -75,14 +106,3 @@ def run_one(model, splitter, tournament, name=None, verbosity=2):
         minutes = (time.time() - t0) / 60
         print('Done in {:.2f} minutes'.format(minutes))
     return prediction
-
-
-def make_model_list(model):
-    "List of models where `model` is a model or list or tuple of models"
-    if isinstance(model, nx.Model):
-        models = [model]
-    elif isinstance(model, list) or isinstance(model, tuple):
-        models = list(model)
-    else:
-        raise ValueError('`model` must be a model, list, or tuple of models')
-    return models
