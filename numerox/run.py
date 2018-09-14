@@ -4,21 +4,22 @@ import pprint
 import numerox as nx
 
 
-def production(model, data, tournament, name=None, verbosity=2):
+def production(model, data, tournament=None, name=None, verbosity=2):
     "Fit a model with train data; make prediction on tournament data"
     splitter = nx.TournamentSplitter(data)
     prediction = run(model, splitter, tournament, name, verbosity=verbosity)
     return prediction
 
 
-def backtest(model, data, tournament, name=None, kfold=5, seed=0, verbosity=2):
+def backtest(model, data, tournament=None, name=None, kfold=5, seed=0,
+             verbosity=2):
     "K-fold cross validation of model through train data"
     splitter = nx.CVSplitter(data, kfold=kfold, seed=seed, train_only=True)
     prediction = run(model, splitter, tournament, name, verbosity)
     return prediction
 
 
-def run(model, splitter, tournament, name=None, verbosity=2):
+def run(model, splitter, tournament=None, name=None, verbosity=2):
     """
     Run a single model through a data splitter.
 

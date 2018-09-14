@@ -20,6 +20,10 @@ def test_run():
             nx.run(model, splitter, tournament='bernie', verbosity=0)
             p = nx.run(model, splitter, tournament=None, verbosity=0)
             ok_(p.shape[1] == 5, 'wrong number of tournaments')
+            ok_(p.tournaments() == nx.tournament_all(), 'wrong tournaments')
+            p = nx.run(model, splitter, verbosity=0)
+            ok_(p.shape[1] == 5, 'wrong number of tournaments')
+            ok_(p.tournaments() == nx.tournament_all(), 'wrong tournaments')
 
 
 def test_backtest_production():
@@ -27,6 +31,12 @@ def test_backtest_production():
     d = testing.micro_data()
     model = fifty()
     with testing.HiddenPrints():
+        p = nx.production(model, d)
+        ok_(p.shape[1] == 5, 'wrong number of tournaments')
+        ok_(p.tournaments() == nx.tournament_all(), 'wrong tournaments')
+        p = nx.backtest(model, d, kfold=2)
+        ok_(p.shape[1] == 5, 'wrong number of tournaments')
+        ok_(p.tournaments() == nx.tournament_all(), 'wrong tournaments')
         for verbosity in (0, 1, 2, 3):
             nx.backtest(model, d, tournament=3, kfold=2, verbosity=verbosity)
             nx.production(model, d, tournament='ken', verbosity=verbosity)
