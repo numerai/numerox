@@ -42,3 +42,5 @@ def test_model_rename():
     model = model.rename('logreg')
     ok_(model.name == 'logreg', 'wrong name')
     ok_(model.__repr__().startswith('logreg'), 'wrong name')
+    model = nx.logistic()
+    ok_(model.rename(None).name == 'logistic', 'wrong name')

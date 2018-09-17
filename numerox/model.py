@@ -39,12 +39,19 @@ class Model(object):
 
     @property
     def name(self):
-        return self.__class__.__name__
+        if hasattr(self, '_name'):
+            return self._name
+        else:
+            self._name = self.__class__.__name__
+            return self._name
 
     def rename(self, name):
+        "Rename model in place; model is returned"
+        if name is None:
+            return self
         if not nx.isstring(name):
             raise ValueError('`name` must be a string')
-        self.__class__.__name__ = name
+        self._name = name
         return self
 
 
