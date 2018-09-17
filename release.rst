@@ -11,6 +11,7 @@ Release Notes
   * You can no longer re-name a model through the run functions
   * Add ``model.name`` and ``model.rename``
   * Models must inhert from ``nx.Model``; it is no longer optional
+  * ``download`` and ``download_deluxe`` combined into ``download``
   * Bugfix: reset splitter before running
 
 - v3.0.0

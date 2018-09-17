@@ -18,19 +18,13 @@ NMR_PRIZE_POOL = 900
 # ---------------------------------------------------------------------------
 # download dataset
 
-def download(filename, verbose=False):
-    "Download the current Numerai dataset; overwrites if file exists"
-    if verbose:
-        print("Download dataset {}".format(filename))
-    napi = NumerAPI()
-    url = napi.get_dataset_url(tournament=1)
-    filename = os.path.expanduser(filename)  # expand ~/tmp to /home/...
-    download_file(url, filename)
-
-
-def download_deluxe(filename, n_tries=100, sleep_seconds=300, verbose=False):
+def download(filename, load=True, n_tries=100, sleep_seconds=300,
+             verbose=False):
     """
     Download current Numerai dataset; overwrites if file exists.
+
+    If `load` is True (default) then return data object; otherwise return
+    None.
 
     If download fails then retry download `n_tries` times, pausing
     `sleep_seconds` between each try.
@@ -40,13 +34,22 @@ def download_deluxe(filename, n_tries=100, sleep_seconds=300, verbose=False):
     count = 0
     while count < n_tries:
         try:
-            download(filename, verbose=verbose)
+            if verbose:
+                print("Download dataset {}".format(filename))
+            napi = NumerAPI()
+            url = napi.get_dataset_url(tournament=1)
+            # line below expands e.g. ~/tmp to /home/me/tmp...
+            filename = os.path.expanduser(filename)
+            download_file(url, filename)
             break
         except: # noqa
             print('download failed')
             time.sleep(sleep_seconds)
         count += 1
-    data = nx.load_zip(filename, verbose=verbose)
+    if load:
+        data = nx.load_zip(filename, verbose=verbose)
+    else:
+        data = None
     return data
 
 

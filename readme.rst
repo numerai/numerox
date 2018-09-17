@@ -15,14 +15,7 @@ Once you have a model numerox will do the rest. First download the Numerai
 dataset and then load it::
 
     >>> import numerox as nx
-    >>> nx.download('numerai_dataset.zip')
-    >>> data = nx.load_zip('numerai_dataset.zip')
-    >>> data
-    region    train, validation, test, live
-    rows      636965
-    era       178, [era1, eraX]
-    x         50, min 0.0000, mean 0.5025, max 1.0000
-    y         mean 0.499546, fraction missing 0.3093
+    >>> data = nx.download('numerai_dataset.zip')
 
 Let's use the logistic regression model in numerox to run 5-fold cross
 validation on the training data::
