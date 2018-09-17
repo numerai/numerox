@@ -7,9 +7,10 @@ Release Notes
 
   * Option to run multiple models in one function call
   * Option to run a list of arbitrary tournaments
+  * Default now runs model through all five tournaments; previously no default
   * You can no longer re-name a model through the run functions
   * Add ``model.name`` and ``model.rename``
-  * Default now runs model through all five tournaments; previously no default
+  * Models must inhert from ``nx.Model``; it is no longer optional
   * Bugfix: reset splitter before running
 
 - v3.0.0

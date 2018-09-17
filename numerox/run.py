@@ -5,14 +5,62 @@ import numerox as nx
 
 
 def production(model, data, tournament=None, verbosity=2):
-    "Fit a model with train data; make prediction on tournament data"
+    """
+    Fit a model with train data; make prediction on tournament data.
+
+    Parameters
+    ----------
+    model : nx.Model, list, tuple
+        Prediction model. Can be a list or tuple of prediction models. Model
+        names must be unique.
+    data : nx.Data
+        The data to run the model through.
+    tournament : {None, int, str, list, tuple}, optional
+        The tournament(s) to run the model through. By default (None) the
+        model is run through all five tournaments. If a list or tuple of
+        tournaments is given then it must must not contain duplicate
+        tournaments.
+    verbosity : int, optional
+        An integer that determines verbosity. Zero is silent.
+
+    Returns
+    -------
+    p : nx.Prediction
+        A prediction object containing the predictions of the specified
+        model/tournament pairs.
+
+    """
     splitter = nx.TournamentSplitter(data)
     prediction = run(model, splitter, tournament, verbosity=verbosity)
     return prediction
 
 
 def backtest(model, data, tournament=None, kfold=5, seed=0, verbosity=2):
-    "K-fold cross validation of model through train data"
+    """
+    K-fold cross validation of model over the train data.
+
+    Parameters
+    ----------
+    model : nx.Model, list, tuple
+        Prediction model. Can be a list or tuple of prediction models. Model
+        names must be unique.
+    data : nx.Data
+        The data to run the model through.
+    tournament : {None, int, str, list, tuple}, optional
+        The tournament(s) to run the model through. By default (None) the
+        model is run through all five tournaments. If a list or tuple of
+        tournaments is given then it must must not contain duplicate
+        tournaments.
+    verbosity : int, optional
+        An integer that determines verbosity. Zero is silent.
+
+    Returns
+    -------
+    p : nx.Prediction
+        A prediction object containing the predictions of the specified
+        model/tournament pairs.
+
+    """
     splitter = nx.CVSplitter(data, kfold=kfold, seed=seed, train_only=True)
     prediction = run(model, splitter, tournament, verbosity)
     return prediction
@@ -24,8 +72,9 @@ def run(model, splitter, tournament=None, verbosity=2):
 
     Parameters
     ----------
-    model : nx.Model
-        Prediction model to run through the splitter.
+    model : nx.Model, list, tuple
+        Prediction model to run through the splitter. Can be a list or tuple
+        of prediction models. Model names must be unique.
     splitter : nx.Splitter
         An iterator of fit/predict data pairs.
     tournament : {None, int, str, list, tuple}, optional
