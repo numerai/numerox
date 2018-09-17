@@ -34,19 +34,20 @@ Your model must inherit from the numerox ``Model`` class. If you optionally
 place your parameters in a ``self.p`` dictionary as is done in the model above
 then you will get a nice printout (model name and parameters)::
 
-    >>> nx.randomforest()
-    randomforest(max_features=2, depth=3, ntrees=100, seed=0)
+    >>> nx.production(nx.randomforest(depth=5), data)
+    randomforest(max_features=2, depth=5, ntrees=100, seed=0)
+    <snip>
 
 You can also rename your model::
 
-    >>> model = nx.randomforest(depth=5)
-    >>> model.rename('rf_experiment_1')
-    rf_experiment_1(max_features=2, depth=5, ntrees=100, seed=0)
+    >>> nx.production(nx.randomforest(depth=5).rename('rf_d5'), data)
+    rf_d5(max_features=2, depth=5, ntrees=100, seed=0)
+    <snip>
 
-Or grab the name::
+The current name of your model::
 
     >> model.name
-    'rf_experiment_1'
+    'rf_d5'
 
 None of the `models in numerox`_ will likely be competitive in the Numerai
 tournament. You'll have to make your own model. If you already have a model

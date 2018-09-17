@@ -58,21 +58,19 @@ or::
 
     >>> p = p.merge(p2)
 
-or (``tournament=None`` means to run the model across all five tournaments)::
+The default is to run the model across all five tournaments)::
 
-    >>> p = nx.production(nx.logistic(), data, tournament=None)
+    >>> p = nx.production(nx.logistic(), data)
 
 
 Evaluate predictions
 --------------------
 
-Let's start by running some models (``tournament=None`` runs the model five
-times, one for each tournament)::
+Let's start by running some models through all five tournaments::
 
     >>> data = nx.load_zip('numerai_dataset.zip')
-    >>> p = nx.production(nx.logistic(), data, tournament=None, verbosity=0)
-    >>> p += nx.production(nx.randomforest(), data, tournament=None, verbosity=0)
-    >>> p += nx.production(nx.example_predictions(), data, tournament=None, verbosity=0)
+    >>> models = [nx.logistic(), nx.randomforest(), nx.example_predictions()]
+    >>> p = nx.production(models, data, verbosity=0)
 
 The (model) names and tournaments contained in the prediction object::
 

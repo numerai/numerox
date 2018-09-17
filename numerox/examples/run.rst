@@ -48,7 +48,7 @@ comes with ten splitters:
 
 For example, here's how you would reproduce the ``backtest`` function::
 
-    >>> splitter = nx.CVSplitter(data, kfold=5, seed=0)
+    >>> splitter = nx.CVSplitter(data, kfold=5, seed=0, train_only=True)
     >>> prediction = nx.run(model, splitter, tournament)
 
 and the ``production`` function::
@@ -56,11 +56,28 @@ and the ``production`` function::
     >>> splitter = nx.TournamentSplitter(data)
     >>> prediction = nx.run(model, splitter, tournament)
 
-If you set ``tournament`` to ``None`` then the model will be run through all
-five tournaments::
+Run multiple models through multiple tournaments
+------------------------------------------------
 
-    >>> p = nx.production(nx.logistic(), data, tournament=None, verbosity=0)
-    >>> p
-             bernie elizabeth jordan ken charles
-    logistic      x         x      x   x       x
+Run a single model for a single tournament::
 
+    >>> p = nx.production(nx.logistic(), data, tournament='bernie')
+
+Two ways to Run a single model through all five tournaments::
+
+    >>> p = nx.production(nx.logistic(), data)
+    >>> p = nx.production(nx.logistic(), data, tournament=None)
+
+Run a single model through arbitrary list of tournaments::
+
+    >>> p = nx.production(nx.logistic(), data, ['bernie', 'charles'])
+
+Run multiple models through a single tournament::
+
+    >>> p = nx.production([nx.logistic(), nx.randomforest()], data, 'bernie')
+
+Run multiple models through all tournaments::
+
+    >>> p = nx.production([nx.logistic(), nx.randomforest()], data)
+
+And so on.

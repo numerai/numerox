@@ -9,16 +9,14 @@ def improve_model(data, tournament='bernie'):
     change.
     """
 
-    tourn = tournament
+    # we'll look at 5 models
+    models = [nx.logistic(), nx.extratrees(), nx.randomforest(), nx.mlpc(),
+              nx.logisticPCA()]
 
     print('\nStandard dataset:\n')
 
-    # we'll look at 5 models
-    prediction = nx.production(nx.logistic(), data, tourn, verbosity=1)
-    prediction += nx.production(nx.extratrees(), data, tourn, verbosity=1)
-    prediction += nx.production(nx.randomforest(), data, tourn, verbosity=1)
-    prediction += nx.production(nx.mlpc(), data, tourn, verbosity=1)
-    prediction += nx.production(nx.logisticPCA(), data, tourn, verbosity=1)
+    # first run the base case
+    prediction = nx.production(models, data, tournament, verbosity=1)
 
     # let's now make a change, could be anything; as an example let's add
     # the square of each feature to the dataset
@@ -28,12 +26,8 @@ def improve_model(data, tournament='bernie'):
     print('\nDataset expanded with squared features:\n')
 
     # rerun all models with the new expanded data
-    prediction2 = nx.production(nx.logistic(), data2, tourn, verbosity=1)
-    prediction2 += nx.production(nx.extratrees(), data2, tourn, verbosity=1)
-    prediction2 += nx.production(nx.randomforest(), data2, tourn, verbosity=1)
-    prediction2 += nx.production(nx.mlpc(), data2, tourn, verbosity=1)
-    prediction2 += nx.production(nx.logisticPCA(), data2, tourn, verbosity=1)
+    prediction2 = nx.production(models, data2, tournament, verbosity=1)
 
     # compare performance
     print('\nCompare (1 is regular dataset; 2 expanded dataset):\n')
-    print(prediction.compare(data['validation'], prediction2, tourn))
+    print(prediction.compare(data['validation'], prediction2, tournament))
