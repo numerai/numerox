@@ -63,7 +63,7 @@ Run a single model for a single tournament::
 
     >>> p = nx.production(nx.logistic(), data, tournament='bernie')
 
-Two ways to Run a single model through all five tournaments::
+Two ways to run a single model through all five tournaments::
 
     >>> p = nx.production(nx.logistic(), data)
     >>> p = nx.production(nx.logistic(), data, tournament=None)
@@ -81,3 +81,24 @@ Run multiple models through all tournaments::
     >>> p = nx.production([nx.logistic(), nx.randomforest()], data)
 
 And so on.
+
+Model names must be unique. This will raise a ``ValueError``::
+
+    >>> models = [nx.randomforest(depth=4), nx.randomforest(depth=5)]
+    >>> p = nx.production(models, data)
+    ValueError: `model` cannot contain duplicate names
+
+Instead rename the models::
+
+    >>> models = [nx.randomforest(depth=4).rename('rf_d4'),
+                  nx.randomforest(depth=5).rename('rf_d5')]
+    >>> p = nx.production(models, data)
+    >>> p
+          bernie elizabeth jordan ken charles
+    rf_d4      x         x      x   x       x
+    rf_d5      x         x      x   x       x
+
+Torunaments must be unique. This will raise a ``ValueError``::
+
+    >>> p = nx.production(nx.logistic(), data, tournament=[1, 'bernie'])
+    ValueError: `tournament` cannot contain duplicates
