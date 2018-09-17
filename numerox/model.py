@@ -19,6 +19,9 @@ https://github.com/kwgoodman/numerox/blob/master/numerox/examples/model.rst
 """
 
 
+# ---------------------------------------------------------------------------
+# base class for all models
+
 class Model(object):
 
     def __repr__(self):
@@ -39,11 +42,10 @@ class Model(object):
 
     @property
     def name(self):
-        if hasattr(self, '_name'):
-            return self._name
-        else:
+        "Name of model"
+        if not hasattr(self, '_name'):
             self._name = self.__class__.__name__
-            return self._name
+        return self._name
 
     def rename(self, name):
         "Rename model in place; model is returned"
@@ -54,6 +56,9 @@ class Model(object):
         self._name = name
         return self
 
+
+# ---------------------------------------------------------------------------
+# numerox example models
 
 class logistic(Model):
 
