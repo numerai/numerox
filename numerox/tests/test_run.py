@@ -1,4 +1,5 @@
 from nose.tools import ok_
+from nose.tools import assert_raises
 
 import numerox as nx
 from numerox import testing
@@ -78,3 +79,10 @@ def test_backtest_production():
                 nx.production(model, d, tournament=5, verbosity=verbosity)
                 nx.production(model, d, tournament='charles',
                               verbosity=verbosity)
+
+
+def test_run_unique():
+    "name and tournament lists must be unique"
+    d = testing.micro_data()
+    assert_raises(ValueError, nx.production, [nx.fifty(), nx.fifty()], d)
+    assert_raises(ValueError, nx.production, nx.fifty(), d, [1, 'bernie'])

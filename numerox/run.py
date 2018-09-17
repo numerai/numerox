@@ -51,6 +51,9 @@ def run(model, splitter, tournament=None, verbosity=2):
         models = model
     else:
         raise ValueError('`model` must be a model, list, or tuple of models')
+    names = [m.name for m in models]
+    if len(names) != len(set(names)):
+        raise ValueError('`model` cannot contain duplicate names')
 
     # make list of tournaments
     if tournament is None:
