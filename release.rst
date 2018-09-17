@@ -12,6 +12,7 @@ Release Notes
   * Add ``model.name`` and ``model.rename``
   * Models must inhert from ``nx.Model``; it is no longer optional
   * ``download`` and ``download_deluxe`` combined into ``download``
+  * ``upload`` and ``upload_deluxe`` combined into ``upload``
   * Bugfix: reset splitter before running
 
 - v3.0.0

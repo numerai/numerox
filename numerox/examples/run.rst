@@ -98,7 +98,7 @@ Instead rename the models::
     rf_d4      x         x      x   x       x
     rf_d5      x         x      x   x       x
 
-Torunaments must be unique. This will raise a ``ValueError``::
+Tournaments must be unique. This will raise a ``ValueError``::
 
     >>> p = nx.production(nx.logistic(), data, tournament=[1, 'bernie'])
     ValueError: `tournament` cannot contain duplicates

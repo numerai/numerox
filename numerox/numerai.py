@@ -31,6 +31,8 @@ def download(filename, load=True, n_tries=100, sleep_seconds=300,
 
     Unlike nx.download() this function loads and returns the data object.
     """
+    # line below expands e.g. ~/tmp to /home/me/tmp...
+    filename = os.path.expanduser(filename)
     count = 0
     while count < n_tries:
         try:
@@ -38,8 +40,6 @@ def download(filename, load=True, n_tries=100, sleep_seconds=300,
                 print("Download dataset {}".format(filename))
             napi = NumerAPI()
             url = napi.get_dataset_url(tournament=1)
-            # line below expands e.g. ~/tmp to /home/me/tmp...
-            filename = os.path.expanduser(filename)
             download_file(url, filename)
             break
         except: # noqa
@@ -64,39 +64,34 @@ def download_data_object(verbose=False):
 # ---------------------------------------------------------------------------
 # upload submission
 
-def upload(filename, tournament, public_id, secret_key, block=True):
+def upload(filename, tournament, public_id, secret_key, block=True,
+           n_tries=100, sleep_seconds=60, verbose=False):
     """
     Upload tournament submission (csv file) to Numerai.
+
+    If upload fails then retry upload `n_tries` times, pausing `sleep_seconds`
+    between each try.
 
     If block is True (default) then the scope of your token must be both
     upload_submission and read_submission_info. If block is False then only
     upload_submission is needed.
+
     """
     tournament = nx.tournament_int(tournament)
-    napi = NumerAPI(public_id=public_id, secret_key=secret_key,
-                    verbosity='warning')
-    upload_id = napi.upload_predictions(filename, tournament=tournament)
-    if block:
-        status = status_block(upload_id, public_id, secret_key)
-    else:
-        status = upload_status(upload_id, public_id, secret_key)
-    return upload_id, status
-
-
-def upload_deluxe(filename, tournament, public_id, secret_key,
-                  n_tries=100, sleep_seconds=60, verbose=False):
-    """
-    Upload tournament submission (csv file) to Numerai.
-
-    If upload fails then retry upload `n_tries` times, pausing
-    `sleep_seconds` between each try.
-    """
     count = 0
     while count < n_tries:
         try:
-            upload_id, status = upload(filename, tournament, public_id,
-                                       secret_key, block=True)
+
+            napi = NumerAPI(public_id=public_id, secret_key=secret_key,
+                            verbosity='warning')
+            upload_id = napi.upload_predictions(filename,
+                                                tournament=tournament)
+            if block:
+                status = status_block(upload_id, public_id, secret_key)
+            else:
+                status = upload_status(upload_id, public_id, secret_key)
             break
+
         except: # noqa
             print('upload failed')
             time.sleep(sleep_seconds)
