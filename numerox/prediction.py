@@ -98,21 +98,34 @@ class Prediction(object):
         return tournament in tournaments
 
     def pairs_with_name(self, name, as_str=True):
-        "List of pairs with given `name`"
+        "List of pairs with given `name`; `name` can be str or list of str."
+        if isinstance(name, list):
+            names = name
+        elif nx.isstring(name):
+            names = [name]
+        else:
+            raise ValueError('`name` must be str or list')
         prs = self.pairs(as_str)
         pairs = []
         for pr in prs:
-            if pr[0] == name:
+            if pr[0] in names:
                 pairs.append(pr)
         return pairs
 
     def pairs_with_tournament(self, tournament, as_str=True):
-        "List of pairs with given `tournament`"
-        tournament = nx.tournament_int(tournament)
+        "List of pairs; `tournament` can be int, str, or list"
+        if isinstance(tournament, list):
+            tournaments = [nx.tournament_int(t) for t in tournament]
+        elif nx.isstring(tournament):
+            tournaments = [nx.tournament_int(tournament)]
+        elif nx.isint(tournament):
+            tournaments = [tournament]
+        else:
+            raise ValueError('`tournament` must be int, str or list')
         prs = self.pairs(as_str=False)
         pairs = []
         for pr in prs:
-            if pr[1] == tournament:
+            if pr[1] in tournaments:
                 if as_str:
                     pr = (pr[0], nx.tournament_str(pr[1]))
                 pairs.append(pr)
@@ -134,6 +147,38 @@ class Prediction(object):
         if not nx.isstring(name):
             raise ValueError("`name` must be a string")
         return (name, nx.tournament_int(tournament))
+
+    def drop_name(self, name):
+        "Drop name or list of names from prediction; return copy"
+        if self.df is None:
+            raise ValueError("Cannot drop a name from an empty prediction")
+        pair = self.pairs_with_name(name, as_str=False)
+        df = self.df.drop(columns=pair)
+        return Prediction(df)
+
+    def drop_tournament(self, tournament):
+        "Drop tournament or list of tournaments from prediction; return copy"
+        if self.df is None:
+            msg = "Cannot drop a tournament from an empty prediction"
+            raise ValueError(msg)
+        pair = self.pairs_with_tournament(tournament, as_str=False)
+        df = self.df.drop(columns=pair)
+        return Prediction(df)
+
+    def drop_pair(self, pair):
+        "Drop pair (tuple) or list of pairs from prediction; return copy"
+        if self.df is None:
+            raise ValueError("Cannot drop a pair from an empty prediction")
+        if isinstance(pair, list):
+            pairs = [self.make_pair(*p) for p in pair]
+        elif isinstance(pair, tuple):
+            pairs = [self.make_pair(*pair)]
+        pairs0 = self.pairs(as_str=False)
+        for p in pairs:
+            if p not in pairs0:
+                raise ValueError('cannot drop pair that does not exist')
+        df = self.df.drop(columns=pairs)
+        return Prediction(df)
 
     def rename(self, mapper):
         """
@@ -659,13 +704,6 @@ class Prediction(object):
         self.df = self.merge(prediction).df
 
     # utilities -------------------------------------------------------------
-
-    def drop(self, pair):
-        "Drop pair (tuple) or list of pairs from prediction; return copy"
-        if self.df is None:
-            raise ValueError("Cannot drop a pair from an empty prediction")
-        df = self.df.drop(columns=pair)
-        return Prediction(df)
 
     def iter(self):
         "Yield a prediction object with only one model at a time"

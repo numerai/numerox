@@ -5,15 +5,27 @@ Release Notes
 
 - v3.1.0 (not yet released; in development)
 
+  **production, backtest, run**
+
   * Option to run multiple models in one function call
   * Option to run a list of arbitrary tournaments
   * Default now runs model through all five tournaments; previously no default
   * You can no longer re-name a model through the run functions
-  * Add ``model.name`` and ``model.rename``
+  * Bugfix: reset splitter before running
+
+  **prediction**
+
+  * Add ``prediction.drop_name`` and ``drop_tournament``
+  * Rename ``prediction.drop`` to ``prediction.drop_pair``
+  * ``prediction.pairs_with_name`` now accepts a list of model names
+  * ``prediction.pairs_with_tournament`` now accepts a list of tournaments
+
+  **miscellaneous**
+
   * Models must inhert from ``nx.Model``; it is no longer optional
+  * Add ``model.name`` and ``model.rename``
   * ``download`` and ``download_deluxe`` combined into ``download``
   * ``upload`` and ``upload_deluxe`` combined into ``upload``
-  * Bugfix: reset splitter before running
 
 - v3.0.0
 

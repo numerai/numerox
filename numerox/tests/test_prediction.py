@@ -18,8 +18,6 @@ def test_empty_prediction():
     ok_(p.names() == [], "wrong name")
     assert_raises(ValueError, p.rename, 'name')
     assert_raises(ValueError, p.rename, ['name'])
-    assert_raises(ValueError, p.drop, 'name')
-    assert_raises(ValueError, p.drop, ['name'])
     assert_raises(ValueError, p.save, 'not_used')
     ok_((p.ids == np.array([], dtype=str)).all(), 'empty ids')
     ok_(p.copy() == p, 'empty copy')
@@ -98,6 +96,35 @@ def test_load_example_predictions():
     ok_(np.abs(p.df.iloc[2, 0] - 0.50397) < 1e-8, 'wrong feature value')
 
 
+def test_prediction_pairs_with_name():
+    "test p.pairs_with_name"
+    p = nx.testing.micro_prediction()
+    pairs = p.pairs_with_name('model0')
+    pairs0 = [('model0', 'elizabeth'), ('model0', 'charles')]
+    ok_(pairs == pairs0, 'wrong pairs')
+    pairs = p.pairs_with_name('model0', as_str=False)
+    pairs0 = [('model0', 2), ('model0', 5)]
+    ok_(pairs == pairs0, 'wrong pairs')
+    pairs = p.pairs_with_name(['model0', 'model2'])
+    pairs0 = [('model0', 'elizabeth'), ('model2', 'jordan'),
+              ('model0', 'charles')]
+    ok_(pairs == pairs0, 'wrong pairs')
+
+
+def test_prediction_pairs_with_tournament():
+    "test p.pairs_with_tournament"
+    p = nx.testing.micro_prediction()
+    pairs = p.pairs_with_tournament('bernie')
+    pairs0 = [('model1', 'bernie')]
+    ok_(pairs == pairs0, 'wrong pairs')
+    pairs = p.pairs_with_tournament('bernie', as_str=False)
+    pairs0 = [('model1', 1)]
+    ok_(pairs == pairs0, 'wrong pairs')
+    pairs = p.pairs_with_tournament([2, 'charles'])
+    pairs0 = [('model0', 'elizabeth'), ('model0', 'charles')]
+    ok_(pairs == pairs0, 'wrong pairs')
+
+
 def test_prediction_copies():
     "prediction properties should be copies"
     p = nx.testing.micro_prediction()
@@ -145,12 +172,35 @@ def test_prediction_rename():
     ok_(p2.names()[0] == 'modelX', 'prediction.rename failed')
 
 
-def test_prediction_drop():
-    "prediction.drop"
+def test_prediction_drop_name():
+    "prediction.drop_name"
+
     p = nx.testing.micro_prediction()
-    p = p.drop(('model1', 1))
+    p = p.drop_name('model1')
+    prs = [('model0', 'elizabeth'), ('model2', 'jordan'),
+           ('model0', 'charles')]
+    ok_(p.pairs() == prs, 'p.drop_name failed')
+
+    p = nx.testing.micro_prediction()
+    p = p.drop_name(['model1', 'model0'])
+    prs = [('model2', 'jordan')]
+    ok_(p.pairs() == prs, 'p.drop_name failed')
+
+
+def test_prediction_drop_pair():
+    "prediction.drop_pair"
+
+    p = nx.testing.micro_prediction()
+    p = p.drop_pair(('model1', 1))
     prs = [('model0', 2), ('model2', 3), ('model0', 5)]
-    ok_(p.pairs(as_str=False) == prs, 'prediction.drop failed')
+    ok_(p.pairs(as_str=False) == prs, 'p.drop_pair failed')
+
+    p = nx.testing.micro_prediction()
+    p = p.drop_pair([('model1', 1), ('model0', 2)])
+    prs = [('model2', 3), ('model0', 5)]
+    ok_(p.pairs(as_str=False) == prs, 'p.drop_pair failed')
+
+    assert_raises(ValueError, p.drop_pair, ('modelX', 1))
 
 
 def test_prediction_add():

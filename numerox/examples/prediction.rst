@@ -58,7 +58,7 @@ or::
 
     >>> p = p.merge(p2)
 
-The default is to run the model across all five tournaments)::
+The default is to run a model across all five tournaments)::
 
     >>> p = nx.production(nx.logistic(), data)
 
@@ -235,6 +235,48 @@ You can index by (name, tournament) pairs::
                  bernie elizabeth jordan ken charles
     randomforest                                   x
     logistic                           x
+
+Dropping predictions
+--------------------
+
+We start with a prediction object, ``p``, that contains::
+
+    >>> p
+                        bernie elizabeth jordan ken charles
+    logistic                 x         x      x   x       x
+    randomforest             x         x      x   x       x
+    example_predictions      x         x      x   x       x
+
+Let's remove the random forest model::
+
+    >>> p.drop_name('randomforest')
+                        bernie elizabeth jordan ken charles
+    logistic                 x         x      x   x       x
+    example_predictions      x         x      x   x       x
+
+Remove the 'ken' tournament::
+
+    >>> p.drop_tournament('ken')
+                        bernie elizabeth jordan ken charles
+    logistic                 x         x      x           x
+    randomforest             x         x      x           x
+    example_predictions      x         x      x           x
+
+Remove the logistic, bernie pair::
+
+    >>> p.drop_pair(('logistic', 'bernie'))
+                        bernie elizabeth jordan ken charles
+    logistic                           x      x   x       x
+    randomforest             x         x      x   x       x
+    example_predictions      x         x      x   x       x
+
+All three drop functions work with lists as well. For example::
+
+    >>> p.drop_tournament([2, 'ken'])
+                        bernie elizabeth jordan ken charles
+    logistic                 x                x           x
+    randomforest             x                x           x
+    example_predictions      x                x           x
 
 Upload checks
 -------------
