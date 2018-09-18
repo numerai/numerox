@@ -36,6 +36,11 @@ Multiple models
 
 A Prediction object can contain the predictions of multiple models::
 
+    >>> models = [nx.logistic(), nx.randomforest()]
+    >>> p = nx.backtest(models, data)
+
+or::
+
     >>> p = nx.production(my_model_1(), data, 'bernie')
     >>> p += nx.production(my_model_2(), data, 'bernie')
 
