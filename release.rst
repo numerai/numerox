@@ -15,7 +15,7 @@ Release Notes
 
   **prediction**
 
-  * Add ``prediction.drop_name`` and ``drop_tournament``
+  * Add ``prediction.drop_name`` and ``prediction.drop_tournament``
   * Rename ``prediction.drop`` to ``prediction.drop_pair``
   * ``prediction.pairs_with_name`` now accepts a list of model names
   * ``prediction.pairs_with_tournament`` now accepts a list of tournaments

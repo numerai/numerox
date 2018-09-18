@@ -43,16 +43,7 @@ class Prediction(object):
         "indexing by row ids"
         return Loc(self)
 
-    # names, tournaments, pairs ---------------------------------------------
-
-    def pairs(self, as_str=True):
-        "List (copy) of (name, tournament) tuple in prediction object"
-        if self.df is None:
-            return list()
-        pairs = self.df.columns.tolist()
-        if as_str:
-            pairs = [(n, nx.tournament_str(t)) for n, t in pairs]
-        return pairs
+    # name ------------------------------------------------------------------
 
     def names(self):
         "List (copy) of names in prediction object"
@@ -63,6 +54,57 @@ class Prediction(object):
                 names.append(n)
         return names
 
+    def name_isin(self, name):
+        "Is name in Prediction object? True or False."
+        names = self.names()
+        return name in names
+
+    def drop_name(self, name):
+        "Drop name or list of names from prediction; return copy"
+        if self.df is None:
+            raise ValueError("Cannot drop a name from an empty prediction")
+        pair = self.pairs_with_name(name, as_str=False)
+        df = self.df.drop(columns=pair)
+        return Prediction(df)
+
+    def rename(self, mapper):
+        """
+        Rename prediction name(s).
+
+        Parameters
+        ----------
+        mapper : {dict-like, str}
+            You can rename using a dictionary with old name as key, new as
+            value. Or, if the prediction contains a single name, then `mapper`
+            can be a string containing the new name.
+
+        Returns
+        -------
+        renamed : Prediction
+            A copy of the prediction with renames names.
+        """
+        if self.df is None:
+            raise ValueError("Cannot rename an empty prediction")
+        names = self.names()
+        df = self.df.copy()
+        if nx.isstring(mapper):
+            if len(names) != 1:
+                msg = 'prediction contains more than one name; use dict mapper'
+                raise ValueError(msg)
+            pairs = self.pairs(as_str=False)
+            pairs = [(mapper, t) for n, t in pairs]
+        elif isinstance(mapper, dict):
+            prs = self.pairs(as_str=False)
+            pairs = []
+            for pr in prs:
+                if pr[0] in mapper:
+                    pr = (mapper[pr[0]], pr[1])
+                pairs.append(pr)
+        df.columns = pairs
+        return Prediction(df)
+
+    # tournament ------------------------------------------------------------
+
     def tournaments(self, as_str=True):
         "List (copy) of tournaments in prediction object"
         pairs = self.pairs(as_str=False)
@@ -71,6 +113,32 @@ class Prediction(object):
         if as_str:
             tournaments = [nx.tournament_str(t) for t in tournaments]
         return tournaments
+
+    def tournament_isin(self, tournament):
+        "Is tournament in Prediction object? True or False."
+        tournaments = self.tournaments(as_str=False)
+        tournament = nx.tournament_int(tournament)
+        return tournament in tournaments
+
+    def drop_tournament(self, tournament):
+        "Drop tournament or list of tournaments from prediction; return copy"
+        if self.df is None:
+            msg = "Cannot drop a tournament from an empty prediction"
+            raise ValueError(msg)
+        pair = self.pairs_with_tournament(tournament, as_str=False)
+        df = self.df.drop(columns=pair)
+        return Prediction(df)
+
+    # pair ------------------------------------------------------------------
+
+    def pairs(self, as_str=True):
+        "List (copy) of (name, tournament) tuple in prediction object"
+        if self.df is None:
+            return list()
+        pairs = self.df.columns.tolist()
+        if as_str:
+            pairs = [(n, nx.tournament_str(t)) for n, t in pairs]
+        return pairs
 
     def pairs_df(self):
         "Bool dataframe with names as index and tournaments as columns"
@@ -85,17 +153,6 @@ class Prediction(object):
     def pair_isin(self, pair):
         "Is (name, tournament) tuple in Prediction object? True or False."
         return pair in self
-
-    def name_isin(self, name):
-        "Is name in Prediction object? True or False."
-        names = self.names()
-        return name in names
-
-    def tournament_isin(self, tournament):
-        "Is tournament in Prediction object? True or False."
-        tournaments = self.tournaments(as_str=False)
-        tournament = nx.tournament_int(tournament)
-        return tournament in tournaments
 
     def pairs_with_name(self, name, as_str=True):
         "List of pairs with given `name`; `name` can be str or list of str."
@@ -148,23 +205,6 @@ class Prediction(object):
             raise ValueError("`name` must be a string")
         return (name, nx.tournament_int(tournament))
 
-    def drop_name(self, name):
-        "Drop name or list of names from prediction; return copy"
-        if self.df is None:
-            raise ValueError("Cannot drop a name from an empty prediction")
-        pair = self.pairs_with_name(name, as_str=False)
-        df = self.df.drop(columns=pair)
-        return Prediction(df)
-
-    def drop_tournament(self, tournament):
-        "Drop tournament or list of tournaments from prediction; return copy"
-        if self.df is None:
-            msg = "Cannot drop a tournament from an empty prediction"
-            raise ValueError(msg)
-        pair = self.pairs_with_tournament(tournament, as_str=False)
-        df = self.df.drop(columns=pair)
-        return Prediction(df)
-
     def drop_pair(self, pair):
         "Drop pair (tuple) or list of pairs from prediction; return copy"
         if self.df is None:
@@ -178,42 +218,6 @@ class Prediction(object):
             if p not in pairs0:
                 raise ValueError('cannot drop pair that does not exist')
         df = self.df.drop(columns=pairs)
-        return Prediction(df)
-
-    def rename(self, mapper):
-        """
-        Rename prediction name(s).
-
-        Parameters
-        ----------
-        mapper : {dict-like, str}
-            You can rename using a dictionary with old name as key, new as
-            value. Or, if the prediction contains a single name, then `mapper`
-            can be a string containing the new name.
-
-        Returns
-        -------
-        renamed : Prediction
-            A copy of the prediction with renames names.
-        """
-        if self.df is None:
-            raise ValueError("Cannot rename an empty prediction")
-        names = self.names()
-        df = self.df.copy()
-        if nx.isstring(mapper):
-            if len(names) != 1:
-                msg = 'prediction contains more than one name; use dict mapper'
-                raise ValueError(msg)
-            pairs = self.pairs(as_str=False)
-            pairs = [(mapper, t) for n, t in pairs]
-        elif isinstance(mapper, dict):
-            prs = self.pairs(as_str=False)
-            pairs = []
-            for pr in prs:
-                if pr[0] in mapper:
-                    pr = (mapper[pr[0]], pr[1])
-                pairs.append(pr)
-        df.columns = pairs
         return Prediction(df)
 
     # y ---------------------------------------------------------------------
