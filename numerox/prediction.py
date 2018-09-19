@@ -43,6 +43,57 @@ class Prediction(object):
         "indexing by row ids"
         return Loc(self)
 
+    # y ---------------------------------------------------------------------
+
+    @property
+    def y(self):
+        "View of y as a 2d numpy float array"
+        if self.df is None:
+            raise ValueError("prediction is empty")
+        return self.df.values
+
+    @property
+    def y_df(self):
+        "Copy of predictions, y, as a dataframe"
+        return self.df.copy()
+
+    def ynew(self, y_array):
+        "Copy of prediction but with prediction.y=`y_array`"
+        if self.df is None:
+            raise ValueError("prediction is empty")
+        if y_array.shape != self.shape:
+            msg = "`y_array` must have the same shape as prediction"
+            raise ValueError(msg)
+        df = pd.DataFrame(data=y_array,
+                          index=self.df.index.copy(deep=True),
+                          columns=self.df.columns.copy())
+        return Prediction(df)
+
+    def y_correlation(self):
+        "Correlation matrix of y's (predictions) as dataframe"
+        return self.df.corr()
+
+    def correlation(self, pair=None, as_str=True):
+        "Correlation of predictions; by default reports given for each model"
+        if pair is None:
+            pairs = self.pairs(as_str)
+        else:
+            pairs = [pair]
+        z = self.df.values
+        zpairs = self.pairs(as_str)
+        idx = np.isfinite(z.sum(axis=1))
+        z = z[idx]
+        z = (z - z.mean(axis=0)) / z.std(axis=0)
+        for pair in pairs:
+            print('{}, {}'.format(*pair))
+            idx = zpairs.index(pair)
+            corr = np.dot(z[:, idx], z) / z.shape[0]
+            index = (-corr).argsort()
+            for ix in index:
+                zpair = zpairs[ix]
+                if pair != zpair:
+                    print("   {:.4f} {}, {}".format(corr[ix], *zpair))
+
     # name ------------------------------------------------------------------
 
     def names(self):
@@ -219,57 +270,6 @@ class Prediction(object):
                 raise ValueError('cannot drop pair that does not exist')
         df = self.df.drop(columns=pairs)
         return Prediction(df)
-
-    # y ---------------------------------------------------------------------
-
-    @property
-    def y(self):
-        "View of y as a 2d numpy float array"
-        if self.df is None:
-            raise ValueError("prediction is empty")
-        return self.df.values
-
-    @property
-    def y_df(self):
-        "Copy of predictions, y, as a dataframe"
-        return self.df.copy()
-
-    def ynew(self, y_array):
-        "Copy of prediction but with prediction.y=`y_array`"
-        if self.df is None:
-            raise ValueError("prediction is empty")
-        if y_array.shape != self.shape:
-            msg = "`y_array` must have the same shape as prediction"
-            raise ValueError(msg)
-        df = pd.DataFrame(data=y_array,
-                          index=self.df.index.copy(deep=True),
-                          columns=self.df.columns.copy())
-        return Prediction(df)
-
-    def y_correlation(self):
-        "Correlation matrix of y's (predictions) as dataframe"
-        return self.df.corr()
-
-    def correlation(self, pair=None, as_str=True):
-        "Correlation of predictions; by default reports given for each model"
-        if pair is None:
-            pairs = self.pairs(as_str)
-        else:
-            pairs = [pair]
-        z = self.df.values
-        zpairs = self.pairs(as_str)
-        idx = np.isfinite(z.sum(axis=1))
-        z = z[idx]
-        z = (z - z.mean(axis=0)) / z.std(axis=0)
-        for pair in pairs:
-            print('{}, {}'.format(*pair))
-            idx = zpairs.index(pair)
-            corr = np.dot(z[:, idx], z) / z.shape[0]
-            index = (-corr).argsort()
-            for ix in index:
-                zpair = zpairs[ix]
-                if pair != zpair:
-                    print("   {:.4f} {}, {}".format(corr[ix], *zpair))
 
     # merge -----------------------------------------------------------------
 
