@@ -266,6 +266,16 @@ def test_prediction_summary():
     ok_(isinstance(df, pd.DataFrame), 'expecting a dataframe')
 
 
+def test_prediction_metric_per_era():
+    "make sure prediction.metric_per_era runs"
+    d = nx.testing.micro_data()
+    p = nx.testing.micro_prediction()
+    df = p.metric_per_era(d, metric='logloss')
+    ok_(isinstance(df, pd.DataFrame), 'expecting a dataframe')
+    ok_(df.shape[0] == len(d.unique_era()), 'wrong shape')
+    ok_(df.shape[1] == len(p.pairs()), 'wrong shape')
+
+
 def test_prediction_performance():
     "make sure prediction.performance runs"
     d = nx.testing.micro_data()

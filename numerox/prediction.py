@@ -403,6 +403,16 @@ class Prediction(object):
                 print(df_dict[pair])
         return df_dict
 
+    def metric_per_era(self, data, tournament=None, metric='logloss',
+                       era_as_str=True, split_pairs=True):
+        "DataFrame containing given metric versus era (as index)"
+        df = self.metrics_per_era(data, tournament=tournament,
+                                  metrics=[metric],
+                                  era_as_str=True, split_pairs=True)
+        df = df.pivot(columns='pair', values=metric)
+        df.columns.name = None
+        return df
+
     def metrics_per_era(self, data, tournament=None,
                         metrics=['logloss', 'auc', 'acc', 'ystd'],
                         era_as_str=True, split_pairs=True):

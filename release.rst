@@ -15,6 +15,7 @@ Release Notes
 
   **prediction**
 
+  * Add ``prediction.metric_per_era``
   * Add ``prediction.drop_name`` and ``prediction.drop_tournament``
   * Rename ``prediction.drop`` to ``prediction.drop_pair``
   * ``prediction.pairs_with_name`` now accepts a list of model names
