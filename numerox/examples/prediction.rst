@@ -125,6 +125,24 @@ prediction object::
 
 Or we can look in even more detail by looking at performance in every era::
 
+    >>> p[:, 'bernie'].metric_per_era(data['validation'], metric='logloss')
+            (example_predictions, 1)  (logistic, 1)  (randomforest, 1)
+    era
+    era121                  0.692964       0.692785           0.692743
+    era122                  0.692620       0.692467           0.692580
+    era123                  0.692703       0.692980           0.693021
+    era124                  0.693064       0.692617           0.692869
+    era125                  0.693169       0.692895           0.692909
+    era126                  0.692607       0.692561           0.692816
+    era127                  0.692803       0.693080           0.692931
+    era128                  0.692923       0.693008           0.693027
+    era129                  0.691768       0.691961           0.692233
+    era130                  0.693176       0.692914           0.692813
+    era131                  0.693094       0.692973           0.693027
+    era132                  0.693519       0.693460           0.693438
+
+or::
+
     >>> p.metrics_per_era(data['validation'])
                            name tournament   logloss       auc       acc      ystd
     era
