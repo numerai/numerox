@@ -440,28 +440,51 @@ class Data(object):
                 else:
                     raise IndexError('string index not recognized')
         elif isinstance(index, slice):
-            if index.step is not None:
+
+            # step
+            if index.step is not None and index.step is not 1:
                 raise IndexError("slice step size must be 1")
+
+            ueras = self.unique_era().tolist()
+
+            # start
             era1 = index.start
-            if not nx.isstring(era1) or not era1.startswith('era'):
+            idx1 = None
+            if era1 is None:
+                idx1 = 0
+            elif not nx.isstring(era1) or not era1.startswith('era'):
                 raise IndexError("slice elements must be strings like 'era23'")
+            if idx1 is None:
+                idx1 = ueras.index(era1)
+
+            # end
             era2 = index.stop
-            if not nx.isstring(era2) or not era1.startswith('era'):
+            idx2 = None
+            if era2 is None:
+                idx2 = len(ueras) - 1
+            elif not nx.isstring(era2) or not era2.startswith('era'):
                 raise IndexError("slice elements must be strings like 'era23'")
-            era1 = int(era1[3:])
-            era2 = int(era2[3:])
-            if era1 > era2:
+            if idx2 is None:
+                idx2 = ueras.index(era2)
+
+            if idx1 > idx2:
                 raise IndexError("slice cannot go from large to small era")
+
+            # find eras in slice
             eras = []
-            era = era1
-            while era <= era2:
-                eras.append('era' + str(era))
-                era += 1
-            return self.era_isin(eras)
+            for ix in range(idx1, idx2 + 1):
+                eras.append(ueras[ix])
+
+            data = self.era_isin(eras)
+
+            return data
+
         elif typidx is pd.Series or typidx is np.ndarray:
-            idx = index
-            return Data(self.df[idx])
+
+            return Data(self.df[index])
+
         else:
+
             raise IndexError('indexing type not recognized')
 
     @property

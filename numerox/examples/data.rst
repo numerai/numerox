@@ -152,7 +152,7 @@ You can also index by Numerai row ids::
 Slicing
 -------
 
-You can slice a Data object by era::
+You can slice a Data object by era, For example::
 
     >>> data['era90':'era120']
     region    train
@@ -160,6 +160,15 @@ You can slice a Data object by era::
     era       31, [era90, era120]
     x         50, min 0.0000, mean 0.5026, max 1.0000
     y         mean 0.499578, fraction missing 0.0000
+    
+or::
+
+    >>> data[:'era60']
+    region    train
+    rows      183195
+    era       60, [era1, era60]
+    x         50, min 0.0000, mean 0.5024, max 1.0000
+    y         mean 0.499509, fraction missing 0.0000
 
 Note that the slice is inclusive of the ending era.
 

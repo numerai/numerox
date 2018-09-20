@@ -23,12 +23,14 @@ Release Notes
 
   **miscellaneous**
 
+  * More expressive data slicing: ``data[:'era60']`` and ``data['era61':]``
+    and can use 'eraX' when slicing
   * Models must inhert from ``nx.Model``; it is no longer optional
   * Add ``model.name`` and ``model.rename``
   * ``download`` and ``download_deluxe`` combined into ``download``
   * ``upload`` and ``upload_deluxe`` combined into ``upload``
-  * Add ``CustomCVSplitter``
   * Add ``CustomSplitter``
+  * Add ``CustomCVSplitter``
 
 - v3.0.0
 
