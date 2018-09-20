@@ -296,7 +296,7 @@ class CustomCVSplitter(Splitter):
     def next_split(self):
         data_list = self.p['data_list']
         dpre = data_list[self.count]
-        idx = range(len(data_list))
+        idx = list(range(len(data_list)))
         idx.remove(self.count)
         dfit = data_list[idx[0]]
         for ix in idx[1:]:
