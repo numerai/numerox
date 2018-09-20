@@ -27,6 +27,7 @@ Release Notes
   * Add ``model.name`` and ``model.rename``
   * ``download`` and ``download_deluxe`` combined into ``download``
   * ``upload`` and ``upload_deluxe`` combined into ``upload``
+  * Add ``CustomCVSplitter``
 
 - v3.0.0
 

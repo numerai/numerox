@@ -34,6 +34,7 @@ from numerox.splitter import LoocvSplitter
 from numerox.splitter import IgnoreEraCVSplitter
 from numerox.splitter import RollSplitter
 from numerox.splitter import ConsecutiveCVSplitter
+from numerox.splitter import CustomCVSplitter
 
 # run
 from numerox.run import production

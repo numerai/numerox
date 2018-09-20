@@ -272,3 +272,33 @@ class ConsecutiveCVSplitter(Splitter):
         pre_eras = self.eras[self.count]
         dpre = data.era_isin(pre_eras)
         return dfit, dpre
+
+
+class CustomCVSplitter(Splitter):
+    "Cross validation over folds given by user as list of data objects"
+
+    def __init__(self, data_list):
+        ids = []
+        if len(data_list) < 2:
+            msg = '`data_list` must contain at least two data objects'
+            raise ValueError(msg)
+        for d in data_list:
+            if not isinstance(d, nx.Data):
+                msg = '`data_list` must be a list of nx.Data objects'
+                raise ValueError(msg)
+            ids.extend(d.ids.tolist())
+        if len(ids) != len(set(ids)):
+            raise ValueError('ids of data objects overlap')
+        self.p = {'data_list': data_list}
+        self.max_count = len(data_list) - 1
+        self.reset()
+
+    def next_split(self):
+        data_list = self.p['data_list']
+        dpre = data_list[self.count]
+        idx = range(len(data_list))
+        idx.remove(self.count)
+        dfit = data_list[idx[0]]
+        for ix in idx[1:]:
+            dfit += data_list[ix]
+        return dfit, dpre

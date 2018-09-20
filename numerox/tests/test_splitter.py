@@ -88,3 +88,17 @@ def test_rollsplitter():
         npre = pera.size
         ntot = tera.size
         ok_(nfit + npre == ntot, "RollSplitter has era overalp")
+
+
+def test_customcvsplitter():
+    d = nx.testing.micro_data()
+    splitter = nx.CustomCVSplitter([d['era1'], d['era2':'era4'], d['eraX']])
+    count = 0
+    ids = []
+    for df, dp in splitter:
+        ok_(isinstance(df, nx.Data), "expecting a data object")
+        ok_(isinstance(dp, nx.Data), "expecting a data object")
+        ids.extend(dp.ids.tolist())
+        count += 1
+    ok_(count == 3, 'number of folds is wrong')
+    ok_(len(ids) == len(set(ids)), 'overlap in ids')
