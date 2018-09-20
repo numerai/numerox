@@ -28,6 +28,7 @@ Release Notes
   * ``download`` and ``download_deluxe`` combined into ``download``
   * ``upload`` and ``upload_deluxe`` combined into ``upload``
   * Add ``CustomCVSplitter``
+  * Add ``CustomSplitter``
 
 - v3.0.0
 

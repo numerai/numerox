@@ -288,7 +288,7 @@ class CustomCVSplitter(Splitter):
                 raise ValueError(msg)
             ids.extend(d.ids.tolist())
         if len(ids) != len(set(ids)):
-            raise ValueError('ids of data objects overlap')
+            raise ValueError('ids of predict data objects overlap')
         self.p = {'data_list': data_list}
         self.max_count = len(data_list) - 1
         self.reset()
@@ -301,4 +301,32 @@ class CustomCVSplitter(Splitter):
         dfit = data_list[idx[0]]
         for ix in idx[1:]:
             dfit += data_list[ix]
+        return dfit, dpre
+
+
+class CustomSplitter(Splitter):
+    "Fit/predict splits given by user as list of data tuples"
+
+    def __init__(self, data_list):
+        ids = []
+        for dt in data_list:
+            if len(dt) != 2:
+                msg = 'elements in `data_list` must have length of two'
+                raise ValueError(msg)
+            isd0 = isinstance(dt[0], nx.Data)
+            isd1 = isinstance(dt[1], nx.Data)
+            if not isd0 or not isd1:
+                msg = '`data_list` must be a list of nx.Data object tuples'
+                raise ValueError(msg)
+            ids.extend(dt[1].ids.tolist())
+        if len(ids) != len(set(ids)):
+            raise ValueError('ids of predict data objects overlap')
+        self.p = {'data_list': data_list}
+        self.max_count = len(data_list) - 1
+        self.reset()
+
+    def next_split(self):
+        data_tuple = self.p['data_list'][self.count]
+        dfit = data_tuple[0]
+        dpre = data_tuple[1]
         return dfit, dpre

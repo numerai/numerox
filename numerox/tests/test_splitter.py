@@ -92,6 +92,7 @@ def test_rollsplitter():
 
 
 def test_customcvsplitter():
+    "test nx.CustomCVSplitter"
     d = nx.testing.micro_data()
     splitter = nx.CustomCVSplitter([d['era1'], d['era2':'era4'], d['eraX']])
     count = 0
@@ -106,3 +107,22 @@ def test_customcvsplitter():
     assert_raises(ValueError, nx.CustomCVSplitter, [d])
     assert_raises(ValueError, nx.CustomCVSplitter, [d, d])
     assert_raises(ValueError, nx.CustomCVSplitter, [d, d, None])
+
+
+def test_customsplitter():
+    "test nx.CustomSplitter"
+    d = nx.testing.micro_data()
+    data_list = [(d['era1'], d['era2']), (d['era4'], d['eraX'])]
+    splitter = nx.CustomSplitter(data_list)
+    count = 0
+    ids = []
+    for df, dp in splitter:
+        ok_(isinstance(df, nx.Data), "expecting a data object")
+        ok_(isinstance(dp, nx.Data), "expecting a data object")
+        ids.extend(dp.ids.tolist())
+        count += 1
+    ok_(count == 2, 'number of splits is wrong')
+    ok_(len(ids) == len(set(ids)), 'overlap in ids')
+    assert_raises(ValueError, nx.CustomSplitter, [(d,)])
+    assert_raises(ValueError, nx.CustomSplitter, [(d, d), (d, d)])
+    assert_raises(ValueError, nx.CustomSplitter, [(d, d), (d, None)])
