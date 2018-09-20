@@ -1,4 +1,5 @@
 from nose.tools import ok_
+from nose.tools import assert_raises
 
 import numpy as np
 
@@ -102,3 +103,6 @@ def test_customcvsplitter():
         count += 1
     ok_(count == 3, 'number of folds is wrong')
     ok_(len(ids) == len(set(ids)), 'overlap in ids')
+    assert_raises(ValueError, nx.CustomCVSplitter, [d])
+    assert_raises(ValueError, nx.CustomCVSplitter, [d, d])
+    assert_raises(ValueError, nx.CustomCVSplitter, [d, d, None])
