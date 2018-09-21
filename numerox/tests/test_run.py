@@ -24,6 +24,8 @@ def test_run():
             p = nx.run(model, splitter, verbosity=0)
             ok_(p.shape[1] == 5, 'wrong number of tournaments')
             ok_(p.tournaments() == nx.tournament_all(), 'wrong tournaments')
+    assert_raises(ValueError, nx.run, None, nx.TournamentSplitter(d))
+    assert_raises(ValueError, nx.run, nx.fifty(), nx.TournamentSplitter(d), {})
 
 
 def test_multiple_runs():

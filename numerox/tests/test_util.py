@@ -41,3 +41,11 @@ def test_flatten_dict():
     f0 = {'a': 1, 'b': 2, 'c': 3}
     ok_(isinstance(f, dict), 'expecting a dict')
     ok_(f == f0, 'wrong dict returned')
+
+
+def test_is_none_splice():
+    "test util.is_none_slice"
+    ok_(nx.util.is_none_slice(slice(None)))
+    ok_(not nx.util.is_none_slice(slice(1, None)))
+    ok_(not nx.util.is_none_slice(slice(None, 1)))
+    ok_(not nx.util.is_none_slice(slice(None, None, 1)))

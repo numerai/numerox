@@ -1,9 +1,11 @@
 import os
 
-import numpy as np
-import pandas as pd
 from nose.tools import ok_
 from nose.tools import assert_raises
+from nose.tools import raises
+
+import numpy as np
+import pandas as pd
 
 import numerox as nx
 from numerox.testing import assert_data_equal as ade
@@ -19,12 +21,21 @@ def test_empty_prediction():
     assert_raises(ValueError, p.rename, 'name')
     assert_raises(ValueError, p.rename, ['name'])
     assert_raises(ValueError, p.save, 'not_used')
+    assert_raises(ValueError, p.drop_name, 'knn')
+    assert_raises(ValueError, p.drop_tournament, 'bernie')
+    assert_raises(ValueError, p.drop_pair, ('knn', 1))
     ok_((p.ids == np.array([], dtype=str)).all(), 'empty ids')
     ok_(p.copy() == p, 'empty copy')
     ok_(p.size == 0, 'empty size')
     ok_(p.shape == (0, 0), 'empty shape')
     ok_(len(p) == 0, 'empty length')
     p.__repr__()
+
+
+@raises(ValueError)
+def test_emtpy_y_raises():
+    p = nx.Prediction()
+    p.y
 
 
 def test_prediction_methods():
@@ -34,6 +45,14 @@ def test_prediction_methods():
     ok_(p.size == 40, "wrong size")
     ok_(p.shape == (10, 4), "wrong shape")
     ok_(p == p, "not equal")
+    ok_(p.name_isin('model1'), 'wrong output')
+    ok_(not p.name_isin('modelX'), 'wrong output')
+    ok_(p.tournament_isin('bernie'), 'wrong output')
+    ok_(not p.tournament_isin('ken'), 'wrong output')
+    ok_(p.pair_isin(('model1', 'bernie')), 'wrong output')
+    ok_(('model1', 'bernie') in p, 'wrong output')
+    ok_(('model1', 1) in p, 'wrong output')
+    ok_(('model0', 'bernie') not in p, 'wrong output')
 
 
 def test_prediction_roundtrip():
@@ -80,6 +99,7 @@ def test_prediction_to_csv():
         with nx.testing.HiddenPrints():
             p[('model1', 1)].to_csv(path, verbose=True)
         p2 = nx.load_prediction_csv(path, 'model1')
+        nx.load_prediction_csv(path)
     finally:
         nx.testing.delete_tempfile(path)
     ade(p2, p[('model1', 1)], "prediction corrupted during roundtrip")
@@ -109,6 +129,7 @@ def test_prediction_pairs_with_name():
     pairs0 = [('model0', 'elizabeth'), ('model2', 'jordan'),
               ('model0', 'charles')]
     ok_(pairs == pairs0, 'wrong pairs')
+    assert_raises(ValueError, p.pairs_with_name, None)
 
 
 def test_prediction_pairs_with_tournament():
@@ -123,6 +144,27 @@ def test_prediction_pairs_with_tournament():
     pairs = p.pairs_with_tournament([2, 'charles'])
     pairs0 = [('model0', 'elizabeth'), ('model0', 'charles')]
     ok_(pairs == pairs0, 'wrong pairs')
+    assert_raises(ValueError, p.pairs_with_tournament, None)
+
+
+def test_iprediction_pairs_split():
+    "test prediction.pairs_split"
+    p = nx.testing.micro_prediction()
+    name0 = ('model0', 'model1', 'model2', 'model0')
+    tournament0 = ('elizabeth', 'bernie', 'jordan', 'charles')
+    name, tournament = p.pairs_split()
+    ok_(name == name0, 'wrong names')
+    ok_(tournament == tournament0, 'wrong tournaments')
+
+
+def test_prediction_make_pair():
+    "test prediction.make_pair"
+    p = nx.testing.micro_prediction()
+    pair = p.make_pair('knn', 'bernie')
+    ok_(pair == ('knn', 1))
+    pair = p.make_pair('knn', 1)
+    ok_(pair == ('knn', 1))
+    assert_raises(ValueError, p.make_pair, None, 1)
 
 
 def test_prediction_copies():
@@ -187,6 +229,21 @@ def test_prediction_drop_name():
     ok_(p.pairs() == prs, 'p.drop_name failed')
 
 
+def test_prediction_drop_tournament():
+    "prediction.drop_tournament"
+
+    p = nx.testing.micro_prediction()
+    p = p.drop_tournament('bernie')
+    prs = [('model0', 'elizabeth'), ('model2', 'jordan'),
+           ('model0', 'charles')]
+    ok_(p.pairs() == prs, 'p.drop_tournament failed')
+
+    p = nx.testing.micro_prediction()
+    p = p.drop_tournament(['bernie', 2, 'jordan'])
+    prs = [('model0', 'charles')]
+    ok_(p.pairs() == prs, 'p.drop_tournament failed')
+
+
 def test_prediction_drop_pair():
     "prediction.drop_pair"
 
@@ -238,6 +295,11 @@ def test_prediction_getitem():
     pairs = [('model1', 1)]
     p2 = p[:, 'bernie']
     ok_(p2.pairs(as_str=False) == pairs, 'pairs corrupted')
+    assert_raises(IndexError, p.__getitem__, ('modelX', 1, 'extra'))
+    assert_raises(IndexError, p.__getitem__, (1, 1))
+    assert_raises(IndexError, p.__getitem__, (slice(1), 1))
+    assert_raises(IndexError, p.__getitem__, (1, slice(1)))
+    assert_raises(IndexError, p.__getitem__, [('model1', 1, 1)])
 
 
 def test_prediction_loc():
@@ -264,6 +326,10 @@ def test_prediction_summary():
     p = nx.testing.micro_prediction()
     df = p[('model1', 1)].summary(d, 3)
     ok_(isinstance(df, pd.DataFrame), 'expecting a dataframe')
+    assert_raises(ValueError, p.summary, d)
+    with nx.testing.HiddenPrints():
+        df_dict = p.summaries(d)
+    ok_(isinstance(df_dict, dict), 'expecting a dict')
 
 
 def test_prediction_metric_per_era():
@@ -274,6 +340,17 @@ def test_prediction_metric_per_era():
     ok_(isinstance(df, pd.DataFrame), 'expecting a dataframe')
     ok_(df.shape[0] == len(d.unique_era()), 'wrong shape')
     ok_(df.shape[1] == len(p.pairs()), 'wrong shape')
+    df = p.metric_per_era(d, metric='logloss', split_pairs=False)
+    ok_(isinstance(df, pd.DataFrame), 'expecting a dataframe')
+
+
+def test_prediction_metrics_per_tournament():
+    "make sure prediction.metric_per_era runs"
+    d = nx.testing.micro_data()
+    p = nx.testing.micro_prediction()
+    df = p.metric_per_tournament(d)
+    ok_(isinstance(df, pd.DataFrame), 'expecting a dataframe')
+    ok_(df.shape[1] == 6, 'expecting 6 columns')
 
 
 def test_prediction_performance():
@@ -304,6 +381,7 @@ def test_prediction_performance_mean():
     p.performance_mean(d, sort_by='ystd')
     p.performance_mean(d, sort_by='sharpe')
     p.performance_mean(d, sort_by='consis')
+    assert_raises(ValueError, p.performance_mean, d, 'x values')
 
 
 def test_prediction_regression():
@@ -343,6 +421,8 @@ def test_prediction_correlation():
     p = nx.testing.micro_prediction()
     with nx.testing.HiddenPrints():
         p.correlation()
+        p.correlation(('model1', 'bernie'))
+        p.correlation(('model1', 1))
 
 
 def test_prediction_check():

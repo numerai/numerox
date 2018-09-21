@@ -78,7 +78,7 @@ class Prediction(object):
         if pair is None:
             pairs = self.pairs(as_str)
         else:
-            pairs = [pair]
+            pairs = [(pair[0], nx.tournament_str(pair[1]))]
         z = self.df.values
         zpairs = self.pairs(as_str)
         idx = np.isfinite(z.sum(axis=1))

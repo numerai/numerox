@@ -1,4 +1,5 @@
 from nose.tools import ok_
+from nose.tools import assert_raises
 
 import numerox as nx
 
@@ -44,3 +45,4 @@ def test_model_rename():
     ok_(model.__repr__().startswith('logreg'), 'wrong name')
     model = nx.logistic()
     ok_(model.rename(None).name == 'logistic', 'wrong name')
+    assert_raises(ValueError, model.rename, 1)
