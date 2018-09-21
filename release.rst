@@ -21,10 +21,14 @@ Release Notes
   * ``prediction.pairs_with_name`` now accepts a list of model names
   * ``prediction.pairs_with_tournament`` now accepts a list of tournaments
 
+  **data slicing**
+
+  * No longer need to specify endpoints: ``data[:'era60']`` and ``data['era61':]``
+  * Can now use 'eraX' as slice endpoints
+  * Can now specify step size of slice: ``data['era1':'era60':2]``
+
   **miscellaneous**
 
-  * More expressive data slicing: ``data[:'era60']`` and ``data['era61':]``
-    and can use 'eraX' when slicing
   * Models must inhert from ``nx.Model``; it is no longer optional
   * Add ``model.name`` and ``model.rename``
   * ``download`` and ``download_deluxe`` combined into ``download``

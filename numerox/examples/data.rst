@@ -170,7 +170,17 @@ or::
     x         50, min 0.0000, mean 0.5024, max 1.0000
     y         mean 0.499509, fraction missing 0.0000
 
-Note that the slice is inclusive of the ending era.
+**Note that the slice is inclusive of the ending era.**
+
+Any slicing of a data object is always a slice by eras. For example this
+selects every 10th era::
+
+    >>> data[::10]
+    region    train, validation, test
+    rows      63747
+    era       18, [era1, era171]
+    x         50, min 0.0000, mean 0.5025, max 1.0000
+    y         mean 0.499531, fraction missing 0.2704
 
 Why so many y's?
 ----------------

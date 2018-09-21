@@ -441,9 +441,16 @@ class Data(object):
                     raise IndexError('string index not recognized')
         elif isinstance(index, slice):
 
-            # step
-            if index.step is not None and index.step is not 1:
-                raise IndexError("slice step size must be 1")
+            # step check
+            if index.step is not None:
+                if not nx.isint(index.step):
+                    msg = "slice step size must be None or psotive integer"
+                    raise IndexError(msg)
+                if index.step < 1:
+                    raise IndexError('slice step must be greater than 0')
+                step = index.step
+            else:
+                step = 1
 
             ueras = self.unique_era().tolist()
 
@@ -472,7 +479,7 @@ class Data(object):
 
             # find eras in slice
             eras = []
-            for ix in range(idx1, idx2 + 1):
+            for ix in range(idx1, idx2 + 1, step):
                 eras.append(ueras[ix])
 
             data = self.era_isin(eras)

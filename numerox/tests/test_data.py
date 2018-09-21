@@ -79,8 +79,9 @@ def test_data_slice():
     msg = 'error slicing data by era'
     ade(d['era1':'era2'], micro_data([0, 1, 2]), msg)
     ade(d['era3':'era3'], micro_data([3, 4, 5]), msg)
-    ade(d['era1':'era2'], d['era1':'era2':1], msg)
     ade(d['eraX'], micro_data([7, 8, 9]), msg)
+    ade(d['eraX'], micro_data([7, 8, 9]), msg)
+    ade(d[::2], micro_data([0, 3, 4, 5, 7, 8, 9]), msg)
     ade(d[:], d, msg)
     ade(d[:'eraX'], d, msg)
     ade(d['era1':], d, msg)
@@ -88,7 +89,7 @@ def test_data_slice():
     assert_raises(IndexError, d.__getitem__, slice('erg1', 'era2'))
     assert_raises(IndexError, d.__getitem__, slice('erg1', 'erg2'))
     assert_raises(IndexError, d.__getitem__, slice('era2', 'era1'))
-    assert_raises(IndexError, d.__getitem__, slice('era1', 'era2', 2))
+    assert_raises(IndexError, d.__getitem__, slice('era1', 'era2', -2))
     assert_raises(IndexError, d.__getitem__, slice(1, 2))
 
 

@@ -34,6 +34,7 @@ coverage:
 clean:
 	rm -f MANIFEST
 	rm -rf cover
+	rm -f .coverage
 	rm -rf *.lprof
 	rm -rf *.egg-info
 	rm -rf build dist some_sums.egg-info
