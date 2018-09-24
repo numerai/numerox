@@ -3,7 +3,7 @@
 Release Notes
 =============
 
-- v3.1.0 (not yet released; in development)
+- v3.1.0
 
   **production, backtest, run**
 
