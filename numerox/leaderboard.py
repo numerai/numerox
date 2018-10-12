@@ -173,7 +173,7 @@ def raw_leaderboard_to_df(raw_leaderboard, round_number):
         burn = user['stakeResolution']
         burned = burn is not None and burn['destroyed']
         x = [round_number, user['username'],
-             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, np.nan, np.nan]
+             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, np.nan, np.nan, 0.0, np.nan, np.nan]
         if main is not None:
             x[2] = float(main['usdAmount'])
             if 'nmrAmount' in main:
@@ -193,8 +193,12 @@ def raw_leaderboard_to_df(raw_leaderboard, round_number):
                 x[7] = np.nan
         else:
             x[7] = float(user['LiveLogloss'])
-        x[8] = float(user['ValidationLogloss'])
-        x[9] = float(user['Consistency'])
+        val = user['ValidationLogloss']
+        if val is not None:
+            x[8] = float(val)
+        consis = user['Consistency']
+        if consis is not None:
+            x[9] = float(consis)
         if user['stake']['value'] is not None:
             x[10] = float(user['stake']['value'])
             x[11] = decimal.Decimal(user['stake']['confidence'])
