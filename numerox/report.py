@@ -32,5 +32,6 @@ class Report(object):
             fraction.insert(0, count)
             fraction.insert(7, mean)
             df.loc[r] = fraction
+        df.loc['mean'] = df.mean()
         df['N'] = df['N'].astype(int)
         return df
