@@ -11,12 +11,9 @@ DEFAULT_FIRST_ROUND = 51
 
 class Leaderboard(object):
 
-    def __init__(self, tournament=1, verbose=False):
-        self.tournament = nx.tournament_int(tournament)
+    def __init__(self, df=None, verbose=False):
         self.verbose = verbose
-        self.df = None
-        self.unresolved_rounds = []
-        self.current_round = None
+        self.df = df
 
     def __getitem__(self, index):
         "Index by round number, list (or tuple), or slice"
@@ -24,21 +21,68 @@ class Leaderboard(object):
             if index.step is not None:
                 raise ValueError("slice step size must be 1")
             r1, r2 = self.rounds_to_ints(index.start, index.stop)
-            self.get_range(r1, r2)
-            idx1 = self.df['round'] >= r1
-            idx2 = self.df['round'] <= r2
-            idx = idx1 & idx2
-            df = self.df[idx]
+            rs = list(range(r1, r2 + 1))
+            ts = nx.tournament_all()
         elif nx.isint(index):
-            self.get_round(index)
-            df = self.df[self.df['round'] == index]
-        elif isinstance(index, list) or isinstance(index, tuple):
-            self.get_list(index)
-            idx = self.df['round'].isin(index)
-            df = self.df[idx]
+            rs = [index]
+            ts = nx.tournament_all()
+        elif isinstance(index, list):
+            rs, ts = zip(*index)
+        elif isinstance(index, tuple):
+            if len(index) != 2:
+                raise IndexError("tuple index must have length 2")
+            r, t = index
+            if not nx.isint(r):
+                raise IndexError("first element of tuple index must be int")
+            if not (nx.isint(t) or nx.isstring(t)):
+                msg = "second element of tuple index must be int or str"
+                raise IndexError(msg)
+            rs = [r]
+            ts = [t]
         else:
             raise IndexError("indexing method not supported")
+        self.gets(rs, ts)
+        ridx = self.df['round'].isin(rs)
+        tidx = self.df['tournament'].isin(ts)
+        idx = ridx & tidx
+        df = self.df[idx]
         return df
+
+    def gets(self, rounds, tournaments):
+        "Download, if missing, round/tournament pairs"
+        for r in rounds:
+            for t in tournaments:
+                self.get(r, t)
+
+    def get(self, round_number, tournament):
+        "Download, if missing, a single round/tournament pair"
+        r = round_number
+        t = tournament
+        if (r, t) not in self:
+            if self.verbose:
+                print("downloading ({:d}, {})".format(r, t))
+            b = download_leaderboard(r, t)
+            if self.verbose:
+                if b['resolved'].all():
+                    print("({:d}, {}) is resolved".format(r, t))
+                else:
+                    print("({:d}, {}) is not resolved".format(r, t))
+            self.df = pd.concat([self.df, b])
+        else:
+            if self.verbose:
+                print("({:d}, {}) already downloaded".format(r, t))
+
+    def __contains__(self, round_tournament_tuple):
+        "Has (round, torunament) tuple already been downloaded? True or False"
+        if len(round_tournament_tuple) != 2:
+            raise ValueError("`round_tournament_tuple` must have length 2")
+        if self.df is None:
+            return False
+        r, t = round_tournament_tuple
+        idx = (self.df['round'] == r) & (self.df['tournament'] == t)
+        if idx.sum() > 0:
+            return True
+        return False
 
     def rounds_to_ints(self, round1, round2):
         "Convert `round1` and `round2`, which might be None, to integers"
@@ -50,61 +94,6 @@ class Leaderboard(object):
             round2 = self.current_round
         return round1, round2
 
-    def get_range(self, round1, round2):
-        "Download leaderboards if not yet downloaded for round range provided"
-        r1, r2 = self.rounds_to_ints(round1, round2)
-        rounds = list(range(r1, r2 + 1))
-        self.get_list(rounds)
-
-    def get_list(self, round_list):
-        "Download leaderboards, if missing, for list of rounds provided"
-        for n in round_list:
-            self.get_round(n)
-
-    def get_round(self, round_number):
-        "Doenload, if missing, a single round"
-        r = round_number
-        if r not in self:
-            if r in self.unresolved_rounds:
-                if self.verbose:
-                    print("R{:d} already download and is unresolved".format(r))
-            else:
-                if self.verbose:
-                    print("downloading R{:d}".format(r))
-                b = download_leaderboard(r, self.tournament)
-                if self.is_resolved(b):
-                    if self.verbose:
-                        print("R{:d} is resolved".format(r))
-                    self.df = pd.concat([self.df, b])
-                else:
-                    if self.verbose:
-                        print("R{:d} is unresolved".format(r))
-                    self.unresolved_rounds.append(r)
-        else:
-            if self.verbose:
-                print("R{:d} already downloaded and is resolved".format(r))
-
-    @property
-    def resolved_rounds(self):
-        "List of resolved rounds"
-        if self.df is None:
-            return []
-        return sorted(self.df['round'].unique().tolist())
-
-    def is_resolved(self, df_single_round):
-        "Has the round been resolved? True or False. Pass in a single round"
-        df = df_single_round
-        total = df.iloc[:, 2:-3].abs().sum().sum()
-        if total == 0:
-            return False
-        return True
-
-    def __contains__(self, round_number):
-        "Has `round_number` already been downloaded? True or False"
-        if self.df is None:
-            return False
-        return round_number in self.df['round'].values
-
 
 def download_leaderboard(round_number=None, tournament=1):
     """
@@ -112,6 +101,7 @@ def download_leaderboard(round_number=None, tournament=1):
 
     Default is to download current round.
     """
+    tournament0 = tournament
     tournament = nx.tournament_int(tournament)
     if round_number is None:
         napi = NumerAPI(verbosity='warn')
@@ -120,6 +110,15 @@ def download_leaderboard(round_number=None, tournament=1):
         num = round_number
     df = download_raw_leaderboard(round_number=num, tournament=tournament)
     df = raw_leaderboard_to_df(df, num)
+    df.insert(1, 'tournament', tournament0)
+    cols = ['usd_main', 'usd_stake', 'nmr_main', 'nmr_stake', 'nmr_burn']
+    d = df[cols]
+    total = d.abs().sum().sum()
+    if total == 0:
+        resolved = False
+    else:
+        resolved = True
+    df.insert(2, 'resolved', resolved)
     return df
 
 
@@ -134,6 +133,8 @@ def download_raw_leaderboard(round_number=None, tournament=1):
                     leaderboard {
                         username
                         LiveLogloss
+                        ValidationLogloss
+                        Consistency
                         paymentGeneral {
                           nmrAmount
                           usdAmount
@@ -172,7 +173,7 @@ def raw_leaderboard_to_df(raw_leaderboard, round_number):
         burn = user['stakeResolution']
         burned = burn is not None and burn['destroyed']
         x = [round_number, user['username'],
-             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, np.nan, np.nan]
+             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, np.nan, np.nan]
         if main is not None:
             x[2] = float(main['usdAmount'])
             if 'nmrAmount' in main:
@@ -192,13 +193,16 @@ def raw_leaderboard_to_df(raw_leaderboard, round_number):
                 x[7] = np.nan
         else:
             x[7] = float(user['LiveLogloss'])
+        x[8] = float(user['ValidationLogloss'])
+        x[9] = float(user['Consistency'])
         if user['stake']['value'] is not None:
-            x[8] = float(user['stake']['value'])
-            x[9] = decimal.Decimal(user['stake']['confidence'])
-            x[10] = float(user['stake']['soc'])
+            x[10] = float(user['stake']['value'])
+            x[11] = decimal.Decimal(user['stake']['confidence'])
+            x[12] = float(user['stake']['soc'])
         leaderboard.append(x)
     columns = ['round', 'user', 'usd_main', 'usd_stake', 'nmr_main',
-               'nmr_stake', 'nmr_burn', 'live', 's', 'c', 'soc']
+               'nmr_stake', 'nmr_burn', 'live', 'val', 'consis', 's', 'c',
+               'soc']
     df = pd.DataFrame(data=leaderboard, columns=columns)
     return df
 
