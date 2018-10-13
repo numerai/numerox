@@ -5,6 +5,9 @@ Release Notes
 
 - v3.2.0 (not yet released; in development)
 
+  * Complete rewrite of Report class
+  * Complete rewrite of Leaderboard class
+
 - v3.1.0
 
   **production, backtest, run**
