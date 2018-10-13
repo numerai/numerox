@@ -37,6 +37,17 @@ class Report(object):
         df['N'] = df['N'].astype(int)
         return df
 
+    def five_star_club(self, round1):
+        "Users who beat benchmark in all 5 tournaments sorted by mean logloss"
+        lb = self.lb[round1]
+        lb['pass'] = lb['live'] < LOGLOSS_BENCHMARK
+        s = lb.groupby('user').sum()
+        df = s[s['pass'] == 5]
+        df = df[['live']] / 5
+        df.columns = ['mean_logloss']
+        df = df.sort_values('mean_logloss')
+        return df
+
     def val_v_live_consistency(self, round1, round2):
         "Live consistency versus validation consistency"
         cols = ['7/12', '8/12', '9/12', '10/12', '11/12', '12/12']
