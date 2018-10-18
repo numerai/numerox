@@ -10,6 +10,21 @@ class Report(object):
     def __init__(self):
         self.lb = nx.Leaderboard()
 
+    def payouts(self, round1, round2):
+        "NMR and USD payouts per round"
+        cols = ['staked_nmr', 'burned_nmr', 'nmr_payout', 'usd_payout']
+        df = pd.DataFrame(columns=cols)
+        lb = self.lb[round1:round2]
+        rounds = lb['round'].unique()
+        for r in rounds:
+            d = lb[lb['round'] == r]
+            ds = d.sum()
+            pay = [ds['s'], ds['nmr_burn'], ds['nmr_stake'], ds['usd_stake']]
+            df.loc[r] = pay
+        df.loc['mean'] = df.mean()
+        df = df.round(2)
+        return df
+
     def out_of_five(self, round1, round2):
         "Fraction of users that get, e.g., 3/5 in a round"
         cols = ['N', '0/5', '1/5', '2/5', '3/5', '4/5', '5/5', 'mean/5']

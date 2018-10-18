@@ -5,6 +5,7 @@ Release Notes
 
 - v3.3.0 (not yet released; in development)
 
+  * Add ``report.payouts``
   * Bugfix: protect ``Report`` from unresovled rounds
 
 - v3.2.0
