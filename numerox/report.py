@@ -16,22 +16,26 @@ class Report(object):
         df = pd.DataFrame(columns=cols)
         lb = self.lb[round1:round2]
         rounds = lb['round'].unique()
+        nan = np.nan
         for r in rounds:
             d = lb[lb['round'] == r]
-            idx = (d.groupby('user').count()['round'] == 5)
-            idx = idx[idx]
-            idx = d.user.isin(idx.index)
-            d = d[idx]
-            d['pass'] = d['live'] < LOGLOSS_BENCHMARK
-            s = d.groupby('user').sum()
-            rep = s.groupby('pass').count()
-            rep = rep['round'].to_frame('count')
-            count = rep['count'].sum()
-            fraction = 1.0 * rep['count'] / count
-            mean = np.dot(fraction, np.array([0, 1, 2, 3, 4, 5]))
-            fraction = fraction.tolist()
-            fraction.insert(0, count)
-            fraction.insert(7, mean)
+            if not d['resolved'].any():
+                fraction = [0, nan, nan, nan, nan, nan, nan, nan]
+            else:
+                idx = (d.groupby('user').count()['round'] == 5)
+                idx = idx[idx]
+                idx = d.user.isin(idx.index)
+                d = d[idx]
+                d['pass'] = d['live'] < LOGLOSS_BENCHMARK
+                s = d.groupby('user').sum()
+                rep = s.groupby('pass').count()
+                rep = rep['round'].to_frame('count')
+                count = rep['count'].sum()
+                fraction = 1.0 * rep['count'] / count
+                mean = np.dot(fraction, np.array([0, 1, 2, 3, 4, 5]))
+                fraction = fraction.tolist()
+                fraction.insert(0, count)
+                fraction.insert(7, mean)
             df.loc[r] = fraction
         df.loc['mean'] = df.mean()
         df['N'] = df['N'].astype(int)
@@ -54,13 +58,17 @@ class Report(object):
         df = pd.DataFrame(columns=cols)
         lb = self.lb[round1:round2]
         rounds = lb['round'].unique()
+        nan = np.nan
         for r in rounds:
             d = lb[lb['round'] == r]
-            d.insert(0, 'pass', d['live'] < LOGLOSS_BENCHMARK)
-            d = d[['consis', 'pass']]
-            d = d.groupby('consis').mean()
-            d = d[d.index > 55]
-            consis = d.T.values.tolist()[0]
+            if not d['resolved'].any():
+                consis = [nan, nan, nan, nan, nan, nan]
+            else:
+                d.insert(0, 'pass', d['live'] < LOGLOSS_BENCHMARK)
+                d = d[['consis', 'pass']]
+                d = d.groupby('consis').mean()
+                d = d[d.index > 55]
+                consis = d.T.values.tolist()[0]
             df.loc[r] = consis
         df.loc['mean'] = df.mean()
         return df

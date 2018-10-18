@@ -5,6 +5,8 @@ Release Notes
 
 - v3.3.0 (not yet released; in development)
 
+  * Bugfix: protect ``Report`` from unresovled rounds
+
 - v3.2.0
 
   * Complete rewrite of Report class
