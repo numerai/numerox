@@ -52,6 +52,9 @@ class Leaderboard(object):
         "Download, if missing, round/tournament pairs"
         for r in rounds:
             for t in tournaments:
+                if r < 111 and t != 1 and t != 'bernie':
+                    # 5 tourney format started in round 111
+                    continue
                 self.get(r, t)
 
     def get(self, round_number, tournament):
