@@ -3,6 +3,7 @@ import pandas as pd
 
 import numerox as nx
 from numerox.metrics import LOGLOSS_BENCHMARK
+from numerox.numerai import calc_cutoff
 
 
 class Report(object):
@@ -12,14 +13,24 @@ class Report(object):
 
     def payouts(self, round1, round2):
         "NMR and USD payouts per round"
-        cols = ['staked_nmr', 'burned_nmr', 'nmr_payout', 'usd_payout']
+        cols = ['staked_nmr', 'staked_above_cutoff', 'burned_nmr',
+                'nmr_payout', 'usd_payout']
         df = pd.DataFrame(columns=cols)
         lb = self.lb[round1:round2]
         rounds = lb['round'].unique()
         for r in rounds:
             d = lb[lb['round'] == r]
+            if r > 112:
+                nmr_cut = 0
+                for t in nx.tournament_all(as_str=False):
+                    dt = d[d.tournament == t]
+                    cutoff, ignore = calc_cutoff(dt)
+                    nmr_cut += dt[dt.c >= cutoff].sum()['s']
+            else:
+                nmr_cut = np.nan
             ds = d.sum()
-            pay = [ds['s'], ds['nmr_burn'], ds['nmr_stake'], ds['usd_stake']]
+            pay = [ds['s'], nmr_cut, ds['nmr_burn'], ds['nmr_stake'],
+                   ds['usd_stake']]
             df.loc[r] = pay
         df.loc['mean'] = df.mean()
         df = df.round(2)
