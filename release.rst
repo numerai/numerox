@@ -3,6 +3,8 @@
 Release Notes
 =============
 
+- v3.3.0 (not yet released; in development)
+
 - v3.2.0
 
   * Complete rewrite of Report class
