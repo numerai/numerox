@@ -329,6 +329,8 @@ def calc_cutoff(stakes, impact_probe_nmr=0):
     Confidence cutoff (scalar) and max user payouts (dataframe).
     """
 
+    stakes = stakes.sort_values('c', ascending=False)
+
     # max nmr payout per user if prize pool were infinite
     cumsum = stakes.s.cumsum(axis=0) + impact_probe_nmr
     c = stakes.c.astype('float')

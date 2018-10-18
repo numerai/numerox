@@ -32,6 +32,8 @@ class Report(object):
             pay = [ds['s'], nmr_cut, ds['nmr_burn'], ds['nmr_stake'],
                    ds['usd_stake']]
             df.loc[r] = pay
+        fraction = df['burned_nmr'] / df['staked_above_cutoff']
+        df.insert(3, 'fraction_burned', fraction)
         df.loc['mean'] = df.mean()
         df = df.round(2)
         return df
