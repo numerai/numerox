@@ -22,12 +22,13 @@ class Leaderboard(object):
                 raise ValueError("slice step size must be 1")
             r1, r2 = self.rounds_to_ints(index.start, index.stop)
             rs = list(range(r1, r2 + 1))
-            ts = nx.tournament_all()
+            ts = nx.tournament_all(as_str=False)
         elif nx.isint(index):
             rs = [index]
-            ts = nx.tournament_all()
+            ts = nx.tournament_all(as_str=False)
         elif isinstance(index, list):
             rs, ts = zip(*index)
+            ts = [nx.tournament_int(i) for i in ts]
         elif isinstance(index, tuple):
             if len(index) != 2:
                 raise IndexError("tuple index must have length 2")
@@ -38,7 +39,7 @@ class Leaderboard(object):
                 msg = "second element of tuple index must be int or str"
                 raise IndexError(msg)
             rs = [r]
-            ts = [t]
+            ts = [nx.tournament_int(t)]
         else:
             raise IndexError("indexing method not supported")
         self.gets(rs, ts)
@@ -60,7 +61,7 @@ class Leaderboard(object):
     def get(self, round_number, tournament):
         "Download, if missing, a single round/tournament pair"
         r = round_number
-        t = tournament
+        t = nx.tournament_int(tournament)
         if (r, t) not in self:
             if self.verbose:
                 print("downloading ({:d}, {})".format(r, t))
@@ -82,6 +83,7 @@ class Leaderboard(object):
         if self.df is None:
             return False
         r, t = round_tournament_tuple
+        t = nx.tournament_int(t)
         idx = (self.df['round'] == r) & (self.df['tournament'] == t)
         if idx.sum() > 0:
             return True
@@ -104,7 +106,6 @@ def download_leaderboard(round_number=None, tournament=1):
 
     Default is to download current round.
     """
-    tournament0 = tournament
     tournament = nx.tournament_int(tournament)
     if round_number is None:
         napi = NumerAPI(verbosity='warn')
@@ -113,7 +114,7 @@ def download_leaderboard(round_number=None, tournament=1):
         num = round_number
     df = download_raw_leaderboard(round_number=num, tournament=tournament)
     df = raw_leaderboard_to_df(df, num)
-    df.insert(1, 'tournament', tournament0)
+    df.insert(1, 'tournament', tournament)
     cols = ['usd_main', 'usd_stake', 'nmr_main', 'nmr_stake', 'nmr_burn']
     d = df[cols]
     total = d.abs().sum().sum()
