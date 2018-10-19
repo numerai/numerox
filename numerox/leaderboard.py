@@ -95,7 +95,7 @@ class Leaderboard(object):
             round1 = DEFAULT_FIRST_ROUND
         if round2 is None:
             if self.current_round is None:
-                self.current_round = get_current_round_number(self.tournament)
+                self.current_round = get_current_round_number()
             round2 = self.current_round
         return round1, round2
 
@@ -109,7 +109,7 @@ def download_leaderboard(round_number=None, tournament=1):
     tournament = nx.tournament_int(tournament)
     if round_number is None:
         napi = NumerAPI(verbosity='warn')
-        num = napi.get_current_round(tournament=tournament)
+        num = napi.get_current_round()
     else:
         num = round_number
     df = download_raw_leaderboard(round_number=num, tournament=tournament)
@@ -215,9 +215,8 @@ def raw_leaderboard_to_df(raw_leaderboard, round_number):
     return df
 
 
-def get_current_round_number(tournament):
+def get_current_round_number():
     "Current round number as an integer."
-    tournament = nx.tournament_int(tournament)
     napi = NumerAPI(verbosity='warn')
-    cr = napi.get_current_round(tournament=tournament)
+    cr = napi.get_current_round(tournament=1)
     return cr

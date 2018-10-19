@@ -11,7 +11,7 @@ class Report(object):
     def __init__(self):
         self.lb = nx.Leaderboard()
 
-    def payouts(self, round1, round2):
+    def payout(self, round1, round2):
         "NMR and USD payouts per round"
         cols = ['staked_nmr', 'staked_above_cutoff', 'burned_nmr',
                 'nmr_payout', 'usd_payout']
@@ -36,6 +36,40 @@ class Report(object):
         df.insert(3, 'fraction_burned', fraction)
         df.loc['mean'] = df.mean()
         df = df.round(2)
+        return df
+
+    def cutoff(self, round1, round2, cache_current_round=True):
+        "Independent calculation of confidence cutoff"
+        cols = nx.tournament_all(as_str=True)
+        df = pd.DataFrame(columns=cols)
+        crn = nx.get_current_round_number()
+        if not cache_current_round:
+            if round1 == crn and round2 == crn:
+                b = nx.Leaderboard()
+                lb = b[crn]
+            elif round2 == crn:
+                lb = self.lb[round1:round2 - 1]
+                b = nx.Leaderboard()
+                lb2 = b[crn]
+                lb = pd.concat([lb, lb2])
+            else:
+                lb = self.lb[round1:round2]
+        else:
+            lb = self.lb[round1:round2]
+        rounds = lb['round'].unique()
+        for r in rounds:
+            d = lb[lb['round'] == r]
+            if r > 112:
+                cut = []
+                for t in nx.tournament_all(as_str=False):
+                    dt = d[d.tournament == t]
+                    cutoff, ignore = calc_cutoff(dt)
+                    cut.append(cutoff)
+            else:
+                cut = [np.nan] * 5
+            df.loc[r] = cut
+        df['mean'] = df.mean(axis=1)
+        df.loc['mean'] = df.mean()
         return df
 
     def out_of_five(self, round1, round2):

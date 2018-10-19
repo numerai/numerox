@@ -5,8 +5,11 @@ Release Notes
 
 - v3.3.0 (not yet released; in development)
 
-  * Add ``report.payouts``
+  * Add ``report.payout``
+  * Add ``report.cutoff``
+  * Remove ``get_stakes_cutoff``
   * Bugfixes in ``Report`` class
+  * No longer need to specify tournament in ``get_current_round_number``
 
 - v3.2.0
 

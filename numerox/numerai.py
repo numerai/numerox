@@ -195,21 +195,6 @@ def get_stakes_users(users, round_number=None):
     return stakes
 
 
-def get_stakes_cutoff(round_number=None):
-    """
-    Staking confidence cutoff for all tournaments in given round.
-
-    Use this function for `round_number` greater than 112.
-    """
-    data = []
-    for number, name in nx.tournament_iter():
-        s, c = get_stakes(round_number, tournament=number)
-        data.append([name, c])
-    df = pd.DataFrame(data=data, columns=['tourney', 'cutoff'])
-    df = df.set_index('tourney')
-    return df
-
-
 def cutoff_impact(round_number=None, nmrs=[5, 10, 100, 200],
                   is_cutoff=True, is_relative=False):
     """
