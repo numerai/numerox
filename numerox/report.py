@@ -147,6 +147,25 @@ class Report(object):
         df = df.sort_values('mean_logloss')
         return df
 
+    def logloss_correlation(self, round1, round2):
+        """
+        Mean correlation of a users live logloss to all other users.
+
+        Only those that have submitted in every tournament are considered.
+
+        """
+        lb = self.lb[round1:round2]
+        lb.insert(0, 'rt', lb['round'] * 10 + lb['tournament'])
+        lb = lb[['user', 'rt', 'live']]
+        lb = lb.set_index('user')
+        lb = lb.pivot(columns='rt', values='live')
+        lb = lb.dropna()
+        corr = lb.T.corr()
+        df = (corr.sum(axis=1) - 1) / (corr.shape[1] - 1)
+        df = df.sort_values()
+        df = df.to_frame('mean_correlation')
+        return df
+
     def val_v_live_consistency(self, round1, round2):
         "Live consistency versus validation consistency"
         cols = ['7/12', '8/12', '9/12', '10/12', '11/12', '12/12']
