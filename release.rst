@@ -8,6 +8,7 @@ Release Notes
   * Add ``report.payout``
   * Add ``report.pass_rate``
   * Add ``report.logloss_correlation``
+  * Add ``report.friends``
   * Add ``report.cutoff``
   * Remove ``get_stakes_cutoff``
   * Bugfixes in ``Report`` class

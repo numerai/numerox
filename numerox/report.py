@@ -166,6 +166,28 @@ class Report(object):
         df = df.to_frame('mean_correlation')
         return df
 
+    def friends(self, user, round1, round2):
+        """
+        Correlation of live logloss of each user to a given `user`
+
+        Only those that have submitted in every tournament are considered. So
+        given `user` must have submitted in every tournament.
+
+        """
+        lb = self.lb[round1:round2]
+        lb.insert(0, 'rt', lb['round'] * 10 + lb['tournament'])
+        lb = lb[['user', 'rt', 'live']]
+        lb = lb.set_index('user')
+        lb = lb.pivot(columns='rt', values='live')
+        lb = lb.dropna()
+        corr = lb.T.corr()
+        corr[corr == 1] = np.nan
+        df = corr.loc[user]
+        df = df.sort_values(ascending=False)
+        df = df.to_frame('mean_correlation')
+        df = df.drop(user, axis=0)
+        return df
+
     def val_v_live_consistency(self, round1, round2):
         "Live consistency versus validation consistency"
         cols = ['7/12', '8/12', '9/12', '10/12', '11/12', '12/12']
