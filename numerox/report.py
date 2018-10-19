@@ -72,6 +72,39 @@ class Report(object):
         df.loc['mean'] = df.mean()
         return df
 
+    def pass_rate(self, round1, round2):
+        "Fraction of users who beat benchmark in each round"
+        cols = ['all', 'stakers', 'nonstakers', 'above_cutoff', 'below_cutoff']
+        df = pd.DataFrame(columns=cols)
+        lb = self.lb[round1:round2]
+        rounds = lb['round'].unique()
+        for r in rounds:
+            d = lb[lb['round'] == r]
+            d.insert(0, 'pass', d['live'] < LOGLOSS_BENCHMARK)
+            pr_all = d['pass'].mean()
+            pr_stakers = d[d['s'] > 0]['pass'].mean()
+            pr_nonstakers = d[d['s'] == 0]['pass'].mean()
+            if r > 112:
+                nabove = 0
+                nbelow = 0
+                pabove = 0
+                pbelow = 0
+                for t in nx.tournament_all(as_str=False):
+                    dt = d[d.tournament == t]
+                    cutoff, ignore = calc_cutoff(dt)
+                    nabove += dt[dt.c > cutoff].shape[0]
+                    nbelow += dt[dt.c < cutoff].shape[0]
+                    pabove += dt[(dt.c > cutoff) & (dt['pass'])].shape[0]
+                    pbelow += dt[(dt.c < cutoff) & (dt['pass'])].shape[0]
+                pr_above = 1.0 * pabove / nabove
+                pr_below = 1.0 * pbelow / nbelow
+            else:
+                pr_above = np.nan
+                pr_below = np.nan
+            df.loc[r] = [pr_all, pr_stakers, pr_nonstakers, pr_above, pr_below]
+        df.loc['mean'] = df.mean()
+        return df
+
     def out_of_five(self, round1, round2):
         "Fraction of users that get, e.g., 3/5 in a round"
         cols = ['N', '0/5', '1/5', '2/5', '3/5', '4/5', '5/5', 'mean/5']

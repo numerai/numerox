@@ -6,6 +6,7 @@ Release Notes
 - v3.3.0 (not yet released; in development)
 
   * Add ``report.payout``
+  * Add ``report.pass_rate``
   * Add ``report.cutoff``
   * Remove ``get_stakes_cutoff``
   * Bugfixes in ``Report`` class
