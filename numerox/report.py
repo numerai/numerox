@@ -166,40 +166,38 @@ class Report(object):
         df = df.to_frame('mean_correlation')
         return df
 
-    def friends(self, user, round1, round2, metric='corr'):
+    def friends(self, user, round1, round2):
         """
-        Correlation of live logloss of each user to a given `user`
+        Correlation of live logloss of each user to a given `user` and
+        Euclidean distance.
 
         Only those that have submitted in every tournament are considered. So
         given `user` must have submitted in every tournament.
 
-        `metric` can be 'corr' for correlation or 'dist' for Euclidean
-        distance.
-
         """
+
         lb = self.lb[round1:round2]
         lb.insert(0, 'rt', lb['round'] * 10 + lb['tournament'])
         lb = lb[['user', 'rt', 'live']]
         lb = lb.set_index('user')
         lb = lb.pivot(columns='rt', values='live')
         lb = lb.dropna()
-        if metric == 'corr':
-            corr = lb.T.corr()
-            corr[corr == 1] = np.nan
-            df = corr.loc[user]
-            df = df.sort_values(ascending=False)
-            df = df.to_frame('mean_correlation')
-            df = df.drop(user, axis=0)
-        elif metric == 'dist':
-            d = lb - lb.loc[user]
-            d = d * d
-            d = d.mean(axis=1)
-            d = np.sqrt(d)
-            d = d.sort_values()
-            df = d.to_frame('rms_distance')
-            df = df.drop(user, axis=0)
-        else:
-            raise ValueError("unknown `metric`")
+
+        corr = lb.T.corr()
+        corr[corr == 1] = np.nan
+        df = corr.loc[user]
+        df = df.to_frame('correlation')
+
+        d = lb - lb.loc[user]
+        d = d * d
+        d = d.mean(axis=1)
+        d = np.sqrt(d)
+        d = d.to_frame('distance')
+
+        df = pd.concat([df, d], axis=1)
+        df = df.drop(user, axis=0)
+        df = df.sort_values(by='correlation', ascending=False)
+
         return df
 
     def val_v_live_consistency(self, round1, round2):
