@@ -72,6 +72,53 @@ class Report(object):
         df.loc['mean'] = df.mean()
         return df
 
+    def whatif(self, users, s, c, round1, round2):
+        """
+        Profit if `users` had staked `s` and `c` in every tournament.
+
+        Earnings are left in NMR instead of splitting the NMR earnings into
+        NMR and USD.
+
+        """
+        if isinstance(users, list):
+            pass
+        elif nx.isstring(users):
+            users = [users]
+        else:
+            raise ValueError("`users` must be str or list (of str)")
+        cols = ['nmr_burn', 'nmr_earn', 'nmr_net']
+        df = pd.DataFrame(columns=cols)
+        if nx.isint(round1):
+            if round1 < 113:
+                raise ValueError("`round1` must start at at least 113")
+        lb = self.lb[round1:round2]
+        lb.insert(0, 'pass', lb['live'] < LOGLOSS_BENCHMARK)
+        rounds = lb['round'].unique()
+        for r in rounds:
+            d = lb[lb['round'] == r]
+            if r > 112:
+                burn = 0
+                earn = 0
+                for t in nx.tournament_all(as_str=False):
+                    dt = d[d.tournament == t]
+                    if dt.shape[0] > 0:
+                        cutoff, ignore = calc_cutoff(dt)
+                        if c >= cutoff:
+                            idx = dt.user.isin(users)
+                            dti = dt[idx]
+                            idx = dti['pass']
+                            nwin = idx.sum()
+                            nlos = (~idx).sum()
+                            p = (1.0 - cutoff) / cutoff
+                            burn += nlos * s
+                            earn += nwin * s * p
+                net = earn - burn
+                df.loc[r] = [burn, earn, net]
+            else:
+                raise ValueError("`round1` must start at at least 113")
+        df.loc['total'] = df.sum()
+        return df
+
     def pass_rate(self, round1, round2):
         "Fraction of users who beat benchmark in each round"
         cols = ['all', 'stakers', 'nonstakers', 'above_cutoff', 'below_cutoff']

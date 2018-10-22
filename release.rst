@@ -5,6 +5,8 @@ Release Notes
 
 - v3.4.0 (not yet released; in development)
 
+  * Add ``report.whatif``
+
 - v3.3.0
 
   * Add ``report.payout``
