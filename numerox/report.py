@@ -86,7 +86,7 @@ class Report(object):
             users = [users]
         else:
             raise ValueError("`users` must be str or list (of str)")
-        cols = ['nmr_burn', 'nmr_earn', 'nmr_net']
+        cols = ['nmr_staked', 'nmr_burn', 'nmr_earn', 'nmr_net']
         df = pd.DataFrame(columns=cols)
         if nx.isint(round1):
             if round1 < 113:
@@ -97,6 +97,7 @@ class Report(object):
         for r in rounds:
             d = lb[lb['round'] == r]
             if r > 112:
+                staked = 0
                 burn = 0
                 earn = 0
                 for t in nx.tournament_all(as_str=False):
@@ -112,8 +113,9 @@ class Report(object):
                             p = (1.0 - cutoff) / cutoff
                             burn += nlos * s
                             earn += nwin * s * p
+                            staked += idx.size * s
                 net = earn - burn
-                df.loc[r] = [burn, earn, net]
+                df.loc[r] = [staked, burn, earn, net]
             else:
                 raise ValueError("`round1` must start at at least 113")
         df.loc['total'] = df.sum()
