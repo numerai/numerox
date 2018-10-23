@@ -7,6 +7,7 @@ Release Notes
 
   * Add ``report.whatif``
   * Add ``report.dominance``
+  * Add ``report.logloss``
 
 - v3.3.0
 

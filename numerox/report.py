@@ -143,6 +143,28 @@ class Report(object):
         df.loc['mean'] = df.mean()
         return df
 
+    def logloss(self, user, round1, round2):
+        "Live logloss for `user`"
+        cols = nx.tournament_all()
+        df = pd.DataFrame(columns=cols)
+        lb = self.lb[round1:round2]
+        lb = lb[['user', 'round', 'tournament', 'live']]
+        rounds = np.sort(lb['round'].unique())
+        for r in rounds:
+            d = lb[lb['round'] == r]
+            dom = []
+            for t in nx.tournament_all(as_str=False):
+                dt = d[d.tournament == t]
+                if user in dt.user.values:
+                    dm = dt[dt.user == user].live.iloc[0]
+                    dom.append(dm)
+                else:
+                    dom.append(np.nan)
+            df.loc[r] = dom
+        df['mean'] = df.mean(axis=1)
+        df.loc['mean'] = df.mean()
+        return df
+
     def pass_rate(self, round1, round2):
         "Fraction of users who beat benchmark in each round"
         cols = ['all', 'stakers', 'nonstakers', 'above_cutoff', 'below_cutoff']
