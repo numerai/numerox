@@ -17,7 +17,7 @@ class Report(object):
                 'nmr_payout', 'usd_payout']
         df = pd.DataFrame(columns=cols)
         lb = self.lb[round1:round2]
-        rounds = lb['round'].unique()
+        rounds = np.sort(lb['round'].unique())
         for r in rounds:
             d = lb[lb['round'] == r]
             if r > 112:
@@ -56,7 +56,7 @@ class Report(object):
                 lb = self.lb[round1:round2]
         else:
             lb = self.lb[round1:round2]
-        rounds = lb['round'].unique()
+        rounds = np.sort(lb['round'].unique())
         for r in rounds:
             d = lb[lb['round'] == r]
             if r > 112:
@@ -93,7 +93,7 @@ class Report(object):
                 raise ValueError("`round1` must start at at least 113")
         lb = self.lb[round1:round2]
         lb.insert(0, 'pass', lb['live'] < LOGLOSS_BENCHMARK)
-        rounds = lb['round'].unique()
+        rounds = np.sort(lb['round'].unique())
         for r in rounds:
             d = lb[lb['round'] == r]
             if r > 112:
@@ -121,12 +121,34 @@ class Report(object):
         df.loc['total'] = df.sum()
         return df
 
+    def dominance(self, user, round1, round2):
+        "Fraction of users that `user` beats in terms of live logloss."
+        cols = nx.tournament_all()
+        df = pd.DataFrame(columns=cols)
+        lb = self.lb[round1:round2]
+        lb = lb[['user', 'round', 'tournament', 'live']]
+        rounds = np.sort(lb['round'].unique())
+        for r in rounds:
+            d = lb[lb['round'] == r]
+            dom = []
+            for t in nx.tournament_all(as_str=False):
+                dt = d[d.tournament == t]
+                if user in dt.user.values:
+                    dm = (dt[dt.user == user].live.iloc[0] < dt.live).mean()
+                    dom.append(dm)
+                else:
+                    dom.append(np.nan)
+            df.loc[r] = dom
+        df['mean'] = df.mean(axis=1)
+        df.loc['mean'] = df.mean()
+        return df
+
     def pass_rate(self, round1, round2):
         "Fraction of users who beat benchmark in each round"
         cols = ['all', 'stakers', 'nonstakers', 'above_cutoff', 'below_cutoff']
         df = pd.DataFrame(columns=cols)
         lb = self.lb[round1:round2]
-        rounds = lb['round'].unique()
+        rounds = np.sort(lb['round'].unique())
         for r in rounds:
             d = lb[lb['round'] == r]
             d.insert(0, 'pass', d['live'] < LOGLOSS_BENCHMARK)
@@ -159,7 +181,7 @@ class Report(object):
         cols = ['N', '0/5', '1/5', '2/5', '3/5', '4/5', '5/5', 'mean/5']
         df = pd.DataFrame(columns=cols)
         lb = self.lb[round1:round2]
-        rounds = lb['round'].unique()
+        rounds = np.sort(lb['round'].unique())
         nan = np.nan
         for r in rounds:
             d = lb[lb['round'] == r]
@@ -254,7 +276,7 @@ class Report(object):
         cols = ['7/12', '8/12', '9/12', '10/12', '11/12', '12/12']
         df = pd.DataFrame(columns=cols)
         lb = self.lb[round1:round2]
-        rounds = lb['round'].unique()
+        rounds = np.sort(lb['round'].unique())
         nan = np.nan
         for r in rounds:
             d = lb[lb['round'] == r]

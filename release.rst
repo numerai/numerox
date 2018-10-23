@@ -6,6 +6,7 @@ Release Notes
 - v3.4.0 (not yet released; in development)
 
   * Add ``report.whatif``
+  * Add ``report.dominance``
 
 - v3.3.0
 
