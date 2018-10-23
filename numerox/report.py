@@ -38,6 +38,28 @@ class Report(object):
         df = df.round(2)
         return df
 
+    def payout_users(self, users, round1, round2):
+        "NMR and USD payouts per round for given `users`"
+        if isinstance(users, list):
+            pass
+        elif nx.isstring(users):
+            users = [users]
+        else:
+            raise ValueError("`users` must be str or list (of str)")
+        cols = ['nmr_staked', 'nmr_burn', 'nmr_earn', 'usd_earn']
+        df = pd.DataFrame(columns=cols)
+        lb = self.lb[round1:round2]
+        rounds = np.sort(lb['round'].unique())
+        for r in rounds:
+            d = lb[lb['round'] == r]
+            idx = d.user.isin(users)
+            d = d[idx]
+            ds = d.sum()
+            pay = [ds['s'], ds['nmr_burn'], ds['nmr_stake'], ds['usd_stake']]
+            df.loc[r] = pay
+        df.loc['total'] = df.sum()
+        return df
+
     def cutoff(self, round1, round2, cache_current_round=True):
         "Independent calculation of confidence cutoff"
         cols = nx.tournament_all(as_str=True)

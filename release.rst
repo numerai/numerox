@@ -8,6 +8,7 @@ Release Notes
   * Add ``report.whatif``
   * Add ``report.dominance``
   * Add ``report.logloss``
+  * Add ``report.payout_users``
 
 - v3.3.0
 
