@@ -302,8 +302,14 @@ def pass_rate(lb):
                 nbelow += dt[dt.c < cutoff].shape[0]
                 pabove += dt[(dt.c > cutoff) & (dt['pass'])].shape[0]
                 pbelow += dt[(dt.c < cutoff) & (dt['pass'])].shape[0]
-            pr_above = 1.0 * pabove / nabove
-            pr_below = 1.0 * pbelow / nbelow
+            if nabove == 0:
+                pr_above = np.an
+            else:
+                pr_above = 1.0 * pabove / nabove
+            if nbelow == 0:
+                pr_below = np.nan
+            else:
+                pr_below = 1.0 * pbelow / nbelow
         else:
             pr_above = np.nan
             pr_below = np.nan
@@ -333,6 +339,9 @@ def out_of_five(lb):
             rep = rep['round'].to_frame('count')
             count = rep['count'].sum()
             fraction = 1.0 * rep['count'] / count
+            if fraction.size != 6:
+                # TODO: should handle case where some are missing
+                fraction = np.array([np.nan] * 6)
             mean = np.dot(fraction, np.array([0, 1, 2, 3, 4, 5]))
             fraction = fraction.tolist()
             fraction.insert(0, count)
@@ -423,6 +432,9 @@ def val_v_live_consistency(lb):
             d = d.groupby('consis').mean()
             d = d[d.index > 55]
             consis = d.T.values.tolist()[0]
+            if len(consis) != len(cols):
+                # TODO handle missing data
+                consis = [np.nan] * len(cols)
         df.loc[r] = consis
     df.loc['mean'] = df.mean()
     return df

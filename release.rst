@@ -9,6 +9,9 @@ Release Notes
   * Add ``report.dominance``
   * Add ``report.logloss``
   * Add ``report.payout_users``
+  * Separate internet and analysis code in Report class
+  * Add simple unit tests of report analysis code (make sure it runs)
+  * Bug fixes in corner cases for some reports
 
 - v3.3.0
 
