@@ -155,17 +155,16 @@ def summary(lb):
     df.loc['realized pay factor'] = rp
 
     rounds = np.sort(lb['round'].unique())
-    ai = []
-    submissions = []
+    users = []
+    peruser = []
     for r in rounds:
         d = lb[lb['round'] == r]
         n = d.shape[0]
         nu = len(d['user'].unique())
-        ai.append(nu)
-        submissions.append(n)
-    df.loc['submissions'] = submissions
-    df.loc['unique ai'] = ai
-    df.loc['submissions per ai'] = df.loc['submissions'] / df.loc['unique ai']
+        users.append(nu)
+        peruser.append(1.0 * n / nu)
+    df.loc['users'] = users
+    df.loc['tournaments/user'] = peruser
 
     df = df.round(2)
 
