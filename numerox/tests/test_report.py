@@ -20,6 +20,9 @@ def leaderboard():
 def test_reports():
     "make sure low-level Report code runs"
 
+    df = report.summary(leaderboard())
+    ok_(isinstance(df, pd.DataFrame), 'expecting a dataframe')
+
     df = report.payout(leaderboard())
     ok_(isinstance(df, pd.DataFrame), 'expecting a dataframe')
 

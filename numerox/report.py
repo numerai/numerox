@@ -11,6 +11,12 @@ class Report(object):
     def __init__(self):
         self.lb = nx.Leaderboard()
 
+    def summary(self, round1, round2):
+        "Round summary"
+        lb = self.lb[round1:round2]
+        df = summary(lb)
+        return df
+
     def payout(self, round1, round2):
         "NMR and USD payouts per round"
         lb = self.lb[round1:round2]
@@ -119,10 +125,51 @@ class Report(object):
         return df
 
 
+def summary(lb):
+    "Round summary"
+
+    rounds = np.sort(lb['round'].unique())
+    df = pd.DataFrame(columns=rounds)
+
+    pr = pass_rate(lb)
+    df.loc['pass rate'] = pr['all']
+
+    five = out_of_five(lb)
+    df.loc['mean/5'] = five['mean/5']
+    mode = five.iloc[:, 1:-1].idxmax(axis=1).tolist()[:-1]
+    try:
+        mode = [int(m[0]) for m in mode]
+    except TypeError:
+        mode = np.nan
+    df.loc['mode/5'] = mode
+
+    co = cutoff(lb)
+    df.loc['mean cutoff'] = co['mean']
+
+    pay = payout(lb)
+    df.loc['staked above cutoff'] = pay['staked_above_cutoff']
+    df.loc['burned'] = pay['burned_nmr']
+    df.loc['usd+nmr pay in nmr'] = pay['total_payout_in_nmr']
+    rp = pay['total_payout_in_nmr'] - pay['burned_nmr']
+    rp = rp / pay['staked_above_cutoff']
+    df.loc['realized pay factor'] = rp
+
+    rounds = np.sort(lb['round'].unique())
+    submissions = []
+    for r in rounds:
+        n = lb[lb['round'] == r].shape[0]
+        submissions.append(n)
+    df.loc['submissions'] = submissions
+
+    df = df.round(2)
+
+    return df
+
+
 def payout(lb):
     "NMR and USD payouts per round"
     cols = ['staked_nmr', 'staked_above_cutoff', 'burned_nmr',
-            'nmr_payout', 'usd_payout']
+            'nmr_payout', 'usd_payout', 'total_payout_in_nmr']
     df = pd.DataFrame(columns=cols)
     rounds = np.sort(lb['round'].unique())
     for r in rounds:
@@ -135,9 +182,13 @@ def payout(lb):
                 nmr_cut += dt[dt.c >= cutoff].sum()['s']
         else:
             nmr_cut = np.nan
+        if cutoff == 0:
+            total = np.nan
+        else:
+            total = nmr_cut * (1.0 - cutoff) / cutoff
         ds = d.sum()
         pay = [ds['s'], nmr_cut, ds['nmr_burn'], ds['nmr_stake'],
-               ds['usd_stake']]
+               ds['usd_stake'], total]
         df.loc[r] = pay
     fraction = df['burned_nmr'] / df['staked_above_cutoff']
     df.insert(3, 'fraction_burned', fraction)
