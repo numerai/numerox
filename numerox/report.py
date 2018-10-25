@@ -155,11 +155,17 @@ def summary(lb):
     df.loc['realized pay factor'] = rp
 
     rounds = np.sort(lb['round'].unique())
+    ai = []
     submissions = []
     for r in rounds:
-        n = lb[lb['round'] == r].shape[0]
+        d = lb[lb['round'] == r]
+        n = d.shape[0]
+        nu = len(d['user'].unique())
+        ai.append(nu)
         submissions.append(n)
     df.loc['submissions'] = submissions
+    df.loc['unique ai'] = ai
+    df.loc['submissions per ai'] = df.loc['submissions'] / df.loc['unique ai']
 
     df = df.round(2)
 
@@ -172,20 +178,23 @@ def payout(lb):
             'nmr_payout', 'usd_payout', 'total_payout_in_nmr']
     df = pd.DataFrame(columns=cols)
     rounds = np.sort(lb['round'].unique())
+    lb.insert(0, 'pass', lb['live'] < LOGLOSS_BENCHMARK)
     for r in rounds:
         d = lb[lb['round'] == r]
         if r > 112:
             nmr_cut = 0
+            nmr_cut_pass = 0
             for t in nx.tournament_all(as_str=False):
                 dt = d[d.tournament == t]
                 cutoff, ignore = calc_cutoff(dt)
                 nmr_cut += dt[dt.c >= cutoff].sum()['s']
+                nmr_cut_pass += dt[(dt.c >= cutoff) & (dt['pass'])].sum()['s']
         else:
             nmr_cut = np.nan
         if cutoff == 0:
             total = np.nan
         else:
-            total = nmr_cut * (1.0 - cutoff) / cutoff
+            total = nmr_cut_pass * (1.0 - cutoff) / cutoff
         ds = d.sum()
         pay = [ds['s'], nmr_cut, ds['nmr_burn'], ds['nmr_stake'],
                ds['usd_stake'], total]
