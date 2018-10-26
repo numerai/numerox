@@ -14,7 +14,8 @@ class Report(object):
     def summary(self, round1, round2):
         "Round summary"
         lb = self.lb[round1:round2]
-        df = summary(lb)
+        prices = nx.nmr_round_prices()
+        df = summary(lb, prices)
         return df
 
     def payout(self, round1, round2):
@@ -125,7 +126,7 @@ class Report(object):
         return df
 
 
-def summary(lb):
+def summary(lb, prices):
     "Round summary"
 
     rounds = np.sort(lb['round'].unique())
@@ -152,7 +153,7 @@ def summary(lb):
     df.loc['usd+nmr pay in nmr'] = pay['total_payout_in_nmr']
     rp = pay['total_payout_in_nmr'] - pay['burned_nmr']
     rp = rp / pay['staked_above_cutoff']
-    df.loc['realized pay factor'] = rp
+    df.loc['stake pay factor'] = rp
 
     rounds = np.sort(lb['round'].unique())
     users = []
@@ -163,6 +164,7 @@ def summary(lb):
         nu = len(d['user'].unique())
         users.append(nu)
         peruser.append(1.0 * n / nu)
+    df.loc['nmr return'] = prices.loc[rounds]['return']
     df.loc['users'] = users
     df.loc['tournaments/user'] = peruser
 
