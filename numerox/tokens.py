@@ -1,6 +1,7 @@
 import datetime
 import requests
 
+import numpy as np
 import pandas as pd
 
 import numerox as nx
@@ -124,10 +125,12 @@ def historical_price(ticker, one_per_day=False):
     return prices
 
 
-def nmr_resolution_price(tournament=1):
-    "Price of NMR in USD and date versus round number as a dataframe."
+def nmr_round_prices():
+    "Price of NMR in USD on open and resolve dates of each round"
     price = nx.historical_price('nmr', one_per_day=True)
-    dates = nx.round_resolution_date(tournament=tournament)
-    price = pd.merge(dates, price, how='inner', left_on='date',
-                     right_index=True)
-    return price
+    dates = nx.round_dates()
+    df = pd.merge(dates, price, how='inner', left_on='open', right_index=True)
+    df = pd.merge(df, price, how='inner', left_on='resolve', right_index=True)
+    df.columns = ['open_date', 'resolve_date', 'open_usd', 'resolve_usd']
+    df['return'] = np.log((df['resolve_usd'] / df['open_usd']).values)
+    return df

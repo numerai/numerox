@@ -45,7 +45,7 @@ from numerox.run import run
 # numerai
 from numerox.numerai import download
 from numerox.numerai import upload
-from numerox.numerai import round_resolution_date
+from numerox.numerai import round_dates
 from numerox.numerai import year_to_round_range
 from numerox.numerai import get_user_names
 from numerox.numerai import show_stakes
@@ -68,7 +68,7 @@ from numerox.tokens import nmr_at_addr
 from numerox.tokens import nmr_transactions
 from numerox.tokens import token_price_data
 from numerox.tokens import historical_price
-from numerox.tokens import nmr_resolution_price
+from numerox.tokens import nmr_round_prices
 
 # misc
 from numerox import examples

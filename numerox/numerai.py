@@ -422,23 +422,25 @@ def get_stakes_minimal(round_number=None, tournament=1, mark_user=None):
 # utilities
 
 
-def round_resolution_date(tournament=1):
-    "The date each round was resolved as a Dataframe."
-    tournament = nx.tournament_int(tournament)
+def round_dates():
+    "The dates each round was opened and resolved as a Dataframe."
     napi = NumerAPI(verbosity='warn')
-    dates = napi.get_competitions(tournament=tournament)
-    dates = pd.DataFrame(dates)[['number', 'resolveTime']]
-    rename_map = {'number': 'round', 'resolveTime': 'date'}
+    dates = napi.get_competitions(tournament=1)
+    dates = pd.DataFrame(dates)[['number', 'openTime', 'resolveTime']]
+    rename_map = {'number': 'round',
+                  'openTime': 'open',
+                  'resolveTime': 'resolve'}
     dates = dates.rename(rename_map, axis=1)
-    date = dates['date'].tolist()
-    date = [d.date() for d in date]
-    dates['date'] = date
+    for item in ('open', 'resolve'):
+        date = dates[item].tolist()
+        date = [d.date() for d in date]
+        dates[item] = date
     dates = dates.set_index('round')
     dates = dates.sort_index()
     return dates
 
 
-def year_to_round_range(year, tournament=1):
+def year_to_round_range(year):
     "First and last (or latest) round number resolved in given year."
     if year < 2016:
         raise ValueError("`year` must be at least 2016")
@@ -454,8 +456,9 @@ def year_to_round_range(year, tournament=1):
         round1 = 32
         round2 = 83
     else:
-        date = round_resolution_date(tournament=tournament)
-        dates = date['date'].tolist()
+        date = round_dates()
+        date = date.drop('open', axis=1)
+        dates = date['resolve'].tolist()
         years = [d.year for d in dates]
         date['year'] = years
         date = date[date['year'] == year]
