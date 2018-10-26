@@ -164,7 +164,7 @@ def summary(lb, prices):
         nu = len(d['user'].unique())
         users.append(nu)
         peruser.append(1.0 * n / nu)
-    df.loc['nmr return'] = prices.loc[rounds]['return']
+    df.loc['nmr price return'] = prices.loc[rounds]['return']
     df.loc['users'] = users
     df.loc['tournaments/user'] = peruser
 

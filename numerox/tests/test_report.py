@@ -20,7 +20,13 @@ def leaderboard():
 def test_reports():
     "make sure low-level Report code runs"
 
-    df = report.summary(leaderboard())
+    data = [[113, None, None, 10, 10, 0.0]]
+    cols = ['round', 'open_date', 'resolve_date', 'open_usd', 'resolve_usd',
+            'return']
+    prices = pd.DataFrame(data=data, columns=cols)
+    prices = prices.set_index('round')
+
+    df = report.summary(leaderboard(), prices)
     ok_(isinstance(df, pd.DataFrame), 'expecting a dataframe')
 
     df = report.payout(leaderboard())
