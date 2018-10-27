@@ -154,7 +154,7 @@ def summary(lb, prices):
     df.loc['usd+nmr in nmr'] = pay['total_payout_in_nmr']
     rp = pay['total_payout_in_nmr'] - pay['burned_nmr']
     rp = rp / pay['staked_above_cutoff']
-    df.loc['stake profit/nmr'] = rp
+    df.loc['stake profit/nmr (nmr)'] = rp
 
     rounds = np.sort(lb['round'].unique())
     users = []
@@ -166,7 +166,11 @@ def summary(lb, prices):
         users.append(nu)
         peruser.append(1.0 * n / nu)
     p = prices.loc[rounds]
-    df.loc['sell profit/nmr'] = p['open_usd'] / p['resolve_usd'] - 1.0
+
+    df.loc['stake profit/nmr (usd)'] = rp * p['resolve_usd']
+    sp = p['open_usd'] / p['resolve_usd'] - 1.0
+    df.loc['sell profit/nmr (nmr)'] = sp
+    df.loc['sell profit/nmr (usd)'] = sp * p['resolve_usd']
     df.loc['open price'] = p['open_usd']
     df.loc['resolve price'] = p['resolve_usd']
     df.loc['nmr return'] = p['return']

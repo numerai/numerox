@@ -1,7 +1,6 @@
 import datetime
 import requests
 
-import numpy as np
 import pandas as pd
 
 import numerox as nx
@@ -132,5 +131,7 @@ def nmr_round_prices():
     df = pd.merge(dates, price, how='inner', left_on='open', right_index=True)
     df = pd.merge(df, price, how='inner', left_on='resolve', right_index=True)
     df.columns = ['open_date', 'resolve_date', 'open_usd', 'resolve_usd']
-    df['return'] = np.log((df['resolve_usd'] / df['open_usd']).values)
+    p0 = df['open_usd']
+    p1 = df['resolve_usd']
+    df['return'] = (p1 - p0) / p0
     return df
