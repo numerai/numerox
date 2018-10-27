@@ -143,17 +143,18 @@ def summary(lb, prices):
     except TypeError:
         mode = np.nan
     df.loc['mode/5'] = mode
+    df.loc['fraction 5/5'] = five['5/5']
 
     co = cutoff(lb)
-    df.loc['mean cutoff'] = co['mean']
+    df.loc['cutoff'] = co['mean']
 
     pay = payout(lb)
-    df.loc['staked above cutoff'] = pay['staked_above_cutoff']
+    df.loc['staked > cutoff'] = pay['staked_above_cutoff']
     df.loc['burned'] = pay['burned_nmr']
-    df.loc['usd+nmr pay in nmr'] = pay['total_payout_in_nmr']
+    df.loc['usd+nmr in nmr'] = pay['total_payout_in_nmr']
     rp = pay['total_payout_in_nmr'] - pay['burned_nmr']
     rp = rp / pay['staked_above_cutoff']
-    df.loc['stake pay factor'] = rp
+    df.loc['stake profit/nmr'] = rp
 
     rounds = np.sort(lb['round'].unique())
     users = []
@@ -165,10 +166,12 @@ def summary(lb, prices):
         users.append(nu)
         peruser.append(1.0 * n / nu)
     p = prices.loc[rounds]
-    df.loc['sell pay factor'] = p['open_usd'] / p['resolve_usd'] - 1.0
-    df.loc['nmr price return'] = p['return']
+    df.loc['sell profit/nmr'] = p['open_usd'] / p['resolve_usd'] - 1.0
+    df.loc['open price'] = p['open_usd']
+    df.loc['resolve price'] = p['resolve_usd']
+    df.loc['nmr return'] = p['return']
     df.loc['users'] = users
-    df.loc['tournaments/user'] = peruser
+    df.loc['tourneys/user'] = peruser
 
     df = df.round(2)
 
