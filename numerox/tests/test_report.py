@@ -29,6 +29,9 @@ def test_reports():
     df = report.summary(leaderboard(), prices)
     ok_(isinstance(df, pd.DataFrame), 'expecting a dataframe')
 
+    df = report.summary_user(leaderboard(), 'bot1')
+    ok_(isinstance(df, pd.DataFrame), 'expecting a dataframe')
+
     df = report.payout(leaderboard())
     ok_(isinstance(df, pd.DataFrame), 'expecting a dataframe')
 

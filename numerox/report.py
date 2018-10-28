@@ -18,6 +18,12 @@ class Report(object):
         df = summary(lb, prices)
         return df
 
+    def summary_user(self, user, round1, round2):
+        "Round summary for `user`"
+        lb = self.lb[round1:round2]
+        df = summary_user(lb, user)
+        return df
+
     def payout(self, round1, round2):
         "NMR and USD payouts per round"
         lb = self.lb[round1:round2]
@@ -178,6 +184,52 @@ def summary(lb, prices):
     df.loc['tourneys/user'] = peruser
 
     df = df.round(2)
+
+    return df
+
+
+def summary_user(lb, user):
+    "Round summary for `user`"
+
+    rounds = np.sort(lb['round'].unique())
+    df = pd.DataFrame(columns=rounds)
+
+    idx = lb.user == user
+    if idx.sum() == 0:
+        df.loc['pass'] = '0/0'
+        for item in ('logloss', 'dominance', 'correlation'):
+            df.loc[item] = np.nan
+        for item in ('staked', 'burned', 'nmr earn', 'usd earn'):
+            df.loc[item] = 0
+    else:
+        d = lb[idx]
+        sums = []
+        subs = []
+        for r in rounds:
+            live = d[d['round'] == r]['live']
+            if live.shape[0] == 0:
+                s = np.nan
+            else:
+                s = (live < LOGLOSS_BENCHMARK).sum()
+            subs.append(live.size)
+            sums.append(s)
+        p = [str(i) + '/' + str(j) for i, j in zip(sums, subs)]
+        df.loc['pass'] = p
+
+        ll = logloss(lb, user)
+        df.loc['logloss'] = ll['mean']
+
+        do = dominance(lb, user)
+        df.loc['dominance'] = do['mean']
+
+        dr = friends(lb, user)
+        df.loc['correlation'] = dr['correlation'].mean()
+
+        pay = payout_users(lb, user)
+        df.loc['staked'] = pay['nmr_staked']
+        df.loc['burned'] = pay['nmr_burn']
+        df.loc['nmr earn'] = pay['nmr_earn']
+        df.loc['usd earn'] = pay['usd_earn']
 
     return df
 
