@@ -344,7 +344,7 @@ def whatif(lb, users, s, c):
                         dti = dt[idx]
                         idx = dti['pass']
                         nwin = idx.sum()
-                        nlos = (~idx).sum()
+                        nlos = (~idx & (dti['live'].notna())).sum()
                         p = (1.0 - cutoff) / cutoff
                         burn += nlos * s
                         earn += nwin * s * p
@@ -368,6 +368,7 @@ def dominance(lb, user):
         dom = []
         for t in nx.tournament_all(as_str=False):
             dt = d[d.tournament == t]
+            dt = dt[dt.live.notna()]
             if user in dt.user.values:
                 dm = (dt[dt.user == user].live.iloc[0] < dt.live).mean()
                 dom.append(dm)
@@ -407,7 +408,7 @@ def pass_rate(lb):
     df = pd.DataFrame(columns=cols)
     rounds = np.sort(lb['round'].unique())
     for r in rounds:
-        d = lb[lb['round'] == r]
+        d = lb[(lb['round'] == r) & (lb.live.notna())]
         d.insert(0, 'pass', d['live'] < LOGLOSS_BENCHMARK)
         pr_all = d['pass'].mean()
         pr_stakers = d[d['s'] > 0]['pass'].mean()
@@ -425,7 +426,7 @@ def pass_rate(lb):
                 pabove += dt[(dt.c > cutoff) & (dt['pass'])].shape[0]
                 pbelow += dt[(dt.c < cutoff) & (dt['pass'])].shape[0]
             if nabove == 0:
-                pr_above = np.an
+                pr_above = np.nan
             else:
                 pr_above = 1.0 * pabove / nabove
             if nbelow == 0:
@@ -449,7 +450,7 @@ def out_of_five(lb):
     for r in rounds:
         d = lb[lb['round'] == r]
         if not d['resolved'].any():
-            fraction = [0, nan, nan, nan, nan, nan, nan, nan]
+            fraction = [nan, nan, nan, nan, nan, nan, nan, nan]
         else:
             idx = (d.groupby('user').count()['round'] == 5)
             idx = idx[idx]
@@ -492,6 +493,7 @@ def logloss_correlation(lb):
     Only those that have submitted in every tournament are considered.
 
     """
+    lb = lb[lb.resolved]
     lb.insert(0, 'rt', lb['round'] * 10 + lb['tournament'])
     lb = lb[['user', 'rt', 'live']]
     lb = lb.set_index('user')
@@ -518,7 +520,8 @@ def friends(lb, user):
     lb = lb[['user', 'rt', 'live']]
     lb = lb.set_index('user')
     lb = lb.pivot(columns='rt', values='live')
-    lb = lb.dropna()
+    lb = lb.dropna(axis=1, how='all')
+    lb = lb.dropna(axis=0)
 
     corr = lb.T.corr()
     corr[corr == 1] = np.nan

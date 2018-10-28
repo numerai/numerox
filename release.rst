@@ -5,6 +5,7 @@ Release Notes
 
 - v3.4.0 (not yet released; in development)
 
+  * All reports can now handle unresolved rounds
   * Add ``report.summary``
   * Add ``report.summary_user``
   * Add ``report.whatif``
@@ -17,7 +18,7 @@ Release Notes
   * Add unresolved rounds to ``nmr_round_prices``
   * Separate internet and analysis code in Report class
   * Add simple unit tests of report analysis code (make sure it runs)
-  * Bug fixes in corner cases for some reports
+  * Bug fixes for some reports
 
 - v3.3.0
 
