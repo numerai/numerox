@@ -128,10 +128,11 @@ def nmr_round_prices():
     "Price of NMR in USD on open and resolve dates of each round"
     price = nx.historical_price('nmr', one_per_day=True)
     dates = nx.round_dates()
-    df = pd.merge(dates, price, how='inner', left_on='open', right_index=True)
-    df = pd.merge(df, price, how='inner', left_on='resolve', right_index=True)
+    df = pd.merge(dates, price, how='left', left_on='open', right_index=True)
+    df = pd.merge(df, price, how='left', left_on='resolve', right_index=True)
     df.columns = ['open_date', 'resolve_date', 'open_usd', 'resolve_usd']
     p0 = df['open_usd']
     p1 = df['resolve_usd']
     df['return'] = (p1 - p0) / p0
+    df = df.loc[65:]
     return df

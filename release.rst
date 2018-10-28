@@ -14,6 +14,7 @@ Release Notes
   * Replace ``round_resolution_date`` with ``round_dates`` and add open date
   * Replace ``nmr_resolution_price`` with ``nmr_round_prices`` and add open
     date and open price and add open-resolve return on nmr
+  * Add unresolved rounds to ``nmr_round_prices``
   * Separate internet and analysis code in Report class
   * Add simple unit tests of report analysis code (make sure it runs)
   * Bug fixes in corner cases for some reports
