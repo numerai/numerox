@@ -3,7 +3,7 @@
 Release Notes
 =============
 
-- v3.4.0 (not yet released; in development)
+- v3.4.0
 
   * All reports can now handle unresolved rounds
   * Add ``report.summary``
