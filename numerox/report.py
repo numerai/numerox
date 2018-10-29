@@ -222,8 +222,12 @@ def summary_user(lb, user):
         do = dominance(lb, user)
         df.loc['dominance'] = do['mean']
 
-        dr = friends(lb, user)
-        df.loc['correlation'] = dr['correlation'].mean()
+        corr = []
+        for r in rounds:
+            dr = friends(lb[lb['round'] == r], user)
+            c = dr['correlation'].mean()
+            corr.append(c)
+        df.loc['correlation'] = corr
 
         pay = payout_users(lb, user)
         df.loc['staked'] = pay['nmr_staked']
