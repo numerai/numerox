@@ -454,7 +454,7 @@ def out_of_five(lb):
     for r in rounds:
         d = lb[lb['round'] == r]
         if not d['resolved'].any():
-            fraction = [nan, nan, nan, nan, nan, nan, nan, nan]
+            fraction = [0, nan, nan, nan, nan, nan, nan, nan]
         else:
             idx = (d.groupby('user').count()['round'] == 5)
             idx = idx[idx]

@@ -5,6 +5,8 @@ Release Notes
 
 - v3.5.0 (not yet released; in development)
 
+  * Bugfix: ``report.summary`` crashes on unresolved round
+
 - v3.4.0
 
   * All reports can now handle unresolved rounds
