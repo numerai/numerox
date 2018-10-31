@@ -66,7 +66,7 @@ class logistic(Model):
         self.p = {'inverse_l2': inverse_l2}
 
     def fit_predict(self, dfit, dpre, tournament):
-        model = LogisticRegression(C=self.p['inverse_l2'])
+        model = LogisticRegression(C=self.p['inverse_l2'], solver='liblinear')
         model.fit(dfit.x, dfit.y[tournament])
         yhat = model.predict_proba(dpre.x)[:, 1]
         return dpre.ids, yhat
