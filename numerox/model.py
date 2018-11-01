@@ -66,7 +66,7 @@ class logistic(Model):
         self.p = {'inverse_l2': inverse_l2}
 
     def fit_predict(self, dfit, dpre, tournament):
-        model = LogisticRegression(C=self.p['inverse_l2'])
+        model = LogisticRegression(C=self.p['inverse_l2'], solver='liblinear')
         model.fit(dfit.x, dfit.y[tournament])
         yhat = model.predict_proba(dpre.x)[:, 1]
         return dpre.ids, yhat
@@ -171,7 +171,8 @@ class logisticPCA(Model):
 
     def fit_predict(self, dfit, dpre, tournament):
         pipe = Pipeline([('pca', PCA(n_components=self.p['nfeatures'])),
-                         ("lr", LogisticRegression(C=self.p['inverse_l2']))])
+                         ("lr", LogisticRegression(C=self.p['inverse_l2'],
+                                                   solver='liblinear'))])
         pipe.fit(dfit.x, dfit.y[tournament])
         yhat = pipe.predict_proba(dpre.x)[:, 1]
         return dpre.ids, yhat
