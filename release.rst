@@ -5,6 +5,8 @@ Release Notes
 
 - v3.5.0 (not yet released; in development)
 
+  * Silence future change warning from sklearn in ``logistic`` and
+    ``logisticPCA`` models
   * Bugfix: ``report.summary`` crashes on unresolved round
 
 - v3.4.0
