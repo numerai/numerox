@@ -7,6 +7,7 @@ Release Notes
 
   * Silence future change warning from sklearn in ``logistic`` and
     ``logisticPCA`` models
+  * Silence unit test warning on python3/linux
   * Bugfix: ``report.summary`` crashes on unresolved round
 
 - v3.4.0

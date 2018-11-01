@@ -173,7 +173,7 @@ def summary(lb, prices):
         peruser.append(1.0 * n / nu)
     p = prices.loc[rounds]
 
-    df.loc['stake profit/nmr (usd)'] = rp * p['resolve_usd']
+    df.loc['stake profit/nmr (usd)'] = rp * p['resolve_usd'].values
     sp = p['open_usd'] / p['resolve_usd'] - 1.0
     df.loc['sell profit/nmr (nmr)'] = sp
     df.loc['sell profit/nmr (usd)'] = sp * p['resolve_usd']
