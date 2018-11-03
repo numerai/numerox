@@ -14,7 +14,7 @@ HDF_DATA_KEY = 'numerox_data'
 ERA_INT_TO_STR = {}
 ERA_STR_TO_INT = {}
 ERA_STR_TO_FLOAT = {}
-for i in range(180):
+for i in range(200):
     name = 'era' + str(i)
     ERA_INT_TO_STR[i] = name
     ERA_STR_TO_INT[name] = i
