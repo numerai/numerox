@@ -7,8 +7,8 @@ from sklearn.neighbors import NearestNeighbors
 
 import numerox as nx
 
-TRAIN_FILE = 'numerai_training_data.csv'
-TOURNAMENT_FILE = 'numerai_tournament_data.csv'
+TRAIN_FILE = 'numerai_datasets/numerai_training_data.csv'
+TOURNAMENT_FILE = 'numerai_datasets/numerai_tournament_data.csv'
 HDF_DATA_KEY = 'numerox_data'
 
 ERA_INT_TO_STR = {}
