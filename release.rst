@@ -6,6 +6,7 @@ Release Notes
 - v3.5.0 (not yet released; in development)
 
   * Now works with new round 132 dataset
+  * Add ``prediction.select_quantiles``
   * Silence future change warning from sklearn in ``logistic`` and
     ``logisticPCA`` models
   * Silence unit test warning on python3/linux

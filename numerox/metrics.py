@@ -28,7 +28,7 @@ def metrics_per_era(data, prediction, tournament, join='data',
         how = 'inner'
     else:
         raise ValueError("`join` method not recognized")
-    yhats_df = df.dropna()
+    yhats_df = df.copy()
     cols = ['era', 'region'] + nx.tournament_all(as_str=True)
     data_df = data.df[cols]
     df = pd.merge(data_df, yhats_df, left_index=True, right_index=True,
@@ -133,6 +133,9 @@ def metrics_per_name(data, prediction, tournament, join='data',
 
 def calc_metrics_arrays(y, yhat, columns):
     "standard metrics for `yhat` array given actual outcome `y` array"
+    idx = np.isfinite(y + yhat)
+    y = y[idx]
+    yhat = yhat[idx]
     metrics = []
     for col in columns:
         if col == 'logloss':

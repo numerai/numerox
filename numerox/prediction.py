@@ -664,6 +664,20 @@ class Prediction(object):
 
     # indexing --------------------------------------------------------------
 
+    def select_quantiles(self, data, lo=0, hi=1):
+        "Set missing all predictions outside of given quantile range per era"
+        p = self.loc[data.ids]
+        dfs = []
+        for era, idx in data.era_iter():
+            df = p.df[idx]
+            qlo = df.quantile(lo)
+            qhi = df.quantile(hi)
+            df = df.mask(df < qlo)
+            df = df.mask(df > qhi)
+            dfs.append(df)
+        df = pd.concat(dfs)
+        return Prediction(df)
+
     def __getitem__(self, index):
         "Prediction indexing is by model pair(s)"
         if isinstance(index, tuple):
