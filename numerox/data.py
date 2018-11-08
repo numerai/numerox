@@ -56,7 +56,7 @@ class Data(object):
 
     def unique_era(self, as_str=True):
         "Array of unique eras as strings (default) or floats"
-        unique_era = self.df.era.unique()
+        unique_era = np.sort(self.df.era.unique())
         if as_str:
             unique_era = np.array(self.eras_int2str(unique_era))
         return unique_era
@@ -117,7 +117,7 @@ class Data(object):
 
     def unique_region(self, as_str=True):
         "Array of unique regions as strings (default) or floats"
-        unique_region = self.df.region.unique()
+        unique_region = np.sort(self.df.region.unique())
         if as_str:
             unique_region = np.array(self.regions_int2str(unique_region))
         return unique_region
