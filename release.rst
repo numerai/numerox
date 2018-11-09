@@ -3,7 +3,7 @@
 Release Notes
 =============
 
-- v3.5.0 (not yet released; in development)
+- v3.5.0
 
   * Now works with new round 132 dataset
   * Add ``prediction.select_quantiles``
