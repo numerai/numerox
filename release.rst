@@ -7,6 +7,7 @@ Release Notes
 
   * Now works with new round 132 dataset
   * Add ``prediction.select_quantiles``
+  * ``compare_data`` can now handle a dataset that changes target order
   * Silence future change warning from sklearn in ``logistic`` and
     ``logisticPCA`` models
   * Silence unit test warning on python3/linux

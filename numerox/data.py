@@ -622,10 +622,10 @@ def compare_data(data1, data2, regions=None, n_jobs=1):
     `x distance` is the mean distance between the row of features in `data2`
     and its nearest neighbor row in `data1`.
 
-    `y accuracy` is the fraction of rows for which the target y in `data2`
-    matches the target of its nearest neighbor in `data1`.
+    `y misses` is the number of times the targets y in `data2` does not equal
+    the targets of its nearest neighbor in `data1`.
 
-    `era accuracy` is similar to `y accuracy` but for era instead of y.
+    `era accuracy` is the fraction of times eras agree.
 
     `d1-d2 rows` is the number of rows in `data1` minus the number of rows in
     `data2`.
@@ -640,16 +640,20 @@ def compare_data(data1, data2, regions=None, n_jobs=1):
         nn.fit(d1.x)
         dist, idx = nn.kneighbors(d2.x, n_neighbors=1, return_distance=True)
         idx = idx.reshape(-1)
-        y1 = d1.y[:][idx]
-        y2 = d2.y[:]
+        y1 = d1.y_df
+        y2 = d2.y_df
+        y2 = y2[y1.columns]  # in case target order changed
+        y1 = y1.values
+        y2 = y2.values
+        y1 = y1[idx]
         if np.isnan(y1).any() or np.isnan(y2).any():
-            y_acc = np.nan
+            y_mis = np.nan
         else:
-            y_acc = (y1 == y2).mean()
+            y_mis = (y1 != y2).sum()
         x_dist = dist.mean()
         era_acc = (d1.era_float[idx] == d2.era_float).mean()
         df.loc['x distance', region] = x_dist
-        df.loc['y accuracy', region] = y_acc
+        df.loc['y misses', region] = y_mis
         df.loc['era accuracy', region] = era_acc
         df.loc['d1-d2 rows', region] = len(d1) - len(d2)
     return df
