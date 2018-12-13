@@ -168,14 +168,14 @@ class Data(object):
     @property
     def x(self):
         "View of features, x, as a numpy float array"
-        return self.df.iloc[:, 2:-5].values
+        return self.df.iloc[:, 2:-7].values
 
     def xnew(self, x_array):
         "Copy of data but with data.x=`x_array`; must have same number of rows"
         if x_array.shape[0] != len(self):
             msg = "`x_array` must have the same number of rows as data"
             raise ValueError(msg)
-        shape = (x_array.shape[0], x_array.shape[1] + 7)
+        shape = (x_array.shape[0], x_array.shape[1] + 9)
         cols = ['x'+str(i) for i in range(x_array.shape[1])]
         cols = ['era', 'region'] + cols
         cols = cols + [name for number, name in nx.tournament_iter()]
@@ -184,7 +184,7 @@ class Data(object):
                           columns=cols)
         df['era'] = self.df['era'].values.copy()
         df['region'] = self.df['region'].values.copy()
-        df.values[:, 2:-5] = x_array
+        df.values[:, 2:-7] = x_array
         for number, name in nx.tournament_iter():
             df[name] = self.df[name].values.copy()
         return Data(df)
@@ -229,10 +229,10 @@ class Data(object):
     def y_similarity(self):
         "Similarity (fraction of y's equal) matrix as dataframe"
         cols = []
-        s = np.ones((5, 5))
-        for i in range(1, 6):
+        s = np.ones((7, 7))
+        for i in range(1, 8):
             cols.append(nx.tournament_str(i))
-            for j in range(i+1, 6):
+            for j in range(i+1, 8):
                 yi = self.y[i]
                 yj = self.y[j]
                 idx = np.isfinite(yi + yj)
@@ -252,6 +252,8 @@ class Data(object):
         data.df = data.df.assign(jordan=np.nan)
         data.df = data.df.assign(ken=np.nan)
         data.df = data.df.assign(charles=np.nan)
+        data.df = data.df.assign(frank=np.nan)
+        data.df = data.df.assign(hillary=np.nan)
         return data
 
     # transforms ----------------------------------------------------------
@@ -579,11 +581,12 @@ def load_zip(file_path, verbose=False):
     # convert era, region, and labels to np.float64
     df['era'] = df['era'].map(ERA_STR_TO_FLOAT)
     df['region'] = df['region'].map(REGION_STR_TO_FLOAT)
-    df.iloc[:, -5:] = df.iloc[:, -5:].astype('float64')
+    n = len(nx.tournament_all())
+    df.iloc[:, -n:] = df.iloc[:, -n:].astype('float64')
 
     # no way we did something wrong, right?
-    if df.shape[1] != 57:
-        raise IOError("expecting 57 columns; found {}".format(df.shape[1]))
+    if df.shape[1] != 59:
+        raise IOError("expecting 59 columns; found {}".format(df.shape[1]))
 
     # make sure memory is contiguous so that, e.g., data.x is a view
     df = df.copy()
@@ -677,19 +680,19 @@ class Y(object):
 
     def __getitem__(self2, index):
         if isinstance(index, str):
-            if index in ('bernie', 'elizabeth', 'jordan', 'ken', 'charles'):
+            if index in nx.tournament_all(as_str=True):
                 return self2.df[index].values
             else:
                 raise IndexError('string index not recognized')
         elif nx.isint(index):
-            if index < 1 or index > 5:
-                raise IndexError('tournament number must be between 1 and 5')
+            if index < 1 or index > 7:
+                raise IndexError('tournament number must be between 1 and 7')
             return self2.df[nx.tournament_str(index)].values
         elif isinstance(index, slice):
             if (index.start is None and index.stop is None and
                index.step is None):
                 # slicing below means a view is returned instead of a copy
-                return self2.df.iloc[:, -5:].values
+                return self2.df.iloc[:, -7:].values
             else:
                 raise IndexError('Start, stop, and step of slice must be None')
         else:

@@ -1,6 +1,7 @@
 import numerox as nx
 
-TOURNAMENT_NAMES = ['bernie', 'elizabeth', 'jordan', 'ken', 'charles']
+TOURNAMENT_NAMES = ['bernie', 'elizabeth', 'jordan', 'ken', 'charles',
+                    'frank', 'hillary']
 
 
 def tournament_int(tournament_int_or_str):
@@ -8,8 +9,8 @@ def tournament_int(tournament_int_or_str):
     if nx.isstring(tournament_int_or_str):
         return tournament_str2int(tournament_int_or_str)
     elif nx.isint(tournament_int_or_str):
-        if tournament_int_or_str not in (1, 2, 3, 4, 5):
-            raise ValueError('tournament int must be between 1 and 5')
+        if tournament_int_or_str not in (1, 2, 3, 4, 5, 6, 7):
+            raise ValueError('tournament int must be between 1 and 7')
         return tournament_int_or_str
     raise ValueError('input must be a str or int')
 
@@ -39,7 +40,7 @@ def tournament_all(as_str=True):
 
 def tournament_iter():
     "Iterate, in order, through tournaments yielding tuple of (int, str)"
-    for t in range(1, 6):
+    for t in range(1, 8):
         yield t, tournament_int2str(t)
 
 
@@ -47,8 +48,8 @@ def tournament_int2str(tournament_int):
     "Convert tournament integer to string name"
     if tournament_int < 1:
         raise ValueError("`tournament_int` must be greater than 0")
-    if tournament_int > 5:
-        raise ValueError("`tournament_int` must be less than 6")
+    if tournament_int > 7:
+        raise ValueError("`tournament_int` must be less than 8")
     return TOURNAMENT_NAMES[tournament_int - 1]
 
 

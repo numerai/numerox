@@ -350,7 +350,7 @@ def test_prediction_metrics_per_tournament():
     p = nx.testing.micro_prediction()
     df = p.metric_per_tournament(d)
     ok_(isinstance(df, pd.DataFrame), 'expecting a dataframe')
-    ok_(df.shape[1] == 6, 'expecting 6 columns')
+    ok_(df.shape[1] == 8, 'expecting 6 columns')
 
 
 def test_prediction_performance():

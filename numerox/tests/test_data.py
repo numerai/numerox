@@ -119,7 +119,15 @@ def test_data_y_indexing():
     assert_array_equal(d.y[5], y5, msg)
     assert_array_equal(d.y['charles'], y5, msg)
 
-    y = np.vstack([[y1], [y2], [y3], [y4], [y5]]).T
+    y6 = [0, 0, 1, 1, 0, 0, 1, 0, 0, 1]
+    assert_array_equal(d.y[6], y6, msg)
+    assert_array_equal(d.y['frank'], y6, msg)
+
+    y7 = [0, 1, 0, 1, 0, 1, 1, 0, 1, 0]
+    assert_array_equal(d.y[7], y7, msg)
+    assert_array_equal(d.y['hillary'], y7, msg)
+
+    y = np.vstack([[y1], [y2], [y3], [y4], [y5], [y6], [y7]]).T
     assert_array_equal(d.y[:], y, msg)
 
     assert_raises(IndexError, d.y.__getitem__, 0)
@@ -274,8 +282,8 @@ def test_data_methods():
     "test data methods"
     d = micro_data()
     ok_(len(d) == 10, "wrong length")
-    ok_(d.size == 100, "wrong size")
-    ok_(d.shape == (10, 10), "wrong shape")
+    ok_(d.size == 120, "wrong size")
+    ok_(d.shape == (10, 12), "wrong shape")
     ok_(d == d, "not equal")
 
 
@@ -309,7 +317,8 @@ def test_data_properties():
     ok_((d.region_float == d.df.region).all(), "region is corrupted")
 
     idx = ~np.isnan(d.y[:])
-    y = d.df[['bernie', 'elizabeth', 'jordan', 'ken', 'charles']].values
+    y = d.df[['bernie', 'elizabeth', 'jordan', 'ken', 'charles', 'frank',
+              'hillary']].values
     ok_((d.y[:][idx] == y[idx]).all(), "y is corrupted")
 
     x = d.x
@@ -386,7 +395,7 @@ def test_load_zip():
             with testing.HiddenPrints():
                 d = nx.load_zip(TINY_DATASET_CSV, verbose=True)
         ok_(len(d) == 14, "wrong number of rows")
-        ok_(d.shape == (14, 57), 'data has wrong shape')
+        ok_(d.shape == (14, 59), 'data has wrong shape')
         ok_(d.x.shape == (14, 50), 'x has wrong shape')
         ok_(d.df.iloc[2, 3] == 0.34143, 'wrong feature value')
 

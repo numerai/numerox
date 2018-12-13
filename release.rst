@@ -5,6 +5,8 @@ Release Notes
 
 - v3.6.0 (not yet released; in development)
 
+  * Handle 7-tournament format that begins in round 138 
+
 - v3.5.0
 
   * Now works with new round 132 dataset
