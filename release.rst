@@ -6,7 +6,7 @@ Release Notes
 - v3.6.0
 
   * Handle 7-tournament format that begins in round 138 
-  * Remove ``Leaderboard`` and ``Report`` classes
+  * Remove ``Leaderboard`` and ``Report`` classes 
 
 - v3.5.0
 
