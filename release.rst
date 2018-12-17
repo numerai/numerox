@@ -5,6 +5,8 @@ Release Notes
 
 - v3.7.0 (net yet released; in development)
 
+  * Remove magic numbers in data.py
+
 - v3.6.0
 
   * Handle 7-tournament format that begins in round 138 

@@ -58,3 +58,8 @@ def tournament_str2int(tournament_str):
     if tournament_str not in TOURNAMENT_NAMES:
         raise ValueError('`tournament_str` name not recognized')
     return TOURNAMENT_NAMES.index(tournament_str) + 1
+
+
+def tournament_count():
+    "Returns the number of tournaments as an integer"
+    return len(TOURNAMENT_NAMES)
