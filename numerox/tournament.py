@@ -1,7 +1,7 @@
 import numerox as nx
 
-TOURNAMENT_NAMES = ['bernie', 'elizabeth', 'jordan', 'ken', 'charles',
-                    'frank', 'hillary']
+TOURNAMENT_NAMES = {'bernie': 1, 'elizabeth': 2, 'jordan': 3, 'ken': 4,
+                    'charles': 5, 'frank': 6, 'hillary': 7}
 
 
 def tournament_int(tournament_int_or_str):
@@ -9,8 +9,8 @@ def tournament_int(tournament_int_or_str):
     if nx.isstring(tournament_int_or_str):
         return tournament_str2int(tournament_int_or_str)
     elif nx.isint(tournament_int_or_str):
-        if tournament_int_or_str not in (1, 2, 3, 4, 5, 6, 7):
-            raise ValueError('tournament int must be between 1 and 7')
+        if tournament_int_or_str not in TOURNAMENT_NAMES.values():
+            raise ValueError("`tournament_int_ot_str` not recognized")
         return tournament_int_or_str
     raise ValueError('input must be a str or int')
 
@@ -40,24 +40,27 @@ def tournament_all(as_str=True):
 
 def tournament_iter():
     "Iterate, in order, through tournaments yielding tuple of (int, str)"
-    for t in range(1, 8):
+    numbers = TOURNAMENT_NAMES.values()
+    numbers.sort()
+    for t in numbers:
         yield t, tournament_int2str(t)
 
 
 def tournament_int2str(tournament_int):
     "Convert tournament integer to string name"
-    if tournament_int < 1:
-        raise ValueError("`tournament_int` must be greater than 0")
-    if tournament_int > 7:
-        raise ValueError("`tournament_int` must be less than 8")
-    return TOURNAMENT_NAMES[tournament_int - 1]
+    if tournament_int not in TOURNAMENT_NAMES.values():
+        raise ValueError("`tournament_int` not recognized")
+    for name in TOURNAMENT_NAMES:
+        if TOURNAMENT_NAMES[name] == tournament_int:
+            return name
+    raise RuntimeError("Did not find tournament name")
 
 
 def tournament_str2int(tournament_str):
     "Convert tournament name (as str) to tournament integer"
     if tournament_str not in TOURNAMENT_NAMES:
         raise ValueError('`tournament_str` name not recognized')
-    return TOURNAMENT_NAMES.index(tournament_str) + 1
+    return TOURNAMENT_NAMES[tournament_str]
 
 
 def tournament_count():

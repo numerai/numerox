@@ -6,6 +6,7 @@ Release Notes
 - v3.7.0 (net yet released; in development)
 
   * Remove magic numbers in data.py
+  * Remove assumption that tournaments are consecutively ordered
 
 - v3.6.0
 
