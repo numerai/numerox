@@ -40,7 +40,7 @@ def tournament_all(as_str=True):
 
 def tournament_iter():
     "Iterate, in order, through tournaments yielding tuple of (int, str)"
-    numbers = TOURNAMENT_NAMES.values()
+    numbers = list(TOURNAMENT_NAMES.values())
     numbers.sort()
     for t in numbers:
         yield t, tournament_int2str(t)
