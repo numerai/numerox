@@ -7,6 +7,7 @@ Release Notes
 
   * Remove magic numbers in data.py
   * Remove assumption that tournaments are consecutively ordered
+  * Remove ``history``
 
 - v3.6.0
 
