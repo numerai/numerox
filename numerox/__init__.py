@@ -80,7 +80,6 @@ from numerox.tournament import tournament_count
 # util
 from numerox.util import isint
 from numerox.util import isstring
-from numerox.util import history
 
 try:
     from numpy.testing import Tester

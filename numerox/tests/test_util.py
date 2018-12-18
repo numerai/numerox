@@ -1,5 +1,4 @@
 from nose.tools import ok_
-import pandas as pd
 
 import numerox as nx
 
@@ -26,12 +25,6 @@ def test_isstring():
     ok_(not nx.isstring(True))
     ok_(not nx.isstring(False))
     ok_(not nx.isstring(None))
-
-
-def test_history():
-    "make sure history runs"
-    df = nx.history()
-    ok_(isinstance(df, pd.DataFrame), 'expecting a dataframe')
 
 
 def test_flatten_dict():
