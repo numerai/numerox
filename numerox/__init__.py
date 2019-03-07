@@ -48,13 +48,8 @@ from numerox.numerai import upload
 from numerox.numerai import round_dates
 from numerox.numerai import year_to_round_range
 from numerox.numerai import get_user_names
-from numerox.numerai import show_stakes
-from numerox.numerai import get_stakes
-from numerox.numerai import get_stakes_old
-from numerox.numerai import get_stakes_users
 from numerox.numerai import get_user_activities
 from numerox.numerai import is_stakeable
-from numerox.numerai import cutoff_impact
 
 # tokens
 from numerox.tokens import nmr_at_addr

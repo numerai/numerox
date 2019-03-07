@@ -8,6 +8,7 @@ Release Notes
   * Add concept of active and inactive tournaments
   * Remove magic numbers in data.py
   * Remove assumption that tournaments are consecutively ordered
+  * Remove stake reporting
   * Remove ``history``
 
 - v3.6.0
