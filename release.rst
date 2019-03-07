@@ -3,7 +3,7 @@
 Release Notes
 =============
 
-- v3.7.0 (net yet released; in development)
+- v3.7.0
 
   * Add concept of active and inactive tournaments
   * Remove magic numbers in data.py
