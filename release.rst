@@ -5,6 +5,7 @@ Release Notes
 
 - v3.7.0 (net yet released; in development)
 
+  * Add concept of active and inactive tournaments
   * Remove magic numbers in data.py
   * Remove assumption that tournaments are consecutively ordered
   * Remove ``history``

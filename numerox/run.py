@@ -79,7 +79,7 @@ def run(model, splitter, tournament=None, verbosity=2):
         An iterator of fit/predict data pairs.
     tournament : {None, int, str, list, tuple}, optional
         The tournament(s) to run the model through. By default (None) the
-        model is run through all five tournaments. If a list or tuple of
+        model is run through all active tournaments. If a list or tuple of
         tournaments is given then it must must not contain duplicate
         tournaments.
     verbosity : int, optional

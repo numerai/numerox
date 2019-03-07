@@ -76,6 +76,9 @@ from numerox.tournament import tournament_str
 from numerox.tournament import tournament_all
 from numerox.tournament import tournament_iter
 from numerox.tournament import tournament_count
+from numerox.tournament import tournament_names
+from numerox.tournament import tournament_numbers
+from numerox.tournament import tournament_isactive
 
 # util
 from numerox.util import isint

@@ -170,7 +170,7 @@ class Data(object):
     @property
     def x(self):
         "View of features, x, as a numpy float array"
-        n = nx.tournament_count()
+        n = nx.tournament_count(active_only=False)
         return self.df.iloc[:, 2:-n].values
 
     def xnew(self, x_array):
@@ -178,18 +178,19 @@ class Data(object):
         if x_array.shape[0] != len(self):
             msg = "`x_array` must have the same number of rows as data"
             raise ValueError(msg)
-        n = nx.tournament_count()
+        n = nx.tournament_count(active_only=False)
         shape = (x_array.shape[0], x_array.shape[1] + n + 2)
         cols = ['x'+str(i) for i in range(x_array.shape[1])]
         cols = ['era', 'region'] + cols
-        cols = cols + [name for number, name in nx.tournament_iter()]
+        cols = cols + [name for number, name in
+                       nx.tournament_iter(active_only=False)]
         df = pd.DataFrame(data=np.empty(shape, dtype=np.float64),
                           index=self.df.index.copy(deep=True),
                           columns=cols)
         df['era'] = self.df['era'].values.copy()
         df['region'] = self.df['region'].values.copy()
         df.values[:, 2:-n] = x_array
-        for number, name in nx.tournament_iter():
+        for number, name in nx.tournament_iter(active_only=False):
             df[name] = self.df[name].values.copy()
         return Data(df)
 
@@ -207,7 +208,7 @@ class Data(object):
         "Copy of targets, y, as a dataframe"
         columns = []
         data = []
-        for number, name in nx.tournament_iter():
+        for number, name in nx.tournament_iter(active_only=False):
             columns.append(name)
             data.append(self.y[number].reshape(-1, 1))
         data = np.hstack(data)
@@ -252,7 +253,7 @@ class Data(object):
     def y_to_nan(self):
         "Copy of data with y values set to NaN"
         data = self.copy()
-        for number, name in nx.tournament_iter():
+        for number, name in nx.tournament_iter(active_only=False):
             kwargs = {name: np.nan}
             data.df = data.df.assign(**kwargs)
         return data
@@ -575,18 +576,18 @@ def load_zip(file_path, verbose=False):
     rename_map = {'data_type': 'region'}
     for i in range(1, N_FEATURES + 1):
         rename_map['feature' + str(i)] = 'x' + str(i)
-    for number, name in nx.tournament_iter():
+    for number, name in nx.tournament_iter(active_only=False):
         rename_map['target_' + name] = name
     df.rename(columns=rename_map, inplace=True)
 
     # convert era, region, and labels to np.float64
     df['era'] = df['era'].map(ERA_STR_TO_FLOAT)
     df['region'] = df['region'].map(REGION_STR_TO_FLOAT)
-    n = len(nx.tournament_all())
+    n = nx.tournament_count(active_only=False)
     df.iloc[:, -n:] = df.iloc[:, -n:].astype('float64')
 
     # no way we did something wrong, right?
-    n = 2 + N_FEATURES + nx.tournament_count()
+    n = 2 + N_FEATURES + nx.tournament_count(active_only=False)
     if df.shape[1] != n:
         raise IOError("expecting {} columns; found {}".format(n, df.shape[1]))
 
@@ -681,9 +682,9 @@ class Y(object):
         self2.df = self.df
 
     def __getitem__(self2, index):
-        n = nx.tournament_count()
+        n = nx.tournament_count(active_only=False)
         if isinstance(index, str):
-            if index in nx.tournament_all(as_str=True):
+            if index in nx.tournament_all(as_str=True, active_only=False):
                 return self2.df[index].values
             else:
                 raise IndexError('string index not recognized')
