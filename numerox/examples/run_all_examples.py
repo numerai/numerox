@@ -8,21 +8,21 @@ def run_all_examples(data=None):
     if data is None:
         data = nx.numerai.download_data_object(verbose=True)
 
-    backtest_example = nx.examples.backtest_example
-    print_source(backtest_example)
-    backtest_example(data)
+    backtest = nx.examples.backtest
+    print_source(backtest)
+    backtest(data)
 
-    concordance_example = nx.examples.concordance_example
-    print_source(concordance_example)
-    concordance_example(data)
+    concordance = nx.examples.concordance
+    print_source(concordance)
+    concordance(data)
 
-    compare_models = nx.examples.compare_models
-    print_source(compare_models)
-    compare_models(data)
+    improve_model = nx.examples.improve_model
+    print_source(improve_model)
+    improve_model(data)
 
     cv_warning = nx.examples.cv_warning
     print_source(cv_warning)
-    cv_warning(data['train'], nsamples=2)
+    cv_warning(nx.logistic(), data['train'], nsamples=2)
 
 
 def print_source(func):

@@ -4,8 +4,7 @@ import os
 from setuptools import setup, find_packages
 
 
-SHORT_DESCRIPTION = ("Numerox is a Numerai tournament toolbox written in "
-                     "Python")
+SHORT_DESCRIPTION = ("Numerai tournament toolbox written in Python")
 
 
 def get_long_description():
@@ -40,6 +39,7 @@ CLASSIFIERS = [
 
 
 REQUIRES = ['numpy',
+            'scipy',
             'pandas',
             'tables',
             'scikit-learn',
@@ -58,6 +58,7 @@ metadata = dict(name='numerox',
                 version=get_version_str(),
                 packages=find_packages(),
                 package_data={'numerox': ['LICENSE', 'readme.rst',
-                              'release.rst', 'tests/test_data.hdf']},
+                                          'release.rst', 'tests/test_data.hdf',
+                                          'tests/tiny_dataset_csv.zip']},
                 install_requires=REQUIRES)
 setup(**metadata)

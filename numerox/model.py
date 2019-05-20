@@ -1,46 +1,32 @@
 import numpy as np
 from sklearn.linear_model import LogisticRegression
+from sklearn.linear_model import Ridge
 from sklearn.neural_network import MLPClassifier as MLPC
 from sklearn.ensemble import ExtraTreesClassifier as ETC
 from sklearn.ensemble import RandomForestClassifier as RFC
+from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.pipeline import Pipeline
 from sklearn.decomposition import PCA
 
-"""
-
-Make your own model
--------------------
-
-First take a look at the logistic regression model below (named logistic). The
-model is just a thin wrapper around sklearn's LogisticRegression. The wrapper
-allows LogisticRegression to receive data from numerox and for numerox to keep
-track of its predictions.
-
-Your model MUST have a fit_predict method that takes two data objects as
-input. The first is training data (dfit), the second is prediction data (dpre).
-
-The fit_predict method MUST return two numpy arrays. The first contains the
-ids, the second the predictions. Make sure that these two arrays stay aligned!
-
-The models below inherit from The Model class. That is optional. But if you do
-inherit from Model and if you place your parameters in self.p as is done in
-the models below then you will get a nice printout (model name and parameters)
-when you run your model.
-
-None of the models below will be competitive in the Numerai tournament. You'll
-have to make your own model. If you already have a model then you can make a
-thin wrapper around it, as is done below, to get it to run with numerox.
-
-OK, now go make money!
+import numerox as nx
 
 """
 
+Here are the directions for making your own model:
+
+https://github.com/kwgoodman/numerox/blob/master/numerox/examples/model.rst
+
+"""
+
+
+# ---------------------------------------------------------------------------
+# base class for all models
 
 class Model(object):
 
     def __repr__(self):
+        model = self.name
         msg = ""
-        model = self.__class__.__name__
         if hasattr(self, "p"):
             if len(self.p) == 0:
                 msg += model + "()"
@@ -54,16 +40,48 @@ class Model(object):
             msg += model + "()"
         return msg
 
+    @property
+    def name(self):
+        "Name of model"
+        if not hasattr(self, '_name'):
+            self._name = self.__class__.__name__
+        return self._name
+
+    def rename(self, name):
+        "Rename model in place; model is returned"
+        if name is None:
+            return self
+        if not nx.isstring(name):
+            raise ValueError('`name` must be a string')
+        self._name = name
+        return self
+
+
+# ---------------------------------------------------------------------------
+# numerox example models
 
 class logistic(Model):
 
     def __init__(self, inverse_l2=0.0001):
         self.p = {'inverse_l2': inverse_l2}
 
-    def fit_predict(self, dfit, dpre):
-        model = LogisticRegression(C=self.p['inverse_l2'])
-        model.fit(dfit.x, dfit.y)
+    def fit_predict(self, dfit, dpre, tournament):
+        model = LogisticRegression(C=self.p['inverse_l2'], solver='liblinear')
+        model.fit(dfit.x, dfit.y[tournament])
         yhat = model.predict_proba(dpre.x)[:, 1]
+        return dpre.ids, yhat
+
+
+class ridge_mean(Model):
+
+    def __init__(self, alpha=6):
+        self.p = {'alpha': alpha}
+
+    def fit_predict(self, dfit, dpre, tournament):
+        model = Ridge(alpha=self.p['alpha'], normalize=True)
+        yfit = dfit.y[:].mean(axis=1)
+        model.fit(dfit.x, yfit)
+        yhat = model.predict(dpre.x)
         return dpre.ids, yhat
 
 
@@ -75,14 +93,14 @@ class extratrees(Model):
                   'nfeatures': nfeatures,
                   'seed': seed}
 
-    def fit_predict(self, dfit, dpre):
+    def fit_predict(self, dfit, dpre, tournament):
         clf = ETC(criterion='gini',
                   max_features=self.p['nfeatures'],
                   max_depth=self.p['depth'],
                   n_estimators=self.p['ntrees'],
                   random_state=self.p['seed'],
                   n_jobs=-1)
-        clf.fit(dfit.x, dfit.y)
+        clf.fit(dfit.x, dfit.y[tournament])
         yhat = clf.predict_proba(dpre.x)[:, 1]
         return dpre.ids, yhat
 
@@ -95,14 +113,14 @@ class randomforest(Model):
                   'max_features': max_features,
                   'seed': seed}
 
-    def fit_predict(self, dfit, dpre):
+    def fit_predict(self, dfit, dpre, tournament):
         clf = RFC(criterion='gini',
                   max_features=self.p['max_features'],
                   max_depth=self.p['depth'],
                   n_estimators=self.p['ntrees'],
                   random_state=self.p['seed'],
                   n_jobs=-1)
-        clf.fit(dfit.x, dfit.y)
+        clf.fit(dfit.x, dfit.y[tournament])
         yhat = clf.predict_proba(dpre.x)[:, 1]
         return dpre.ids, yhat
 
@@ -117,15 +135,30 @@ class mlpc(Model):
                   'learn': learn,
                   'seed': seed}
 
-    def fit_predict(self, dfit, dpre):
+    def fit_predict(self, dfit, dpre, tournament):
         clf = MLPC(hidden_layer_sizes=self.p['layers'],
                    alpha=self.p['alpha'],
                    activation=self.p['activation'],
                    learning_rate_init=self.p['learn'],
                    random_state=self.p['seed'],
                    max_iter=200)
-        clf.fit(dfit.x, dfit.y)
+        clf.fit(dfit.x, dfit.y[tournament])
         yhat = clf.predict_proba(dpre.x)[:, 1]
+        return dpre.ids, yhat
+
+
+# model used by numerai to generate example_predictions.csv
+class example_predictions(Model):
+
+    def __init__(self):
+        self.p = {}
+
+    def fit_predict(self, dfit, dpre, tournament):
+        model = GradientBoostingClassifier(n_estimators=25, max_depth=1,
+                                           random_state=1776)
+        model.fit(dfit.x, dfit.y[tournament])
+        yhat = model.predict_proba(dpre.x)[:, 1]
+        yhat = np.round(yhat, 5)
         return dpre.ids, yhat
 
 
@@ -136,10 +169,11 @@ class logisticPCA(Model):
         self.p = {'inverse_l2': inverse_l2,
                   'nfeatures': nfeatures}
 
-    def fit_predict(self, dfit, dpre):
+    def fit_predict(self, dfit, dpre, tournament):
         pipe = Pipeline([('pca', PCA(n_components=self.p['nfeatures'])),
-                         ("lr", LogisticRegression(C=self.p['inverse_l2']))])
-        pipe.fit(dfit.x, dfit.y)
+                         ("lr", LogisticRegression(C=self.p['inverse_l2'],
+                                                   solver='liblinear'))])
+        pipe.fit(dfit.x, dfit.y[tournament])
         yhat = pipe.predict_proba(dpre.x)[:, 1]
         return dpre.ids, yhat
 
@@ -150,6 +184,6 @@ class fifty(Model):
     def __init__(self):
         self.p = {}
 
-    def fit_predict(self, dfit, dpre):
+    def fit_predict(self, dfit, dpre, tournament):
         yhat = 0.5 * np.ones(len(dpre))
         return dpre.ids, yhat

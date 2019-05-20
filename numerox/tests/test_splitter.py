@@ -1,4 +1,5 @@
 from nose.tools import ok_
+from nose.tools import assert_raises
 
 import numpy as np
 
@@ -9,11 +10,14 @@ def test_splitter_overlap():
     "prediction data should not overlap"
     d = nx.play_data()
     splitters = [nx.TournamentSplitter(d),
+                 nx.FlipSplitter(d),
                  nx.ValidationSplitter(d),
                  nx.CheatSplitter(d),
                  nx.CVSplitter(d),
-                 nx.IgnoreEraCVSplitter(d),
-                 nx.SplitSplitter(d, fit_fraction=0.5)]
+                 nx.LoocvSplitter(d),
+                 nx.IgnoreEraCVSplitter(d, tournament=1),
+                 nx.SplitSplitter(d, fit_fraction=0.5),
+                 nx.ConsecutiveCVSplitter(d)]
     for splitter in splitters:
         predict_ids = []
         for dfit, dpredict in splitter:
@@ -25,11 +29,14 @@ def test_splitter_reset():
     "splitter reset should not change results"
     d = nx.play_data()
     splitters = [nx.TournamentSplitter(d),
+                 nx.FlipSplitter(d),
                  nx.ValidationSplitter(d),
                  nx.CheatSplitter(d),
                  nx.CVSplitter(d),
-                 nx.IgnoreEraCVSplitter(d),
-                 nx.SplitSplitter(d, fit_fraction=0.5)]
+                 nx.LoocvSplitter(d),
+                 nx.IgnoreEraCVSplitter(d, tournament=2),
+                 nx.SplitSplitter(d, fit_fraction=0.5),
+                 nx.ConsecutiveCVSplitter(d)]
     for splitter in splitters:
         ftups = [[], []]
         ptups = [[], []]
@@ -53,6 +60,23 @@ def test_cvsplitter_kfold():
         ok_(count == k, "CVSplitter iterated through wrong number of folds")
 
 
+def test_loocvsplitter():
+    "test loocvsplitter"
+    d = nx.play_data()['train']
+    splitter = nx.LoocvSplitter(d)
+    count = 0
+    for dfit, dpre in splitter:
+        count += 1
+        eras = dfit.unique_era().tolist()
+        era = dpre.unique_era().tolist()
+        ok_(isinstance(eras, list), "expecting a list")
+        ok_(isinstance(era, list), "expecting a list")
+        ok_(len(era) == 1, "expecting a single era")
+        ok_(era not in eras, "did not hold out era")
+    k = d.unique_era().size
+    ok_(count == k, "LoocvSplitter iterated through wrong number of folds")
+
+
 def test_rollsplitter():
     "make sure rollsplitter has no overlaps"
     d = nx.play_data()
@@ -65,3 +89,40 @@ def test_rollsplitter():
         npre = pera.size
         ntot = tera.size
         ok_(nfit + npre == ntot, "RollSplitter has era overalp")
+
+
+def test_customcvsplitter():
+    "test nx.CustomCVSplitter"
+    d = nx.testing.micro_data()
+    splitter = nx.CustomCVSplitter([d['era1'], d['era2':'era4'], d['eraX']])
+    count = 0
+    ids = []
+    for df, dp in splitter:
+        ok_(isinstance(df, nx.Data), "expecting a data object")
+        ok_(isinstance(dp, nx.Data), "expecting a data object")
+        ids.extend(dp.ids.tolist())
+        count += 1
+    ok_(count == 3, 'number of folds is wrong')
+    ok_(len(ids) == len(set(ids)), 'overlap in ids')
+    assert_raises(ValueError, nx.CustomCVSplitter, [d])
+    assert_raises(ValueError, nx.CustomCVSplitter, [d, d])
+    assert_raises(ValueError, nx.CustomCVSplitter, [d, d, None])
+
+
+def test_customsplitter():
+    "test nx.CustomSplitter"
+    d = nx.testing.micro_data()
+    data_list = [(d['era1'], d['era2']), (d['era4'], d['eraX'])]
+    splitter = nx.CustomSplitter(data_list)
+    count = 0
+    ids = []
+    for df, dp in splitter:
+        ok_(isinstance(df, nx.Data), "expecting a data object")
+        ok_(isinstance(dp, nx.Data), "expecting a data object")
+        ids.extend(dp.ids.tolist())
+        count += 1
+    ok_(count == 2, 'number of splits is wrong')
+    ok_(len(ids) == len(set(ids)), 'overlap in ids')
+    assert_raises(ValueError, nx.CustomSplitter, [(d,)])
+    assert_raises(ValueError, nx.CustomSplitter, [(d, d), (d, d)])
+    assert_raises(ValueError, nx.CustomSplitter, [(d, d), (d, None)])

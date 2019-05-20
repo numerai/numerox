@@ -3,15 +3,20 @@ import zipfile
 import numpy as np
 import pandas as pd
 from sklearn.decomposition import PCA
+from sklearn.neighbors import NearestNeighbors
+
+import numerox as nx
 
 TRAIN_FILE = 'numerai_training_data.csv'
 TOURNAMENT_FILE = 'numerai_tournament_data.csv'
 HDF_DATA_KEY = 'numerox_data'
 
+N_FEATURES = 50
+
 ERA_INT_TO_STR = {}
 ERA_STR_TO_INT = {}
 ERA_STR_TO_FLOAT = {}
-for i in range(150):
+for i in range(200):
     name = 'era' + str(i)
     ERA_INT_TO_STR[i] = name
     ERA_STR_TO_INT[name] = i
@@ -53,7 +58,7 @@ class Data(object):
 
     def unique_era(self, as_str=True):
         "Array of unique eras as strings (default) or floats"
-        unique_era = self.df.era.unique()
+        unique_era = np.sort(self.df.era.unique())
         if as_str:
             unique_era = np.array(self.eras_int2str(unique_era))
         return unique_era
@@ -114,7 +119,7 @@ class Data(object):
 
     def unique_region(self, as_str=True):
         "Array of unique regions as strings (default) or floats"
-        unique_region = self.df.region.unique()
+        unique_region = np.sort(self.df.region.unique())
         if as_str:
             unique_region = np.array(self.regions_int2str(unique_region))
         return unique_region
@@ -165,23 +170,28 @@ class Data(object):
     @property
     def x(self):
         "View of features, x, as a numpy float array"
-        return self.df.iloc[:, 2:-1].values
+        n = nx.tournament_count(active_only=False)
+        return self.df.iloc[:, 2:-n].values
 
     def xnew(self, x_array):
         "Copy of data but with data.x=`x_array`; must have same number of rows"
         if x_array.shape[0] != len(self):
             msg = "`x_array` must have the same number of rows as data"
             raise ValueError(msg)
-        shape = (x_array.shape[0], x_array.shape[1] + 3)
+        n = nx.tournament_count(active_only=False)
+        shape = (x_array.shape[0], x_array.shape[1] + n + 2)
         cols = ['x'+str(i) for i in range(x_array.shape[1])]
-        cols = ['era', 'region'] + cols + ['y']
+        cols = ['era', 'region'] + cols
+        cols = cols + [name for number, name in
+                       nx.tournament_iter(active_only=False)]
         df = pd.DataFrame(data=np.empty(shape, dtype=np.float64),
                           index=self.df.index.copy(deep=True),
                           columns=cols)
         df['era'] = self.df['era'].values.copy()
         df['region'] = self.df['region'].values.copy()
-        df.values[:, 2:-1] = x_array
-        df['y'] = self.df['y'].values.copy()
+        df.values[:, 2:-n] = x_array
+        for number, name in nx.tournament_iter(active_only=False):
+            df[name] = self.df[name].values.copy()
         return Data(df)
 
     @property
@@ -194,9 +204,59 @@ class Data(object):
     # y ---------------------------------------------------------------------
 
     @property
+    def y_df(self):
+        "Copy of targets, y, as a dataframe"
+        columns = []
+        data = []
+        for number, name in nx.tournament_iter(active_only=False):
+            columns.append(name)
+            data.append(self.y[number].reshape(-1, 1))
+        data = np.hstack(data)
+        df = pd.DataFrame(data=data, columns=columns, index=self.ids)
+        return df
+
+    @property
     def y(self):
-        "View of y as a 1d numpy float array"
-        return self.df['y'].values
+        "indexing targets, y, by tournament name or number"
+        return Y(self)
+
+    def y_sum_hist(self):
+        "Histogram data of sum of y targets across tournaments as dataframe"
+        s = self.y[:].sum(axis=1)
+        s = s[np.isfinite(s)]
+        data = []
+        for si in range(nx.tournament_count() + 1):
+            data.append((si, (s == si).mean()))
+        df = pd.DataFrame(data=data, columns=['ysum', 'fraction'])
+        df = df.set_index('ysum')
+        return df
+
+    def y_similarity(self):
+        "Similarity (fraction of y's equal) matrix as dataframe"
+        cols = []
+        n = nx.tournament_count()
+        s = np.ones((n, n))
+        for i in range(1, n + 1):
+            cols.append(nx.tournament_str(i))
+            for j in range(i+1, n + 1):
+                yi = self.y[i]
+                yj = self.y[j]
+                idx = np.isfinite(yi + yj)
+                yi = yi[idx]
+                yj = yj[idx]
+                sij = (yi == yj).mean()
+                s[i-1, j-1] = sij
+                s[j-1, i-1] = sij
+        df = pd.DataFrame(data=s, columns=cols, index=cols)
+        return df
+
+    def y_to_nan(self):
+        "Copy of data with y values set to NaN"
+        data = self.copy()
+        for number, name in nx.tournament_iter(active_only=False):
+            kwargs = {name: np.nan}
+            data.df = data.df.assign(**kwargs)
+        return data
 
     # transforms ----------------------------------------------------------
 
@@ -231,12 +291,14 @@ class Data(object):
         data = self.xnew(x)
         return data
 
-    def balance(self, train_only=True, seed=0):
+    def balance(self, tournament, train_only=True, seed=0):
         """
         Copy of data where specified eras have mean y of 0.5.
 
         Parameters
         ----------
+        tournament : int or str
+            Which tournament's targets to balance.
         train_only : {True, False}, optional
             By default (True) only train eras are y balanced. No matter what
             the setting of `train_only` any era that contains a y that is NaN
@@ -248,7 +310,8 @@ class Data(object):
         Returns
         -------
         data : Data
-            A copy of data where specified eras have mean y of 0.5.
+            A copy of data where specified eras have mean y (for the
+            given `tournament`) of 0.5.
         """
         # This function is not written in a straightforward manner.
         # A few speed optimizations have been made.
@@ -259,7 +322,7 @@ class Data(object):
         else:
             eras = data.unique_era(as_str=False).tolist()
         era = data.era_float
-        y = data.y
+        y = data.y[tournament]
         index = np.arange(y.size)
         remove = []
         rs = np.random.RandomState(seed)
@@ -283,7 +346,8 @@ class Data(object):
                 ix = rs.choice(ix, size=n1-n0, replace=False)
                 remove.append(ix)
             else:
-                raise RuntimeError("balance should not reach this line")
+                msg = "balance should not reach this line"  # pragma: no cover
+                raise RuntimeError(msg)  # pragma: no cover
             idx = ~idx
             era = era[idx]
             y = y[idx]
@@ -297,13 +361,9 @@ class Data(object):
             data = Data(df)
         return data
 
-    def subsample(self, fraction, balance=True, seed=0):
+    def subsample(self, fraction, seed=0):
         """
         Randomly sample `fraction` of each era's rows.
-
-        data.y is optionally balanced. The default is to balance y. Balancing
-        is achieved by removing rows so the number of rows will likely be
-        less than expected using `fraction` if `balance` is True.
         """
         rs = np.random.RandomState(seed)
         data_index = np.arange(len(self))
@@ -317,9 +377,7 @@ class Data(object):
             index.append(idx)
         index = np.concatenate(index)
         df = self.df.take(index)
-        data = Data(df)
-        if balance:
-            data = data.balance(train_only=False, seed=seed)
+        data = Data(df.copy())
         return data
 
     # misc ------------------------------------------------------------------
@@ -385,10 +443,59 @@ class Data(object):
                     return self.region_isin(TOURNAMENT_REGIONS)
                 else:
                     raise IndexError('string index not recognized')
+        elif isinstance(index, slice):
+
+            # step check
+            if index.step is not None:
+                if not nx.isint(index.step):
+                    msg = "slice step size must be None or psotive integer"
+                    raise IndexError(msg)
+                if index.step < 1:
+                    raise IndexError('slice step must be greater than 0')
+                step = index.step
+            else:
+                step = 1
+
+            ueras = self.unique_era().tolist()
+
+            # start
+            era1 = index.start
+            idx1 = None
+            if era1 is None:
+                idx1 = 0
+            elif not nx.isstring(era1) or not era1.startswith('era'):
+                raise IndexError("slice elements must be strings like 'era23'")
+            if idx1 is None:
+                idx1 = ueras.index(era1)
+
+            # end
+            era2 = index.stop
+            idx2 = None
+            if era2 is None:
+                idx2 = len(ueras) - 1
+            elif not nx.isstring(era2) or not era2.startswith('era'):
+                raise IndexError("slice elements must be strings like 'era23'")
+            if idx2 is None:
+                idx2 = ueras.index(era2)
+
+            if idx1 > idx2:
+                raise IndexError("slice cannot go from large to small era")
+
+            # find eras in slice
+            eras = []
+            for ix in range(idx1, idx2 + 1, step):
+                eras.append(ueras[ix])
+
+            data = self.era_isin(eras)
+
+            return data
+
         elif typidx is pd.Series or typidx is np.ndarray:
-            idx = index
-            return Data(self.df[idx])
+
+            return Data(self.df[index])
+
         else:
+
             raise IndexError('indexing type not recognized')
 
     @property
@@ -436,9 +543,15 @@ class Data(object):
         t.append(fmt.format('x', stats))
 
         # y
-        y = self.df.y
+        y = self.y[:]
         stats = 'mean {:.6f}, fraction missing {:.4f}'
-        stats = stats.format(y.mean(), y.isnull().mean())
+        idx = np.isnan(y)
+        if idx.all():
+            # avoid numpy empty slice warning
+            mean = np.nan
+        else:
+            mean = np.nanmean(y)
+        stats = stats.format(mean, idx.mean())
         t.append(fmt.format('y', stats))
 
         return '\n'.join(t)
@@ -460,14 +573,23 @@ def load_zip(file_path, verbose=False):
 
     # turn into single dataframe and rename columns
     df = pd.concat([train, tourn], axis=0)
-    rename_map = {'data_type': 'region', 'target': 'y'}
-    for i in range(1, 51):
+    rename_map = {'data_type': 'region'}
+    for i in range(1, N_FEATURES + 1):
         rename_map['feature' + str(i)] = 'x' + str(i)
+    for number, name in nx.tournament_iter(active_only=False):
+        rename_map['target_' + name] = name
     df.rename(columns=rename_map, inplace=True)
 
-    # convert era and region strings to np.float64
+    # convert era, region, and labels to np.float64
     df['era'] = df['era'].map(ERA_STR_TO_FLOAT)
     df['region'] = df['region'].map(REGION_STR_TO_FLOAT)
+    n = nx.tournament_count(active_only=False)
+    df.iloc[:, -n:] = df.iloc[:, -n:].astype('float64')
+
+    # no way we did something wrong, right?
+    n = 2 + N_FEATURES + nx.tournament_count(active_only=False)
+    if df.shape[1] != n:
+        raise IOError("expecting {} columns; found {}".format(n, df.shape[1]))
 
     # make sure memory is contiguous so that, e.g., data.x is a view
     df = df.copy()
@@ -495,6 +617,54 @@ def concat_data(datas):
     return Data(df)
 
 
+def compare_data(data1, data2, regions=None, n_jobs=1):
+    """
+    Compare two data objects, e.g., when they are from different datasets.
+
+    The features, x, from the first dataset `data1` is used to fit a KNN tree.
+    The nearest neighbor (k=1) of each row of features in `data2` is then
+    found using the tree.
+
+    `x distance` is the mean distance between the row of features in `data2`
+    and its nearest neighbor row in `data1`.
+
+    `y misses` is the number of times the targets y in `data2` does not equal
+    the targets of its nearest neighbor in `data1`.
+
+    `era accuracy` is the fraction of times eras agree.
+
+    `d1-d2 rows` is the number of rows in `data1` minus the number of rows in
+    `data2`.
+    """
+    if regions is None:
+        regions = ('train', 'validation', 'test', 'live')
+    df = pd.DataFrame(columns=regions)
+    nn = NearestNeighbors(n_neighbors=1,  n_jobs=n_jobs)
+    for region in regions:
+        d1 = data1[data1.region == region]
+        d2 = data2[data2.region == region]
+        nn.fit(d1.x)
+        dist, idx = nn.kneighbors(d2.x, n_neighbors=1, return_distance=True)
+        idx = idx.reshape(-1)
+        y1 = d1.y_df
+        y2 = d2.y_df
+        y2 = y2[y1.columns]  # in case target order changed
+        y1 = y1.values
+        y2 = y2.values
+        y1 = y1[idx]
+        if np.isnan(y1).any() or np.isnan(y2).any():
+            y_mis = np.nan
+        else:
+            y_mis = (y1 != y2).sum()
+        x_dist = dist.mean()
+        era_acc = (d1.era_float[idx] == d2.era_float).mean()
+        df.loc['x distance', region] = x_dist
+        df.loc['y misses', region] = y_mis
+        df.loc['era accuracy', region] = era_acc
+        df.loc['d1-d2 rows', region] = len(d1) - len(d2)
+    return df
+
+
 class Loc(object):
     "Utility class for the loc method."
 
@@ -503,3 +673,32 @@ class Loc(object):
 
     def __getitem__(self, index):
         return Data(self.data.df.loc[index])
+
+
+class Y(object):
+    "Utility class for y access."
+
+    def __init__(self2, self):
+        self2.df = self.df
+
+    def __getitem__(self2, index):
+        n = nx.tournament_count(active_only=False)
+        if isinstance(index, str):
+            if index in nx.tournament_all(as_str=True, active_only=False):
+                return self2.df[index].values
+            else:
+                raise IndexError('string index not recognized')
+        elif nx.isint(index):
+            if index < 1 or index > n:
+                txt = 'tournament number must be between 1 and {}'
+                raise IndexError(txt.format(n))
+            return self2.df[nx.tournament_str(index)].values
+        elif isinstance(index, slice):
+            if (index.start is None and index.stop is None and
+               index.step is None):
+                # slicing below means a view is returned instead of a copy
+                return self2.df.iloc[:, -n:].values
+            else:
+                raise IndexError('Start, stop, and step of slice must be None')
+        else:
+            raise IndexError('indexing type not recognized')
