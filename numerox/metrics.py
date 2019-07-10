@@ -144,7 +144,7 @@ def calc_metrics_arrays(y, yhat, columns):
                 m = np.nan
         elif col == 'corr_pass':
             try:
-                m = spearmanr(y, yhat).correlation < CORR_BENCHMARK
+                m = spearmanr(y, yhat).correlation > CORR_BENCHMARK
             except ValueError:
                 m = np.nan
         elif col == 'mse':
