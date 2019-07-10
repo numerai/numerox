@@ -682,7 +682,7 @@ class Y(object):
         self2.df = self.df
 
     def __getitem__(self2, index):
-        n = nx.tournament_count(active_only=True)
+        n = nx.tournament_count(active_only=False)
         if isinstance(index, str):
             if index in nx.tournament_all(as_str=True, active_only=True):
                 return self2.df[index].values
