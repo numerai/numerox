@@ -1,12 +1,13 @@
 import numerox as nx
 
-TOURNAMENTS = [{'name': 'bernie', 'number': 1, 'active': True},
+TOURNAMENTS = [{'name': 'bernie', 'number': 1, 'active': False},
                {'name': 'elizabeth', 'number': 2, 'active': False},
                {'name': 'jordan', 'number': 3, 'active': False},
-               {'name': 'ken', 'number': 4, 'active': True},
-               {'name': 'charles', 'number': 5, 'active': True},
-               {'name': 'frank', 'number': 6, 'active': True},
-               {'name': 'hillary', 'number': 7, 'active': True}]
+               {'name': 'ken', 'number': 4, 'active': False},
+               {'name': 'charles', 'number': 5, 'active': False},
+               {'name': 'frank', 'number': 6, 'active': False},
+               {'name': 'hillary', 'number': 7, 'active': False},
+               {'name': 'kazutsugi', 'number': 8, 'active': True}]
 
 
 def tournament_int(tournament_int_or_str):
