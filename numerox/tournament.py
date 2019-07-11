@@ -1,12 +1,13 @@
 import numerox as nx
 
-TOURNAMENTS = [{'name': 'bernie', 'number': 1, 'active': True},
+TOURNAMENTS = [{'name': 'bernie', 'number': 1, 'active': False},
                {'name': 'elizabeth', 'number': 2, 'active': False},
                {'name': 'jordan', 'number': 3, 'active': False},
-               {'name': 'ken', 'number': 4, 'active': True},
-               {'name': 'charles', 'number': 5, 'active': True},
-               {'name': 'frank', 'number': 6, 'active': True},
-               {'name': 'hillary', 'number': 7, 'active': True}]
+               {'name': 'ken', 'number': 4, 'active': False},
+               {'name': 'charles', 'number': 5, 'active': False},
+               {'name': 'frank', 'number': 6, 'active': False},
+               {'name': 'hillary', 'number': 7, 'active': False},
+               {'name': 'kazutsugi', 'number': 8, 'active': True}]
 
 
 def tournament_int(tournament_int_or_str):
@@ -14,7 +15,7 @@ def tournament_int(tournament_int_or_str):
     if nx.isstring(tournament_int_or_str):
         return tournament_str2int(tournament_int_or_str)
     elif nx.isint(tournament_int_or_str):
-        numbers = nx.tournament_numbers(active_only=False)
+        numbers = nx.tournament_numbers(active_only=True)
         if tournament_int_or_str not in numbers:
             raise ValueError("`tournament_int_or_str` not recognized")
         return tournament_int_or_str
@@ -24,7 +25,7 @@ def tournament_int(tournament_int_or_str):
 def tournament_str(tournament_int_or_str):
     "Convert tournament int or str to str"
     if nx.isstring(tournament_int_or_str):
-        if tournament_int_or_str not in nx.tournament_names(active_only=False):
+        if tournament_int_or_str not in nx.tournament_names(active_only=True):
             raise ValueError('tournament name is unknown')
         return tournament_int_or_str
     elif nx.isint(tournament_int_or_str):
@@ -54,7 +55,7 @@ def tournament_iter(active_only=True):
 
 def tournament_int2str(tournament_int):
     "Convert tournament integer to string name"
-    if tournament_int not in nx.tournament_numbers(active_only=False):
+    if tournament_int not in nx.tournament_numbers(active_only=True):
         raise ValueError("`tournament_int` not recognized")
     for tourney in TOURNAMENTS:
         if tourney['number'] == tournament_int:
@@ -64,7 +65,7 @@ def tournament_int2str(tournament_int):
 
 def tournament_str2int(tournament_str):
     "Convert tournament name (as str) to tournament integer"
-    if tournament_str not in nx.tournament_names(active_only=False):
+    if tournament_str not in nx.tournament_names(active_only=True):
         raise ValueError('`tournament_str` name not recognized')
     for tourney in TOURNAMENTS:
         if tourney['name'] == tournament_str:

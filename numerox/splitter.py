@@ -176,7 +176,7 @@ class IgnoreEraCVSplitter(Splitter):
                                  random_state=self.p['seed'],
                                  shuffle=True)
             y = data.y[self.p['tournament']]
-            self.cv = cv.split(data.x, y)
+            self.cv = cv.split(data.x, np.int32(4*y))
         if sys.version_info[0] == 2:
             fit_index, pre_index = self.cv.next()
         else:

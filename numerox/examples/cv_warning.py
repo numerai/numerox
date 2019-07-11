@@ -2,7 +2,7 @@ import pandas as pd
 import numerox as nx
 
 
-def cv_warning(model, data, tournament='bernie', kfold=5, nsamples=100):
+def cv_warning(model, data, tournament='kazutsugi', kfold=5, nsamples=100):
     "Hold out a sample of eras not rows when doing cross validation."
 
     data = data['train']

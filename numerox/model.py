@@ -1,10 +1,10 @@
 import numpy as np
-from sklearn.linear_model import LogisticRegression
+from sklearn.linear_model import LinearRegression
 from sklearn.linear_model import Ridge
-from sklearn.neural_network import MLPClassifier as MLPC
-from sklearn.ensemble import ExtraTreesClassifier as ETC
-from sklearn.ensemble import RandomForestClassifier as RFC
-from sklearn.ensemble import GradientBoostingClassifier
+from sklearn.neural_network import MLPRegressor as MLPC
+from sklearn.ensemble import ExtraTreesRegressor as ETC
+from sklearn.ensemble import RandomForestRegressor as RFC
+from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.pipeline import Pipeline
 from sklearn.decomposition import PCA
 
@@ -60,15 +60,12 @@ class Model(object):
 # ---------------------------------------------------------------------------
 # numerox example models
 
-class logistic(Model):
-
-    def __init__(self, inverse_l2=0.0001):
-        self.p = {'inverse_l2': inverse_l2}
+class linear(Model):
 
     def fit_predict(self, dfit, dpre, tournament):
-        model = LogisticRegression(C=self.p['inverse_l2'], solver='liblinear')
+        model = LinearRegression()
         model.fit(dfit.x, dfit.y[tournament])
-        yhat = model.predict_proba(dpre.x)[:, 1]
+        yhat = model.predict(dpre.x)
         return dpre.ids, yhat
 
 
@@ -94,14 +91,14 @@ class extratrees(Model):
                   'seed': seed}
 
     def fit_predict(self, dfit, dpre, tournament):
-        clf = ETC(criterion='gini',
+        clf = ETC(criterion='mse',
                   max_features=self.p['nfeatures'],
                   max_depth=self.p['depth'],
                   n_estimators=self.p['ntrees'],
                   random_state=self.p['seed'],
                   n_jobs=-1)
         clf.fit(dfit.x, dfit.y[tournament])
-        yhat = clf.predict_proba(dpre.x)[:, 1]
+        yhat = clf.predict(dpre.x)
         return dpre.ids, yhat
 
 
@@ -114,14 +111,14 @@ class randomforest(Model):
                   'seed': seed}
 
     def fit_predict(self, dfit, dpre, tournament):
-        clf = RFC(criterion='gini',
+        clf = RFC(criterion='mse',
                   max_features=self.p['max_features'],
                   max_depth=self.p['depth'],
                   n_estimators=self.p['ntrees'],
                   random_state=self.p['seed'],
                   n_jobs=-1)
         clf.fit(dfit.x, dfit.y[tournament])
-        yhat = clf.predict_proba(dpre.x)[:, 1]
+        yhat = clf.predict(dpre.x)
         return dpre.ids, yhat
 
 
@@ -143,7 +140,7 @@ class mlpc(Model):
                    random_state=self.p['seed'],
                    max_iter=200)
         clf.fit(dfit.x, dfit.y[tournament])
-        yhat = clf.predict_proba(dpre.x)[:, 1]
+        yhat = clf.predict(dpre.x)
         return dpre.ids, yhat
 
 
@@ -154,27 +151,25 @@ class example_predictions(Model):
         self.p = {}
 
     def fit_predict(self, dfit, dpre, tournament):
-        model = GradientBoostingClassifier(n_estimators=25, max_depth=1,
+        model = GradientBoostingRegressor(n_estimators=25, max_depth=1,
                                            random_state=1776)
         model.fit(dfit.x, dfit.y[tournament])
-        yhat = model.predict_proba(dpre.x)[:, 1]
+        yhat = model.predict(dpre.x)
         yhat = np.round(yhat, 5)
         return dpre.ids, yhat
 
 
 # sklearn pipeline example
-class logisticPCA(Model):
+class linearPCA(Model):
 
-    def __init__(self, nfeatures=10, inverse_l2=1e-4):
-        self.p = {'inverse_l2': inverse_l2,
-                  'nfeatures': nfeatures}
+    def __init__(self, nfeatures=10):
+        self.p = {'nfeatures': nfeatures}
 
     def fit_predict(self, dfit, dpre, tournament):
         pipe = Pipeline([('pca', PCA(n_components=self.p['nfeatures'])),
-                         ("lr", LogisticRegression(C=self.p['inverse_l2'],
-                                                   solver='liblinear'))])
+                         ("lr", LinearRegression())])
         pipe.fit(dfit.x, dfit.y[tournament])
-        yhat = pipe.predict_proba(dpre.x)[:, 1]
+        yhat = pipe.predict(dpre.x)
         return dpre.ids, yhat
 
 

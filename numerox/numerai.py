@@ -11,7 +11,7 @@ import numerox as nx
 from numerox.util import flatten_dict
 from numerox.prediction import CONSISTENCY_GTE
 
-NMR_PRIZE_POOL = 900
+NMR_PRIZE_POOL = 2000
 
 
 # ---------------------------------------------------------------------------

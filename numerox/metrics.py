@@ -3,17 +3,17 @@ import numpy as np
 from scipy.stats import ks_2samp
 
 from sklearn.cluster import MiniBatchKMeans
-from sklearn.metrics import log_loss, roc_auc_score, accuracy_score
 
 import numerox as nx
 from numerox.data import ERA_INT_TO_STR
 from numerox.data import REGION_INT_TO_STR
+from scipy.stats import spearmanr
 
-LOGLOSS_BENCHMARK = 0.693
+CORR_BENCHMARK = 0.002
 
 
 def metrics_per_era(data, prediction, tournament, join='data',
-                    columns=['logloss', 'auc', 'acc', 'ystd'],
+                    columns=['corr', 'mse', 'ystd'],
                     era_as_str=False, region_as_str=False, split_pairs=True):
     "Dataframe with columns era, model, and specified metrics. And region list"
 
@@ -30,7 +30,7 @@ def metrics_per_era(data, prediction, tournament, join='data',
         raise ValueError("`join` method not recognized")
     yhats_df = df.copy()
     cols = ['era', 'region'] + nx.tournament_all(as_str=True,
-                                                 active_only=False)
+                                                 active_only=True)
     data_df = data.df[cols]
     df = pd.merge(data_df, yhats_df, left_index=True, right_index=True,
                   how=how)
@@ -71,15 +71,15 @@ def metrics_per_era(data, prediction, tournament, join='data',
 
 
 def metrics_per_name(data, prediction, tournament, join='data',
-                     columns=['logloss', 'auc', 'acc', 'ystd'],
+                     columns=['corr', 'mse', 'ystd'],
                      era_as_str=True, region_as_str=True, split_pairs=True):
 
     # calc metrics per era
     skip = ['sharpe', 'consis']
     cols = [c for c in columns if c not in skip]
     if 'sharpe' in columns or 'consis' in columns:
-        if 'logloss' not in cols:
-            cols.append('logloss')
+        if 'corr' not in cols:
+            cols.append('corr')
     mpe, regions = metrics_per_era(data, prediction, tournament, join=join,
                                    columns=cols)
 
@@ -92,12 +92,12 @@ def metrics_per_name(data, prediction, tournament, join='data',
     if region_as_str:
         info['region'] = [REGION_INT_TO_STR[r] for r in info['region']]
 
-    if 'logloss' in cols:
+    if 'corr' in cols:
         # pivot is a dataframe with:
         #     era for rows
         #     pair for columns
-        #     logloss for cell values
-        pivot = mpe.pivot(index='era', columns='pair', values='logloss')
+        #     corr for cell values
+        pivot = mpe.pivot(index='era', columns='pair', values='corr')
 
     # mm is a dataframe with:
     #    pair as rows
@@ -111,15 +111,13 @@ def metrics_per_name(data, prediction, tournament, join='data',
 
     for col in columns:
         if col == 'consis':
-            m = (pivot < LOGLOSS_BENCHMARK).mean(axis=0)
+            m = (pivot > CORR_BENCHMARK).mean(axis=0)
         elif col == 'sharpe':
-            m = (LOGLOSS_BENCHMARK - pivot).mean(axis=0) / pivot.std(axis=0)
-        elif col == 'logloss':
-            m = mm['logloss']
-        elif col == 'auc':
-            m = mm['auc']
-        elif col == 'acc':
-            m = mm['acc']
+            m = (pivot - CORR_BENCHMARK).mean(axis=0) / pivot.std(axis=0)
+        elif col == 'corr':
+            m = mm['corr']
+        elif col == 'mse':
+            m = mm['mse']
         elif col == 'ystd':
             m = mm['ystd']
         else:
@@ -139,26 +137,19 @@ def calc_metrics_arrays(y, yhat, columns):
     yhat = yhat[idx]
     metrics = []
     for col in columns:
-        if col == 'logloss':
+        if col == 'corr':
             try:
-                m = log_loss(y, yhat)
+                m = spearmanr(y, yhat).correlation
             except ValueError:
                 m = np.nan
-        elif col == 'logloss_pass':
+        elif col == 'corr_pass':
             try:
-                m = log_loss(y, yhat) < LOGLOSS_BENCHMARK
+                m = spearmanr(y, yhat).correlation > CORR_BENCHMARK
             except ValueError:
                 m = np.nan
-        elif col == 'auc':
+        elif col == 'mse':
             try:
-                m = roc_auc_score(y, yhat)
-            except ValueError:
-                m = np.nan
-        elif col == 'acc':
-            yh = np.zeros(yhat.size)
-            yh[yhat >= 0.5] = 1
-            try:
-                m = accuracy_score(y, yh)
+                m = np.mean((y - yhat)**2)
             except ValueError:
                 m = np.nan
         elif col == 'ymin':
