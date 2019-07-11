@@ -12,8 +12,13 @@ CORR_BENCHMARK = 0.002
 
 
 def score_correlation(labels, predictions):
-    ranked_predictions = predictions.rank(pct=True, method='first')
-    return np.corrcoef(labels, ranked_predictions)[0, 1]
+    if type(predictions) is not pd.core.frame.DataFrame:
+        predictions_df = pd.DataFrame(predictions)
+    else:
+        predictions_df = predictions
+    ranked_predictions = predictions_df.rank(pct=True, method='first')
+
+    return np.corrcoef(labels, np.array(ranked_predictions)[:,0])[0, 1]
 
 
 def metrics_per_era(data, prediction, tournament, join='data',
