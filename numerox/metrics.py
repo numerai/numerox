@@ -7,9 +7,13 @@ from sklearn.cluster import MiniBatchKMeans
 import numerox as nx
 from numerox.data import ERA_INT_TO_STR
 from numerox.data import REGION_INT_TO_STR
-from scipy.stats import spearmanr
 
 CORR_BENCHMARK = 0.002
+
+
+def score_correlation(labels, predictions):
+    ranked_predictions = predictions.rank(pct=True, method='first')
+    return np.corrcoef(labels, ranked_predictions)[0, 1]
 
 
 def metrics_per_era(data, prediction, tournament, join='data',
@@ -139,12 +143,12 @@ def calc_metrics_arrays(y, yhat, columns):
     for col in columns:
         if col == 'corr':
             try:
-                m = spearmanr(y, yhat).correlation
+                m = score_correlation(y, yhat)
             except ValueError:
                 m = np.nan
         elif col == 'corr_pass':
             try:
-                m = spearmanr(y, yhat).correlation > CORR_BENCHMARK
+                m = score_correlation(y, yhat) > CORR_BENCHMARK
             except ValueError:
                 m = np.nan
         elif col == 'mse':
