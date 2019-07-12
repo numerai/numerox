@@ -3,6 +3,11 @@
 Release Notes
 =============
 
+- v4.0.0
+
+  * Add new `kazutsugi` tournament
+  * Add support for new data format
+
 - v3.7.0
 
   * Add concept of active and inactive tournaments
@@ -13,8 +18,8 @@ Release Notes
 
 - v3.6.0
 
-  * Handle 7-tournament format that begins in round 138 
-  * Remove ``Leaderboard`` and ``Report`` classes 
+  * Handle 7-tournament format that begins in round 138
+  * Remove ``Leaderboard`` and ``Report`` classes
 
 - v3.5.0
 

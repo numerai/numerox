@@ -11,7 +11,7 @@ import numerox as nx
 from numerox.metrics import metrics_per_era
 from numerox.metrics import metrics_per_name
 from numerox.metrics import concordance
-from numerox.metrics import LOGLOSS_BENCHMARK
+from numerox.metrics import CORR_BENCHMARK
 from numerox.metrics import add_split_pairs
 from numerox.util import is_none_slice
 
@@ -364,8 +364,8 @@ class Prediction(object):
         # additional metrics
         region_str = ', '.join(regions)
         nera = metrics.shape[0]
-        logloss = metrics['logloss']
-        consis = (logloss < LOGLOSS_BENCHMARK).mean()
+        corr = metrics['corr']
+        consis = (corr > CORR_BENCHMARK).mean()
 
         # summary of metrics
         if tournament is None:
@@ -386,7 +386,7 @@ class Prediction(object):
 
         # make output (optionally) pretty
         if round_output:
-            round_dict = {'logloss': 6, 'auc': 4, 'acc': 4, 'ystd': 4}
+            round_dict = {'corr': 6, 'mse': 4, 'ystd': 4}
             df = df.round(decimals=round_dict)
 
         return df
@@ -403,7 +403,7 @@ class Prediction(object):
                 print(df_dict[pair])
         return df_dict
 
-    def metric_per_era(self, data, tournament=None, metric='logloss',
+    def metric_per_era(self, data, tournament=None, metric='corr',
                        era_as_str=True, split_pairs=True):
         "DataFrame containing given metric versus era (as index)"
         df = self.metrics_per_era(data, tournament=tournament,
@@ -414,7 +414,7 @@ class Prediction(object):
         return df
 
     def metrics_per_era(self, data, tournament=None,
-                        metrics=['logloss', 'auc', 'acc', 'ystd'],
+                        metrics=['corr', 'mse', 'ystd'],
                         era_as_str=True, split_pairs=True):
         "DataFrame containing given metrics versus era (as index)"
         metrics, regions = metrics_per_era(data, self, tournament,
@@ -430,7 +430,7 @@ class Prediction(object):
             metrics = metrics.drop('pair', axis=1)
         return metrics
 
-    def metric_per_tournament(self, data, metric='logloss'):
+    def metric_per_tournament(self, data, metric='corr'):
         "DataFrame containing given metric versus tournament"
         dfs = []
         for t_int, t_name in nx.tournament_iter(active_only=False):
@@ -446,8 +446,8 @@ class Prediction(object):
 
     def performance(self, data, tournament=None, era_as_str=True,
                     region_as_str=True,
-                    columns=['logloss', 'auc', 'acc', 'ystd', 'sharpe',
-                             'consis'], sort_by='logloss'):
+                    columns=['corr', 'mse', 'ystd', 'sharpe',
+                             'consis'], sort_by='corr'):
         df, info = metrics_per_name(data,
                                     self,
                                     tournament,
@@ -455,12 +455,10 @@ class Prediction(object):
                                     era_as_str=era_as_str,
                                     region_as_str=region_as_str)
         if sort_by in columns:
-            if sort_by == 'logloss':
-                df = df.sort_values(by='logloss', ascending=True)
-            elif sort_by == 'auc':
-                df = df.sort_values(by='auc', ascending=False)
-            elif sort_by == 'acc':
-                df = df.sort_values(by='acc', ascending=False)
+            if sort_by == 'corr':
+                df = df.sort_values(by='corr', ascending=True)
+            elif sort_by == 'mse':
+                df = df.sort_values(by='mse', ascending=False)
             elif sort_by == 'ystd':
                 df = df.sort_values(by='ystd', ascending=False)
             elif sort_by == 'sharpe':
@@ -468,8 +466,8 @@ class Prediction(object):
             elif sort_by == 'consis':
                 by = ['consis']
                 ascending = [False]
-                if 'logloss' in df:
-                    by.append('logloss')
+                if 'corr' in df:
+                    by.append('corr')
                     ascending.append('True')
                 df = df.sort_values(by=by, ascending=ascending)
             else:
@@ -478,8 +476,8 @@ class Prediction(object):
 
     def performance_mean(self, data, mean_of='name', era_as_str=True,
                          region_as_str=True,
-                         columns=['logloss', 'auc', 'acc', 'ystd', 'sharpe',
-                                  'consis'], sort_by='logloss'):
+                         columns=['corr', 'mse', 'ystd', 'sharpe',
+                                  'consis'], sort_by='corr'):
         "Mean performance averaged across names (default) or tournaments,"
         df = self.performance(data, era_as_str=era_as_str,
                               region_as_str=region_as_str, columns=columns)
@@ -496,12 +494,10 @@ class Prediction(object):
         else:
             raise ValueError("`across` must be 'name' or 'tournament'")
         if sort_by in columns:
-            if sort_by == 'logloss':
-                df = df.sort_values(by='logloss', ascending=True)
-            elif sort_by == 'auc':
-                df = df.sort_values(by='auc', ascending=False)
-            elif sort_by == 'acc':
-                df = df.sort_values(by='acc', ascending=False)
+            if sort_by == 'corr':
+                df = df.sort_values(by='corr', ascending=True)
+            elif sort_by == 'mse':
+                df = df.sort_values(by='mse', ascending=False)
             elif sort_by == 'ystd':
                 df = df.sort_values(by='ystd', ascending=False)
             elif sort_by == 'sharpe':
@@ -509,17 +505,17 @@ class Prediction(object):
             elif sort_by == 'consis':
                 by = ['consis']
                 ascending = [False]
-                if 'logloss' in df:
-                    by.append('logloss')
+                if 'corr' in df:
+                    by.append('corr')
                     ascending.append('True')
                 df = df.sort_values(by=by, ascending=ascending)
             else:
                 raise ValueError("`sort_by` method not recognized")
         return df
 
-    def dominance(self, data, tournament=None, sort_by='logloss'):
+    def dominance(self, data, tournament=None, sort_by='corr'):
         "Mean (across eras) of fraction of models bested per era"
-        columns = ['logloss', 'auc', 'acc']
+        columns = ['corr', 'mse']
         mpe, regions = metrics_per_era(data, self, tournament, columns=columns)
         dfs = []
         for i, col in enumerate(columns):
@@ -531,7 +527,7 @@ class Prediction(object):
                 raise ValueError("Must have at least two pairs")
             m = []
             for j in range(pivot.shape[1]):
-                if col == 'logloss':
+                if col == 'corr':
                     z = (a[:, j].reshape(-1, 1) < a).sum(axis=1) / n
                 else:
                     z = (a[:, j].reshape(-1, 1) > a).sum(axis=1) / n
@@ -619,7 +615,7 @@ class Prediction(object):
         for pair in self.pairs(as_str=False):
             if pair in prediction:
                 pairs.append(pair)
-        cols = ['logloss1', 'logloss2', 'win1',
+        cols = ['corr1', 'corr2', 'win1',
                 'corr', 'maxdiff', 'ystd1', 'ystd2']
         comp = pd.DataFrame(columns=cols, index=pairs)
         if len(pairs) == 0:
@@ -629,9 +625,9 @@ class Prediction(object):
         df2 = prediction.loc[ids]
         p1 = self[pairs]
         p2 = prediction[pairs]
-        m1 = p1.metrics_per_era(data, tournament, metrics=['logloss'],
+        m1 = p1.metrics_per_era(data, tournament, metrics=['corr'],
                                 era_as_str=False)
-        m2 = p2.metrics_per_era(data, tournament, metrics=['logloss'],
+        m2 = p2.metrics_per_era(data, tournament, metrics=['corr'],
                                 era_as_str=False)
         for i, pair in enumerate(pairs):
 
@@ -643,9 +639,9 @@ class Prediction(object):
             if (m1i.index != m2i.index).any():
                 raise IndexError("Can only handle aligned eras")
 
-            logloss1 = m1i.logloss.mean()
-            logloss2 = m2i.logloss.mean()
-            win1 = (m1i.logloss < m2i.logloss).mean()
+            corr1 = m1i['corr'].mean()
+            corr2 = m2i['corr'].mean()
+            win1 = (m1i['corr'] < m2i['corr']).mean()
 
             y1 = df1[pair].y.reshape(-1)
             y2 = df2[pair].y.reshape(-1)
@@ -655,7 +651,7 @@ class Prediction(object):
             ystd1 = y1.std()
             ystd2 = y2.std()
 
-            m = [logloss1, logloss2, win1, corr, maxdiff, ystd1, ystd2]
+            m = [corr1, corr2, win1, corr, maxdiff, ystd1, ystd2]
             comp.iloc[i] = m
 
         comp = add_split_pairs(comp)

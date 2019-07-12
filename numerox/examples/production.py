@@ -14,13 +14,13 @@ def numerox_example():
     data = nx.download('numerai_dataset.zip')
 
     # we will use logistic regression; you will want to write your own model
-    model = nx.logistic()
+    model = nx.linear()
 
     # fit model with train data and make predictions for tournament data
-    prediction = nx.production(model, data, tournament='bernie')
+    prediction = nx.production(model, data, tournament='kazutsugi')
 
     # save predictions to csv file
-    prediction.to_csv('logistic.csv', verbose=True)
+    prediction.to_csv('linear.csv', verbose=True)
 
     # upload predictions to Numerai to enter the tournament
     # create the public_id and secret_key on the Numerai website

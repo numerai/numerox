@@ -2,7 +2,7 @@ import numpy as np
 import numerox as nx
 
 
-def improve_model(data, tournament='bernie'):
+def improve_model(data, tournament='kazutsugi'):
     """
     Run multiple models: fit on training data, predict for tournament data.
     Then change the data, rerun and compare performance with and without the
@@ -10,8 +10,8 @@ def improve_model(data, tournament='bernie'):
     """
 
     # we'll look at 5 models
-    models = [nx.logistic(), nx.extratrees(), nx.randomforest(), nx.mlpc(),
-              nx.logisticPCA()]
+    models = [nx.linear(), nx.extratrees(), nx.randomforest(), nx.mlpc(),
+              nx.linearPCA()]
 
     print('\nStandard dataset:\n')
 

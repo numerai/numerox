@@ -11,7 +11,7 @@ import numerox as nx
 from numerox.util import flatten_dict
 from numerox.prediction import CONSISTENCY_GTE
 
-NMR_PRIZE_POOL = 900
+NMR_PRIZE_POOL = 2000
 
 
 # ---------------------------------------------------------------------------
@@ -38,7 +38,7 @@ def download(filename, load=True, n_tries=100, sleep_seconds=300,
             if verbose:
                 print("Download dataset {}".format(filename))
             napi = NumerAPI()
-            url = napi.get_dataset_url(tournament=1)
+            url = napi.get_dataset_url(tournament=8)
             download_file(url, filename)
             break
         except: # noqa

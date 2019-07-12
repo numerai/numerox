@@ -22,7 +22,7 @@ def run_all_examples(data=None):
 
     cv_warning = nx.examples.cv_warning
     print_source(cv_warning)
-    cv_warning(nx.logistic(), data['train'], nsamples=2)
+    cv_warning(nx.linear(), data['train'], nsamples=2)
 
 
 def print_source(func):
