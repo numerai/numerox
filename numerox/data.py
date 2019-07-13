@@ -253,7 +253,7 @@ class Data(object):
     def y_to_nan(self):
         "Copy of data with y values set to NaN"
         data = self.copy()
-        for number, name in nx.tournament_iter(active_only=True):
+        for name in nx.tournament_iter(active_only=True):
             kwargs = {name: np.nan}
             data.df = data.df.assign(**kwargs)
         return data

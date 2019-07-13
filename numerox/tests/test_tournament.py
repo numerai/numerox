@@ -32,7 +32,7 @@ def test_tournament_str():
         t_str2 = nx.tournament_str(t_str)
         ok_(t_str2 == t_str, "tournament str do not agree")
     assert_raises(ValueError, nx.tournament_str, 0)
-    assert_raises(ValueError, nx.tournament_str, 8)
+    assert_raises(ValueError, nx.tournament_str, 9)
     assert_raises(ValueError, nx.tournament_str, 'burn')
     assert_raises(ValueError, nx.tournament_str, None)
 
