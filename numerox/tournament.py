@@ -56,7 +56,7 @@ def tournament_iter(active_only=True):
 def tournament_int2str(tournament_int):
     "Convert tournament integer to string name"
     if tournament_int not in nx.tournament_numbers(active_only=True):
-        raise ValueError("`tournament_int` not recognized")
+        raise ValueError("`tournament_int` {} not recognized".format(tournament_int))
     for tourney in TOURNAMENTS:
         if tourney['number'] == tournament_int:
             return tourney['name']
