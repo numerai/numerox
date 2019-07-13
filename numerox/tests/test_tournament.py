@@ -39,7 +39,7 @@ def test_tournament_str():
 
 def test_tournament_all():
     "test tournament_all"
-    
+
     t = ['bernie', 'elizabeth', 'jordan', 'ken', 'charles', 'frank', 'hillary']
     ok_(nx.tournament_all(active_only=False) == t, 'wrong tournaments')
     ok_(nx.tournament_all(True, active_only=False) == t, 'wrong tournaments')
