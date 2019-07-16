@@ -50,12 +50,12 @@ def tournament_iter(active_only=True):
     numbers = nx.tournament_numbers(active_only)
     numbers.sort()
     for t in numbers:
-        yield t, tournament_int2str(t)
+        yield t, tournament_int2str(t, active_only)
 
 
-def tournament_int2str(tournament_int):
+def tournament_int2str(tournament_int, active_only=True):
     "Convert tournament integer to string name"
-    if tournament_int not in nx.tournament_numbers(active_only=True):
+    if tournament_int not in nx.tournament_numbers(active_only):
         raise ValueError("`tournament_int` {} not recognized".format(tournament_int))
     for tourney in TOURNAMENTS:
         if tourney['number'] == tournament_int:
@@ -63,9 +63,9 @@ def tournament_int2str(tournament_int):
     raise RuntimeError("Did not find tournament name")
 
 
-def tournament_str2int(tournament_str):
+def tournament_str2int(tournament_str, active_only=True):
     "Convert tournament name (as str) to tournament integer"
-    if tournament_str not in nx.tournament_names(active_only=True):
+    if tournament_str not in nx.tournament_names(active_only):
         raise ValueError('`tournament_str` name not recognized')
     for tourney in TOURNAMENTS:
         if tourney['name'] == tournament_str:
