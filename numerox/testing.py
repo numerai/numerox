@@ -59,7 +59,7 @@ def micro_data(index=None):
     # Add Kazutsugi here 
     cols = ['era', 'region', 'x1', 'x2', 'x3',
             'bernie', 'elizabeth', 'jordan', 'ken', 'charles', 'frank',
-            'hillary']    
+            'hillary']
     df = pd.DataFrame(columns=cols)
     d0 = ['era1', 'train']      + [0.00, 0.01, 0.02] + [0., 0., 1., 1., 0., 0., 0.]
     d1 = ['era2', 'train']      + [0.10, 0.11, 0.12] + [1, 1, 1, 1, 0, 0, 1]
