@@ -2,12 +2,12 @@ from nose.tools import ok_
 from nose.tools import assert_raises
 
 import numerox as nx
-from numerox.tournament import tournament_int2str, tournament_str2int
+from numerox.tournament import tournament_numbers, tournament_int2str, tournament_str2int
 
 
 def test_tournament():
     "Roundtrip of tournament_int2str and tournament_str2int"
-    for i in range(1, 8):
+    for i in tournament_numbers():
         t = tournament_str2int(tournament_int2str(i))
         ok_(t == i, 'tournament corrupted during round trip')
 
@@ -39,15 +39,15 @@ def test_tournament_str():
 
 def test_tournament_all():
     "test tournament_all"
-
-    t = ['bernie', 'elizabeth', 'jordan', 'ken', 'charles', 'frank', 'hillary']
+    # Testing all tournaments
+    t = ['bernie', 'elizabeth', 'jordan', 'ken', 'charles', 'frank', 'hillary', 'kazutsugi']
     ok_(nx.tournament_all(active_only=False) == t, 'wrong tournaments')
     ok_(nx.tournament_all(True, active_only=False) == t, 'wrong tournaments')
-    t = [1, 2, 3, 4, 5, 6, 7]
+    t = [1, 2, 3, 4, 5, 6, 7, 8]
     ok_(nx.tournament_all(False, active_only=False) == t, 'wrong tournaments')
-
-    t = ['bernie', 'ken', 'charles', 'frank', 'hillary']
+    # Testing all active tournaments
+    t = ['kazutsugi']
     ok_(nx.tournament_all() == t, 'wrong tournaments')
     ok_(nx.tournament_all(True) == t, 'wrong tournaments')
-    t = [1, 4, 5, 6, 7]
+    t = [8]
     ok_(nx.tournament_all(False) == t, 'wrong tournaments')
