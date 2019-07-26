@@ -435,8 +435,8 @@ class Prediction(object):
         dfs = []
         for t_int, t_name in nx.tournament_iter(active_only=False):
             df, info = metrics_per_name(data, self, t_int,
-                                            columns=[metric],
-                                            split_pairs=False)
+                                        columns=[metric],
+                                        split_pairs=False)
             df.columns = [t_name]
             dfs.append(df)
         df = pd.concat(dfs, axis=1)

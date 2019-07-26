@@ -691,8 +691,8 @@ class Y(object):
                 raise IndexError(idx_err)
         elif nx.isint(index):
             if index < 1 or index > n:
-                txt = 'tournament #`{}` must be between 1 and {}'.format(index, n)
-                raise IndexError(txt)
+                txt = 'tournament #`{}` must be between 1 and {}'
+                raise IndexError(txt.format(index, n))
             return self2.df[nx.tournament_str(index)].values
         elif isinstance(index, slice):
             if (index.start is None and index.stop is None and
