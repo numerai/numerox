@@ -687,11 +687,12 @@ class Y(object):
             if index in nx.tournament_all(as_str=True, active_only=True):
                 return self2.df[index].values
             else:
-                raise IndexError('string index `{}` not recognized'.format(index))
+                idx_err = 'string index `{}` not recognized'.format(index)
+                raise IndexError(idx_err)
         elif nx.isint(index):
             if index < 1 or index > n:
-                txt = 'tournament number `{}` must be between 1 and {}'.format(index, n)
-                raise IndexError(txt.format(n))
+                txt = 'tournament #`{}` must be between 1 and {}'.format(index, n)
+                raise IndexError(txt)
             return self2.df[nx.tournament_str(index)].values
         elif isinstance(index, slice):
             if (index.start is None and index.stop is None and

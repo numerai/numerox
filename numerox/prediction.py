@@ -434,11 +434,11 @@ class Prediction(object):
         "DataFrame containing given metric versus tournament"
         dfs = []
         for t_int, t_name in nx.tournament_iter(active_only=False):
-                df, info = metrics_per_name(data, self, t_int,
+            df, info = metrics_per_name(data, self, t_int,
                                             columns=[metric],
                                             split_pairs=False)
-                df.columns = [t_name]
-                dfs.append(df)
+            df.columns = [t_name]
+            dfs.append(df)
         df = pd.concat(dfs, axis=1)
         df.insert(df.shape[1], 'mean', df.mean(axis=1))
         df = df.sort_values('mean')

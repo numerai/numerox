@@ -18,7 +18,7 @@ def score_correlation(labels, predictions):
         predictions_df = predictions
     ranked_predictions = predictions_df.rank(pct=True, method='first')
 
-    return np.corrcoef(labels, np.array(ranked_predictions)[:,0])[0, 1]
+    return np.corrcoef(labels, np.array(ranked_predictions)[:, 0])[0, 1]
 
 
 def metrics_per_era(data, prediction, tournament, join='data',

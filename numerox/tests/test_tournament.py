@@ -2,7 +2,9 @@ from nose.tools import ok_
 from nose.tools import assert_raises
 
 import numerox as nx
-from numerox.tournament import tournament_numbers, tournament_int2str, tournament_str2int
+from numerox.tournament import tournament_numbers
+from numerox.tournament import tournament_int2str
+from numerox.tournament import tournament_str2int
 
 
 def test_tournament():
@@ -40,7 +42,8 @@ def test_tournament_str():
 def test_tournament_all():
     "test tournament_all"
     # Testing all tournaments
-    t = ['bernie', 'elizabeth', 'jordan', 'ken', 'charles', 'frank', 'hillary', 'kazutsugi']
+    t = ['bernie', 'elizabeth', 'jordan', 'ken', 'charles', 'frank', 'hillary']
+    t.append('kazutsugi')
     ok_(nx.tournament_all(active_only=False) == t, 'wrong tournaments')
     ok_(nx.tournament_all(True, active_only=False) == t, 'wrong tournaments')
     t = [1, 2, 3, 4, 5, 6, 7, 8]

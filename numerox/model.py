@@ -151,8 +151,9 @@ class example_predictions(Model):
         self.p = {}
 
     def fit_predict(self, dfit, dpre, tournament):
-        model = GradientBoostingRegressor(n_estimators=25, max_depth=1,
-                                           random_state=1776)
+        model = GradientBoostingRegressor(n_estimators=25, 
+                                          max_depth=1,
+                                          random_state=1776)
         model.fit(dfit.x, dfit.y[tournament])
         yhat = model.predict(dpre.x)
         yhat = np.round(yhat, 5)
