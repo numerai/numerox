@@ -387,9 +387,9 @@ def test_prediction_performance_mean():
 def test_prediction_regression():
     "regression test of prediction performance evaluation"
     d = nx.play_data()
-    p = nx.production(nx.logistic(), d, tournament=None, verbosity=0)
+    p = nx.production(nx.linear(), d, tournament=None, verbosity=0)
     for number, name in nx.tournament_iter():
-        p2 = nx.production(nx.logistic(), d, tournament=name, verbosity=0)
+        p2 = nx.production(nx.linear(), d, tournament=name, verbosity=0)
         df = p.performance_mean(d['validation'], mean_of='tournament')
         logloss1 = df.loc[name]['logloss']
         logloss2 = p2.summary(d['validation']).loc['mean']['logloss']
@@ -428,7 +428,7 @@ def test_prediction_correlation():
 def test_prediction_check():
     "make sure prediction.check runs"
     d = nx.play_data()
-    p1 = nx.production(nx.logistic(), d, 'ken', verbosity=0)
+    p1 = nx.production(nx.linear(), d, 'ken', verbosity=0)
     p2 = p1.copy()
     p2 = p2.rename('example_predictions')
     p = p1 + p2
@@ -440,7 +440,7 @@ def test_prediction_check():
 def test_prediction_concordance():
     "make sure prediction.concordance runs"
     d = nx.testing.play_data()
-    p = nx.production(nx.logistic(), d, 3, verbosity=0)
+    p = nx.production(nx.linear(), d, 3, verbosity=0)
     df = p.concordance(d)
     ok_(isinstance(df, pd.DataFrame), 'expecting a dataframe')
 
@@ -457,16 +457,16 @@ def test_prediction_setitem():
     "compare prediction._setitem__ with merge"
 
     data = nx.play_data()
-    p1 = nx.production(nx.logistic(), data, 'bernie', verbosity=0)
-    p2 = nx.production(nx.logistic(1e-5), data, 2,  verbosity=0)
-    p3 = nx.production(nx.logistic(1e-6), data, 3,  verbosity=0)
-    p4 = nx.backtest(nx.logistic(), data, 4,  verbosity=0)
+    p1 = nx.production(nx.linear(), data, 'bernie', verbosity=0)
+    p2 = nx.production(nx.linear(1e-5), data, 2,  verbosity=0)
+    p3 = nx.production(nx.linear(1e-6), data, 3,  verbosity=0)
+    p4 = nx.backtest(nx.linear(), data, 4,  verbosity=0)
 
     p = nx.Prediction()
-    p[('logistic', 1)] = p1
-    p[('logistic', 2)] = p2
-    p[('logistic', 3)] = p3
-    p[('logistic', 4)] = p4
+    p[('linear', 1)] = p1
+    p[('linear', 2)] = p2
+    p[('linear', 3)] = p3
+    p[('linear', 4)] = p4
 
     pp = nx.Prediction()
     pp = pp.merge(p1)
@@ -476,8 +476,8 @@ def test_prediction_setitem():
 
     pd.testing.assert_frame_equal(p.df, pp.df)
 
-    assert_raises(ValueError, p.__setitem__, ('logistic', 1), p1)
-    assert_raises(ValueError, p.__setitem__, ('logistic', 1), p)
+    assert_raises(ValueError, p.__setitem__, ('linear', 1), p1)
+    assert_raises(ValueError, p.__setitem__, ('linear', 1), p)
 
 
 def test_prediction_ynew():

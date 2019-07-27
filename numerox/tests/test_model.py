@@ -37,12 +37,12 @@ def test_model_run():
 def test_model_rename():
     "Test renaming a model"
     model = nx.linear()
-    ok_(model.name == 'linear', 'wrong name')
+    ok_(model.name == 'logistic', 'wrong name')
     model.rename('LR')
     ok_(model.name == 'LR', 'wrong name')
     model = model.rename('logreg')
     ok_(model.name == 'logreg', 'wrong name')
     ok_(model.__repr__().startswith('logreg'), 'wrong name')
     model = nx.linear()
-    ok_(model.rename(None).name == 'linear', 'wrong name')
+    ok_(model.rename(None).name == 'linear', 'right name')
     assert_raises(ValueError, model.rename, 1)
