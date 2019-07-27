@@ -8,7 +8,7 @@ from numerox import testing
 def test_run():
     "Make sure run runs"
     d = testing.play_data()
-    models = [nx.logistic(), nx.fifty()]
+    models = [nx.linear(), nx.fifty()]
     splitters = [nx.TournamentSplitter(d),
                  nx.ValidationSplitter(d),
                  nx.CheatSplitter(d),
@@ -32,7 +32,7 @@ def test_multiple_runs():
     "test running multiple models through multiple tournaments"
 
     d = testing.play_data()
-    models = [nx.logistic(), nx.fifty()]
+    models = [nx.linear(), nx.fifty()]
 
     with testing.HiddenPrints():
 
