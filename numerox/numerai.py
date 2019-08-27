@@ -95,6 +95,10 @@ def upload(filename, tournament, public_id, secret_key, block=True,
             print('upload failed')
             time.sleep(sleep_seconds)
         count += 1
+
+    else:
+        raise Exception('Upload failed after reaching max retries')
+
     return upload_id, status
 
 
