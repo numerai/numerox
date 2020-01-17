@@ -18,12 +18,14 @@ NMR_PRIZE_POOL = 2000
 # download dataset
 
 def download(filename, load=True, n_tries=100, sleep_seconds=300,
-             verbose=False):
+             verbose=False, include_train=True, single_precision=False):
     """
     Download current Numerai dataset; overwrites if file exists.
 
     If `load` is True (default) then return data object; otherwise return
-    None.
+    None. It will include train data if `include_train` is True as well.
+
+    Set `single_precision` to True in order to load data in float32 precision.
 
     If download fails then retry download `n_tries` times, pausing
     `sleep_seconds` between each try.
@@ -46,7 +48,7 @@ def download(filename, load=True, n_tries=100, sleep_seconds=300,
             time.sleep(sleep_seconds)
         count += 1
     if load:
-        data = nx.load_zip(filename, verbose=verbose)
+        data = nx.load_zip(filename, verbose=verbose, include_train=include_train, single_precision=single_precision)
     else:
         data = None
     return data

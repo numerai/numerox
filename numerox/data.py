@@ -563,16 +563,47 @@ def load_data(file_path):
     return Data(df)
 
 
-def load_zip(file_path, verbose=False):
-    "Load numerai dataset from zip archive; return Data"
+def load_zip(file_path, verbose=False, include_train=True, single_precision=False):
+    """
+    Load numerai dataset from zip archive; return Data
+
+    It includes train data by default. To work with tournament data only,
+    set `include_train` to False.
+
+    Set `single_precision` to True in order to have data in float32 (saves memory).
+    """
 
     # load zip
     zf = zipfile.ZipFile(file_path)
-    train = pd.read_csv(zf.open(TRAIN_FILE), header=0, index_col=0)
-    tourn = pd.read_csv(zf.open(TOURNAMENT_FILE), header=0, index_col=0)
 
-    # turn into single dataframe and rename columns
-    df = pd.concat([train, tourn], axis=0)
+    if single_precision:
+        # read first 100 rows to scan types
+        # then replace all float64 types with float32
+        df_test = pd.read_csv(zf.open(TOURNAMENT_FILE), nrows=100, header=0, index_col=0)
+
+        float_cols = [c for c in df_test if df_test[c].dtype == "float64"]
+        float32_cols = {c: np.float32 for c in float_cols}
+
+        tourn = pd.read_csv(zf.open(TOURNAMENT_FILE), header=0, index_col=0, engine='c', dtype=float32_cols)
+
+        if include_train:
+            train = pd.read_csv(zf.open(TRAIN_FILE), header=0, index_col=0, engine='c', dtype=float32_cols)
+            # merge train and tournament data to single dataframe
+            df = pd.concat([train, tourn], axis=0)
+        else:
+            df = tourn
+    else:
+        # regular parsing, float64 will be used
+        tourn = pd.read_csv(zf.open(TOURNAMENT_FILE), header=0, index_col=0)
+
+        if include_train:
+            train = pd.read_csv(zf.open(TRAIN_FILE), header=0, index_col=0)
+            # merge train and tournament data to single dataframe
+            df = pd.concat([train, tourn], axis=0)
+        else:
+            df = tourn
+
+    # rename columns
     rename_map = {'data_type': 'region'}
     for i in range(1, N_FEATURES + 1):
         rename_map['feature' + str(i)] = 'x' + str(i)
@@ -580,11 +611,15 @@ def load_zip(file_path, verbose=False):
         rename_map['target_' + name] = name
     df.rename(columns=rename_map, inplace=True)
 
-    # convert era, region, and labels to np.float64
+    # convert era, region, and labels to np.float32 or np.float64 depending on the mode
     df['era'] = df['era'].map(ERA_STR_TO_FLOAT)
     df['region'] = df['region'].map(REGION_STR_TO_FLOAT)
     n = nx.tournament_count(active_only=True)
-    df.iloc[:, -n:] = df.iloc[:, -n:].astype('float64')
+    if single_precision:
+        df.iloc[:, -n:] = df.iloc[:, -n:].astype('float32')
+        df.iloc[:, 0:2] = df.iloc[:, 0:2].astype('float32')
+    else:
+        df.iloc[:, -n:] = df.iloc[:, -n:].astype('float64')
 
     # no way we did something wrong, right?
     n = 2 + N_FEATURES + nx.tournament_count(active_only=True)
