@@ -16,7 +16,7 @@ N_FEATURES = 310
 ERA_INT_TO_STR = {}
 ERA_STR_TO_INT = {}
 ERA_STR_TO_FLOAT = {}
-for i in range(200):
+for i in range(998):
     name = 'era' + str(i)
     ERA_INT_TO_STR[i] = name
     ERA_STR_TO_INT[name] = i
