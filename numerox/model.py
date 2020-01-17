@@ -9,7 +9,6 @@ from sklearn.pipeline import Pipeline
 from sklearn.decomposition import PCA
 
 import numerox as nx
-
 """
 
 Here are the directions for making your own model:
@@ -18,12 +17,11 @@ https://github.com/kwgoodman/numerox/blob/master/numerox/examples/model.rst
 
 """
 
-
 # ---------------------------------------------------------------------------
 # base class for all models
 
-class Model(object):
 
+class Model(object):
     def __repr__(self):
         model = self.name
         msg = ""
@@ -60,8 +58,8 @@ class Model(object):
 # ---------------------------------------------------------------------------
 # numerox example models
 
-class linear(Model):
 
+class linear(Model):
     def fit_predict(self, dfit, dpre, tournament):
         model = LinearRegression()
         model.fit(dfit.x, dfit.y[tournament])
@@ -70,7 +68,6 @@ class linear(Model):
 
 
 class ridge_mean(Model):
-
     def __init__(self, alpha=6):
         self.p = {'alpha': alpha}
 
@@ -83,12 +80,13 @@ class ridge_mean(Model):
 
 
 class extratrees(Model):
-
     def __init__(self, ntrees=100, depth=3, nfeatures=7, seed=0):
-        self.p = {'ntrees': ntrees,
-                  'depth': depth,
-                  'nfeatures': nfeatures,
-                  'seed': seed}
+        self.p = {
+            'ntrees': ntrees,
+            'depth': depth,
+            'nfeatures': nfeatures,
+            'seed': seed
+        }
 
     def fit_predict(self, dfit, dpre, tournament):
         clf = ETC(criterion='mse',
@@ -103,12 +101,13 @@ class extratrees(Model):
 
 
 class randomforest(Model):
-
     def __init__(self, ntrees=100, depth=3, max_features=2, seed=0):
-        self.p = {'ntrees': ntrees,
-                  'depth': depth,
-                  'max_features': max_features,
-                  'seed': seed}
+        self.p = {
+            'ntrees': ntrees,
+            'depth': depth,
+            'max_features': max_features,
+            'seed': seed
+        }
 
     def fit_predict(self, dfit, dpre, tournament):
         clf = RFC(criterion='mse',
@@ -123,14 +122,19 @@ class randomforest(Model):
 
 
 class mlpc(Model):
-
-    def __init__(self, alpha=0.11, layers=[5, 3], activation='tanh',
-                 learn=0.002, seed=0):
-        self.p = {'alpha': alpha,
-                  'layers': layers,
-                  'activation': activation,
-                  'learn': learn,
-                  'seed': seed}
+    def __init__(self,
+                 alpha=0.11,
+                 layers=[5, 3],
+                 activation='tanh',
+                 learn=0.002,
+                 seed=0):
+        self.p = {
+            'alpha': alpha,
+            'layers': layers,
+            'activation': activation,
+            'learn': learn,
+            'seed': seed
+        }
 
     def fit_predict(self, dfit, dpre, tournament):
         clf = MLPC(hidden_layer_sizes=self.p['layers'],
@@ -146,13 +150,13 @@ class mlpc(Model):
 
 # model used by numerai to generate example_predictions.csv
 class example_predictions(Model):
-
     def __init__(self):
         self.p = {}
 
     def fit_predict(self, dfit, dpre, tournament):
-        model = GradientBoostingRegressor(n_estimators=25, max_depth=1,
-                                           random_state=1776)
+        model = GradientBoostingRegressor(n_estimators=25,
+                                          max_depth=1,
+                                          random_state=1776)
         model.fit(dfit.x, dfit.y[tournament])
         yhat = model.predict(dpre.x)
         yhat = np.round(yhat, 5)
@@ -161,7 +165,6 @@ class example_predictions(Model):
 
 # sklearn pipeline example
 class linearPCA(Model):
-
     def __init__(self, nfeatures=10):
         self.p = {'nfeatures': nfeatures}
 
@@ -175,7 +178,6 @@ class linearPCA(Model):
 
 # fast model for testing; always predicts 0.5
 class fifty(Model):
-
     def __init__(self):
         self.p = {}
 

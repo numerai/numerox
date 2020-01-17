@@ -10,8 +10,13 @@ def improve_model(data, tournament='kazutsugi'):
     """
 
     # we'll look at 5 models
-    models = [nx.linear(), nx.extratrees(), nx.randomforest(), nx.mlpc(),
-              nx.linearPCA()]
+    models = [
+        nx.linear(),
+        nx.extratrees(),
+        nx.randomforest(),
+        nx.mlpc(),
+        nx.linearPCA()
+    ]
 
     print('\nStandard dataset:\n')
 

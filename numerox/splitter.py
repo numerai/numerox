@@ -82,10 +82,12 @@ class SplitSplitter(Splitter):
     "Single fit-predict split of data"
 
     def __init__(self, data, fit_fraction, seed=0, train_only=True):
-        self.p = {'data': data,
-                  'fit_fraction': fit_fraction,
-                  'seed': seed,
-                  'train_only': train_only}
+        self.p = {
+            'data': data,
+            'fit_fraction': fit_fraction,
+            'seed': seed,
+            'train_only': train_only
+        }
         self.max_count = 0
         self.reset()
 
@@ -106,10 +108,12 @@ class CVSplitter(Splitter):
     "K-fold cross validation fit-predict splits across train eras"
 
     def __init__(self, data, kfold=5, seed=0, train_only=True):
-        self.p = {'data': data,
-                  'kfold': kfold,
-                  'seed': seed,
-                  'train_only': train_only}
+        self.p = {
+            'data': data,
+            'kfold': kfold,
+            'seed': seed,
+            'train_only': train_only
+        }
         self.eras = None
         self.cv = None
         self.max_count = kfold
@@ -121,7 +125,8 @@ class CVSplitter(Splitter):
             if self.p['train_only']:
                 data = data['train']
             self.eras = data.unique_era()
-            cv = KFold(n_splits=self.p['kfold'], random_state=self.p['seed'],
+            cv = KFold(n_splits=self.p['kfold'],
+                       random_state=self.p['seed'],
                        shuffle=True)
             self.cv = cv.split(self.eras)
         if sys.version_info[0] == 2:
@@ -158,11 +163,13 @@ class IgnoreEraCVSplitter(Splitter):
     "K-fold cross validation fit-predict splits ignoring eras and balancing y"
 
     def __init__(self, data, tournament, kfold=5, seed=0, train_only=True):
-        self.p = {'data': data,
-                  'tournament': tournament,
-                  'kfold': kfold,
-                  'seed': seed,
-                  'train_only': train_only}
+        self.p = {
+            'data': data,
+            'tournament': tournament,
+            'kfold': kfold,
+            'seed': seed,
+            'train_only': train_only
+        }
         self.cv = None
         self.max_count = kfold
         self.reset()
@@ -176,7 +183,7 @@ class IgnoreEraCVSplitter(Splitter):
                                  random_state=self.p['seed'],
                                  shuffle=True)
             y = data.y[self.p['tournament']]
-            self.cv = cv.split(data.x, np.int32(4*y))
+            self.cv = cv.split(data.x, np.int32(4 * y))
         if sys.version_info[0] == 2:
             fit_index, pre_index = self.cv.next()
         else:
@@ -189,13 +196,19 @@ class IgnoreEraCVSplitter(Splitter):
 class RollSplitter(Splitter):
     "Roll forward through consecutive eras to generate fit, train splits"
 
-    def __init__(self, data, fit_window, predict_window, step,
+    def __init__(self,
+                 data,
+                 fit_window,
+                 predict_window,
+                 step,
                  train_only=True):
-        self.p = {'data': data,
-                  'fit_window': fit_window,
-                  'predict_window': predict_window,
-                  'step': step,
-                  'train_only': train_only}
+        self.p = {
+            'data': data,
+            'fit_window': fit_window,
+            'predict_window': predict_window,
+            'step': step,
+            'train_only': train_only
+        }
         self.eras = None
         self.cv = None
         self.max_count = np.inf  # prevent Splitter for stoping iteration
@@ -235,10 +248,12 @@ class ConsecutiveCVSplitter(Splitter):
     "K-fold CV where folds contain mostly consecutive eras"
 
     def __init__(self, data, kfold=5, seed=0, train_only=True):
-        self.p = {'data': data,
-                  'kfold': kfold,
-                  'seed': seed,
-                  'train_only': train_only}
+        self.p = {
+            'data': data,
+            'kfold': kfold,
+            'seed': seed,
+            'train_only': train_only
+        }
         self.eras = None
         self.cv = None
         self.max_count = kfold - 1

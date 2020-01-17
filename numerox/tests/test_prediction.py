@@ -458,9 +458,9 @@ def test_prediction_setitem():
 
     data = nx.play_data()
     p1 = nx.production(nx.logistic(), data, 'bernie', verbosity=0)
-    p2 = nx.production(nx.logistic(1e-5), data, 2,  verbosity=0)
-    p3 = nx.production(nx.logistic(1e-6), data, 3,  verbosity=0)
-    p4 = nx.backtest(nx.logistic(), data, 4,  verbosity=0)
+    p2 = nx.production(nx.logistic(1e-5), data, 2, verbosity=0)
+    p3 = nx.production(nx.logistic(1e-6), data, 3, verbosity=0)
+    p4 = nx.backtest(nx.logistic(), data, 4, verbosity=0)
 
     p = nx.Prediction()
     p[('logistic', 1)] = p1

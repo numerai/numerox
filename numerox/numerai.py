@@ -48,12 +48,15 @@ def download(filename,
             url = napi.get_dataset_url(tournament=8)
             download_file(url, filename)
             break
-        except: # noqa
+        except:  # noqa
             print('download failed')
             time.sleep(sleep_seconds)
         count += 1
     if load:
-        data = nx.load_zip(filename, verbose=verbose, include_train=include_train, single_precision=single_precision)
+        data = nx.load_zip(filename,
+                           verbose=verbose,
+                           include_train=include_train,
+                           single_precision=single_precision)
     else:
         data = None
     return data
@@ -70,8 +73,15 @@ def download_data_object(verbose=False):
 # ---------------------------------------------------------------------------
 # upload submission
 
-def upload(filename, tournament, public_id, secret_key, block=True,
-           n_tries=100, sleep_seconds=60, verbose=False):
+
+def upload(filename,
+           tournament,
+           public_id,
+           secret_key,
+           block=True,
+           n_tries=100,
+           sleep_seconds=60,
+           verbose=False):
     """
     Upload tournament submission (csv file) to Numerai.
 
@@ -88,7 +98,8 @@ def upload(filename, tournament, public_id, secret_key, block=True,
     while count < n_tries:
         try:
 
-            napi = NumerAPI(public_id=public_id, secret_key=secret_key,
+            napi = NumerAPI(public_id=public_id,
+                            secret_key=secret_key,
                             verbosity='warning')
             upload_id = napi.upload_predictions(filename,
                                                 tournament=tournament)
@@ -98,7 +109,7 @@ def upload(filename, tournament, public_id, secret_key, block=True,
                 status = upload_status(upload_id, public_id, secret_key)
             break
 
-        except: # noqa
+        except:  # noqa
             print('upload failed')
             time.sleep(sleep_seconds)
         count += 1
@@ -111,7 +122,8 @@ def upload(filename, tournament, public_id, secret_key, block=True,
 
 def upload_status(upload_id, public_id, secret_key):
     "Dictionary containing the status of upload"
-    napi = NumerAPI(public_id=public_id, secret_key=secret_key,
+    napi = NumerAPI(public_id=public_id,
+                    secret_key=secret_key,
                     verbosity='warning')
     status_raw = napi.submission_status(upload_id)
     status = {}
@@ -143,9 +155,9 @@ def status_block(upload_id, public_id, secret_key, verbose=True):
                 minutes = (t - t0) / 60
                 if verbose:
                     if key in ('originality', 'concordance'):
-                        print(fmt_b.format(key,  str(value), minutes))
+                        print(fmt_b.format(key, str(value), minutes))
                     else:
-                        print(fmt_f.format(key,  value, minutes))
+                        print(fmt_f.format(key, value, minutes))
         if len(status) == len(seen):
             break
         seconds = min(5 + int((t - t0) / 100.0), 30)
@@ -170,14 +182,17 @@ def is_stakeable(status):
 # ---------------------------------------------------------------------------
 # utilities
 
+
 def round_dates():
     "The dates each round was opened and resolved as a Dataframe."
     napi = NumerAPI(verbosity='warn')
     dates = napi.get_competitions(tournament=1)
     dates = pd.DataFrame(dates)[['number', 'openTime', 'resolveTime']]
-    rename_map = {'number': 'round',
-                  'openTime': 'open',
-                  'resolveTime': 'resolve'}
+    rename_map = {
+        'number': 'round',
+        'openTime': 'open',
+        'resolveTime': 'resolve'
+    }
     dates = dates.rename(rename_map, axis=1)
     for item in ('open', 'resolve'):
         date = dates[item].tolist()

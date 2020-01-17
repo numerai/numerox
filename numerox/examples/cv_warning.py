@@ -18,7 +18,9 @@ def cv_warning(model, data, tournament='kazutsugi', kfold=5, nsamples=100):
         results_cve = results_cve.append(df, ignore_index=True)
 
         # cv ignoring eras but y balanced
-        cv = nx.IgnoreEraCVSplitter(data, tournament=tournament, kfold=kfold,
+        cv = nx.IgnoreEraCVSplitter(data,
+                                    tournament=tournament,
+                                    kfold=kfold,
                                     seed=i)
         prediction = nx.run(model, cv, tournament, verbosity=0)
         df = prediction.performance(data, tournament)
@@ -30,5 +32,5 @@ def cv_warning(model, data, tournament='kazutsugi', kfold=5, nsamples=100):
         rcve.name = 'cve'
         rcv.name = 'cv'
         r = pd.concat([rcve, rcv], axis=1)
-        print("\n{} runs".format(i+1))
+        print("\n{} runs".format(i + 1))
         print(r)

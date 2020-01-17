@@ -18,6 +18,9 @@ test:
 flake8:
 	flake8 .
 
+format:
+	yapf --recursive -p -i numerox tests
+
 sdist: clean
 	${PYTHON} setup.py sdist
 	git status
