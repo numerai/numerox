@@ -5,9 +5,16 @@ import numerox as nx
 
 
 def get_models():
-    models = [nx.logistic(), nx.ridge_mean(), nx.extratrees(),
-              nx.randomforest(), nx.mlpc(), nx.logisticPCA(),
-              nx.example_predictions(), nx.fifty()]
+    models = [
+        nx.logistic(),
+        nx.ridge_mean(),
+        nx.extratrees(),
+        nx.randomforest(),
+        nx.mlpc(),
+        nx.logisticPCA(),
+        nx.example_predictions(),
+        nx.fifty()
+    ]
     return models
 
 

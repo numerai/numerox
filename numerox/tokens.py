@@ -65,10 +65,12 @@ def nmr_transactions(addr_str):
 
 def token_price_data(ticker='nmr'):
     "Most recent price (and return) data for given ticker; returns dictionary."
-    tickers = {'nmr': 'numeraire',
-               'btc': 'bitcoin',
-               'eth': 'ethereum',
-               'ltc': 'litecoin'}
+    tickers = {
+        'nmr': 'numeraire',
+        'btc': 'bitcoin',
+        'eth': 'ethereum',
+        'ltc': 'litecoin'
+    }
     if ticker in tickers:
         ticker = tickers[ticker]
     url = 'https://api.coinmarketcap.com/v1/ticker/%s/' % ticker
@@ -86,11 +88,13 @@ def token_price_data(ticker='nmr'):
 
 def historical_price(ticker, one_per_day=False):
     "Historical prices as a dataframe with date as index"
-    tickers = {'nmr': 'currencies/numeraire',
-               'btc': 'currencies/bitcoin',
-               'eth': 'currencies/ethereum',
-               'ltc': 'currencies/litecoin',
-               'mkt': 'global/marketcap-total'}
+    tickers = {
+        'nmr': 'currencies/numeraire',
+        'btc': 'currencies/bitcoin',
+        'eth': 'currencies/ethereum',
+        'ltc': 'currencies/litecoin',
+        'mkt': 'global/marketcap-total'
+    }
     url = 'https://graphs2.coinmarketcap.com/%s'
     r = requests.get(url % tickers[ticker])
     data = r.json()
@@ -111,7 +115,7 @@ def historical_price(ticker, one_per_day=False):
         d = []
         for i in range(len(prices) - 1):
             d1 = dates[i]
-            d2 = dates[i+1]
+            d2 = dates[i + 1]
             if d1 != d2:
                 p.append(prices[i])
                 d.append(d1)

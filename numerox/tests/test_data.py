@@ -180,8 +180,8 @@ def test_data_y_for_tournment():
     d = nx.load_zip(TINY_DATASET_CSV)
     for i in range(1, 6):
         y = np.zeros(14)
-        y[i-1] = 1
-        y[i-1+5] = 1
+        y[i - 1] = 1
+        y[i - 1 + 5] = 1
         y[10:] = np.nan
         yt = d.y[i]
         yt2 = d.y[nx.tournament_str(i)]
@@ -317,8 +317,9 @@ def test_data_properties():
     ok_((d.region_float == d.df.region).all(), "region is corrupted")
 
     idx = ~np.isnan(d.y[:])
-    y = d.df[['bernie', 'elizabeth', 'jordan', 'ken', 'charles', 'frank',
-              'hillary']].values
+    y = d.df[[
+        'bernie', 'elizabeth', 'jordan', 'ken', 'charles', 'frank', 'hillary'
+    ]].values
     ok_((d.y[:][idx] == y[idx]).all(), "y is corrupted")
 
     x = d.x
@@ -375,6 +376,7 @@ def test_data_repr():
 
 # ---------------------------------------------------------------------------
 # data functions
+
 
 def test_concat_data():
     "test concat_data"
