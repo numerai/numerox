@@ -13,12 +13,17 @@ from numerox.prediction import CONSISTENCY_GTE
 
 NMR_PRIZE_POOL = 2000
 
-
 # ---------------------------------------------------------------------------
 # download dataset
 
-def download(filename, load=True, n_tries=100, sleep_seconds=300,
-             verbose=False, include_train=True, single_precision=False):
+
+def download(filename,
+             load=True,
+             n_tries=100,
+             sleep_seconds=300,
+             verbose=False,
+             include_train=True,
+             single_precision=True):
     """
     Download current Numerai dataset; overwrites if file exists.
 
