@@ -563,7 +563,10 @@ def load_data(file_path):
     return Data(df)
 
 
-def load_zip(file_path, verbose=False, include_train=True, single_precision=False):
+def load_zip(file_path,
+             verbose=False,
+             include_train=True,
+             single_precision=True):
     """
     Load numerai dataset from zip archive; return Data
 
