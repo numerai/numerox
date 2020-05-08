@@ -45,7 +45,7 @@ Let's upload our predictions to enter the tournament::
 
     >>> prediction.to_csv('logistic.csv')
     >>> upload_id, status = nx.upload('logistic.csv', 'bernie',
-                                      public_id, secret_key)
+                                      public_id, secret_key, model_id)
     metric                  value   minutes
     concordance              True   0.0898
     consistency              0.75   0.0898
