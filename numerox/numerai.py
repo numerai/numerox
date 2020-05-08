@@ -98,12 +98,18 @@ def upload(filename,
     """
     tournament = nx.tournament_int(tournament)
     count = 0
-    napi = NumerAPI(public_id=public_id, secret_key=secret_key, verbosity='warning')
+    napi = NumerAPI(public_id=public_id,
+                    secret_key=secret_key,
+                    verbosity='warning')
     models = napi.get_models()
     if len(models) > 1 and model_id is None:
-        raise Exception(f"Account has multiple models - you must specify model_id from {models}")
+        raise Exception(
+            f"Account has multiple models - you must specify model_id from {models}"
+        )
     elif model_id not in models.values():
-        raise Exception(f"Specified model_id {model_id} not found in account models {models}")
+        raise Exception(
+            f"Specified model_id {model_id} not found in account models {models}"
+        )
 
     while count < n_tries:
         try:
