@@ -81,9 +81,12 @@ def upload(filename,
            block=True,
            n_tries=100,
            sleep_seconds=60,
-           verbose=False):
+           verbose=False,
+           model_id=None):
     """
     Upload tournament submission (csv file) to Numerai.
+
+    Accounts with multiple models must specify model_id
 
     If upload fails then retry upload `n_tries` times, pausing `sleep_seconds`
     between each try.
@@ -95,14 +98,18 @@ def upload(filename,
     """
     tournament = nx.tournament_int(tournament)
     count = 0
+    napi = NumerAPI(public_id=public_id, secret_key=secret_key, verbosity='warning')
+    models = napi.get_models()
+    if len(models) > 1 and model_id is None:
+        raise Exception(f"Account has multiple models - you must specify model_id from {models}")
+    elif model_id not in models.values():
+        raise Exception(f"Specified model_id {model_id} not found in account models {models}")
+
     while count < n_tries:
         try:
-
-            napi = NumerAPI(public_id=public_id,
-                            secret_key=secret_key,
-                            verbosity='warning')
             upload_id = napi.upload_predictions(filename,
-                                                tournament=tournament)
+                                                tournament=tournament,
+                                                model_id=model_id)
             if block:
                 status = status_block(upload_id, public_id, secret_key)
             else:
