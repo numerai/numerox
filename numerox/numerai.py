@@ -106,7 +106,7 @@ def upload(filename,
         raise Exception(
             f"Account has multiple models - you must specify model_id from {models}"
         )
-    elif model_id not in models.values():
+    elif model_id and model_id not in models.values():
         raise Exception(
             f"Specified model_id {model_id} not found in account models {models}"
         )
