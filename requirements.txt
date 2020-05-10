@@ -3,5 +3,5 @@ scipy
 pandas
 tables
 scikit-learn
-numerapi >= 2.2.0
+numerapi >= 2.2.2
 nose

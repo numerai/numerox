@@ -117,13 +117,13 @@ def upload(filename,
                                                 tournament=tournament,
                                                 model_id=model_id)
             if block:
-                status = status_block(upload_id, public_id, secret_key)
+                status = status_block(upload_id, public_id, secret_key, model_id=model_id)
             else:
-                status = upload_status(upload_id, public_id, secret_key)
+                status = upload_status(upload_id, public_id, secret_key, model_id=model_id)
             break
 
-        except:  # noqa
-            print('upload failed')
+        except Exception as e:  # noqa
+            print('upload failed - %s' % e)
             time.sleep(sleep_seconds)
         count += 1
 
@@ -133,12 +133,12 @@ def upload(filename,
     return upload_id, status
 
 
-def upload_status(upload_id, public_id, secret_key):
+def upload_status(upload_id, public_id, secret_key, model_id=None):
     "Dictionary containing the status of upload"
     napi = NumerAPI(public_id=public_id,
                     secret_key=secret_key,
                     verbosity='warning')
-    status_raw = napi.submission_status(upload_id)
+    status_raw = napi.submission_status(upload_id, model_id=model_id)
     status = {}
     for key, value in status_raw.items():
         if isinstance(value, dict):
@@ -147,7 +147,7 @@ def upload_status(upload_id, public_id, secret_key):
     return status
 
 
-def status_block(upload_id, public_id, secret_key, verbose=True):
+def status_block(upload_id, public_id, secret_key, verbose=True, model_id=None):
     """
     Block until status completes; then return status dictionary.
 
@@ -159,12 +159,17 @@ def status_block(upload_id, public_id, secret_key, verbose=True):
     seen = []
     fmt_f = "{:<19} {:>9.4f}   {:<.4f}"
     fmt_b = "{:<19} {:>9}   {:<.4f}"
-    while True:
-        status = upload_status(upload_id, public_id, secret_key)
+    n_tries = 3
+    count = 0
+    while count < n_tries:
+        count += 1
+        status = upload_status(upload_id, public_id, secret_key, model_id=model_id)
         t = time.time()
         for key, value in status.items():
             if value is not None and key not in seen:
                 seen.append(key)
+                if key == 'filename':
+                    continue
                 minutes = (t - t0) / 60
                 if verbose:
                     if key in ('originality', 'concordance'):
