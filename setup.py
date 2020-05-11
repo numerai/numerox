@@ -41,7 +41,7 @@ REQUIRES = ['numpy',
             'pandas',
             'tables',
             'scikit-learn',
-            'numerapi>=2.2.2',
+            'numerapi>=2.2.4',
             'nose']
 
 
