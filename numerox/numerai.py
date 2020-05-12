@@ -123,8 +123,12 @@ def upload(filename,
             break
 
         except Exception as e:  # noqa
-            print('upload failed - %s' % e)
-            time.sleep(sleep_seconds)
+            if str(e).startswith("Can't update submission after deadline"):
+                # Bailout with error message and do not retry uploads
+                raise Exception(e)
+            else:
+                print('Upload exception - %s' % e)
+                time.sleep(sleep_seconds)
         count += 1
 
     else:
