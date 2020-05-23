@@ -21,9 +21,14 @@ def score_correlation(labels, predictions):
     return np.corrcoef(labels, np.array(ranked_predictions)[:, 0])[0, 1]
 
 
-def metrics_per_era(data, prediction, tournament, join='data',
+def metrics_per_era(data,
+                    prediction,
+                    tournament,
+                    join='data',
                     columns=['corr', 'mse', 'ystd'],
-                    era_as_str=False, region_as_str=False, split_pairs=True):
+                    era_as_str=False,
+                    region_as_str=False,
+                    split_pairs=True):
     "Dataframe with columns era, model, and specified metrics. And region list"
 
     df = prediction.df
@@ -38,10 +43,12 @@ def metrics_per_era(data, prediction, tournament, join='data',
     else:
         raise ValueError("`join` method not recognized")
     yhats_df = df.copy()
-    cols = ['era', 'region'] + nx.tournament_all(as_str=True,
-                                                 active_only=True)
+    cols = ['era', 'region'] + nx.tournament_all(as_str=True, active_only=True)
     data_df = data.df[cols]
-    df = pd.merge(data_df, yhats_df, left_index=True, right_index=True,
+    df = pd.merge(data_df,
+                  yhats_df,
+                  left_index=True,
+                  right_index=True,
                   how=how)
 
     regions = df['region'].unique().tolist()
@@ -79,9 +86,14 @@ def metrics_per_era(data, prediction, tournament, join='data',
     return metrics, regions
 
 
-def metrics_per_name(data, prediction, tournament, join='data',
+def metrics_per_name(data,
+                     prediction,
+                     tournament,
+                     join='data',
                      columns=['corr', 'mse', 'ystd'],
-                     era_as_str=True, region_as_str=True, split_pairs=True):
+                     era_as_str=True,
+                     region_as_str=True,
+                     split_pairs=True):
 
     # calc metrics per era
     skip = ['sharpe', 'consis']
@@ -89,7 +101,10 @@ def metrics_per_name(data, prediction, tournament, join='data',
     if 'sharpe' in columns or 'consis' in columns:
         if 'corr' not in cols:
             cols.append('corr')
-    mpe, regions = metrics_per_era(data, prediction, tournament, join=join,
+    mpe, regions = metrics_per_era(data,
+                                   prediction,
+                                   tournament,
+                                   join=join,
                                    columns=cols)
 
     # gather some info
@@ -204,9 +219,11 @@ def concordance(data, prediction, split_pairs=True):
             yhat0 = yhats[0][:, i][clusters[0] == j]
             yhat1 = yhats[1][:, i][clusters[1] == j]
             yhat2 = yhats[2][:, i][clusters[2] == j]
-            d = [ks_2samp(yhat0, yhat1)[0],
-                 ks_2samp(yhat0, yhat2)[0],
-                 ks_2samp(yhat2, yhat1)[0]]
+            d = [
+                ks_2samp(yhat0, yhat1)[0],
+                ks_2samp(yhat0, yhat2)[0],
+                ks_2samp(yhat2, yhat1)[0]
+            ]
             ks.append(max(d))
         concord = np.mean(ks)
         concords.iloc[i] = concord

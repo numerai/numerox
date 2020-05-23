@@ -16,7 +16,7 @@ N_FEATURES = 310
 ERA_INT_TO_STR = {}
 ERA_STR_TO_INT = {}
 ERA_STR_TO_FLOAT = {}
-for i in range(200):
+for i in range(998):
     name = 'era' + str(i)
     ERA_INT_TO_STR[i] = name
     ERA_STR_TO_INT[name] = i
@@ -32,7 +32,6 @@ REGION_STR_TO_FLOAT = {'train': 0., 'validation': 1., 'test': 2., 'live': 3.}
 
 
 class Data(object):
-
     def __init__(self, df):
         self.df = df
 
@@ -180,10 +179,11 @@ class Data(object):
             raise ValueError(msg)
         n = nx.tournament_count(active_only=True)
         shape = (x_array.shape[0], x_array.shape[1] + n + 2)
-        cols = ['x'+str(i) for i in range(x_array.shape[1])]
+        cols = ['x' + str(i) for i in range(x_array.shape[1])]
         cols = ['era', 'region'] + cols
-        cols = cols + [name for number, name in
-                       nx.tournament_iter(active_only=True)]
+        cols = cols + [
+            name for number, name in nx.tournament_iter(active_only=True)
+        ]
         df = pd.DataFrame(data=np.empty(shape, dtype=np.float64),
                           index=self.df.index.copy(deep=True),
                           columns=cols)
@@ -238,22 +238,22 @@ class Data(object):
         s = np.ones((n, n))
         for i in range(1, n + 1):
             cols.append(nx.tournament_str(i))
-            for j in range(i+1, n + 1):
+            for j in range(i + 1, n + 1):
                 yi = self.y[i]
                 yj = self.y[j]
                 idx = np.isfinite(yi + yj)
                 yi = yi[idx]
                 yj = yj[idx]
                 sij = (yi == yj).mean()
-                s[i-1, j-1] = sij
-                s[j-1, i-1] = sij
+                s[i - 1, j - 1] = sij
+                s[j - 1, i - 1] = sij
         df = pd.DataFrame(data=s, columns=cols, index=cols)
         return df
 
     def y_to_nan(self):
         "Copy of data with y values set to NaN"
         data = self.copy()
-        for name in nx.tournament_iter(active_only=True):
+        for name in nx.tournament_names(active_only=True):
             kwargs = {name: np.nan}
             data.df = data.df.assign(**kwargs)
         return data
@@ -339,11 +339,11 @@ class Data(object):
                 pass
             elif n0 > n1:
                 ix = indexi[yi == 0]
-                ix = rs.choice(ix, size=n0-n1, replace=False)
+                ix = rs.choice(ix, size=n0 - n1, replace=False)
                 remove.append(ix)
             elif n0 < n1:
                 ix = indexi[yi == 1]
-                ix = rs.choice(ix, size=n1-n0, replace=False)
+                ix = rs.choice(ix, size=n1 - n0, replace=False)
                 remove.append(ix)
             else:
                 msg = "balance should not reach this line"  # pragma: no cover
@@ -398,16 +398,17 @@ class Data(object):
         "Copy of data"
         # df.copy(deep=True) doesn't copy index. So:
         df = self.df
-        df = pd.DataFrame(df.values.copy(),
-                          df.index.copy(deep=True),
+        df = pd.DataFrame(df.values.copy(), df.index.copy(deep=True),
                           df.columns.copy())
         return Data(df)
 
     def save(self, path_or_buf, compress=False):
         "Save data as an hdf archive"
         if compress:
-            self.df.to_hdf(path_or_buf, HDF_DATA_KEY,
-                           complib='zlib', complevel=4)
+            self.df.to_hdf(path_or_buf,
+                           HDF_DATA_KEY,
+                           complib='zlib',
+                           complevel=4)
         else:
             self.df.to_hdf(path_or_buf, HDF_DATA_KEY)
 
@@ -563,16 +564,61 @@ def load_data(file_path):
     return Data(df)
 
 
-def load_zip(file_path, verbose=False):
-    "Load numerai dataset from zip archive; return Data"
+def load_zip(file_path,
+             verbose=False,
+             include_train=True,
+             single_precision=True):
+    """
+    Load numerai dataset from zip archive; return Data
+
+    It includes train data by default. To work with tournament data only,
+    set `include_train` to False.
+
+    Set `single_precision` to True in order to have data in float32 (saves memory).
+    """
 
     # load zip
     zf = zipfile.ZipFile(file_path)
-    train = pd.read_csv(zf.open(TRAIN_FILE), header=0, index_col=0)
-    tourn = pd.read_csv(zf.open(TOURNAMENT_FILE), header=0, index_col=0)
 
-    # turn into single dataframe and rename columns
-    df = pd.concat([train, tourn], axis=0)
+    if single_precision:
+        # read first 100 rows to scan types
+        # then replace all float64 types with float32
+        df_test = pd.read_csv(zf.open(TOURNAMENT_FILE),
+                              nrows=100,
+                              header=0,
+                              index_col=0)
+
+        float_cols = [c for c in df_test if df_test[c].dtype == "float64"]
+        float32_cols = {c: np.float32 for c in float_cols}
+
+        tourn = pd.read_csv(zf.open(TOURNAMENT_FILE),
+                            header=0,
+                            index_col=0,
+                            engine='c',
+                            dtype=float32_cols)
+
+        if include_train:
+            train = pd.read_csv(zf.open(TRAIN_FILE),
+                                header=0,
+                                index_col=0,
+                                engine='c',
+                                dtype=float32_cols)
+            # merge train and tournament data to single dataframe
+            df = pd.concat([train, tourn], axis=0)
+        else:
+            df = tourn
+    else:
+        # regular parsing, float64 will be used
+        tourn = pd.read_csv(zf.open(TOURNAMENT_FILE), header=0, index_col=0)
+
+        if include_train:
+            train = pd.read_csv(zf.open(TRAIN_FILE), header=0, index_col=0)
+            # merge train and tournament data to single dataframe
+            df = pd.concat([train, tourn], axis=0)
+        else:
+            df = tourn
+
+    # rename columns
     rename_map = {'data_type': 'region'}
     for i in range(1, N_FEATURES + 1):
         rename_map['feature' + str(i)] = 'x' + str(i)
@@ -580,11 +626,15 @@ def load_zip(file_path, verbose=False):
         rename_map['target_' + name] = name
     df.rename(columns=rename_map, inplace=True)
 
-    # convert era, region, and labels to np.float64
+    # convert era, region, and labels to np.float32 or np.float64 depending on the mode
     df['era'] = df['era'].map(ERA_STR_TO_FLOAT)
     df['region'] = df['region'].map(REGION_STR_TO_FLOAT)
     n = nx.tournament_count(active_only=True)
-    df.iloc[:, -n:] = df.iloc[:, -n:].astype('float64')
+    if single_precision:
+        df.iloc[:, -n:] = df.iloc[:, -n:].astype('float32')
+        df.iloc[:, 0:2] = df.iloc[:, 0:2].astype('float32')
+    else:
+        df.iloc[:, -n:] = df.iloc[:, -n:].astype('float64')
 
     # no way we did something wrong, right?
     n = 2 + N_FEATURES + nx.tournament_count(active_only=True)
@@ -639,7 +689,7 @@ def compare_data(data1, data2, regions=None, n_jobs=1):
     if regions is None:
         regions = ('train', 'validation', 'test', 'live')
     df = pd.DataFrame(columns=regions)
-    nn = NearestNeighbors(n_neighbors=1,  n_jobs=n_jobs)
+    nn = NearestNeighbors(n_neighbors=1, n_jobs=n_jobs)
     for region in regions:
         d1 = data1[data1.region == region]
         d2 = data2[data2.region == region]
@@ -695,8 +745,8 @@ class Y(object):
                 raise IndexError(txt.format(index, n))
             return self2.df[nx.tournament_str(index)].values
         elif isinstance(index, slice):
-            if (index.start is None and index.stop is None and
-               index.step is None):
+            if (index.start is None and index.stop is None
+                    and index.step is None):
                 # slicing below means a view is returned instead of a copy
                 return self2.df.iloc[:, -n:].values
             else:

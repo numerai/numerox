@@ -19,7 +19,7 @@ def assert_data_equal(obj1, obj2, msg=None):
         # pd.testing.assert_frame_equal doesn't take an error message as input
         if msg is not None:
             msg = '\n\n' + msg + '\n\n' + e.args[0]
-            e.args = (msg,)
+            e.args = (msg, )
         raise
 
 
@@ -56,8 +56,15 @@ def shares_memory(data1, data_or_array2):
 
 def micro_data(index=None):
     "Returns a tiny data object for use in unit testing"
+<<<<<<< HEAD
     cols = ['era', 'region', 'x1', 'x2', 'x3',
             'kazutsugi']
+=======
+    cols = [
+        'era', 'region', 'x1', 'x2', 'x3', 'bernie', 'elizabeth', 'jordan',
+        'ken', 'charles', 'frank', 'hillary'
+    ]
+>>>>>>> 4f84aeb10a9b557f01e98ec23e2572ce14e24e59
     df = pd.DataFrame(columns=cols)
     d0 = ['era1', 'train'] + [0.00, 0.01, 0.02] + [0]
     d1 = ['era2', 'train'] + [0.10, 0.11, 0.12] + [1]
@@ -138,7 +145,6 @@ def delete_tempfile(path):
 # taken from https://stackoverflow.com/a/45669280
 # modified for use in numerox
 class HiddenPrints(object):
-
     def __enter__(self):
         self._original_stdout = sys.stdout
         sys.stdout = open(os.devnull, 'w')

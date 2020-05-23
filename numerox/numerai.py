@@ -13,17 +13,24 @@ from numerox.prediction import CONSISTENCY_GTE
 
 NMR_PRIZE_POOL = 2000
 
-
 # ---------------------------------------------------------------------------
 # download dataset
 
-def download(filename, load=True, n_tries=100, sleep_seconds=300,
-             verbose=False):
+
+def download(filename,
+             load=True,
+             n_tries=100,
+             sleep_seconds=300,
+             verbose=False,
+             include_train=True,
+             single_precision=True):
     """
     Download current Numerai dataset; overwrites if file exists.
 
     If `load` is True (default) then return data object; otherwise return
-    None.
+    None. It will include train data if `include_train` is True as well.
+
+    Set `single_precision` to True in order to load data in float32 precision.
 
     If download fails then retry download `n_tries` times, pausing
     `sleep_seconds` between each try.
@@ -41,12 +48,15 @@ def download(filename, load=True, n_tries=100, sleep_seconds=300,
             url = napi.get_dataset_url(tournament=8)
             download_file(url, filename)
             break
-        except: # noqa
+        except:  # noqa
             print('download failed')
             time.sleep(sleep_seconds)
         count += 1
     if load:
-        data = nx.load_zip(filename, verbose=verbose)
+        data = nx.load_zip(filename,
+                           verbose=verbose,
+                           include_train=include_train,
+                           single_precision=single_precision)
     else:
         data = None
     return data
@@ -63,10 +73,20 @@ def download_data_object(verbose=False):
 # ---------------------------------------------------------------------------
 # upload submission
 
-def upload(filename, tournament, public_id, secret_key, block=True,
-           n_tries=100, sleep_seconds=60, verbose=False):
+
+def upload(filename,
+           tournament,
+           public_id,
+           secret_key,
+           block=True,
+           n_tries=100,
+           sleep_seconds=60,
+           verbose=False,
+           model_id=None):
     """
     Upload tournament submission (csv file) to Numerai.
+
+    Accounts with multiple models must specify model_id
 
     If upload fails then retry upload `n_tries` times, pausing `sleep_seconds`
     between each try.
@@ -78,22 +98,37 @@ def upload(filename, tournament, public_id, secret_key, block=True,
     """
     tournament = nx.tournament_int(tournament)
     count = 0
+    napi = NumerAPI(public_id=public_id,
+                    secret_key=secret_key,
+                    verbosity='warning')
+    models = napi.get_models()
+    if len(models) > 1 and model_id is None:
+        raise Exception(
+            f"Account has multiple models - you must specify model_id from {models}"
+        )
+    elif model_id and model_id not in models.values():
+        raise Exception(
+            f"Specified model_id {model_id} not found in account models {models}"
+        )
+
     while count < n_tries:
         try:
-
-            napi = NumerAPI(public_id=public_id, secret_key=secret_key,
-                            verbosity='warning')
             upload_id = napi.upload_predictions(filename,
-                                                tournament=tournament)
+                                                tournament=tournament,
+                                                model_id=model_id)
             if block:
-                status = status_block(upload_id, public_id, secret_key)
+                status = status_block(upload_id, public_id, secret_key, model_id=model_id)
             else:
-                status = upload_status(upload_id, public_id, secret_key)
+                status = upload_status(upload_id, public_id, secret_key, model_id=model_id)
             break
 
-        except: # noqa
-            print('upload failed')
-            time.sleep(sleep_seconds)
+        except Exception as e:  # noqa
+            if str(e).startswith("Can't update submission after deadline"):
+                # Bailout with error message and do not retry uploads
+                raise Exception(e)
+            else:
+                print('Upload exception - %s' % e)
+                time.sleep(sleep_seconds)
         count += 1
 
     else:
@@ -102,11 +137,12 @@ def upload(filename, tournament, public_id, secret_key, block=True,
     return upload_id, status
 
 
-def upload_status(upload_id, public_id, secret_key):
+def upload_status(upload_id, public_id, secret_key, model_id=None):
     "Dictionary containing the status of upload"
-    napi = NumerAPI(public_id=public_id, secret_key=secret_key,
+    napi = NumerAPI(public_id=public_id,
+                    secret_key=secret_key,
                     verbosity='warning')
-    status_raw = napi.submission_status(upload_id)
+    status_raw = napi.submission_status(upload_id, model_id=model_id)
     status = {}
     for key, value in status_raw.items():
         if isinstance(value, dict):
@@ -115,7 +151,7 @@ def upload_status(upload_id, public_id, secret_key):
     return status
 
 
-def status_block(upload_id, public_id, secret_key, verbose=True):
+def status_block(upload_id, public_id, secret_key, verbose=True, model_id=None):
     """
     Block until status completes; then return status dictionary.
 
@@ -127,18 +163,23 @@ def status_block(upload_id, public_id, secret_key, verbose=True):
     seen = []
     fmt_f = "{:<19} {:>9.4f}   {:<.4f}"
     fmt_b = "{:<19} {:>9}   {:<.4f}"
-    while True:
-        status = upload_status(upload_id, public_id, secret_key)
+    n_tries = 3
+    count = 0
+    while count < n_tries:
+        count += 1
+        status = upload_status(upload_id, public_id, secret_key, model_id=model_id)
         t = time.time()
         for key, value in status.items():
             if value is not None and key not in seen:
                 seen.append(key)
+                if key == 'filename':
+                    continue
                 minutes = (t - t0) / 60
                 if verbose:
                     if key in ('originality', 'concordance'):
-                        print(fmt_b.format(key,  str(value), minutes))
+                        print(fmt_b.format(key, str(value), minutes))
                     else:
-                        print(fmt_f.format(key,  value, minutes))
+                        print(fmt_f.format(key, value, minutes))
         if len(status) == len(seen):
             break
         seconds = min(5 + int((t - t0) / 100.0), 30)
@@ -163,14 +204,17 @@ def is_stakeable(status):
 # ---------------------------------------------------------------------------
 # utilities
 
+
 def round_dates():
     "The dates each round was opened and resolved as a Dataframe."
     napi = NumerAPI(verbosity='warn')
     dates = napi.get_competitions(tournament=1)
     dates = pd.DataFrame(dates)[['number', 'openTime', 'resolveTime']]
-    rename_map = {'number': 'round',
-                  'openTime': 'open',
-                  'resolveTime': 'resolve'}
+    rename_map = {
+        'number': 'round',
+        'openTime': 'open',
+        'resolveTime': 'resolve'
+    }
     dates = dates.rename(rename_map, axis=1)
     for item in ('open', 'resolve'):
         date = dates[item].tolist()

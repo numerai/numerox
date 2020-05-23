@@ -3,6 +3,10 @@
 Release Notes
 =============
 
+- v4.1.2
+
+  * Adds support for multi-model accounts and passing model_id to upload
+
 - v4.0.0
 
   * Add new `kazutsugi` tournament

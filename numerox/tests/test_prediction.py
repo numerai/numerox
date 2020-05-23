@@ -457,10 +457,17 @@ def test_prediction_setitem():
     "compare prediction._setitem__ with merge"
 
     data = nx.play_data()
+<<<<<<< HEAD
     p1 = nx.production(nx.linear(), data, 'bernie', verbosity=0)
     p2 = nx.production(nx.linear(1e-5), data, 2,  verbosity=0)
     p3 = nx.production(nx.linear(1e-6), data, 3,  verbosity=0)
     p4 = nx.backtest(nx.linear(), data, 4,  verbosity=0)
+=======
+    p1 = nx.production(nx.logistic(), data, 'bernie', verbosity=0)
+    p2 = nx.production(nx.logistic(1e-5), data, 2, verbosity=0)
+    p3 = nx.production(nx.logistic(1e-6), data, 3, verbosity=0)
+    p4 = nx.backtest(nx.logistic(), data, 4, verbosity=0)
+>>>>>>> 4f84aeb10a9b557f01e98ec23e2572ce14e24e59
 
     p = nx.Prediction()
     p[('linear', 1)] = p1

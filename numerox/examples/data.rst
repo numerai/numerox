@@ -17,6 +17,16 @@ Or::
 
 If the download fails then it will by default retry.
 
+You can force the internal CSV parser to use ``float32`` in order to save memory::
+
+    >>> data = nx.download('numerai_dataset.zip', single_precision=True)
+
+By default the training data will be loaded, parsed and included in the data frame. If you need just the tournament dataset, you can set ``include_train`` to ``False``::
+
+    >>> data = nx.download('numerai_dataset.zip', include_train=False)
+
+It won't bother parsing the train data and so it won't need that much memory.
+
 Load data
 ---------
 
@@ -30,7 +40,10 @@ You can create a data object from the zip archive provided by Numerai::
     x         50, min 0.0000, mean 0.5025, max 1.0000
     y         mean 0.499546, fraction missing 0.3093
 
-But that is slow (~7 seconds) which is painful for dedicated overfitters.
+
+You can use ``include_train`` and ``single_precision`` options here as well.
+
+Loading data from ZIP archive is slow (~7 seconds) which is painful for dedicated overfitters.
 Let's convert the zip archive to an HDF5 archive::
 
     >>> data.save('numerai_dataset.hdf')

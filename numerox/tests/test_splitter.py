@@ -9,15 +9,17 @@ import numerox as nx
 def test_splitter_overlap():
     "prediction data should not overlap"
     d = nx.play_data()
-    splitters = [nx.TournamentSplitter(d),
-                 nx.FlipSplitter(d),
-                 nx.ValidationSplitter(d),
-                 nx.CheatSplitter(d),
-                 nx.CVSplitter(d),
-                 nx.LoocvSplitter(d),
-                 nx.IgnoreEraCVSplitter(d, tournament=1),
-                 nx.SplitSplitter(d, fit_fraction=0.5),
-                 nx.ConsecutiveCVSplitter(d)]
+    splitters = [
+        nx.TournamentSplitter(d),
+        nx.FlipSplitter(d),
+        nx.ValidationSplitter(d),
+        nx.CheatSplitter(d),
+        nx.CVSplitter(d),
+        nx.LoocvSplitter(d),
+        nx.IgnoreEraCVSplitter(d, tournament=1),
+        nx.SplitSplitter(d, fit_fraction=0.5),
+        nx.ConsecutiveCVSplitter(d)
+    ]
     for splitter in splitters:
         predict_ids = []
         for dfit, dpredict in splitter:
@@ -28,15 +30,17 @@ def test_splitter_overlap():
 def test_splitter_reset():
     "splitter reset should not change results"
     d = nx.play_data()
-    splitters = [nx.TournamentSplitter(d),
-                 nx.FlipSplitter(d),
-                 nx.ValidationSplitter(d),
-                 nx.CheatSplitter(d),
-                 nx.CVSplitter(d),
-                 nx.LoocvSplitter(d),
-                 nx.IgnoreEraCVSplitter(d, tournament=2),
-                 nx.SplitSplitter(d, fit_fraction=0.5),
-                 nx.ConsecutiveCVSplitter(d)]
+    splitters = [
+        nx.TournamentSplitter(d),
+        nx.FlipSplitter(d),
+        nx.ValidationSplitter(d),
+        nx.CheatSplitter(d),
+        nx.CVSplitter(d),
+        nx.LoocvSplitter(d),
+        nx.IgnoreEraCVSplitter(d, tournament=2),
+        nx.SplitSplitter(d, fit_fraction=0.5),
+        nx.ConsecutiveCVSplitter(d)
+    ]
     for splitter in splitters:
         ftups = [[], []]
         ptups = [[], []]
@@ -123,6 +127,6 @@ def test_customsplitter():
         count += 1
     ok_(count == 2, 'number of splits is wrong')
     ok_(len(ids) == len(set(ids)), 'overlap in ids')
-    assert_raises(ValueError, nx.CustomSplitter, [(d,)])
+    assert_raises(ValueError, nx.CustomSplitter, [(d, )])
     assert_raises(ValueError, nx.CustomSplitter, [(d, d), (d, d)])
     assert_raises(ValueError, nx.CustomSplitter, [(d, d), (d, None)])

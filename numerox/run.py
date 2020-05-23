@@ -151,11 +151,13 @@ def run_one(model, splitter, tournament, verbosity=2):
         ids, yhat = model.fit_predict(data_fit, data_predict, tournament)
         prediction = prediction.merge_arrays(ids, yhat, name, tournament)
         if verbosity > 1:
-            print(prediction.summary(data.region_isnotin(['test', 'live']),
-                                     tournament))
+            print(
+                prediction.summary(data.region_isnotin(['test', 'live']),
+                                   tournament))
     if verbosity == 1:
-        print(prediction.summary(data.region_isnotin(['test', 'live']),
-                                 tournament))
+        print(
+            prediction.summary(data.region_isnotin(['test', 'live']),
+                               tournament))
     if verbosity > 1:
         minutes = (time.time() - t0) / 60
         print('Done in {:.2f} minutes'.format(minutes))

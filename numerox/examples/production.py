@@ -25,7 +25,7 @@ def numerox_example():
     # upload predictions to Numerai to enter the tournament
     # create the public_id and secret_key on the Numerai website
     #
-    # nx.upload('logistic.csv', tournament='bernie', public_id, secret_key)
+    # nx.upload('logistic.csv', tournament='bernie', public_id, secret_key, model_id)
 
 
 if __name__ == '__main__':

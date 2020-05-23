@@ -32,8 +32,6 @@ CLASSIFIERS = [
     "License :: OSI Approved :: GNU General Public License v3 "
     "or later (GPLv3+)",
     "Operating System :: OS Independent",
-    "Programming Language :: Python",
-    "Programming Language :: Python :: 2",
     "Programming Language :: Python :: 3",
     "Topic :: Scientific/Engineering"]
 
@@ -43,7 +41,7 @@ REQUIRES = ['numpy',
             'pandas',
             'tables',
             'scikit-learn',
-            'numerapi',
+            'numerapi>=2.2.4',
             'nose']
 
 
@@ -51,7 +49,7 @@ metadata = dict(name='numerox',
                 maintainer="Keith Goodman",
                 description=SHORT_DESCRIPTION,
                 long_description=get_long_description(),
-                url="https://github.com/kwgoodman/numerox",
+                url="https://github.com/numerai/numerox",
                 license="GNU General Public License v3",
                 classifiers=CLASSIFIERS,
                 platforms="OS Independent",

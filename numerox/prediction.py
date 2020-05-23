@@ -25,7 +25,6 @@ CONCORDANCE_LT = 0.12
 
 
 class Prediction(object):
-
     def __init__(self, df=None):
         self.df = df
 
@@ -330,8 +329,10 @@ class Prediction(object):
             # and hence pairs in a prediction object
             warnings.simplefilter("ignore")
             if compress:
-                self.df.to_hdf(path_or_buf, HDF_PREDICTION_KEY,
-                               complib='zlib', complevel=4)
+                self.df.to_hdf(path_or_buf,
+                               HDF_PREDICTION_KEY,
+                               complib='zlib',
+                               complevel=4)
             else:
                 self.df.to_hdf(path_or_buf, HDF_PREDICTION_KEY)
 
@@ -356,7 +357,9 @@ class Prediction(object):
             raise ValueError("prediction must contain a single pair")
 
         # metrics
-        metrics, regions = metrics_per_era(data, self, tournament,
+        metrics, regions = metrics_per_era(data,
+                                           self,
+                                           tournament,
                                            region_as_str=True,
                                            split_pairs=False)
         metrics = metrics.drop(['era', 'pair'], axis=1)
@@ -391,33 +394,48 @@ class Prediction(object):
 
         return df
 
-    def summaries(self, data, tournament=None, round_output=True,
+    def summaries(self,
+                  data,
+                  tournament=None,
+                  round_output=True,
                   display=True):
         "Dictionary of performance summaries of predictions"
         df_dict = {}
         for pair in self.pairs(as_str=False):
-            df_dict[pair] = self[pair].summary(data, tournament,
+            df_dict[pair] = self[pair].summary(data,
+                                               tournament,
                                                round_output=round_output)
             if display:
                 print('{}, {}'.format(pair[0], nx.tournament_str(pair[1])))
                 print(df_dict[pair])
         return df_dict
 
-    def metric_per_era(self, data, tournament=None, metric='corr',
-                       era_as_str=True, split_pairs=True):
+    def metric_per_era(self,
+                       data,
+                       tournament=None,
+                       metric='corr',
+                       era_as_str=True,
+                       split_pairs=True):
         "DataFrame containing given metric versus era (as index)"
-        df = self.metrics_per_era(data, tournament=tournament,
+        df = self.metrics_per_era(data,
+                                  tournament=tournament,
                                   metrics=[metric],
-                                  era_as_str=True, split_pairs=True)
+                                  era_as_str=True,
+                                  split_pairs=True)
         df = df.pivot(columns='pair', values=metric)
         df.columns.name = None
         return df
 
-    def metrics_per_era(self, data, tournament=None,
+    def metrics_per_era(self,
+                        data,
+                        tournament=None,
                         metrics=['corr', 'mse', 'ystd'],
-                        era_as_str=True, split_pairs=True):
+                        era_as_str=True,
+                        split_pairs=True):
         "DataFrame containing given metrics versus era (as index)"
-        metrics, regions = metrics_per_era(data, self, tournament,
+        metrics, regions = metrics_per_era(data,
+                                           self,
+                                           tournament,
                                            columns=metrics,
                                            era_as_str=era_as_str)
         metrics.index = metrics['era']
@@ -434,7 +452,13 @@ class Prediction(object):
         "DataFrame containing given metric versus tournament"
         dfs = []
         for t_int, t_name in nx.tournament_iter(active_only=False):
+<<<<<<< HEAD
             df, info = metrics_per_name(data, self, t_int,
+=======
+            df, info = metrics_per_name(data,
+                                        self,
+                                        t_int,
+>>>>>>> 4f84aeb10a9b557f01e98ec23e2572ce14e24e59
                                         columns=[metric],
                                         split_pairs=False)
             df.columns = [t_name]
@@ -444,10 +468,13 @@ class Prediction(object):
         df = df.sort_values('mean')
         return df
 
-    def performance(self, data, tournament=None, era_as_str=True,
+    def performance(self,
+                    data,
+                    tournament=None,
+                    era_as_str=True,
                     region_as_str=True,
-                    columns=['corr', 'mse', 'ystd', 'sharpe',
-                             'consis'], sort_by='corr'):
+                    columns=['corr', 'mse', 'ystd', 'sharpe', 'consis'],
+                    sort_by='corr'):
         df, info = metrics_per_name(data,
                                     self,
                                     tournament,
@@ -474,13 +501,18 @@ class Prediction(object):
                 raise ValueError("`sort_by` method not recognized")
         return df
 
-    def performance_mean(self, data, mean_of='name', era_as_str=True,
+    def performance_mean(self,
+                         data,
+                         mean_of='name',
+                         era_as_str=True,
                          region_as_str=True,
-                         columns=['corr', 'mse', 'ystd', 'sharpe',
-                                  'consis'], sort_by='corr'):
+                         columns=['corr', 'mse', 'ystd', 'sharpe', 'consis'],
+                         sort_by='corr'):
         "Mean performance averaged across names (default) or tournaments,"
-        df = self.performance(data, era_as_str=era_as_str,
-                              region_as_str=region_as_str, columns=columns)
+        df = self.performance(data,
+                              era_as_str=era_as_str,
+                              region_as_str=region_as_str,
+                              columns=columns)
         if mean_of == 'name':
             g = df.groupby('name')
             df = g.mean()
@@ -565,8 +597,10 @@ class Prediction(object):
         # calc example predictions
         example_y = {}
         for tournament in self.tournaments(as_str=False):
-            ep = nx.production(nx.example_predictions(), data,
-                               tournament=tournament, verbosity=0)
+            ep = nx.production(nx.example_predictions(),
+                               data,
+                               tournament=tournament,
+                               verbosity=0)
             ep = ep.loc[self.ids]
             example_y[tournament] = ep.y[:, 0]
 
@@ -615,8 +649,7 @@ class Prediction(object):
         for pair in self.pairs(as_str=False):
             if pair in prediction:
                 pairs.append(pair)
-        cols = ['corr1', 'corr2', 'win1',
-                'corr', 'maxdiff', 'ystd1', 'ystd2']
+        cols = ['corr1', 'corr2', 'win1', 'corr', 'maxdiff', 'ystd1', 'ystd2']
         comp = pd.DataFrame(columns=cols, index=pairs)
         if len(pairs) == 0:
             return comp
@@ -625,16 +658,20 @@ class Prediction(object):
         df2 = prediction.loc[ids]
         p1 = self[pairs]
         p2 = prediction[pairs]
-        m1 = p1.metrics_per_era(data, tournament, metrics=['corr'],
+        m1 = p1.metrics_per_era(data,
+                                tournament,
+                                metrics=['corr'],
                                 era_as_str=False)
-        m2 = p2.metrics_per_era(data, tournament, metrics=['corr'],
+        m2 = p2.metrics_per_era(data,
+                                tournament,
+                                metrics=['corr'],
                                 era_as_str=False)
         for i, pair in enumerate(pairs):
 
-            m1i = m1[(m1.name == pair[0]) &
-                     (m1.tournament == nx.tournament_str(pair[1]))]
-            m2i = m2[(m2.name == pair[0]) &
-                     (m2.tournament == nx.tournament_str(pair[1]))]
+            m1i = m1[(m1.name == pair[0])
+                     & (m1.tournament == nx.tournament_str(pair[1]))]
+            m2i = m2[(m2.name == pair[0])
+                     & (m2.tournament == nx.tournament_str(pair[1]))]
 
             if (m1i.index != m2i.index).any():
                 raise IndexError("Can only handle aligned eras")
@@ -740,8 +777,7 @@ class Prediction(object):
             return Prediction(None)
         # df.copy(deep=True) doesn't copy index. So:
         df = self.df
-        df = pd.DataFrame(df.values.copy(),
-                          df.index.copy(deep=True),
+        df = pd.DataFrame(df.values.copy(), df.index.copy(deep=True),
                           df.columns.copy())
         return Prediction(df)
 
@@ -853,18 +889,27 @@ def _merge_predictions(prediction1, prediction2):
         df = prediction2.df
     elif pair not in prediction1:
         # inserting predictions from a model not already in report
-        df = pd.merge(prediction1.df, prediction2.df, how='outer',
-                      left_index=True, right_index=True)
+        df = pd.merge(prediction1.df,
+                      prediction2.df,
+                      how='outer',
+                      left_index=True,
+                      right_index=True)
     else:
         # add more ys from a model whose name already exists
         y = prediction1.df[pair]
         y = y.dropna()
         s = prediction2.df.iloc[:, 0]
         s = s.dropna()
-        s = pd.concat([s, y], join='outer', ignore_index=False,
+        s = pd.concat([s, y],
+                      join='outer',
+                      ignore_index=False,
                       verify_integrity=True)
         dfnew = pd.DataFrame(s, columns=[pair])
-        df = pd.merge(prediction1.df, dfnew, how='outer', on=[pair],
-                      left_index=True, right_index=True)
+        df = pd.merge(prediction1.df,
+                      dfnew,
+                      how='outer',
+                      on=[pair],
+                      left_index=True,
+                      right_index=True)
         df[pair] = dfnew
     return Prediction(df)
