@@ -467,6 +467,9 @@ def test_prediction_setitem():
     p2 = nx.production(nx.logistic(1e-5), data, 2, verbosity=0)
     p3 = nx.production(nx.logistic(1e-6), data, 3, verbosity=0)
     p4 = nx.backtest(nx.logistic(), data, 4, verbosity=0)
+<<<<<<< HEAD
+>>>>>>> 4f84aeb10a9b557f01e98ec23e2572ce14e24e59
+=======
 >>>>>>> 4f84aeb10a9b557f01e98ec23e2572ce14e24e59
 
     p = nx.Prediction()

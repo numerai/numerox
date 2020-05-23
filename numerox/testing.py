@@ -57,13 +57,19 @@ def shares_memory(data1, data_or_array2):
 def micro_data(index=None):
     "Returns a tiny data object for use in unit testing"
 <<<<<<< HEAD
+<<<<<<< HEAD
     cols = ['era', 'region', 'x1', 'x2', 'x3',
             'kazutsugi']
 =======
+=======
+>>>>>>> 4f84aeb10a9b557f01e98ec23e2572ce14e24e59
     cols = [
         'era', 'region', 'x1', 'x2', 'x3', 'bernie', 'elizabeth', 'jordan',
         'ken', 'charles', 'frank', 'hillary'
     ]
+<<<<<<< HEAD
+>>>>>>> 4f84aeb10a9b557f01e98ec23e2572ce14e24e59
+=======
 >>>>>>> 4f84aeb10a9b557f01e98ec23e2572ce14e24e59
     df = pd.DataFrame(columns=cols)
     d0 = ['era1', 'train'] + [0.00, 0.01, 0.02] + [0]

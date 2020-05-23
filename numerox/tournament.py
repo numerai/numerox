@@ -1,6 +1,7 @@
 import numerox as nx
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 # TOURNAMENTS = [{'name': 'bernie', 'number': 1, 'active': False},
 #                {'name': 'elizabeth', 'number': 2, 'active': False},
 #                {'name': 'jordan', 'number': 3, 'active': False},
@@ -10,6 +11,8 @@ import numerox as nx
 #                {'name': 'hillary', 'number': 7, 'active': False},
 TOURNAMENTS = [{'name': 'kazutsugi', 'number': 1, 'active': True}]
 =======
+=======
+>>>>>>> 4f84aeb10a9b557f01e98ec23e2572ce14e24e59
 TOURNAMENTS = [{
     'name': 'bernie',
     'number': 1,
@@ -43,6 +46,9 @@ TOURNAMENTS = [{
     'number': 8,
     'active': True
 }]
+<<<<<<< HEAD
+>>>>>>> 4f84aeb10a9b557f01e98ec23e2572ce14e24e59
+=======
 >>>>>>> 4f84aeb10a9b557f01e98ec23e2572ce14e24e59
 
 
@@ -99,6 +105,9 @@ def tournament_int2str(tournament_int, active_only=True):
     if tournament_int not in nx.tournament_numbers(active_only=True):
         raise ValueError(
             "`tournament_int` {} not recognized".format(tournament_int))
+<<<<<<< HEAD
+>>>>>>> 4f84aeb10a9b557f01e98ec23e2572ce14e24e59
+=======
 >>>>>>> 4f84aeb10a9b557f01e98ec23e2572ce14e24e59
     for tourney in TOURNAMENTS:
         if tourney['number'] == tournament_int:

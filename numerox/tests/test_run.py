@@ -9,6 +9,7 @@ def test_run():
     "Make sure run runs"
     d = testing.play_data()
 <<<<<<< HEAD
+<<<<<<< HEAD
     models = [nx.linear(), nx.fifty()]
     splitters = [nx.TournamentSplitter(d),
                  nx.ValidationSplitter(d),
@@ -16,6 +17,8 @@ def test_run():
                  nx.CVSplitter(d, kfold=2),
                  nx.SplitSplitter(d, fit_fraction=0.5)]
 =======
+=======
+>>>>>>> 4f84aeb10a9b557f01e98ec23e2572ce14e24e59
     models = [nx.logistic(), nx.fifty()]
     splitters = [
         nx.TournamentSplitter(d),
@@ -24,6 +27,9 @@ def test_run():
         nx.CVSplitter(d, kfold=2),
         nx.SplitSplitter(d, fit_fraction=0.5)
     ]
+<<<<<<< HEAD
+>>>>>>> 4f84aeb10a9b557f01e98ec23e2572ce14e24e59
+=======
 >>>>>>> 4f84aeb10a9b557f01e98ec23e2572ce14e24e59
     for model in models:
         for splitter in splitters:
