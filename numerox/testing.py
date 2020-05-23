@@ -57,19 +57,18 @@ def shares_memory(data1, data_or_array2):
 def micro_data(index=None):
     "Returns a tiny data object for use in unit testing"
     cols = ['era', 'region', 'x1', 'x2', 'x3',
-            'bernie', 'elizabeth', 'jordan', 'ken', 'charles', 'frank',
-            'hillary']  # Add Kazutsugi here
+            'kazutsugi']
     df = pd.DataFrame(columns=cols)
-    d0 = ['era1', 'train'] + [0.00, 0.01, 0.02] + [0., 0., 1., 1., 0., 0., 0.]
-    d1 = ['era2', 'train'] + [0.10, 0.11, 0.12] + [1, 1, 1, 1, 0, 0, 1]
-    d2 = ['era2', 'train'] + [0.20, 0.21, 0.22] + [0, 1, 1, 1, 1, 1, 0]
-    d3 = ['era3', 'validation'] + [0.30, 0.31, 0.32] + [1, 1, 0, 1, 0, 1, 1]
-    d4 = ['era3', 'validation'] + [0.40, 0.41, 0.42] + [0, 0, 0, 1, 0, 0, 0]
-    d5 = ['era3', 'validation'] + [0.50, 0.51, 0.52] + [1, 1, 1, 1, 0, 0, 1]
-    d6 = ['era4', 'validation'] + [0.60, 0.61, 0.62] + [0, 1, 0, 1, 1, 1, 1]
-    d7 = ['eraX', 'test'] + [0.70, 0.71, 0.72] + [1, 1, 1, 1, 1, 0, 0]
-    d8 = ['eraX', 'test'] + [0.80, 0.81, 0.82] + [0, 0, 0, 0, 0, 0, 1]
-    d9 = ['eraX', 'live'] + [0.90, 0.91, 0.92] + [0, 1, 0, 0, 1, 1, 0]
+    d0 = ['era1', 'train'] + [0.00, 0.01, 0.02] + [0]
+    d1 = ['era2', 'train'] + [0.10, 0.11, 0.12] + [1]
+    d2 = ['era2', 'train'] + [0.20, 0.21, 0.22] + [0]
+    d3 = ['era3', 'validation'] + [0.30, 0.31, 0.32] + [1]
+    d4 = ['era3', 'validation'] + [0.40, 0.41, 0.42] + [0]
+    d5 = ['era3', 'validation'] + [0.50, 0.51, 0.52] + [1]
+    d6 = ['era4', 'validation'] + [0.60, 0.61, 0.62] + [0]
+    d7 = ['eraX', 'test'] + [0.70, 0.71, 0.72] + [0]
+    d8 = ['eraX', 'test'] + [0.80, 0.81, 0.82] + [0]
+    d9 = ['eraX', 'live'] + [0.90, 0.91, 0.92] + [0]
     df.loc['index0'] = d0
     df.loc['index1'] = d1
     df.loc['index2'] = d2

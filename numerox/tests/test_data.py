@@ -63,7 +63,7 @@ def test_data_indexing():
     ade(d['live'], micro_data([9]), msg)
 
     msg = 'error indexing data by array'
-    ade(d[d.y['bernie'] == 0], micro_data([0, 2, 4, 6, 8, 9]), msg)
+    ade(d[d.y['kazutsugi'] == 0], micro_data([0, 2, 4, 6, 8, 9]), msg)
     ade(d[d.era == 'era4'], micro_data([6]), msg)
 
     assert_raises(IndexError, d.__getitem__, 'era')
@@ -99,36 +99,37 @@ def test_data_y_indexing():
     d = micro_data()
 
     msg = 'y arrays not equal'
-    y1 = [0, 1, 0, 1, 0, 1, 0, 1, 0, 0]
+    y1 = [0, 1, 0, 1, 0, 1, 0, 0, 0, 0]
+
     assert_array_equal(d.y[1], y1, msg)
-    assert_array_equal(d.y['bernie'], y1, msg)
+    assert_array_equal(d.y['kazutsugi'], y1, msg)
 
-    y2 = [0, 1, 1, 1, 0, 1, 1, 1, 0, 1]
-    assert_array_equal(d.y[2], y2, msg)
-    assert_array_equal(d.y['elizabeth'], y2, msg)
-
-    y3 = [1, 1, 1, 0, 0, 1, 0, 1, 0, 0]
-    assert_array_equal(d.y[3], y3, msg)
-    assert_array_equal(d.y['jordan'], y3, msg)
-
-    y4 = [1, 1, 1, 1, 1, 1, 1, 1, 0, 0]
-    assert_array_equal(d.y[4], y4, msg)
-    assert_array_equal(d.y['ken'], y4, msg)
-
-    y5 = [0, 0, 1, 0, 0, 0, 1, 1, 0, 1]
-    assert_array_equal(d.y[5], y5, msg)
-    assert_array_equal(d.y['charles'], y5, msg)
-
-    y6 = [0, 0, 1, 1, 0, 0, 1, 0, 0, 1]
-    assert_array_equal(d.y[6], y6, msg)
-    assert_array_equal(d.y['frank'], y6, msg)
-
-    y7 = [0, 1, 0, 1, 0, 1, 1, 0, 1, 0]
-    assert_array_equal(d.y[7], y7, msg)
-    assert_array_equal(d.y['hillary'], y7, msg)
-
-    y = np.vstack([[y1], [y2], [y3], [y4], [y5], [y6], [y7]]).T
-    assert_array_equal(d.y[:], y, msg)
+    # y2 = [0, 1, 1, 1, 0, 1, 1, 1, 0, 1]
+    # assert_array_equal(d.y[2], y2, msg)
+    # assert_array_equal(d.y['elizabeth'], y2, msg)
+    #
+    # y3 = [1, 1, 1, 0, 0, 1, 0, 1, 0, 0]
+    # assert_array_equal(d.y[3], y3, msg)
+    # assert_array_equal(d.y['jordan'], y3, msg)
+    #
+    # y4 = [1, 1, 1, 1, 1, 1, 1, 1, 0, 0]
+    # assert_array_equal(d.y[4], y4, msg)
+    # assert_array_equal(d.y['ken'], y4, msg)
+    #
+    # y5 = [0, 0, 1, 0, 0, 0, 1, 1, 0, 1]
+    # assert_array_equal(d.y[5], y5, msg)
+    # assert_array_equal(d.y['charles'], y5, msg)
+    #
+    # y6 = [0, 0, 1, 1, 0, 0, 1, 0, 0, 1]
+    # assert_array_equal(d.y[6], y6, msg)
+    # assert_array_equal(d.y['frank'], y6, msg)
+    #
+    # y7 = [0, 1, 0, 1, 0, 1, 1, 0, 1, 0]
+    # assert_array_equal(d.y[7], y7, msg)
+    # assert_array_equal(d.y['hillary'], y7, msg)
+    #
+    # y = np.vstack([[y1], [y2], [y3], [y4], [y5], [y6], [y7]]).T
+    # assert_array_equal(d.y[:], y, msg)
 
     assert_raises(IndexError, d.y.__getitem__, 0)
     assert_raises(IndexError, d.y.__getitem__, 'era')
@@ -162,12 +163,12 @@ def test_data_xnew():
 def test_data_pca():
     "test data.pca"
     d = nx.play_data()
-    nfactors = (None, 3, 0.5)
-    for nfactor in nfactors:
-        d2 = d.pca(nfactor=nfactor)
+    test_factors = (None, 3, 0.5)
+    for factor in test_factors:
+        d2 = d.pca(nfactor=factor)
         msg = "data.pca should return a copy"
         ok_(not shares_memory(d, d2), msg)
-        if nfactor is None:
+        if factor is None:
             ok_(d.shape == d2.shape, "shape should not change")
         corr = np.corrcoef(d2.x.T)
         corr.flat[::corr.shape[0] + 1] = 0
