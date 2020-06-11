@@ -398,9 +398,9 @@ def test_load_zip():
             with testing.HiddenPrints():
                 d = nx.load_zip(TINY_DATASET_CSV, verbose=True)
         ok_(len(d) == 14, "wrong number of rows")
-        ok_(d.shape == (14, 59), 'data has wrong shape')
-        ok_(d.x.shape == (14, 50), 'x has wrong shape')
-        ok_(d.df.iloc[2, 3] == 0.34143, 'wrong feature value')
+        ok_(d.shape == (14, 313), 'data has wrong shape')
+        ok_(d.x.shape == (14, 310), 'x has wrong shape')
+        ok_(d.df.iloc[2, 3] == 0.50000, 'wrong feature value')
 
 
 def test_compare_data():
