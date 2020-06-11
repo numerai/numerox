@@ -452,19 +452,9 @@ class Prediction(object):
         "DataFrame containing given metric versus tournament"
         dfs = []
         for t_int, t_name in nx.tournament_iter(active_only=False):
-<<<<<<< HEAD
-<<<<<<< HEAD
-            df, info = metrics_per_name(data, self, t_int,
-=======
             df, info = metrics_per_name(data,
                                         self,
                                         t_int,
->>>>>>> 4f84aeb10a9b557f01e98ec23e2572ce14e24e59
-=======
-            df, info = metrics_per_name(data,
-                                        self,
-                                        t_int,
->>>>>>> 4f84aeb10a9b557f01e98ec23e2572ce14e24e59
                                         columns=[metric],
                                         split_pairs=False)
             df.columns = [t_name]
