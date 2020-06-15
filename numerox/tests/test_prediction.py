@@ -15,7 +15,7 @@ TINY_DATASET_CSV = os.path.join(os.path.dirname(__file__),
 
 
 def test_empty_prediction():
-    "Test handling of empty predictions"
+    """Test handling of empty predictions"""
     p = nx.Prediction()
     ok_(p.names() == [], "wrong name")
     assert_raises(ValueError, p.rename, 'name')
@@ -39,7 +39,7 @@ def test_emtpy_y_raises():
 
 
 def test_prediction_methods():
-    "test prediction methods"
+    """test prediction methods"""
     p = nx.testing.micro_prediction()
     ok_(len(p) == 10, "wrong length")
     ok_(p.size == 40, "wrong size")
@@ -56,7 +56,7 @@ def test_prediction_methods():
 
 
 def test_prediction_roundtrip():
-    "save/load roundtrip shouldn't change prediction"
+    """save/load roundtrip shouldn't change prediction"""
     p = nx.testing.micro_prediction()
     path = None
     try:
@@ -74,7 +74,7 @@ def test_prediction_roundtrip():
 
 
 def test_prediction_save():
-    "test prediction.save with mode='a'"
+    """test prediction.save with mode='a'"""
     p = nx.testing.micro_prediction()
     p1 = p[('model0', 2)]
     p2 = p[[('model1', 1), ('model2', 3), ('model0', 5)]]
@@ -90,7 +90,7 @@ def test_prediction_save():
 
 
 def test_prediction_to_csv():
-    "make sure prediction.to_csv runs"
+    """make sure prediction.to_csv runs"""
     p = nx.testing.micro_prediction()
     path = None
     try:
@@ -108,16 +108,16 @@ def test_prediction_to_csv():
 
 
 def test_load_example_predictions():
-    "test nx.load_example_predictions"
-    p = nx.load_example_predictions(TINY_DATASET_CSV, tournament='elizabeth')
-    p = nx.load_example_predictions(TINY_DATASET_CSV, tournament=1)
+    """test nx.load_example_predictions"""
+    p = nx.load_example_predictions(TINY_DATASET_CSV, tournament='kazutsugi')
+    p = nx.load_example_predictions(TINY_DATASET_CSV, tournament=8)
     ok_(len(p) == 6, "wrong number of rows")
     ok_(p.shape == (6, 1), 'data has wrong shape')
     ok_(np.abs(p.df.iloc[2, 0] - 0.50397) < 1e-8, 'wrong feature value')
 
 
 def test_prediction_pairs_with_name():
-    "test p.pairs_with_name"
+    """test p.pairs_with_name"""
     p = nx.testing.micro_prediction()
     pairs = p.pairs_with_name('model0')
     pairs0 = [('model0', 'elizabeth'), ('model0', 'charles')]
@@ -133,7 +133,7 @@ def test_prediction_pairs_with_name():
 
 
 def test_prediction_pairs_with_tournament():
-    "test p.pairs_with_tournament"
+    """test p.pairs_with_tournament"""
     p = nx.testing.micro_prediction()
     pairs = p.pairs_with_tournament('bernie')
     pairs0 = [('model1', 'bernie')]
@@ -148,7 +148,7 @@ def test_prediction_pairs_with_tournament():
 
 
 def test_iprediction_pairs_split():
-    "test prediction.pairs_split"
+    """test prediction.pairs_split"""
     p = nx.testing.micro_prediction()
     name0 = ('model0', 'model1', 'model2', 'model0')
     tournament0 = ('elizabeth', 'bernie', 'jordan', 'charles')
@@ -158,7 +158,7 @@ def test_iprediction_pairs_split():
 
 
 def test_prediction_make_pair():
-    "test prediction.make_pair"
+    """test prediction.make_pair"""
     p = nx.testing.micro_prediction()
     pair = p.make_pair('knn', 'bernie')
     ok_(pair == ('knn', 1))
@@ -168,7 +168,7 @@ def test_prediction_make_pair():
 
 
 def test_prediction_copies():
-    "prediction properties should be copies"
+    """prediction properties should be copies"""
     p = nx.testing.micro_prediction()
     ok_(nx.testing.shares_memory(p, p), "looks like shares_memory failed")
     ok_(nx.testing.shares_memory(p, p.ids), "p.ids should be a view")
@@ -178,21 +178,21 @@ def test_prediction_copies():
 
 
 def test_prediction_properties():
-    "prediction properties should not be corrupted"
+    """prediction properties should not be corrupted"""
 
     d = nx.testing.micro_data()
     p = nx.Prediction()
-    p = p.merge_arrays(d.ids, d.y['bernie'], 'model1', 1)
-    p = p.merge_arrays(d.ids, d.y['elizabeth'], 'model2', 2)
+    p = p.merge_arrays(d.ids, d.y['kazutsugi'], 'model1', 1)
+    p = p.merge_arrays(d.ids, d.y['kazutsugi'], 'model2', 2)
 
     ok_((p.ids == p.df.index).all(), "ids is corrupted")
     ok_((p.ids == d.df.index).all(), "ids is corrupted")
-    ok_((p.y[:, 0] == d.df.bernie).all(), "y is corrupted")
-    ok_((p.y[:, 1] == d.df.elizabeth).all(), "y is corrupted")
+    ok_((p.y[:, 0] == d.df.kazutsugi).all(), "y is corrupted")
+    ok_((p.y[:, 1] == d.df.kazutsugi).all(), "y is corrupted")
 
 
 def test_prediction_rename():
-    "prediction.rename"
+    """prediction.rename"""
 
     p = nx.testing.micro_prediction()
     rename_dict = {}
@@ -215,7 +215,7 @@ def test_prediction_rename():
 
 
 def test_prediction_drop_name():
-    "prediction.drop_name"
+    """prediction.drop_name"""
 
     p = nx.testing.micro_prediction()
     p = p.drop_name('model1')
@@ -230,7 +230,7 @@ def test_prediction_drop_name():
 
 
 def test_prediction_drop_tournament():
-    "prediction.drop_tournament"
+    """prediction.drop_tournament"""
 
     p = nx.testing.micro_prediction()
     p = p.drop_tournament('bernie')
@@ -245,7 +245,7 @@ def test_prediction_drop_tournament():
 
 
 def test_prediction_drop_pair():
-    "prediction.drop_pair"
+    """prediction.drop_pair"""
 
     p = nx.testing.micro_prediction()
     p = p.drop_pair(('model1', 1))
@@ -261,7 +261,7 @@ def test_prediction_drop_pair():
 
 
 def test_prediction_add():
-    "add two predictions together"
+    """add two predictions together"""
 
     d = nx.testing.micro_data()
     p1 = nx.Prediction()
@@ -281,7 +281,7 @@ def test_prediction_add():
 
 
 def test_prediction_getitem():
-    "prediction.__getitem__"
+    """prediction.__getitem__"""
     p = nx.testing.micro_prediction()
     pairs = [('model2', 3), ('model0', 2)]
     p2 = p[pairs]
@@ -303,7 +303,7 @@ def test_prediction_getitem():
 
 
 def test_prediction_loc():
-    "test prediction.loc"
+    """test prediction.loc"""
     mp = nx.testing.micro_prediction
     p = mp()
     msg = 'prediction.loc indexing error'
@@ -314,14 +314,14 @@ def test_prediction_loc():
 
 
 def test_prediction_y_correlation():
-    "test prediction.y_correlation"
+    """test prediction.y_correlation"""
     p = nx.testing.micro_prediction()
     df = p.y_correlation()
     ok_(isinstance(df, pd.DataFrame), 'expecting a dataframe')
 
 
 def test_prediction_summary():
-    "make sure prediction.summary runs"
+    """make sure prediction.summary runs"""
     d = nx.testing.micro_data()
     p = nx.testing.micro_prediction()
     df = p[('model1', 1)].summary(d, 3)
@@ -333,28 +333,28 @@ def test_prediction_summary():
 
 
 def test_prediction_metric_per_era():
-    "make sure prediction.metric_per_era runs"
+    """make sure prediction.metric_per_era runs"""
     d = nx.testing.micro_data()
     p = nx.testing.micro_prediction()
-    df = p.metric_per_era(d, metric='logloss')
+    df = p.metric_per_era(d, metric='mse')
     ok_(isinstance(df, pd.DataFrame), 'expecting a dataframe')
     ok_(df.shape[0] == len(d.unique_era()), 'wrong shape')
     ok_(df.shape[1] == len(p.pairs()), 'wrong shape')
-    df = p.metric_per_era(d, metric='logloss', split_pairs=False)
+    df = p.metric_per_era(d, metric='mse', split_pairs=False)
     ok_(isinstance(df, pd.DataFrame), 'expecting a dataframe')
 
 
 def test_prediction_metrics_per_tournament():
-    "make sure prediction.metric_per_era runs"
+    """make sure prediction.metric_per_era runs"""
     d = nx.testing.micro_data()
     p = nx.testing.micro_prediction()
     df = p.metric_per_tournament(d)
     ok_(isinstance(df, pd.DataFrame), 'expecting a dataframe')
-    ok_(df.shape[1] == 8, 'expecting 6 columns')
+    ok_(df.shape[1] == 9, 'expecting 9 columns')
 
 
 def test_prediction_performance():
-    "make sure prediction.performance runs"
+    """make sure prediction.performance runs"""
     d = nx.testing.micro_data()
     p = nx.testing.micro_prediction()
     df = p.performance(d, 1)
@@ -368,7 +368,7 @@ def test_prediction_performance():
 
 
 def test_prediction_performance_mean():
-    "make sure prediction.performance_mean runs"
+    """make sure prediction.performance_mean runs"""
     d = nx.testing.micro_data()
     p = nx.testing.micro_prediction()
     df = p.performance_mean(d, mean_of='tournament')
@@ -385,39 +385,40 @@ def test_prediction_performance_mean():
 
 
 def test_prediction_regression():
-    "regression test of prediction performance evaluation"
+    """regression test of prediction performance evaluation"""
     d = nx.play_data()
-    p = nx.production(nx.logistic(), d, tournament=None, verbosity=0)
+    p = nx.production(nx.linear(), d, tournament=None, verbosity=0)
     for number, name in nx.tournament_iter():
-        p2 = nx.production(nx.logistic(), d, tournament=name, verbosity=0)
+        p2 = nx.production(nx.linear(), d, tournament=name, verbosity=0)
         df = p.performance_mean(d['validation'], mean_of='tournament')
-        logloss1 = df.loc[name]['logloss']
-        logloss2 = p2.summary(d['validation']).loc['mean']['logloss']
+        # TODO
+        logloss1 = df.loc[name]['mse']
+        logloss2 = p2.summary(d['validation']).loc['mean']['mse']
         diff = np.abs(logloss1 - logloss2)
         msg = 'failed on {}'.format(name)
         ok_(diff < 1e-6, msg)
 
 
 def test_prediction_dominance():
-    "make sure prediction.dominance runs"
+    """make sure prediction.dominance runs"""
 
     d = nx.play_data()
     d = d['validation']
 
     p = nx.Prediction()
-    p = p.merge_arrays(d.ids, d.y['bernie'], 'model1', 1)
-    p = p.merge_arrays(d.ids, d.y['elizabeth'], 'model2', 2)
-    p = p.merge_arrays(d.ids, d.y['jordan'], 'model3', 3)
+    p = p.merge_arrays(d.ids, d.y['kazutsugi'], 'model1', 8)
+    p = p.merge_arrays(d.ids, d.y['kazutsugi'], 'model2', 8)
+    p = p.merge_arrays(d.ids, d.y['kazutsugi'], 'model3', 8)
 
-    df = p.dominance(d, 3)
-    df = p.dominance(d, 'jordan')
+    df = p.dominance(d, 8)
+    df = p.dominance(d, 'kazutsugi')
 
     ok_(isinstance(df, pd.DataFrame), 'expecting a dataframe')
     assert_raises(ValueError, p[('model1', 1)].dominance, d, 1)
 
 
 def test_prediction_correlation():
-    "make sure prediction.correlation runs"
+    """make sure prediction.correlation runs"""
     p = nx.testing.micro_prediction()
     with nx.testing.HiddenPrints():
         p.correlation()
@@ -426,9 +427,9 @@ def test_prediction_correlation():
 
 
 def test_prediction_check():
-    "make sure prediction.check runs"
+    """make sure prediction.check runs"""
     d = nx.play_data()
-    p1 = nx.production(nx.logistic(), d, 'ken', verbosity=0)
+    p1 = nx.production(nx.linear(), d, 'kazutsugi', verbosity=0)
     p2 = p1.copy()
     p2 = p2.rename('example_predictions')
     p = p1 + p2
@@ -438,35 +439,43 @@ def test_prediction_check():
 
 
 def test_prediction_concordance():
-    "make sure prediction.concordance runs"
+    """make sure prediction.concordance runs"""
     d = nx.testing.play_data()
-    p = nx.production(nx.logistic(), d, 3, verbosity=0)
+    p = nx.production(nx.linear(), d, 8, verbosity=0)
     df = p.concordance(d)
     ok_(isinstance(df, pd.DataFrame), 'expecting a dataframe')
 
 
 def test_prediction_compare():
-    "make sure prediction.compare runs"
+    """make sure prediction.compare runs"""
     d = nx.testing.micro_data()
     p = nx.testing.micro_prediction()
-    df = p.compare(d, p, tournament=2)
+    df = p.compare(d, p, tournament=8)
     ok_(isinstance(df, pd.DataFrame), 'expecting a dataframe')
 
 
 def test_prediction_setitem():
-    "compare prediction._setitem__ with merge"
+    """compare prediction._setitem__ with merge"""
 
     data = nx.play_data()
+<<<<<<< HEAD
     p1 = nx.production(nx.logistic(), data, 'bernie', verbosity=0)
     p2 = nx.production(nx.logistic(1e-5), data, 2, verbosity=0)
     p3 = nx.production(nx.logistic(1e-6), data, 3, verbosity=0)
     p4 = nx.backtest(nx.logistic(), data, 4, verbosity=0)
+=======
+
+    p1 = nx.production(nx.linear(), data, 'kazutsugi', verbosity=0)
+    p2 = nx.production(nx.linear(), data, 8,  verbosity=0)
+    p3 = nx.production(nx.linear(), data, 8,  verbosity=0)
+    p4 = nx.backtest(nx.linear(), data, 8,  verbosity=0)
+>>>>>>> Squashing commits
 
     p = nx.Prediction()
-    p[('logistic', 1)] = p1
-    p[('logistic', 2)] = p2
-    p[('logistic', 3)] = p3
-    p[('logistic', 4)] = p4
+    p[('linear', 1)] = p1
+    p[('linear', 2)] = p2
+    p[('linear', 3)] = p3
+    p[('linear', 4)] = p4
 
     pp = nx.Prediction()
     pp = pp.merge(p1)
@@ -476,8 +485,8 @@ def test_prediction_setitem():
 
     pd.testing.assert_frame_equal(p.df, pp.df)
 
-    assert_raises(ValueError, p.__setitem__, ('logistic', 1), p1)
-    assert_raises(ValueError, p.__setitem__, ('logistic', 1), p)
+    assert_raises(ValueError, p.__setitem__, ('linear', 1), p1)
+    assert_raises(ValueError, p.__setitem__, ('linear', 1), p)
 
 
 def test_prediction_ynew():

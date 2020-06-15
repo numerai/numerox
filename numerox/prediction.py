@@ -32,32 +32,32 @@ class Prediction(object):
 
     @property
     def ids(self):
-        "View of ids as a numpy str array"
+        """View of ids as a numpy str array"""
         if self.df is None:
             return np.array([], dtype=str)
         return self.df.index.values
 
     @property
     def loc(self):
-        "indexing by row ids"
+        """indexing by row ids"""
         return Loc(self)
 
     # y ---------------------------------------------------------------------
 
     @property
     def y(self):
-        "View of y as a 2d numpy float array"
+        """View of y as a 2d numpy float array"""
         if self.df is None:
             raise ValueError("prediction is empty")
         return self.df.values
 
     @property
     def y_df(self):
-        "Copy of predictions, y, as a dataframe"
+        """Copy of predictions, y, as a dataframe"""
         return self.df.copy()
 
     def ynew(self, y_array):
-        "Copy of prediction but with prediction.y=`y_array`"
+        """Copy of prediction but with prediction.y=`y_array`"""
         if self.df is None:
             raise ValueError("prediction is empty")
         if y_array.shape != self.shape:
@@ -69,11 +69,11 @@ class Prediction(object):
         return Prediction(df)
 
     def y_correlation(self):
-        "Correlation matrix of y's (predictions) as dataframe"
+        """Correlation matrix of y's (predictions) as dataframe"""
         return self.df.corr()
 
     def correlation(self, pair=None, as_str=True):
-        "Correlation of predictions; by default reports given for each model"
+        """Correlation of predictions; by default reports given for each model"""
         if pair is None:
             pairs = self.pairs(as_str)
         else:
@@ -96,7 +96,7 @@ class Prediction(object):
     # name ------------------------------------------------------------------
 
     def names(self):
-        "List (copy) of names in prediction object"
+        """List (copy) of names in prediction object"""
         pairs = self.pairs()
         names = []
         for n, t in pairs:
@@ -105,12 +105,12 @@ class Prediction(object):
         return names
 
     def name_isin(self, name):
-        "Is name in Prediction object? True or False."
+        """Is name in Prediction object? True or False."""
         names = self.names()
         return name in names
 
     def drop_name(self, name):
-        "Drop name or list of names from prediction; return copy"
+        """Drop name or list of names from prediction; return copy"""
         if self.df is None:
             raise ValueError("Cannot drop a name from an empty prediction")
         pair = self.pairs_with_name(name, as_str=False)
@@ -156,7 +156,7 @@ class Prediction(object):
     # tournament ------------------------------------------------------------
 
     def tournaments(self, as_str=True):
-        "List (copy) of tournaments in prediction object"
+        """List (copy) of tournaments in prediction object"""
         pairs = self.pairs(as_str=False)
         tournaments = [t for n, t in pairs]
         tournaments = sorted(set(tournaments))
@@ -165,13 +165,13 @@ class Prediction(object):
         return tournaments
 
     def tournament_isin(self, tournament):
-        "Is tournament in Prediction object? True or False."
+        """Is tournament in Prediction object? True or False."""
         tournaments = self.tournaments(as_str=False)
         tournament = nx.tournament_int(tournament)
         return tournament in tournaments
 
     def drop_tournament(self, tournament):
-        "Drop tournament or list of tournaments from prediction; return copy"
+        """Drop tournament or list of tournaments from prediction; return copy"""
         if self.df is None:
             msg = "Cannot drop a tournament from an empty prediction"
             raise ValueError(msg)
@@ -182,7 +182,7 @@ class Prediction(object):
     # pair ------------------------------------------------------------------
 
     def pairs(self, as_str=True):
-        "List (copy) of (name, tournament) tuple in prediction object"
+        """List (copy) of (name, tournament) tuple in prediction object"""
         if self.df is None:
             return list()
         pairs = self.df.columns.tolist()
@@ -191,7 +191,7 @@ class Prediction(object):
         return pairs
 
     def pairs_df(self):
-        "Bool dataframe with names as index and tournaments as columns"
+        """Bool dataframe with names as index and tournaments as columns"""
         names = self.names()
         tourns = nx.tournament_all(active_only=False)
         df = pd.DataFrame(index=names, columns=tourns)
@@ -201,11 +201,11 @@ class Prediction(object):
         return df
 
     def pair_isin(self, pair):
-        "Is (name, tournament) tuple in Prediction object? True or False."
+        """Is (name, tournament) tuple in Prediction object? True or False."""
         return pair in self
 
     def pairs_with_name(self, name, as_str=True):
-        "List of pairs with given `name`; `name` can be str or list of str."
+        """List of pairs with given `name`; `name` can be str or list of str."""
         if isinstance(name, list):
             names = name
         elif nx.isstring(name):
@@ -220,7 +220,7 @@ class Prediction(object):
         return pairs
 
     def pairs_with_tournament(self, tournament, as_str=True):
-        "List of pairs; `tournament` can be int, str, or list"
+        """List of pairs; `tournament` can be int, str, or list"""
         if isinstance(tournament, list):
             tournaments = [nx.tournament_int(t) for t in tournament]
         elif nx.isstring(tournament):
@@ -239,24 +239,24 @@ class Prediction(object):
         return pairs
 
     def pairs_split(self, as_str=True):
-        "Split pairs into two lists: names and tournaments"
+        """Split pairs into two lists: names and tournaments"""
         pairs = self.pairs(as_str)
         name, tournament = zip(*pairs)
         return name, tournament
 
     def __contains__(self, pair):
-        "Is `pair` already in prediction? True or False"
+        """Is `pair` already in prediction? True or False"""
         pair = self.make_pair(*pair)
         return pair in self.df
 
     def make_pair(self, name, tournament):
-        "Combine `name` and `tournament` into a pair (dataframe column name)"
+        """Combine `name` and `tournament` into a pair (dataframe column name)"""
         if not nx.isstring(name):
             raise ValueError("`name` must be a string")
         return (name, nx.tournament_int(tournament))
 
     def drop_pair(self, pair):
-        "Drop pair (tuple) or list of pairs from prediction; return copy"
+        """Drop pair (tuple) or list of pairs from prediction; return copy"""
         if self.df is None:
             raise ValueError("Cannot drop a pair from an empty prediction")
         if isinstance(pair, list):
@@ -273,22 +273,22 @@ class Prediction(object):
     # merge -----------------------------------------------------------------
 
     def merge_arrays(self, ids, y, name, tournament):
-        "Merge numpy arrays `ids` and `y` with name `name`"
+        """Merge numpy arrays `ids` and `y` with name `name`"""
         pair = self.make_pair(name, tournament)
         df = pd.DataFrame(data=y, columns=[pair], index=ids)
         prediction = Prediction(df)
         return self.merge(prediction)
 
     def merge(self, prediction):
-        "Merge prediction"
+        """Merge prediction"""
         return merge_predictions([self, prediction])
 
     def __add__(self, prediction):
-        "Merge predictions"
+        """Merge predictions"""
         return self.merge(prediction)
 
     def __iadd__(self, prediction):
-        "Merge predictions"
+        """Merge predictions"""
         return self.merge(prediction)
 
     # io --------------------------------------------------------------------
@@ -337,7 +337,7 @@ class Prediction(object):
                 self.df.to_hdf(path_or_buf, HDF_PREDICTION_KEY)
 
     def to_csv(self, path_or_buf, decimals=6, verbose=False):
-        "Save a csv file of predictions; prediction must contain only one pair"
+        """Save a csv file of predictions; prediction must contain only one pair"""
         if self.shape[1] != 1:
             raise ValueError("prediction must contain a single pair")
         tourn = self.tournaments(as_str=True)[0]
@@ -351,7 +351,7 @@ class Prediction(object):
     # metrics ---------------------------------------------------------------
 
     def summary(self, data, tournament=None, round_output=True):
-        "Performance summary of prediction object that contains a single pair"
+        """Performance summary of prediction object that contains a single pair"""
 
         if self.shape[1] != 1:
             raise ValueError("prediction must contain a single pair")
@@ -399,7 +399,7 @@ class Prediction(object):
                   tournament=None,
                   round_output=True,
                   display=True):
-        "Dictionary of performance summaries of predictions"
+        """Dictionary of performance summaries of predictions"""
         df_dict = {}
         for pair in self.pairs(as_str=False):
             df_dict[pair] = self[pair].summary(data,
@@ -416,7 +416,11 @@ class Prediction(object):
                        metric='corr',
                        era_as_str=True,
                        split_pairs=True):
+<<<<<<< HEAD
         "DataFrame containing given metric versus era (as index)"
+=======
+        """DataFrame containing given metric versus era (as index)"""
+>>>>>>> Squashing commits
         df = self.metrics_per_era(data,
                                   tournament=tournament,
                                   metrics=[metric],
@@ -432,7 +436,11 @@ class Prediction(object):
                         metrics=['corr', 'mse', 'ystd'],
                         era_as_str=True,
                         split_pairs=True):
+<<<<<<< HEAD
         "DataFrame containing given metrics versus era (as index)"
+=======
+        """DataFrame containing given metrics versus era (as index)"""
+>>>>>>> Squashing commits
         metrics, regions = metrics_per_era(data,
                                            self,
                                            tournament,
@@ -449,7 +457,7 @@ class Prediction(object):
         return metrics
 
     def metric_per_tournament(self, data, metric='corr'):
-        "DataFrame containing given metric versus tournament"
+        """DataFrame containing given metric versus tournament"""
         dfs = []
         for t_int, t_name in nx.tournament_iter(active_only=False):
             df, info = metrics_per_name(data,
@@ -504,7 +512,11 @@ class Prediction(object):
                          region_as_str=True,
                          columns=['corr', 'mse', 'ystd', 'sharpe', 'consis'],
                          sort_by='corr'):
+<<<<<<< HEAD
         "Mean performance averaged across names (default) or tournaments,"
+=======
+        """Mean performance averaged across names (default) or tournaments,"""
+>>>>>>> Squashing commits
         df = self.performance(data,
                               era_as_str=era_as_str,
                               region_as_str=region_as_str,
@@ -542,7 +554,7 @@ class Prediction(object):
         return df
 
     def dominance(self, data, tournament=None, sort_by='corr'):
-        "Mean (across eras) of fraction of models bested per era"
+        """Mean (across eras) of fraction of models bested per era"""
         columns = ['corr', 'mse']
         mpe, regions = metrics_per_era(data, self, tournament, columns=columns)
         dfs = []
@@ -568,7 +580,7 @@ class Prediction(object):
         return df
 
     def concordance(self, data):
-        "Less than 0.12 is passing; data should be the full dataset."
+        """Less than 0.12 is passing; data should be the full dataset."""
         return concordance(data, self)
 
     def check(self, data, verbose=True):

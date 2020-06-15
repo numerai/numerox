@@ -5,6 +5,7 @@ import numerox as nx
 
 
 def get_models():
+<<<<<<< HEAD
     models = [
         nx.logistic(),
         nx.ridge_mean(),
@@ -15,6 +16,18 @@ def get_models():
         nx.example_predictions(),
         nx.fifty()
     ]
+=======
+
+    models = [nx.linear(),
+              nx.ridge_mean(),
+              nx.extratrees(),
+              nx.randomforest(),
+              nx.mlpc(),
+              nx.linearPCA(),
+              nx.example_predictions(),
+              nx.fifty()]
+
+>>>>>>> Squashing commits
     return models
 
 
@@ -31,25 +44,25 @@ def test_model_repr():
     model = test_model()
     model.__repr__()
 
-
+# TODO Fix for kazutsugi #32 DONE
 def test_model_run():
-    "Make sure models run"
+    """Make sure models run"""
     d = nx.play_data()
     dfit = d['train']
     dpre = d['tournament']
     for model in get_models():
-        model.fit_predict(dfit, dpre, tournament=5)
+        model.fit_predict(dfit, dpre, tournament=8)
 
 
 def test_model_rename():
     "Test renaming a model"
-    model = nx.logistic()
-    ok_(model.name == 'logistic', 'wrong name')
+    model = nx.linear()
+    ok_(model.name == 'linear', 'wrong name')
     model.rename('LR')
     ok_(model.name == 'LR', 'wrong name')
     model = model.rename('logreg')
     ok_(model.name == 'logreg', 'wrong name')
     ok_(model.__repr__().startswith('logreg'), 'wrong name')
-    model = nx.logistic()
-    ok_(model.rename(None).name == 'logistic', 'wrong name')
+    model = nx.linear()
+    ok_(model.rename(None).name == 'linear', 'wrong name')
     assert_raises(ValueError, model.rename, 1)

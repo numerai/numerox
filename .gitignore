@@ -5,3 +5,9 @@ dist
 cover
 *.coverage
 *.lprof
+
+*.vscode/
+*.*/
+*_*/
+
+venv/*
