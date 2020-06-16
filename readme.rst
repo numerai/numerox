@@ -1,12 +1,13 @@
-.. image:: https://github.com/csp197/numerox/workflows/makefile_test/badge.svg
-    :target: https://github.com/CSP197/numerox/actions
+.. image:: https://github.com/numerai/numerox/workflows/makefile_test/badge.svg
+    :target: https://github.com/numerai/numerox/actions
     
 .. image:: https://travis-ci.org/numerai/numerox.svg?branch=master
     :target: https://travis-ci.org/numerai/numerox
 
 .. image:: https://img.shields.io/pypi/v/numerox.svg
    :target: https://pypi.python.org/pypi/numerox/
-numerox
+
+Numerox
 =======
 
 Numerox is a Numerai tournament toolbox written in Python.
@@ -81,7 +82,7 @@ Resources
 
 - Let's `chat`_
 - See `examples`_
-- Check `what's new`_
+- Check `whats new`_
 - Report `bugs`_
 
 Sponsor
@@ -97,9 +98,9 @@ Where indicated by code comments parts of NumPy are included in numerox. The
 NumPy license appears in the licenses directory.
 
 
-.. _model: https://github.com/kwgoodman/numerox/blob/master/numerox/examples/model.rst
-.. _examples: https://github.com/kwgoodman/numerox/blob/master/numerox/examples/readme.rst
+.. _model: https://github.com/numerai/numerox/blob/master/numerox/examples/model.rst
+.. _examples: https://github.com/numerai/numerox/blob/master/numerox/examples/readme.rst
 .. _chat: https://community.numer.ai/channel/numerox
-.. _bugs: https://github.com/kwgoodman/numerox/issues
-.. _what's new: https://github.com/kwgoodman/numerox/blob/master/release.rst
+.. _bugs: https://github.com/numerai/numerox/issues
+.. _whats new: https://github.com/numerai/numerox/blob/master/release.rst
 .. _Numerai: https://numer.ai

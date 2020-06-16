@@ -29,11 +29,8 @@ def metrics_per_era(data,
                     era_as_str=False,
                     region_as_str=False,
                     split_pairs=True):
-<<<<<<< HEAD
-    "Dataframe with columns era, model, and specified metrics. And region list"
-=======
+
     """Dataframe with columns era, model, and specified metrics. And region list"""
->>>>>>> Squashing commits
 
     df = prediction.df
 

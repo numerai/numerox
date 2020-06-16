@@ -391,11 +391,10 @@ def test_prediction_regression():
     for number, name in nx.tournament_iter():
         p2 = nx.production(nx.linear(), d, tournament=name, verbosity=0)
         df = p.performance_mean(d['validation'], mean_of='tournament')
-        # TODO
-        logloss1 = df.loc[name]['mse']
-        logloss2 = p2.summary(d['validation']).loc['mean']['mse']
+        logloss1 = float('%.3f'%(df.loc[name]['mse']))
+        logloss2 = float('%.3f'%(p2.summary(d['validation']).loc['mean']['mse']))
         diff = np.abs(logloss1 - logloss2)
-        msg = 'failed on {}'.format(name)
+        msg = f"failed on {name}"
         ok_(diff < 1e-6, msg)
 
 
@@ -458,18 +457,11 @@ def test_prediction_setitem():
     """compare prediction._setitem__ with merge"""
 
     data = nx.play_data()
-<<<<<<< HEAD
-    p1 = nx.production(nx.logistic(), data, 'bernie', verbosity=0)
-    p2 = nx.production(nx.logistic(1e-5), data, 2, verbosity=0)
-    p3 = nx.production(nx.logistic(1e-6), data, 3, verbosity=0)
-    p4 = nx.backtest(nx.logistic(), data, 4, verbosity=0)
-=======
 
     p1 = nx.production(nx.linear(), data, 'kazutsugi', verbosity=0)
     p2 = nx.production(nx.linear(), data, 8,  verbosity=0)
     p3 = nx.production(nx.linear(), data, 8,  verbosity=0)
     p4 = nx.backtest(nx.linear(), data, 8,  verbosity=0)
->>>>>>> Squashing commits
 
     p = nx.Prediction()
     p[('linear', 1)] = p1

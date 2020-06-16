@@ -16,11 +16,7 @@ def test_splitter_overlap():
         nx.CheatSplitter(d),
         nx.CVSplitter(d),
         nx.LoocvSplitter(d),
-<<<<<<< HEAD
-        nx.IgnoreEraCVSplitter(d, tournament=1),
-=======
         nx.IgnoreEraCVSplitter(d, tournament=8),
->>>>>>> Squashing commits
         nx.SplitSplitter(d, fit_fraction=0.5),
         nx.ConsecutiveCVSplitter(d)
     ]
@@ -41,11 +37,7 @@ def test_splitter_reset():
         nx.CheatSplitter(d),
         nx.CVSplitter(d),
         nx.LoocvSplitter(d),
-<<<<<<< HEAD
-        nx.IgnoreEraCVSplitter(d, tournament=2),
-=======
         nx.IgnoreEraCVSplitter(d, tournament=8),
->>>>>>> Squashing commits
         nx.SplitSplitter(d, fit_fraction=0.5),
         nx.ConsecutiveCVSplitter(d)
     ]

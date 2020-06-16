@@ -152,9 +152,7 @@ def test_data_pca():
         corr = np.corrcoef(d2.x.T)
         corr.flat[::corr.shape[0] + 1] = 0
         corr = np.abs(corr).max()
-
-        # TODO
-        # ok_(corr < 1e-5, "features are not orthogonal")
+        ok_(corr < 1e-5, "features are not orthogonal")
 
 
 def test_data_y_for_tournament():
@@ -163,14 +161,10 @@ def test_data_y_for_tournament():
 
     for number, name in nx.tournament_iter(active_only=True):
         y = np.zeros(14)
-<<<<<<< HEAD
-        y[i - 1] = 1
-        y[i - 1 + 5] = 1
-=======
 
         y[0] = y[4] = y[5] = y[9] = 0.75000
         y[1] = y[6] = 0.25000
->>>>>>> Squashing commits
+
         y[10:] = np.nan
 
         yt = d.y[number]
@@ -311,17 +305,6 @@ def test_data_properties():
     ok_((d.era_float == d.df.era).all(), "era is corrupted")
     ok_((d.region_float == d.df.region).all(), "region is corrupted")
 
-<<<<<<< HEAD
-    idx = ~np.isnan(d.y[:])
-    y = d.df[[
-        'bernie', 'elizabeth', 'jordan', 'ken', 'charles', 'frank', 'hillary'
-    ]].values
-    ok_((d.y[:][idx] == y[idx]).all(), "y is corrupted")
-
-    x = d.x
-    for i, name in enumerate(d.column_list(x_only=True)):
-        ok_((x[:, i] == d.df[name]).all(), "%s is corrupted" % name)
-=======
     idx = ~pd.isnull(d.y[:])
     y = d.df[['kazutsugi']].values
     # TODO
@@ -332,7 +315,6 @@ def test_data_properties():
     # x = d.x
     # for i, name in enumerate(d.column_list(x_only=True)):
     #     ok_((x[:, i] == d.df[name]).all(), "%s is corrupted" % name)
->>>>>>> Squashing commits
 
 
 def test_data_era_isnotin():

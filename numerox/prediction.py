@@ -416,11 +416,9 @@ class Prediction(object):
                        metric='corr',
                        era_as_str=True,
                        split_pairs=True):
-<<<<<<< HEAD
-        "DataFrame containing given metric versus era (as index)"
-=======
+
         """DataFrame containing given metric versus era (as index)"""
->>>>>>> Squashing commits
+
         df = self.metrics_per_era(data,
                                   tournament=tournament,
                                   metrics=[metric],
@@ -436,11 +434,9 @@ class Prediction(object):
                         metrics=['corr', 'mse', 'ystd'],
                         era_as_str=True,
                         split_pairs=True):
-<<<<<<< HEAD
-        "DataFrame containing given metrics versus era (as index)"
-=======
+
         """DataFrame containing given metrics versus era (as index)"""
->>>>>>> Squashing commits
+
         metrics, regions = metrics_per_era(data,
                                            self,
                                            tournament,
@@ -512,11 +508,8 @@ class Prediction(object):
                          region_as_str=True,
                          columns=['corr', 'mse', 'ystd', 'sharpe', 'consis'],
                          sort_by='corr'):
-<<<<<<< HEAD
-        "Mean performance averaged across names (default) or tournaments,"
-=======
         """Mean performance averaged across names (default) or tournaments,"""
->>>>>>> Squashing commits
+
         df = self.performance(data,
                               era_as_str=era_as_str,
                               region_as_str=region_as_str,

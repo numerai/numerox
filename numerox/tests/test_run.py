@@ -8,16 +8,6 @@ from numerox import testing
 def test_run():
     "Make sure run runs"
     d = testing.play_data()
-<<<<<<< HEAD
-    models = [nx.logistic(), nx.fifty()]
-    splitters = [
-        nx.TournamentSplitter(d),
-        nx.ValidationSplitter(d),
-        nx.CheatSplitter(d),
-        nx.CVSplitter(d, kfold=2),
-        nx.SplitSplitter(d, fit_fraction=0.5)
-    ]
-=======
 
     models = [nx.linear(), nx.fifty()]
     splitters = [nx.TournamentSplitter(d),
@@ -25,7 +15,7 @@ def test_run():
                  nx.CheatSplitter(d),
                  nx.CVSplitter(d, kfold=2),
                  nx.SplitSplitter(d, fit_fraction=0.5)]
->>>>>>> Squashing commits
+
     for model in models:
         for splitter in splitters:
             p = nx.run(model, splitter, tournament=None, verbosity=0)
@@ -86,17 +76,10 @@ def test_backtest_production():
             nx.production(model, d, tournament=8, verbosity=verbosity)
             nx.production(model, d, tournament=None, verbosity=verbosity)
             if verbosity == 3:
-<<<<<<< HEAD
-                nx.production(model, d, tournament=5, verbosity=verbosity)
-                nx.production(model,
-                              d,
-                              tournament='charles',
-=======
                 nx.production(model, d, tournament=8, verbosity=verbosity)
                 nx.production(model,
                               d,
                               tournament='kazutsugi',
->>>>>>> Squashing commits
                               verbosity=verbosity)
 
 

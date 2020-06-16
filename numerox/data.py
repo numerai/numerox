@@ -181,17 +181,10 @@ class Data(object):
             raise ValueError(msg)
         n = nx.tournament_count(active_only=True)
         shape = (x_array.shape[0], x_array.shape[1] + n + 2)
-<<<<<<< HEAD
-        cols = ['x' + str(i) for i in range(x_array.shape[1])]
-        cols = ['era', 'region'] + cols
-        cols = cols + [
-            name for number, name in nx.tournament_iter(active_only=True)
-=======
         cols = ['x' + str(col) for col in range(1, x_array.shape[1]+1)]
         cols = ['era', 'region'] + cols
         cols = cols + [
             name for _, name in nx.tournament_iter(active_only=True)
->>>>>>> Squashing commits
         ]
         df = pd.DataFrame(data=np.empty(shape, dtype=np.float64),
                           index=self.df.index.copy(deep=True),
@@ -551,6 +544,8 @@ class Data(object):
         x = self.x
         stats = '{}, min {:.4f}, mean {:.4f}, max {:.4f}'
         # TODO
+        # This is a quick fix to convert vectors to scalars
+        # Not sure if this is the correct approach for all inputs
         a = x.shape[1]
         b = x.min().min()
         c = x.mean().mean()
@@ -590,12 +585,9 @@ def load_zip(file_path,
     It includes train data by default. To work with tournament data only,
     set `include_train` to False.
 
-<<<<<<< HEAD
-    Set `single_precision` to True in order to have data in float32 (saves memory).
-=======
+
     Set `single_precision` to True in order to have data in float32 
     (saves memory).
->>>>>>> Squashing commits
     """
 
     # load zip
@@ -647,12 +639,9 @@ def load_zip(file_path,
         rename_map['target_' + name] = name
     df.rename(columns=rename_map, inplace=True)
 
-<<<<<<< HEAD
-    # convert era, region, and labels to np.float32 or np.float64 depending on the mode
-=======
     # convert era, region, and labels to np.float32 or
     # np.float64 depending on the mode
->>>>>>> Squashing commits
+
     df['era'] = df['era'].map(ERA_STR_TO_FLOAT)
     df['region'] = df['region'].map(REGION_STR_TO_FLOAT)
     n = nx.tournament_count(active_only=True)

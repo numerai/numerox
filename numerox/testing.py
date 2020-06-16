@@ -55,13 +55,7 @@ def shares_memory(data1, data_or_array2):
 
 
 def micro_data(index=None):
-<<<<<<< HEAD
-    "Returns a tiny data object for use in unit testing"
-    cols = [
-        'era', 'region', 'x1', 'x2', 'x3', 'bernie', 'elizabeth', 'jordan',
-        'ken', 'charles', 'frank', 'hillary'
-    ]
-=======
+
     """Returns a tiny data object for use in unit testing"""
 
     cols = ['era',
@@ -70,7 +64,6 @@ def micro_data(index=None):
             'kazutsugi'
             ]
 
->>>>>>> Squashing commits
     df = pd.DataFrame(columns=cols)
     d0 = ['era1', 'train'] + [0.00, 0.01, 0.02] + [0]
     d1 = ['era2', 'train'] + [0.10, 0.11, 0.12] + [1]

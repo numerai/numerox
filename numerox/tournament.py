@@ -1,20 +1,5 @@
 import numerox as nx
 
-<<<<<<< HEAD
-=======
-
-# # TOURNAMENTS = [{'name': 'bernie', 'number': 1, 'active': False},
-# #                {'name': 'elizabeth', 'number': 2, 'active': False},
-# #                {'name': 'jordan', 'number': 3, 'active': False},
-# #                {'name': 'ken', 'number': 4, 'active': False},
-# #                {'name': 'charles', 'number': 5, 'active': False},
-# #                {'name': 'frank', 'number': 6, 'active': False},
-# #                {'name': 'hillary', 'number': 7, 'active': False},
-
-
-# TOURNAMENTS = [{'name': 'kazutsugi', 'number': 1, 'active': True}]
-
->>>>>>> Squashing commits
 TOURNAMENTS = [{
     'name': 'bernie',
     'number': 1,
@@ -94,19 +79,12 @@ def tournament_iter(active_only=True):
 
 
 def tournament_int2str(tournament_int):
-<<<<<<< HEAD
-    "Convert tournament integer to string name"
-    if tournament_int not in nx.tournament_numbers(active_only=True):
-        raise ValueError(
-            "`tournament_int` {} not recognized".format(tournament_int))
-=======
     """Convert tournament integer to string name"""
 
     if tournament_int not in nx.tournament_numbers(active_only=False):
         value_err = "tournament_int `{}` not recognized".format(tournament_int)
         raise ValueError(value_err)
 
->>>>>>> Squashing commits
     for tourney in TOURNAMENTS:
         if tourney['number'] == tournament_int:
             return tourney['name']

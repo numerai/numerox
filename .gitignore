@@ -10,4 +10,4 @@ cover
 *.*/
 *_*/
 
-venv/*
+nmr_env/*

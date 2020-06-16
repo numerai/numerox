@@ -5,18 +5,6 @@ import numerox as nx
 
 
 def get_models():
-<<<<<<< HEAD
-    models = [
-        nx.logistic(),
-        nx.ridge_mean(),
-        nx.extratrees(),
-        nx.randomforest(),
-        nx.mlpc(),
-        nx.logisticPCA(),
-        nx.example_predictions(),
-        nx.fifty()
-    ]
-=======
 
     models = [nx.linear(),
               nx.ridge_mean(),
@@ -27,12 +15,11 @@ def get_models():
               nx.example_predictions(),
               nx.fifty()]
 
->>>>>>> Squashing commits
     return models
 
 
 def test_model_repr():
-    "Make sure Model.__repr__ runs"
+    """Make sure Model.__repr__ runs"""
     for model in get_models():
         model.__repr__()
 
@@ -44,7 +31,6 @@ def test_model_repr():
     model = test_model()
     model.__repr__()
 
-# TODO Fix for kazutsugi #32 DONE
 def test_model_run():
     """Make sure models run"""
     d = nx.play_data()
@@ -55,7 +41,7 @@ def test_model_run():
 
 
 def test_model_rename():
-    "Test renaming a model"
+    """Test renaming a model"""
     model = nx.linear()
     ok_(model.name == 'linear', 'wrong name')
     model.rename('LR')
