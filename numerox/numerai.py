@@ -142,7 +142,7 @@ def upload_status(upload_id, public_id, secret_key, model_id=None):
     napi = NumerAPI(public_id=public_id,
                     secret_key=secret_key,
                     verbosity='warning')
-    status_raw = napi.submission_status(upload_id, model_id=model_id)
+    status_raw = napi.submission_status(model_id=model_id)
     status = {}
     for key, value in status_raw.items():
         if isinstance(value, dict):
