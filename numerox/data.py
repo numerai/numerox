@@ -623,12 +623,7 @@ def load_zip(file_path,
     for i in range(1, N_FEATURES + 1):
         rename_map['feature' + str(i)] = 'x' + str(i)
     for number, name in nx.tournament_iter(active_only=True):
-        if number >= 8:
-            # Starting for round 238, training and tournament files will
-            # contain the target column `target` instead of `target_kazutsugi`.
-            rename_map['target'] = name
-        else:
-            rename_map['target_' + name] = name
+        rename_map['target'] = name
     df.rename(columns=rename_map, inplace=True)
 
     # convert era, region, and labels to np.float32 or np.float64 depending on the mode
