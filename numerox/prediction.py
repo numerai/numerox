@@ -340,8 +340,7 @@ class Prediction(object):
         "Save a csv file of predictions; prediction must contain only one pair"
         if self.shape[1] != 1:
             raise ValueError("prediction must contain a single pair")
-        tourn = self.tournaments(as_str=True)[0]
-        df = self.df.iloc[:, 0].to_frame('probability_' + tourn)
+        df = self.df.iloc[:, 0].to_frame('prediction')
         df.index.rename('id', inplace=True)
         float_format = "%.{}f".format(decimals)
         df.to_csv(path_or_buf, float_format=float_format)
