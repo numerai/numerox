@@ -12,7 +12,7 @@ TEST_DATA = os.path.join(os.path.dirname(__file__), 'tests', 'test_data.hdf')
 
 
 def assert_data_equal(obj1, obj2, msg=None):
-    "Assert that two data (or prediction) objects are equal"
+    """Assert that two data (or prediction) objects are equal"""
     try:
         pd.testing.assert_frame_equal(obj1.df, obj2.df)
     except AssertionError as e:
@@ -24,7 +24,7 @@ def assert_data_equal(obj1, obj2, msg=None):
 
 
 def shares_memory(data1, data_or_array2):
-    "True if `data1` shares memory with `data_or_array2`; False otherwise"
+    """True if `data1` shares memory with `data_or_array2`; False otherwise"""
 
     isdata_like = isinstance(data_or_array2, nx.Data)
     isdata_like = isdata_like or isinstance(data_or_array2, nx.Prediction)
@@ -55,23 +55,26 @@ def shares_memory(data1, data_or_array2):
 
 
 def micro_data(index=None):
-    "Returns a tiny data object for use in unit testing"
-    cols = [
-        'era', 'region', 'x1', 'x2', 'x3', 'bernie', 'elizabeth', 'jordan',
-        'ken', 'charles', 'frank', 'hillary'
-    ]
+
+    """Returns a tiny data object for use in unit testing"""
+
+    cols = ['era',
+            'region',
+            'x1', 'x2', 'x3',
+            'kazutsugi'
+            ]
+
     df = pd.DataFrame(columns=cols)
-    d0 = ['era1', 'train'] + [0.00, 0.01, 0.02]
-    d0 += [0., 0., 1., 1., 0., 0., 0.]
-    d1 = ['era2', 'train'] + [0.10, 0.11, 0.12] + [1, 1, 1, 1, 0, 0, 1]
-    d2 = ['era2', 'train'] + [0.20, 0.21, 0.22] + [0, 1, 1, 1, 1, 1, 0]
-    d3 = ['era3', 'validation'] + [0.30, 0.31, 0.32] + [1, 1, 0, 1, 0, 1, 1]
-    d4 = ['era3', 'validation'] + [0.40, 0.41, 0.42] + [0, 0, 0, 1, 0, 0, 0]
-    d5 = ['era3', 'validation'] + [0.50, 0.51, 0.52] + [1, 1, 1, 1, 0, 0, 1]
-    d6 = ['era4', 'validation'] + [0.60, 0.61, 0.62] + [0, 1, 0, 1, 1, 1, 1]
-    d7 = ['eraX', 'test'] + [0.70, 0.71, 0.72] + [1, 1, 1, 1, 1, 0, 0]
-    d8 = ['eraX', 'test'] + [0.80, 0.81, 0.82] + [0, 0, 0, 0, 0, 0, 1]
-    d9 = ['eraX', 'live'] + [0.90, 0.91, 0.92] + [0, 1, 0, 0, 1, 1, 0]
+    d0 = ['era1', 'train'] + [0.00, 0.01, 0.02] + [0]
+    d1 = ['era2', 'train'] + [0.10, 0.11, 0.12] + [1]
+    d2 = ['era2', 'train'] + [0.20, 0.21, 0.22] + [0]
+    d3 = ['era3', 'validation'] + [0.30, 0.31, 0.32] + [1]
+    d4 = ['era3', 'validation'] + [0.40, 0.41, 0.42] + [0]
+    d5 = ['era3', 'validation'] + [0.50, 0.51, 0.52] + [1]
+    d6 = ['era4', 'validation'] + [0.60, 0.61, 0.62] + [0]
+    d7 = ['eraX', 'test'] + [0.70, 0.71, 0.72] + [0]
+    d8 = ['eraX', 'test'] + [0.80, 0.81, 0.82] + [0]
+    d9 = ['eraX', 'live'] + [0.90, 0.91, 0.92] + [0]
     df.loc['index0'] = d0
     df.loc['index1'] = d1
     df.loc['index2'] = d2
@@ -92,7 +95,7 @@ def micro_data(index=None):
 
 
 def micro_prediction(index=None):
-    "Returns a tiny prediction object for use in unit testing"
+    """Returns a tiny prediction object for use in unit testing"""
     cols = [('model0', 2), ('model1', 1), ('model2', 3), ('model0', 5)]
     df = pd.DataFrame(columns=cols)
     df.loc['index0'] = [0.002, 0.011, 0.023, 0.005]
@@ -113,12 +116,12 @@ def micro_prediction(index=None):
 
 
 def play_data():
-    "About 1% of a regular Numerai dataset, so contains around 60 rows per era"
+    """About 1% of a regular Numerai dataset, so contains around 60 rows per era"""
     return nx.load_data(TEST_DATA)
 
 
 def update_play_data(data=None, fraction=0.01):
-    "Create and save data used by play_data function"
+    """Create and save data used by play_data function"""
     if data is None:
         data = nx.numerai.download_data_object()
     play = data.subsample(fraction=fraction, seed=0)
@@ -126,12 +129,12 @@ def update_play_data(data=None, fraction=0.01):
 
 
 def create_tempfile(path):
-    "Create temporary file"
+    """Create temporary file"""
     return os.path.join(tempfile.gettempdir(), path)
 
 
 def delete_tempfile(path):
-    "Remove file"
+    """Remove file"""
     try:
         os.remove(path)
     except:  # noqa

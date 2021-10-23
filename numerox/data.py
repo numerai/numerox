@@ -39,31 +39,31 @@ class Data(object):
 
     @property
     def ids(self):
-        "Copy of ids as a numpy str array"
+        """Copy of ids as a numpy str array"""
         return self.df.index.values.astype('str')
 
     # era -------------------------------------------------------------------
 
     @property
     def era(self):
-        "Copy of era as a 1d numpy str array"
+        """Copy of era as a 1d numpy str array"""
         series = self.df['era'].map(ERA_INT_TO_STR)
         return series.values.astype(str)
 
     @property
     def era_float(self):
-        "View of era as a 1d numpy float array"
+        """View of era as a 1d numpy float array"""
         return self.df['era'].values
 
     def unique_era(self, as_str=True):
-        "Array of unique eras as strings (default) or floats"
+        """Array of unique eras as strings (default) or floats"""
         unique_era = np.sort(self.df.era.unique())
         if as_str:
             unique_era = np.array(self.eras_int2str(unique_era))
         return unique_era
 
     def era_iter(self, as_str=True):
-        "Iterator that yields era and bool index that gives rows of era"
+        """Iterator that yields era and bool index that gives rows of era"""
         eras = self.unique_era(as_str=False)
         for era in eras:
             index = self.era_float == era
@@ -72,19 +72,19 @@ class Data(object):
             yield era, index
 
     def era_isin(self, eras):
-        "Copy of data containing only eras in the iterable `eras`"
+        """Copy of data containing only eras in the iterable `eras`"""
         eras = self.eras_str2int(eras)
         idx = self.df.era.isin(eras)
         return self[idx]
 
     def era_isnotin(self, eras):
-        "Copy of data containing eras that are not the iterable `eras`"
+        """Copy of data containing eras that are not the iterable `eras`"""
         eras = self.eras_str2int(eras)
         idx = self.df.era.isin(eras)
         return self[~idx]
 
     def eras_str2int(self, eras):
-        "List with eras names (str) converted to int"
+        """List with eras names (str) converted to int"""
         e = []
         for era in eras:
             if era in ERA_STR_TO_INT:
@@ -94,7 +94,7 @@ class Data(object):
         return e
 
     def eras_int2str(self, eras):
-        "List with eras numbers converted to eras names (str)"
+        """List with eras numbers converted to eras names (str)"""
         e = []
         for era in eras:
             if era in ERA_INT_TO_STR:
@@ -107,24 +107,24 @@ class Data(object):
 
     @property
     def region(self):
-        "Copy of region as a 1d numpy str array"
+        """Copy of region as a 1d numpy str array"""
         series = self.df['region'].map(REGION_INT_TO_STR)
         return series.values.astype(str)
 
     @property
     def region_float(self):
-        "View of region as a 1d numpy float array"
+        """View of region as a 1d numpy float array"""
         return self.df['region'].values
 
     def unique_region(self, as_str=True):
-        "Array of unique regions as strings (default) or floats"
+        """Array of unique regions as strings (default) or floats"""
         unique_region = np.sort(self.df.region.unique())
         if as_str:
             unique_region = np.array(self.regions_int2str(unique_region))
         return unique_region
 
     def region_iter(self, as_str=True):
-        "Iterator that yields region and bool index that gives rows of region"
+        """Iterator that yields region and bool index that gives rows of region"""
         regions = self.unique_region(as_str=False)
         for region in regions:
             index = self.region_float == region
@@ -133,19 +133,19 @@ class Data(object):
             yield region, index
 
     def region_isin(self, regions):
-        "Copy of data containing only regions in the iterable `regions`"
+        """Copy of data containing only regions in the iterable `regions`"""
         regions = self.regions_str2int(regions)
         idx = self.df.region.isin(regions)
         return self[idx]
 
     def region_isnotin(self, regions):
-        "Copy of data containing regions that are not the iterable `regions`"
+        """Copy of data containing regions that are not the iterable `regions`"""
         regions = self.regions_str2int(regions)
         idx = self.df.region.isin(regions)
         return self[~idx]
 
     def regions_str2int(self, regions):
-        "List with regions names (str) converted to int"
+        """List with regions names (str) converted to int"""
         r = []
         for region in regions:
             if region in REGION_STR_TO_INT:
@@ -155,7 +155,7 @@ class Data(object):
         return r
 
     def regions_int2str(self, regions):
-        "List with regions numbers converted to region names (str)"
+        """List with regions numbers converted to region names (str)"""
         r = []
         for region in regions:
             if region in REGION_INT_TO_STR:
@@ -168,21 +168,23 @@ class Data(object):
 
     @property
     def x(self):
-        "View of features, x, as a numpy float array"
+        """View of features, x, as a numpy float array"""
         n = nx.tournament_count(active_only=True)
-        return self.df.iloc[:, 2:-n].values
+        return self.df.iloc[:, 2:-n]
 
     def xnew(self, x_array):
-        "Copy of data but with data.x=`x_array`; must have same number of rows"
+        """ Copy of data but with data.x=`x_array`
+            must have same number of rows
+        """
         if x_array.shape[0] != len(self):
             msg = "`x_array` must have the same number of rows as data"
             raise ValueError(msg)
         n = nx.tournament_count(active_only=True)
         shape = (x_array.shape[0], x_array.shape[1] + n + 2)
-        cols = ['x' + str(i) for i in range(x_array.shape[1])]
+        cols = ['x' + str(col) for col in range(1, x_array.shape[1]+1)]
         cols = ['era', 'region'] + cols
         cols = cols + [
-            name for number, name in nx.tournament_iter(active_only=True)
+            name for _, name in nx.tournament_iter(active_only=True)
         ]
         df = pd.DataFrame(data=np.empty(shape, dtype=np.float64),
                           index=self.df.index.copy(deep=True),
@@ -190,13 +192,13 @@ class Data(object):
         df['era'] = self.df['era'].values.copy()
         df['region'] = self.df['region'].values.copy()
         df.values[:, 2:-n] = x_array
-        for number, name in nx.tournament_iter(active_only=True):
+        for _, name in nx.tournament_iter(active_only=True):
             df[name] = self.df[name].values.copy()
         return Data(df)
 
     @property
     def xshape(self):
-        "Shape (nrows, ncols) of x; faster than data.x.shape"
+        """Shape (nrows, ncols) of x; faster than data.x.shape"""
         rows = self.df.shape[0]
         cols = len(self.column_list(x_only=True))
         return (rows, cols)
@@ -205,7 +207,7 @@ class Data(object):
 
     @property
     def y_df(self):
-        "Copy of targets, y, as a dataframe"
+        """Copy of targets, y, as a dataframe"""
         columns = []
         data = []
         for number, name in nx.tournament_iter(active_only=True):
@@ -217,12 +219,12 @@ class Data(object):
 
     @property
     def y(self):
-        "indexing targets, y, by tournament name or number"
+        """indexing targets, y, by tournament name or number"""
         return Y(self)
 
     def y_sum_hist(self):
-        "Histogram data of sum of y targets across tournaments as dataframe"
-        s = self.y[:].sum(axis=1)
+        """Histogram data of sum of y targets across tournaments as dataframe"""
+        s = np.array(self.y[:].sum(axis=1), dtype='float64')
         s = s[np.isfinite(s)]
         data = []
         for si in range(nx.tournament_count() + 1):
@@ -232,7 +234,7 @@ class Data(object):
         return df
 
     def y_similarity(self):
-        "Similarity (fraction of y's equal) matrix as dataframe"
+        """Similarity (fraction of y's equal) matrix as dataframe"""
         cols = []
         n = nx.tournament_count()
         s = np.ones((n, n))
@@ -251,7 +253,7 @@ class Data(object):
         return df
 
     def y_to_nan(self):
-        "Copy of data with y values set to NaN"
+        """Copy of data with y values set to NaN"""
         data = self.copy()
         for name in nx.tournament_names(active_only=True):
             kwargs = {name: np.nan}
@@ -390,12 +392,13 @@ class Data(object):
         Python version, etc). But should be the same for the same dataset on
         the same system.
         """
-        b = self.df.values.tobytes(order='A')
-        h = hash(b)
-        return h
+
+        h = pd.util.hash_pandas_object(self.df)
+        m = h.mean()
+        return m
 
     def copy(self):
-        "Copy of data"
+        """Copy of data"""
         # df.copy(deep=True) doesn't copy index. So:
         df = self.df
         df = pd.DataFrame(df.values.copy(), df.index.copy(deep=True),
@@ -403,7 +406,7 @@ class Data(object):
         return Data(df)
 
     def save(self, path_or_buf, compress=False):
-        "Save data as an hdf archive"
+        """Save data as an hdf archive"""
         if compress:
             self.df.to_hdf(path_or_buf,
                            HDF_DATA_KEY,
@@ -413,7 +416,7 @@ class Data(object):
             self.df.to_hdf(path_or_buf, HDF_DATA_KEY)
 
     def column_list(self, x_only=False):
-        "Return column names of dataframe as a list"
+        """Return column names of dataframe as a list"""
         cols = self.df.columns.tolist()
         if x_only:
             cols = [n for n in cols if n.startswith('x')]
@@ -430,7 +433,7 @@ class Data(object):
         return self.df.shape
 
     def __getitem__(self, index):
-        "Data indexing"
+        """Data indexing"""
         typidx = type(index)
         if isinstance(index, str):
             if index.startswith('era'):
@@ -501,19 +504,19 @@ class Data(object):
 
     @property
     def loc(self):
-        "indexing by row ids"
+        """indexing by row ids"""
         return Loc(self)
 
     def __len__(self):
-        "Number of rows"
+        """Number of rows"""
         return self.df.__len__()
 
     def __eq__(self, other_data):
-        "Check if data objects are equal (True) or not (False); order matters"
+        """Check if data objects are equal (True) or not (False); order matters"""
         return self.df.equals(other_data.df)
 
     def __add__(self, other_data):
-        "concatenate two data objects that have no overlap in ids"
+        """concatenate two data objects that have no overlap in ids"""
         return concat_data([self, other_data])
 
     def __repr__(self):
@@ -540,12 +543,20 @@ class Data(object):
         # x
         x = self.x
         stats = '{}, min {:.4f}, mean {:.4f}, max {:.4f}'
-        stats = stats.format(x.shape[1], x.min(), x.mean(), x.max())
+        # TODO
+        # This is a quick fix to convert vectors to scalars
+        # Not sure if this is the correct approach for all inputs
+        a = x.shape[1]
+        b = x.min().min()
+        c = x.mean().mean()
+        d = x.max().max()
+        stats = stats.format(a, b, c, d)
         t.append(fmt.format('x', stats))
 
         # y
         y = self.y[:]
         stats = 'mean {:.6f}, fraction missing {:.4f}'
+        y = np.array(y, dtype='float64')
         idx = np.isnan(y)
         if idx.all():
             # avoid numpy empty slice warning
@@ -559,7 +570,7 @@ class Data(object):
 
 
 def load_data(file_path):
-    "Load data object from hdf archive; return Data"
+    """Load data object from hdf archive; return Data"""
     df = pd.read_hdf(file_path, key=HDF_DATA_KEY)
     return Data(df)
 
@@ -574,7 +585,9 @@ def load_zip(file_path,
     It includes train data by default. To work with tournament data only,
     set `include_train` to False.
 
-    Set `single_precision` to True in order to have data in float32 (saves memory).
+
+    Set `single_precision` to True in order to have data in float32 
+    (saves memory).
     """
 
     # load zip
@@ -626,7 +639,9 @@ def load_zip(file_path,
         rename_map['target'] = name
     df.rename(columns=rename_map, inplace=True)
 
-    # convert era, region, and labels to np.float32 or np.float64 depending on the mode
+    # convert era, region, and labels to np.float32 or
+    # np.float64 depending on the mode
+
     df['era'] = df['era'].map(ERA_STR_TO_FLOAT)
     df['region'] = df['region'].map(REGION_STR_TO_FLOAT)
     n = nx.tournament_count(active_only=True)
@@ -702,6 +717,8 @@ def compare_data(data1, data2, regions=None, n_jobs=1):
         y1 = y1.values
         y2 = y2.values
         y1 = y1[idx]
+        y1 = np.array(y1, dtype='float64')
+        y2 = np.array(y2, dtype='float64')
         if np.isnan(y1).any() or np.isnan(y2).any():
             y_mis = np.nan
         else:
@@ -716,7 +733,7 @@ def compare_data(data1, data2, regions=None, n_jobs=1):
 
 
 class Loc(object):
-    "Utility class for the loc method."
+    """Utility class for the loc method."""
 
     def __init__(self, data):
         self.data = data
@@ -726,7 +743,7 @@ class Loc(object):
 
 
 class Y(object):
-    "Utility class for y access."
+    """Utility class for y access."""
 
     def __init__(self2, self):
         self2.df = self.df
@@ -737,11 +754,12 @@ class Y(object):
             if index in nx.tournament_all(as_str=True, active_only=True):
                 return self2.df[index].values
             else:
-                raise IndexError('string index not recognized')
+                idx_err = 'string index `{}` not recognized'.format(index)
+                raise IndexError(idx_err)
         elif nx.isint(index):
             if index < 1 or index > n:
-                txt = 'tournament number must be between 1 and {}'
-                raise IndexError(txt.format(n))
+                txt = 'tournament #`{}` must be between 1 and {}'
+                raise IndexError(txt.format(index, n))
             return self2.df[nx.tournament_str(index)].values
         elif isinstance(index, slice):
             if (index.start is None and index.stop is None

@@ -3,6 +3,12 @@
 Release Notes
 =============
 
+- v4.1.6
+
+  * Added support for `kazutsugi` tournament
+  * Fixed unit tests to comply with updated training + tournament data
+  * Updated testing data used in regression testing
+
 - v4.1.2
 
   * Adds support for multi-model accounts and passing model_id to upload

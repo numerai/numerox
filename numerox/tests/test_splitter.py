@@ -7,7 +7,7 @@ import numerox as nx
 
 
 def test_splitter_overlap():
-    "prediction data should not overlap"
+    """prediction data should not overlap"""
     d = nx.play_data()
     splitters = [
         nx.TournamentSplitter(d),
@@ -16,7 +16,7 @@ def test_splitter_overlap():
         nx.CheatSplitter(d),
         nx.CVSplitter(d),
         nx.LoocvSplitter(d),
-        nx.IgnoreEraCVSplitter(d, tournament=1),
+        nx.IgnoreEraCVSplitter(d, tournament=8),
         nx.SplitSplitter(d, fit_fraction=0.5),
         nx.ConsecutiveCVSplitter(d)
     ]
@@ -28,7 +28,7 @@ def test_splitter_overlap():
 
 
 def test_splitter_reset():
-    "splitter reset should not change results"
+    """splitter reset should not change results"""
     d = nx.play_data()
     splitters = [
         nx.TournamentSplitter(d),
@@ -37,7 +37,7 @@ def test_splitter_reset():
         nx.CheatSplitter(d),
         nx.CVSplitter(d),
         nx.LoocvSplitter(d),
-        nx.IgnoreEraCVSplitter(d, tournament=2),
+        nx.IgnoreEraCVSplitter(d, tournament=8),
         nx.SplitSplitter(d, fit_fraction=0.5),
         nx.ConsecutiveCVSplitter(d)
     ]
@@ -54,7 +54,7 @@ def test_splitter_reset():
 
 
 def test_cvsplitter_kfold():
-    "make sure cvsplitter runs k folds"
+    """make sure cvsplitter runs k folds"""
     d = nx.play_data()
     for k in (2, 3):
         splitter = nx.CVSplitter(d, kfold=k)
@@ -65,7 +65,7 @@ def test_cvsplitter_kfold():
 
 
 def test_loocvsplitter():
-    "test loocvsplitter"
+    """test loocvsplitter"""
     d = nx.play_data()['train']
     splitter = nx.LoocvSplitter(d)
     count = 0
@@ -82,7 +82,7 @@ def test_loocvsplitter():
 
 
 def test_rollsplitter():
-    "make sure rollsplitter has no overlaps"
+    """make sure rollsplitter has no overlaps"""
     d = nx.play_data()
     splitter = nx.RollSplitter(d, fit_window=15, predict_window=10, step=15)
     for dfit, dpre in splitter:
@@ -96,7 +96,7 @@ def test_rollsplitter():
 
 
 def test_customcvsplitter():
-    "test nx.CustomCVSplitter"
+    """test nx.CustomCVSplitter"""
     d = nx.testing.micro_data()
     splitter = nx.CustomCVSplitter([d['era1'], d['era2':'era4'], d['eraX']])
     count = 0
@@ -114,7 +114,7 @@ def test_customcvsplitter():
 
 
 def test_customsplitter():
-    "test nx.CustomSplitter"
+    """test nx.CustomSplitter"""
     d = nx.testing.micro_data()
     data_list = [(d['era1'], d['era2']), (d['era4'], d['eraX'])]
     splitter = nx.CustomSplitter(data_list)

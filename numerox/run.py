@@ -122,8 +122,8 @@ def run(model, splitter, tournament=None, verbosity=2):
     p = nx.Prediction()
     for m in models:
         for t in tournaments:
-            splitter.reset()
             p += run_one(m, splitter, t, verbosity=verbosity)
+            splitter.reset()
     splitter.reset()
 
     return p

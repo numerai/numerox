@@ -29,7 +29,8 @@ def metrics_per_era(data,
                     era_as_str=False,
                     region_as_str=False,
                     split_pairs=True):
-    "Dataframe with columns era, model, and specified metrics. And region list"
+
+    """Dataframe with columns era, model, and specified metrics. And region list"""
 
     df = prediction.df
 
@@ -65,12 +66,14 @@ def metrics_per_era(data,
         if era_as_str:
             era = ERA_INT_TO_STR[era]
         for pair in pairs:
-            if tournament is None:
-                # evaluate with targets that model trained on
-                tourni = nx.tournament_str(pair[1])
-            else:
-                # force evaluation targets to be from given tournament
-                tourni = nx.tournament_str(tournament)
+
+            # if tournament is None:
+            #     # evaluate with targets that model trained on
+            #     tourni = nx.tournament_str(pair[1])
+            # else:
+
+            # force evaluation targets to be from given tournament
+            tourni = nx.tournament_str(8)
             y = df_era[tourni].values
             yhat = df_era[pair].values
             m = calc_metrics_arrays(y, yhat, columns)
@@ -155,7 +158,10 @@ def metrics_per_name(data,
 
 
 def calc_metrics_arrays(y, yhat, columns):
-    "standard metrics for `yhat` array given actual outcome `y` array"
+    """standard metrics for `yhat` array given actual outcome `y` array"""
+    y = np.array(y, dtype='float64')
+    yhat = np.array(yhat, dtype='float64')
+
     idx = np.isfinite(y + yhat)
     y = y[idx]
     yhat = yhat[idx]

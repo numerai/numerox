@@ -1,0 +1,48 @@
+# This is a modification of the basic workflow to help you get started with Actions
+
+name: makefile_test
+
+# Controls when the action will run. Triggers the workflow on push or pull request
+# events but only for the master branch
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    
+    strategy:
+      max-parallel: 4
+      matrix:
+        platform: [ubuntu-latest, macos-latest]
+        python-version: [3.6, 3.7]
+    # The type of runner that the job will run on
+    runs-on: ${{ matrix.platform }}
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+    - uses: actions/checkout@v2
+    - name: Setup Python
+      uses: actions/setup-python@v2
+      with:
+        # Version range or exact version of a Python version to use, using SemVer's version range syntax.
+        python-version: ${{ matrix.python-version }}
+
+    # Installs numpy, pandas, numerapi, etc.
+    - name: Install Dependencies
+      run: |
+            python setup.py install
+            
+    # Remove all temp files
+    - name: Clean
+      run: make clean
+    
+    # Run tests
+    - name: Run tests
+      run: make test
+      
